@@ -14,9 +14,10 @@ import giteri.tool.other.WriteNRead
 
 object Run {
 
-  def run(network: File, one: Double) = { // Region Param
+  def run(network: File, one: Double, two: Double, seed: Long) = { // Region Param
+    val rand = new java.util.Random(seed)
     val s = io.Source.fromFile(network).getLines()
-    (s.length, one * 2)
+    (math.abs(one * 2 - 10) + rand.nextGaussian(), math.abs(10 - two) + rand.nextGaussian())
 
 
     //    val probaBehavior = new util.ArrayList[Double]
