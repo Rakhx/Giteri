@@ -300,8 +300,8 @@ public class Toolz {
 		double resultat = 0.0;
 		double sumDesFrequences = 0;
 		for (Integer index : entry.keySet()) {
-			sumDesFrequences += (double)(T)entry.get(index);
-			resultat += index * (double)(T)entry.get(index);
+			sumDesFrequences += (Double) entry.get(index);
+			resultat += index * (Double) entry.get(index);
 //			System.out.println(index + ":" + (double)(T)entry.get(index));
 		}
 		
@@ -316,7 +316,7 @@ public class Toolz {
 	public static <T extends Number> Double getAvg(CircularFifoQueue<T> queue){
 		double resultat = 0;
 		for (T t : queue) {
-			resultat += (double)t;
+			resultat += (Double)t;
 		}
 		resultat /= queue.size();
 		return resultat;
@@ -342,7 +342,7 @@ public class Toolz {
 		Double avg = 0., sd = 0.;
 		double sumFreq = 0;
 		for (T value : entry)
-			sumFreq += (double)value;
+			sumFreq += (Double)value;
 		
 		avg = sumFreq / entry.size();
 				
@@ -418,7 +418,7 @@ public class Toolz {
 		moyenne = getAvg(entry);
 				
 		for (int degree : entry.keySet()) 
-			nbValues += (double)entry.get(degree);
+			nbValues += (Double)entry.get(degree);
 		
 		// on trie la valeur des clefs, pour pouvoir les ordonnées et les parcourir en ordre croissant
 		Object[] list = entry.keySet().toArray();
@@ -438,7 +438,7 @@ public class Toolz {
 		do
 		{
 			index++;
-			parcouru += (double)entry.get(degrees.get(index));			
+			parcouru += (Double)entry.get(degrees.get(index));
 		} while ( parcouru < temp);
 		
 		firstQ = index; 
@@ -450,7 +450,7 @@ public class Toolz {
 		do
 		{
 			index++;
-			parcouru += (double)entry.get(degrees.get(index));			
+			parcouru += (Double)entry.get(degrees.get(index));
 		} while ( parcouru < temp);
 		
 		thirdQ = index; 
