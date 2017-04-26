@@ -90,7 +90,7 @@ public class WriteNRead {
 	/** Lecture d'un fichier texte, et appelle de la fonction de l'interface IReadNetwork
 	 * a chaque ligne lue. 
 	 * 
-	 * @param aFileName String du path + file name du fichier texte contenant des données
+	 * @param aFile File fichier texte contenant des données
 	 * @param networkLoader Interface qui va définir l'actionà faire lors de la lecture d'une ligne
 	 * @param separator Caractere de séparation entre les éléments d'une ligne, si neccesaire.
 	 * @param comString spécifie la string qui est la marque des commentaires, et ignore la ligne
@@ -98,8 +98,8 @@ public class WriteNRead {
 	 * @return l'objet qui a lu le réseau et qui le contient.
 	 * @throws IOException
 	 */
-	public IReadNetwork readAndCreateNetwork(String aFileName, IReadNetwork networkLoader, String separator ,String comString) throws IOException{
-		Path path = Paths.get(aFileName);
+	public IReadNetwork readAndCreateNetwork(File aFile, IReadNetwork networkLoader, String separator ,String comString) throws IOException{
+		Path path = aFile.toPath();
 		String line;
 		networkLoader.init();
 	    try (Scanner scanner =  new Scanner(path, ENCODING.name())){

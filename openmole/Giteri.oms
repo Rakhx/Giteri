@@ -1,0 +1,18 @@
+// Define the variables that are transmitted between the tasks
+val one = Val[Double]
+val network = Val[File]
+val l = Val[Int]
+val res = Val[Double]
+
+// Define the model task that computes an estimation of pi
+val model =
+  ScalaTask("""
+   |val (l, res) = giteri.Run.run(network, one)
+   |""".stripMargin) set (
+      inputs += (one, network),
+      outputs += (l, res),
+      one := 9.0,
+      network := workDirectory / "default.txt"
+    )
+    
+model hook ToStringHook()

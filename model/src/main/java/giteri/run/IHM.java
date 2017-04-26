@@ -1280,7 +1280,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 				NetworkProperties readedProperties;
 				NetworkProperties cNetworkProperties;
 				try {
-					WriteNRead.getInstance().readAndCreateNetwork("" + Configurator.defaultPathForReadingNetwork, nl,
+					WriteNRead.getInstance().readAndCreateNetwork(Configurator.defaultPathForReadingNetwork, nl,
 							" ", "#");
 				} catch (IOException e1) {
 					e1.printStackTrace();
