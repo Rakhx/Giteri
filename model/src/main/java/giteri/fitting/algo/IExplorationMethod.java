@@ -15,17 +15,6 @@ public interface IExplorationMethod {
 	public String toString();
 	public ArrayList<IModelParameter<?>> getModelParameterSet();
 
-//	default IExplorationMethod getSpecificExplorator(EnumExplorationMethod explo, Hashtable<Integer, IModelParameter<?>> provids){
-//		switch (explo) {
-//		case random:
-//			return new ExplorationRandom(provids);
-//		case exhaustive:
-//			return new ExplorationExhaustive(provids);
-//		default:
-//			return new ExplorationOneShot(provids);
-//		}
-//	}
-	
 	/** CLASSE ABSTRAITE commune a tte les méthodes d'explorations.
 	 * 
 	 */

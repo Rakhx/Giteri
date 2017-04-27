@@ -62,7 +62,7 @@ public class Entite implements Comparable<Entite>{
 	/** Apres application d'une action, l'entité apprend de cette action
 	 * qu'il a vu. 
 	 * 
-	 * @param meme
+	 * @param subMeme
 	 * @Return le giteri.meme qui a été remplacé s'il existe,
 	 */
 	public Boolean receiveMeme(Meme subMeme){
