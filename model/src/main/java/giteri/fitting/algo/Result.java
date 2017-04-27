@@ -26,21 +26,22 @@ import org.jfree.data.xy.XYSeriesCollection;
 import giteri.tool.other.WriteNRead;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.NetworkAttribType;
-
-/** Classe de résultat des réseaux pendant l'étape de giteri.fitting.
+/** Classe de résultat des réseaux pendant l'étape de fitting.
  * les réseaux sont identifiés par un GUID, et des map <Guid, parametre> // Score>
  * sont la pour associer réseau, paramètre et résultat suivant des métriques calculées
- * pendant l'étape de giteri.fitting.
+ * pendant l'étape de fitting.
  */
 public class Result {
 
+	private WriteNRead writeNRead;
+
 	// Structure de donnée
-	
+
 	// Identifiant et paramètre d'une config
 	Hashtable<Integer, String> parameterSetById;
 	// Ensemble des scores calculés pour les différents runs d'une config
 	Hashtable<Integer, ArrayList<Double>> scoreById;
-	// Ensemble des propriétés des réseaux obtenues pour différents giteri.run sur une giteri.meme config
+	// Ensemble des propriétés des réseaux obtenues pour différents run sur une meme config
 	Hashtable<Integer, ArrayList<NetworkProperties>> networkPropertiesById;
 
 	// Affichage stuff
@@ -51,58 +52,59 @@ public class Result {
 	int lastNetworkId;
 
 	/** Constructeur.
-    * 
-    */
-	public Result() {
+	 *
+	 */
+	public Result(WriteNRead wnr) {
+		writeNRead = wnr;
 		parameterSetById = new Hashtable<Integer, String>();
 		scoreById = new Hashtable<Integer, ArrayList<Double>>();
 		networkPropertiesById = new Hashtable<Integer, ArrayList<NetworkProperties>>();
 	}
-	
+
 	// Region Public Method
-	
+
 	/** Parcourt tout les réseaux de la liste, et choisi ceux qui ont des valeurs
-	 * extremes ( min ou max) dans au moins l'une des propriétés regardé. 
-	 * Va ensuite afficher le résultat. 
-	 * 
-	 */	
+	 * extremes ( min ou max) dans au moins l'une des propriétés regardé.
+	 * Va ensuite afficher le résultat.
+	 *
+	 */
 	public void displayPolar(){
 		int activationCode = 23;
 		// choix de ceux qui ont une valeur min/max dans un domaine
 		Hashtable<Integer, Integer> scoreMax = new Hashtable<Integer, Integer>();
 		Hashtable<Integer, Integer> scoreMin = new Hashtable<Integer, Integer>();
 		ArrayList<Integer> interestingNetwork = new ArrayList<Integer>();
-		
+
 		int rangParameter = -1;
 		int bitConcerne = 0;
 		double maxValue , minValue , currentValue;
 		NetworkProperties netProp;
-		
+
 		// Initialisation des meilleurs score
 		for (Integer id : parameterSetById.keySet()) {
 			scoreMax.put(id, 0);
 			scoreMin.put(id, 0);
 		}
-		
+
 		rangParameter = -1;
 		// pour chaque type d'attribut
 		for (NetworkAttribType attributTypeLooked : NetworkAttribType.values()) {
 			if(!Configurator.isAttribActived(activationCode, attributTypeLooked))
 				continue;
-			
+
 			maxValue = 0;
 			minValue = Double.MAX_VALUE;
 			rangParameter++;
 			// Association d'un rang a une puissance de 2 dans le int de max et min score.
 			bitConcerne = (int) Math.pow(2, rangParameter);
-			
+
 			// pour chaque réseau.
 			for (Integer id : parameterSetById.keySet()) {
-				
+
 				// propriété du réseau étudié.
 				netProp = networkPropertiesById.get(id).get(0);
 				currentValue = Double.parseDouble(""+netProp.getValue(attributTypeLooked));
-				
+
 				// si on trouve un meilleur score que le score précédent
 				if(currentValue > maxValue) {
 					if(debugMode)
@@ -112,10 +114,10 @@ public class Result {
 						scoreMax.put(concerne, (scoreMax.get(concerne) | bitConcerne) ^ bitConcerne);
 					}
 					// On place la nouvelle meilleur valeur
-					scoreMax.put(id, scoreMax.get(id) | bitConcerne); 
+					scoreMax.put(id, scoreMax.get(id) | bitConcerne);
 					maxValue = currentValue;
 				}
-				
+
 				// Si le score est égal a la meilleure valeur, on ajoute cet id au meilleur valeur
 				else if(currentValue == maxValue ){
 					// On ajoute une nouvelle meilleur valeur
@@ -123,7 +125,7 @@ public class Result {
 					if(debugMode)
 						System.out.println("Score egal au meilleur score courant "+ maxValue);
 				}
-				
+
 				// Si le score trouvé est inférieur a la plus petite des valeur min
 				if(currentValue < minValue){
 					if(debugMode)
@@ -134,7 +136,7 @@ public class Result {
 					scoreMin.put(id, scoreMin.get(id) | bitConcerne);
 					minValue = currentValue;
 
-				// si le socre trouvé est égal a la meilleur valeur inférieur 
+					// si le socre trouvé est égal a la meilleur valeur inférieur
 				}else if(currentValue == minValue){
 					if(debugMode)
 						System.out.println(" EGALITE DE MIN ");
@@ -142,7 +144,7 @@ public class Result {
 				}
 			}
 		}
-		
+
 		// Initialisation des meilleurs score
 		for (Integer id : parameterSetById.keySet()) {
 			if(debugMode){
@@ -152,8 +154,8 @@ public class Result {
 				System.out.println("MIN " + scoreMin.get(id));
 				System.out.println("elements " + getConfigAsStringForId(id));
 			}
-			
-			
+
+
 			// Eventuellement rarifier la selection pour avoir moins de réseau qui ressorte.
 			// genre savoir si on veut un min ou un max sur certaines propriétés ou encore
 			// sélectionner les réseaux qui sont les meilleurs sur deux attrib ou qui sont meilleurs
@@ -161,12 +163,12 @@ public class Result {
 			if(scoreMax.get(id) != 0 || scoreMin.get(id) != 0)
 				interestingNetwork.add(id);
 		}
-		
+
 		for (Integer networkId : parameterSetById.keySet()) {
 			System.out.println("_____________________________________");
 			System.out.println(networkPropertiesById.get(networkId).get(0).toString() + " ◊score: "+scoreById.get(networkId));
 		}
-		
+
 		processData(interestingNetwork, 23);
 	}
 
@@ -175,41 +177,41 @@ public class Result {
 	 */
 	public void displayResult(){
 		if(Configurator.jarMode){
-			for (Integer networkId : parameterSetById.keySet()) 
+			for (Integer networkId : parameterSetById.keySet())
 				System.out.println(Toolz.getAvg(scoreById.get(networkId)));
 			return;
 		}
-		
+
 		for (Integer networkId : parameterSetById.keySet()) {
 			System.out.println("_____________________________________");
 			parameterSetById.get(networkId);
 			System.out.println("◊ Moyenne score: "+Toolz.getAvg(scoreById.get(networkId)));
 			System.out.println("◊ EcartType: "+Toolz.getDeviation((scoreById.get(networkId)), Optional.ofNullable(null)));
-			System.out.println("◊ Propriété du premier giteri.network obtenu "+ networkPropertiesById.get(networkId).get(0).toString());
+			System.out.println("◊ Propriété du premier network obtenu "+ networkPropertiesById.get(networkId).get(0).toString());
 			System.out.println("◊ Configuration "+ parameterSetById.get(networkId));
 		}
 	}
-	
+
 	/** Retourne a partir du UUID d'un réseau lae string des set de
-	 * parameter ParameterSetOfValue. 
-	 * 
+	 * parameter ParameterSetOfValue.
+	 *
 	 * @param networkId
 	 * @return
 	 */
 	public String getConfigAsStringForId(Integer networkId){
 		String resultat="";
 		if(parameterSetById.containsKey(networkId)){
-				resultat = parameterSetById.get(networkId);
-				return resultat;
+			resultat = parameterSetById.get(networkId);
+			return resultat;
 		}
 		else{
-			System.err.println("[Result] L'id du giteri.network n'est pas trouvable dans les hashtable, ca ne devrait pas arriver");
+			System.err.println("[Result] L'id du network n'est pas trouvable dans les hashtable, ca ne devrait pas arriver");
 			return "FAIL";
 		}
 	}
 
 	/**
-	 * 
+	 *
 	 * @param networkId
 	 * @param paramAsString
 	 * @param value
@@ -221,38 +223,38 @@ public class Result {
 		parameterSetById.put(networkId, paramAsString);
 		lastNetworkId = networkId;
 	}
-	
-	/** Ecriture dans le fichier détaillé des propriétés du dernier giteri.network.
-	 * Ecrit ttes les propriétés, et laisse un espace pour leur SD qui sera écrit a la fin de 
+
+	/** Ecriture dans le fichier détaillé des propriétés du dernier network.
+	 * Ecrit ttes les propriétés, et laisse un espace pour leur SD qui sera écrit a la fin de
 	 * chaque RUN
-	 * 
+	 *
 	 * @param rep
 	 */
 	public void writelastTurnOnDetailCSV(File rep){
 		String toWrite = "";
-		
+
 		toWrite += lastNetworkId;
 		toWrite += ";" + parameterSetById.get(lastNetworkId);
 		toWrite += "; -";
-		
+
 		// On prend le dernier élément de la liste
 		NetworkProperties lastProp = networkPropertiesById.get(lastNetworkId).get (
-									 networkPropertiesById.get(lastNetworkId).size() - 1 );
-		
+				networkPropertiesById.get(lastNetworkId).size() - 1 );
+
 		// à encadrer avec l'entete etc
 		toWrite += lastProp.getCSVFormatDoubleColonne(null, Configurator.activationCodeAllAttribExceptDD);
-		
+
 		// Concernant les scores
 		toWrite += ";" + scoreById.get(lastNetworkId).get( scoreById.get(lastNetworkId).size() - 1) ;
 		toWrite += ";" + -1;
-		
-		WriteNRead.getInstance().writeSmallFile2(rep, "NetworkDetailsCSV", Arrays.asList(toWrite)) ;
+
+		writeNRead.writeSmallFile2(rep, "NetworkDetailsCSV", Arrays.asList(toWrite)) ;
 	}
-	
+
 	/** Va écrire:
-	 * Pour le CSV normal : les valeurs moyennes et écartType pour les attributs activés 
-	 * Pour le CSV détaillé : écartType et moyenne pour chaque attribut 
-	 * 
+	 * Pour le CSV normal : les valeurs moyennes et écartType pour les attributs activés
+	 * Pour le CSV détaillé : écartType et moyenne pour chaque attribut
+	 *
 	 */
 	public void writeLastRunOnCSV(File rep, int activator){
 		NetworkProperties netMean = new NetworkProperties(); netMean.createStub();
@@ -261,64 +263,64 @@ public class Result {
 		Double[] scoreMeanAndSd;
 		String toWriteSimple = "", toWriteDetailled = "";
 		String parameter = parameterSetById.get(lastNetworkId);
-		
+
 		updateMeanAndSD(networkPropertiesById.get(lastNetworkId), Configurator.activationCodeAllAttribExceptDD, netMean, netSD);
 		toWriteSimple += lastNetworkId;
 		toWriteDetailled += lastNetworkId;
-		
+
 		toWriteSimple += ";" + parameter;
 		toWriteDetailled += ";" + parameter;
-		
+
 		toWriteSimple += "; -"; //+ parameter;
 		toWriteDetailled += "; -"; // + parameter;
-		
+
 		// STEP: Partie simple
 		// Moyenne et ecart type sur les valeurs activées, et sur le score
 		toWriteSimple += netMean.getCSVFormatDoubleColonne(netSD, activator);
-		
-		// STEP: Partie detaillé 
+
+		// STEP: Partie detaillé
 		toWriteDetailled += netMean.getCSVFormatDoubleColonne(netSD, Configurator.activationCodeAllAttribExceptDD);
-		
+
 		// STEP: Commun
 		// Dans tous les cas, ajouts du score et de son SD
 		scoreMeanAndSd = Toolz.getDeviationAndMean(scores);
 		// TODO [WayPoint]- Calcul du score moyenne X ecart type
-		toWriteSimple += ";" + scoreMeanAndSd[0] + ";" + scoreMeanAndSd[1] + ";"  
+		toWriteSimple += ";" + scoreMeanAndSd[0] + ";" + scoreMeanAndSd[1] + ";"
 				+ ((scoreMeanAndSd[0]*scoreMeanAndSd[0]) / (scoreMeanAndSd[0] - scoreMeanAndSd[1]) );
-				
+
 		toWriteDetailled += ";" + scoreMeanAndSd[0] + ";" + scoreMeanAndSd[1]
 				+ ((scoreMeanAndSd[0]*scoreMeanAndSd[0]) / (scoreMeanAndSd[0] - scoreMeanAndSd[1]) );
-		
-		// TODO [WayPoint]- Ecriture dans les deux csv, normal et détaillé. 
-		WriteNRead.getInstance().writeSmallFile2(rep, "NetworkCSV", Arrays.asList(toWriteSimple)) ;
-		WriteNRead.getInstance().writeSmallFile2(rep, "NetworkDetailsCSV", Arrays.asList(toWriteDetailled)) ;
+
+		// TODO [WayPoint]- Ecriture dans les deux csv, normal et détaillé.
+		writeNRead.writeSmallFile2(rep, "NetworkCSV", Arrays.asList(toWriteSimple)) ;
+		writeNRead.writeSmallFile2(rep, "NetworkDetailsCSV", Arrays.asList(toWriteDetailled)) ;
 	}
-	
+
 	// EndRegion
-	
+
 	// Region private
 
 	// REGION SCORE ETC
-	
+
 	/** Va calculer la moyenne et l'écart type de la série de nework properties en parametre
 	 * Dans le cas du fichier détaillé, tous les champs ont besoin d'etre calculer.
 	 * Pour l'autre seulement les champs activé
 	 * @param networksToRead IN
 	 * @param activationCode IN
-	 * @param mean passage par "référence" IN/OUT 
-	 * @param SD IN/OUT
+	 * @param netMean passage par "référence" IN/OUT
+	 * @param netSD IN/OUT
 	 * @return
 	 */
 	private void updateMeanAndSD(ArrayList<NetworkProperties> networksToRead, int activationCode, NetworkProperties netMean, NetworkProperties netSD){
 		netMean.createStub();
 		netSD.createStub();
-		
+
 		NetworkAttribType attribut;
 		ArrayList<Double> netPropValues  = new ArrayList<Double>();
-		
+
 		// On regarde sur tous les attributs de réseau ceux qui ont été activé
 		// pour le calcul de distance entre deux réseaux
-		
+
 		// For each Attribut existant
 		for (int i = 0; i < Configurator.NetworkAttribType.values().length; i++) {
 			attribut = NetworkAttribType.values()[i];
@@ -327,45 +329,45 @@ public class Result {
 			{
 				netPropValues.clear();
 				// On regarde tous les réseaux en param
-				for (NetworkProperties netProp : networksToRead) 
+				for (NetworkProperties netProp : networksToRead)
 					// Ajout de ces valeurs dans une liste
 					netPropValues.add((Double)netProp.getValue(attribut));
-				
+
 				// calcul des moyennes et écart type sur les valeurs données dans la liste
 				Double[] avgNSd = Toolz.getDeviationAndMean(netPropValues);
-				
+
 				// Ajout de ces valeurs dans les networkProperties contenant moyenne et écart type
 				netMean.setValue(attribut, avgNSd[0]);
-				netSD.setValue(attribut, avgNSd[1]);	
+				netSD.setValue(attribut, avgNSd[1]);
 			}
 		}
 	}
-	
+
 	/** Va les mettres sous forme string:config du réseau arraydouble : valeur des attributs
 	 * ordonnée
-	 * 
-	 * @param network
+	 *
+	 * @param bestNetwork
 	 */
 	private void processData(ArrayList<Integer> bestNetwork, int activationCode){
-		
+
 		double valeurMax, valeurCourante, valeurNormalisee;
 		String networkBlaze;
-		
-		// Data formaté, sous forme nom du réseau :: list d'attribut & value 
+
+		// Data formaté, sous forme nom du réseau :: list d'attribut & value
 		Hashtable<String, Hashtable<NetworkAttribType, Double>> dataFormat =
 				new Hashtable<String,Hashtable<NetworkAttribType, Double>>();
-		
+
 		// attribut qui sont utilisé pour les réseaux
 		final ArrayList<NetworkAttribType> usedAttrib = new ArrayList<Configurator.NetworkAttribType>();
-		
+
 		// Valeur max par type d'attrib
 		Hashtable<NetworkAttribType, Double> maxValues = new Hashtable<Configurator.NetworkAttribType, Double>();
-		
+
 		// Renseigne les attributs effectivement utilisés
-		for (NetworkAttribType type : NetworkAttribType.values()) 
+		for (NetworkAttribType type : NetworkAttribType.values())
 			if(Configurator.isAttribActived(activationCode, type))
 				usedAttrib.add(type);
-		
+
 		// Recherche des meilleurs valeurs pour tous les attribs
 		for (NetworkAttribType type : usedAttrib) {
 			valeurMax = 0;
@@ -374,10 +376,10 @@ public class Result {
 				if(valeurMax < valeurCourante)
 					valeurMax = valeurCourante;
 			}
-			
+
 			maxValues.put(type, valeurMax);
 		}
-		
+
 		// Création de valeur normalisée pour les valeurs de chacun de ces networks
 		for (Integer networkId : bestNetwork) {
 
@@ -386,21 +388,21 @@ public class Result {
 			// sa liste de donnée normalisé, classé en hash par le type d'attribut du réseau
 			Hashtable<NetworkAttribType, Double> formatValues = new Hashtable<NetworkAttribType, Double>();
 			dataFormat.put(networkBlaze, formatValues);
-			
-			// on rempli la structure de données normalisées 
+
+			// on rempli la structure de données normalisées
 			for (NetworkAttribType type : usedAttrib) {
 				valeurNormalisee = Double.parseDouble(""+networkPropertiesById.get(networkId).get(0).getValue(type)) / maxValues.get(type);
 				formatValues.put(type, valeurNormalisee);
 			}
 		}
-		
+
 		displayShit(dataFormat, activationCode);
 	}
-	
+
 	// REGION DISPLAY ETC
-	
-	/**  Affiche les données sélectionnées, 
-	 * 
+
+	/**  Affiche les données sélectionnées,
+	 *
 	 * @param dataFormat key::Nom du réseau, to string de ses propriétés
 	 * Value::Hashtable
 	 * 		Key:: Type de propriété considéré ( clustering, densité... )
@@ -411,16 +413,16 @@ public class Result {
 		JFrame radar = new JFrame("Result");
 		final XYDataset dataset = createDataset(dataFormat, activationCode);
 		final JFreeChart chart = createChart(dataset);
-        final ChartPanel chartPanel = new PolarChartPanel(chart);
-        chartPanel.setPreferredSize(new Dimension(500, 270));
-        chartPanel.setEnforceFileExtensions(false);
-        radar.getContentPane().add(chartPanel, BorderLayout.CENTER);
+		final ChartPanel chartPanel = new PolarChartPanel(chart);
+		chartPanel.setPreferredSize(new Dimension(500, 270));
+		chartPanel.setEnforceFileExtensions(false);
+		radar.getContentPane().add(chartPanel, BorderLayout.CENTER);
 		radar.pack();
 		radar.setVisible(true);
 	}
-	
-	/** création a partir d'un data set du polar. 
-	 * 
+
+	/** création a partir d'un data set du polar.
+	 *
 	 * @param dataset
 	 * @return
 	 */
@@ -433,33 +435,33 @@ public class Result {
 		renderer.setSeriesFilled(2, true);
 		return chart;
 	}
-	
-	/** Crée et retourne le dataset 
-	 * 
+
+	/** Crée et retourne le dataset
+	 *
 	 * @return
 	 */
 	private XYDataset createDataset(Hashtable<String, Hashtable<NetworkAttribType, Double>> dataFormat, int activationCode){
 		final XYSeriesCollection data = new XYSeriesCollection();
 		Hashtable<NetworkAttribType, Double> values;
-		
+
 		// On recherche les type d'attributs qui sont effectivement utilisés.
 		final ArrayList<NetworkAttribType> usedAttrib = new ArrayList<Configurator.NetworkAttribType>();
-		
+
 		// Devrait ne pas etre obligatoire, redondance des données puisque déja présenter dnas les hashtables
-		for (NetworkAttribType type : NetworkAttribType.values()) 
+		for (NetworkAttribType type : NetworkAttribType.values())
 			if(Configurator.isAttribActived(activationCode, type))
 				usedAttrib.add(type);
-		
+
 		for (String networkName : dataFormat.keySet()) {
 			values = dataFormat.get(networkName);
 			data.addSeries(createSeries(networkName, values,usedAttrib));
 		}
-		
+
 		return data;
 	}
-	
+
 	/** Renvoi une série correspondant a un NetworkProperties, sur les attributs de la liste.
-	 * 
+	 *
 	 * @param name
 	 * @param netProp
 	 * @param attribs
@@ -474,12 +476,12 @@ public class Result {
 			value = values.get(type);
 			series.add(placementRadius, value);
 		}
-		
+
 		return series;
 	}
-	
+
 	/** Obtient la division de 360 par l'emplacement dans la liste de l'attribut en question.
-	 * 
+	 *
 	 * @param attribType
 	 * @param nbAttribut
 	 * @return
@@ -490,7 +492,7 @@ public class Result {
 		return tranche * indexConcerne;
 	}
 
-	
-	
-	// EndRegion 
+
+
+	// EndRegion
 }

@@ -1,5 +1,10 @@
 package giteri.run;
 
+import giteri.meme.mecanisme.ActionFactory;
+import giteri.meme.mecanisme.AgregatorFactory;
+import giteri.meme.mecanisme.AttributFactory;
+import giteri.meme.mecanisme.MemeFactory;
+import giteri.network.networkStuff.*;
 import giteri.run.configurator.Configurator;
 import giteri.run.controller.Controller;
 import giteri.run.interfaces.Interfaces.IView;
@@ -11,10 +16,7 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import giteri.network.networkStuff.DrawerGraphStream;
-import giteri.network.networkStuff.NetworkConstructor;
-import giteri.network.networkStuff.WorkerFactory;
-
+import giteri.tool.other.WriteNRead;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.view.Viewer;
@@ -23,62 +25,85 @@ import giteri.meme.entite.EntiteHandler;
 
 public final class Main {
 
-	public static void main(String[] args)  {		
+	public static void main(String[] args)  {
 
-//		WorkerFactory wf = WorkerFactory.getInstance();
-		
-		// Constructeur du réseau, des éléments qui le composent, fait le lien avec la partie 
-		// graphique
-		final NetworkConstructor nc = NetworkConstructor.getInstance();
-		
-		// Gestion des entités du réseau, ainsi que les nodes auxquels ils sont associées
-		final EntiteHandler eh = EntiteHandler.getInstance();
-		
-		// Fenetre d'affichage 
-		IHM fenetre;
-		
+		WriteNRead writeNRead = new WriteNRead();
+		AttributFactory attributFactory = new AttributFactory();
+		AgregatorFactory agregatorFactory = new AgregatorFactory();
+		ActionFactory actionFactory = new ActionFactory() ;
+		MemeFactory memeFactory = new MemeFactory(actionFactory, agregatorFactory, attributFactory);
+		WorkerFactory workerFactory = new WorkerFactory();
+		NetworkConstructor networkConstructor = new NetworkConstructor();
+		EntiteHandler entiteHandler = new EntiteHandler(networkConstructor, memeFactory, workerFactory);
+		NetworkFileLoader networkFileLoader = new NetworkFileLoader( memeFactory, writeNRead);
+		DrawerGraphStream drawerGraphStream = new DrawerGraphStream(entiteHandler, memeFactory,
+				networkConstructor, writeNRead, networkFileLoader, workerFactory);
+
+		// Communication model
+
+		CommunicationModel communicationModel = new CommunicationModel(entiteHandler, networkConstructor, networkFileLoader, workerFactory,drawerGraphStream);
+		drawerGraphStream.setCommunicationModel(communicationModel);
+		networkFileLoader.setCommunicationModel(communicationModel);
+		actionFactory.setEntiteHandler(entiteHandler);
+		agregatorFactory.setEntiteHandler(entiteHandler);
+		workerFactory.setNecessary(drawerGraphStream, drawerGraphStream);
+		networkConstructor.setDrawer(drawerGraphStream);
+
+
 		// Controller
 		Controller c = new Controller();
 		Controller.VueController vControl = c.new VueController();
-		Controller.ModelController mControl = c.new ModelController(vControl);
-		
-		// La fenetre en elle giteri.meme
-		// Controller de Model donné a l'IHM
-		fenetre = new IHM(mControl);
+		Controller.ModelController mControl = c.new ModelController(vControl, communicationModel);
+
+		// La fenetre en elle meme Controller de Model donné a l'IHM
+		IHM fenetre = new IHM(mControl,
+				networkConstructor,
+				memeFactory,
+				workerFactory,
+				entiteHandler,
+				actionFactory ,
+				drawerGraphStream,
+				writeNRead);
+
 		vControl.setView((IView)fenetre);
-		
-		
+
+		entiteHandler.initialisation();
+
+
 		// Le graph associé lors de l'affichage avec graphstream
 		if(Configurator.withGraphicalDisplay){
-			 Graph graph = new SingleGraph("Embedded");
-			 DrawerGraphStream.getInstance().setGraph(graph);
-			 @SuppressWarnings("unused")
+			Graph graph = new SingleGraph("Embedded");
+			drawerGraphStream.setGraph(graph);
+			@SuppressWarnings("unused")
 			Viewer lol = graph.display();
 		}
-		
+
+
+
+
 		fenetre.setVisible(true);
-		eh.setIHMController(vControl);
-		
-		// fait le lien entre les entités d'action et de transmission de giteri.meme
+		entiteHandler.setIHMController(vControl);
+
+		// fait le lien entre les entités d'action et de transmission de meme
 		// avec l'IHM, pour permettre la mise a jour des affichages etc
-		eh.addEntityListener(fenetre);
-		eh.addMemeListener(fenetre);
-		 
-		// De giteri.meme, le dessinateur graphique s'abonne aux évènements de type transmission de giteri.meme
+		entiteHandler.addEntityListener(fenetre);
+		entiteHandler.addMemeListener(fenetre);
+
+		// De meme, le dessinateur graphique s'abonne aux évènements de type transmission de meme
 		// Dans le but de faire changer la couleur du noeud en fonction des memes possédés par ce dernier
-		eh.addMemeListener(WorkerFactory.getInstance().getDrawer());
-		eh.addEntityListener(WorkerFactory.getInstance().getCalculator());      
-		
-		nc.start();
+		entiteHandler.addMemeListener(workerFactory.getDrawer());
+		entiteHandler.addEntityListener(workerFactory.getCalculator());
+
+		networkConstructor.start();
 		if(! Configurator.isSystemPaused()){
-			nc.start();
-			eh.start();
+			networkConstructor.start();
+			entiteHandler.start();
 		}
 		else {
-			nc.start();
-			nc.suspend();
-			eh.start();
-			eh.suspend();
+			networkConstructor.start();
+			networkConstructor.suspend();
+			entiteHandler.start();
+			entiteHandler.suspend();
 		}
 	}
 } 

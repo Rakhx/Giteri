@@ -1,5 +1,8 @@
 package giteri.run;
 
+import giteri.meme.mecanisme.ActionFactory;
+import giteri.network.networkStuff.NetworkConstructor;
+import giteri.network.networkStuff.WorkerFactory;
 import giteri.run.configurator.Configurator;
 import giteri.run.interfaces.Interfaces.IReadNetwork;
 import giteri.run.interfaces.Interfaces.ISetValues;
@@ -70,12 +73,34 @@ import giteri.meme.event.BehaviorTransmissionListener;
 
 /**
  * JFrame qui gère l'affichage de l'application.
- * 
+ *
  */
 @SuppressWarnings("unused")
 public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmissionListener, IView {
 
 	// Region properties
+
+
+	// worker Factory
+	NetworkConstructor networkConstructor;
+
+
+	// action , attribut, aggrgator factory
+	MemeFactory memeFactory;
+
+	// StatAndPlot, DrawerInteface ou drawerGraphStream, Network Analyze
+	WorkerFactory workerFactory;
+
+	// networkConstructor, memeFactory, WorkerFactory
+	EntiteHandler entiteHandler;
+
+	// entiteHandler
+	ActionFactory actionFactory ;
+
+	// entitehandler, memefactory, ntworkconstructor
+	DrawerGraphStream drawerGraphStream;
+
+	WriteNRead writeNRead;
 
 	// à voir avec les éléments d'interface
 	private static final int IFW = JComponent.WHEN_IN_FOCUSED_WINDOW;
@@ -121,10 +146,10 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 	public JButton btToggleStep;
 	public JButton btRandomConfig;
 	public JButton btSemiAutomaticStep;
-	
+
 	public JTextField tfPath;
 	public JLabel jlWorkInProgress;
-	
+
 	public JLabel jlScore;
 
 	// -- Panel génération de réseau
@@ -138,8 +163,8 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 
 	// Les labels qui affichent les informations sur les nodes possédant les
 	// memes,
-	// le nombre d'activation d'un giteri.meme, et les X dernières activation en terme
-	// de giteri.meme
+	// le nombre d'activation d'un meme, et les X dernières activation en terme
+	// de meme
 	public Hashtable<String, JLabel> nodesHavingXoxoMemesLabel;
 	public Hashtable<String, JLabel> nbActivationByMemesLabel;
 	public Hashtable<String, JLabel> nbLastActivationByMemesLabel;
@@ -148,28 +173,28 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 
 	// a voir avec les structures de données
 
-	// Correspondance entre un giteri.meme et les memes le possédant
+	// Correspondance entre un meme et les memes le possédant
 	public Hashtable<String, ArrayList<Integer>> nodesHavingXoxoMemes;
-	// Nombre de fois ou le giteri.meme a été appelé
+	// Nombre de fois ou le meme a été appelé
 	public Hashtable<String, Integer> nbActivationByMemes;
-	// Nombre de fois ou le giteri.meme a été appelé sur les 20 dernieres actions
+	// Nombre de fois ou le meme a été appelé sur les 20 dernieres actions
 	public Hashtable<String, Integer> countOfLastMemeActivation;
-	// Sur les 100 dernières actions, quel giteri.meme a été appelé
+	// Sur les 100 dernières actions, quel meme a été appelé
 	public CircularFifoQueue<String> lastHundredActionDone;
 	public int sizeOfCircularQueue = 100;
 
 	// Séries de donnée pour l'affichage des graphiques
 	XYSeries seriesDegreeDistribution;
 	XYSeries seriesDensity;
-	
+
 	XYSeries seriesDensityOverProba;
-	
+
 	ArrayList<XYSeries> seriesAppliances ;
 	XYSeriesCollection datasetDensityOverProba ;
 //	XYSeries seriesAppliance1;
 //	XYSeries seriesAppliance2;
 //	XYSeries seriesAppliance3;
-	
+
 	// Chart de l'IHM
 	private JFreeChart chart;
 	private JFreeChart chartDensity;
@@ -177,8 +202,8 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 
 	int compteurSerieDensity = 0;
 
-	// Liste des memes disponibles dans le programme / giteri.meme sélectionné pour le
-	// giteri.run
+	// Liste des memes disponibles dans le programme / meme sélectionné pour le
+	// run
 	private ArrayList<Meme> existingMeme;
 	private ArrayList<Meme> selectedMemeOnSimulation;
 
@@ -193,13 +218,27 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 
 	// EndRegion
 
-	public IHM(ModelController modelParam) {
+	public IHM(ModelController modelParam,
+			   NetworkConstructor networkConstructor,
+			   MemeFactory memeFactory,
+			   WorkerFactory workerFactory,
+			   EntiteHandler entiteHandler,
+			   ActionFactory actionFactory ,
+			   DrawerGraphStream drawerGraphStream,
+			   WriteNRead wnr) {
 
 		super("-");
 
 		modelController = modelParam;
+		this.networkConstructor = networkConstructor;
+		this.memeFactory =memeFactory ;;
+		this.workerFactory= workerFactory ;
+		this.entiteHandler =entiteHandler ;
+		this.actionFactory =actionFactory ;
+		this.drawerGraphStream= drawerGraphStream ;
+		this.writeNRead = wnr;
 
-		existingMeme = MemeFactory.getInstance().getMemeAvailable(false);
+		existingMeme = memeFactory.getMemeAvailable(false);
 		lastHundredActionDone = new CircularFifoQueue<String>(
 				sizeOfCircularQueue);
 		nbActivationByMemes = new Hashtable<String, Integer>();
@@ -211,14 +250,14 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 		nodesHavingXoxoMemesLabel = new Hashtable<String, JLabel>();
 		lastActionRatioLabel = new JLabel();
 		jlScore = new JLabel();
-		
+
 		memesTitle = new Hashtable<String, Meme>();
 		this.setSelectedMeme(existingMeme);
 		compteurAction = 0;
 		densityMaxValue = 0.0;
 		decimal = new DecimalFormat();
 		decimal.setMaximumFractionDigits(4); // arrondi à 2 chiffres apres la
-												// virgules
+		// virgules
 		decimal.setMinimumFractionDigits(3);
 
 		nope = UIManager.getIcon("OptionPane.errorIcon");
@@ -235,7 +274,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 	/**
 	 * Réinitilise l'interface aux valeurs de base, entre les steps de
 	 * simulation par exemple.
-	 * 
+	 *
 	 */
 	public void resetIHM() {
 		resetHashTableKeys();
@@ -244,14 +283,14 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 		for (XYSeries serie : seriesAppliances) {
 			serie.clear();
 		}
-		
+
 		seriesAppliances.clear();
 		datasetDensityOverProba.removeAllSeries();
 	}
 
-	/** Reset la chart de densité over proba, utilisée pour 
-	 * l'ancienne simu. 
-	 * 
+	/** Reset la chart de densité over proba, utilisée pour
+	 * l'ancienne simu.
+	 *
 	 */
 	public void resetDensityOverProbaChart(){
 		seriesDensity.clear();
@@ -260,7 +299,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 	/**
 	 * Met en place la liste des memes qui seront utilisés lors de la
 	 * simulation.
-	 * 
+	 *
 	 * @param selectedMeme
 	 *            la liste des memes utilisés
 	 */
@@ -272,8 +311,8 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 
 	/**
 	 * Lorsqu'une entité fait une action, fonction appelée. Mise à jour des
-	 * indicateurs 
-	 * 
+	 * indicateurs
+	 *
 	 */
 	public void handlerActionApply(ActionApplyEvent e) {
 
@@ -282,7 +321,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 			if (e.memeApply != null) {
 				String elementRemoveOfCircular ="";
 				Toolz.addCountToElementInHashArray(nbActivationByMemes, e.memeApply.toString(), 1);
-				
+
 				// partie last twenty
 //				countOfLastMemeActivation.clear();
 				if(lastHundredActionDone.size() == lastHundredActionDone.maxSize())
@@ -290,30 +329,30 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 					elementRemoveOfCircular = lastHundredActionDone.poll();
 					Toolz.removeCountToElementInHashArray(countOfLastMemeActivation, elementRemoveOfCircular, 1);
 				}
-				
+
 				lastHundredActionDone.add(e.memeApply.toString());
 				Toolz.addCountToElementInHashArray(countOfLastMemeActivation, e.memeApply.toString(), 1);
 			}
-			// Dans le cas ou il n'y a pas de giteri.meme apply, c'est a dire que l'action
-			// d'application du giteri.meme a échouer.
+			// Dans le cas ou il n'y a pas de meme apply, c'est a dire que l'action
+			// d'application du meme a échouer.
 			else if (Configurator.displayLogRatioLogFailOverFail ||Configurator.displayLogRatioLogFailOverSuccess )
 			{
 				System.out.println("Aucune action réalisé par l'entité " + e.entite.getIndex() + " :: message " + e.message);
-				if (e.message.contains("RMLK")) 
+				if (e.message.contains("RMLK"))
 					rmv++;
-				else if (e.message.contains("ADLK")) 
+				else if (e.message.contains("ADLK"))
 					add++;
-	
+
 				if(Configurator.displayLogRatioLogFailOverFail)
 					System.out.println("ratio fail (rmvFail/addFail): " + (double) rmv / add);
 				if(Configurator.displayLogRatioLogFailOverSuccess){
 					int nbWin = 0;
-					for (Integer winTimes : nbActivationByMemes.values()) 
+					for (Integer winTimes : nbActivationByMemes.values())
 						nbWin += winTimes;
 					System.out.println("Ratio Fail / sucess: " + (double) (rmv + add) / nbWin);
 				}
 			}
-	
+
 			// Compteur de tour
 			if (++compteurAction % Configurator.refreshInfoRate == 0) {
 				compteurAction = 0;
@@ -328,11 +367,11 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 	public void handlerBehavTransm(BehavTransmEvent e) {
 		if(Configurator.displayMemePosessionDuringSimulation){
 			if(e.message == Configurator.MemeActivityPossibility.AjoutMeme.toString())
-			// Ajout dans la liste des giteri.meme possédé par des entités
+				// Ajout dans la liste des meme possédé par des entités
 				Toolz.addElementInHashArray(nodesHavingXoxoMemes, e.meme.toString(), e.entite.getIndex());
 			else if((e.message == Configurator.MemeActivityPossibility.RetraitMeme.toString()))
 				Toolz.removeElementInHashArray(nodesHavingXoxoMemes, e.meme.toString(), e.entite.getIndex());
-				// RETRAIT
+			// RETRAIT
 		}
 	}
 
@@ -340,15 +379,15 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 
 	/**
 	 * affiche le nombre d'action par seconde.
-	 * 
+	 *
 	 */
 	public void setDisplayNbAction(String message) {
 		nbActionBySecond.setText(message + " action/sec");
 	}
 
 	/**
-	 * Permet d'afficher un message dans le panel de giteri.fitting positionné après
-	 * les boutons de lancement de fit etc. Si le message est le giteri.meme que celui
+	 * Permet d'afficher un message dans le panel de fitting positionné après
+	 * les boutons de lancement de fit etc. Si le message est le meme que celui
 	 * déja en place, toggle sa visibilité.
 	 */
 	public void toggleWkProgress(String message) {
@@ -380,7 +419,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 
 	/**
 	 * Initialisation des champs et de la fenetre openGL
-	 * 
+	 *
 	 */
 	private void Init() {
 
@@ -400,7 +439,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 	/**
 	 * Création de la fenetre principale, qui va renvoyer un JPane pour
 	 * permettre d'y ajouter des composants.
-	 * 
+	 *
 	 * @return
 	 */
 	private JTabbedPane createMainFrame() {
@@ -467,7 +506,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 
 	/**
 	 * Création d'un panel de stat
-	 * 
+	 *
 	 * @return
 	 */
 	private JPanel createPaneStat() {
@@ -528,7 +567,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 	/**
 	 * Création du panel de review de configuration, permet de save et charger
 	 * un fichier de conf.
-	 * 
+	 *
 	 * @return
 	 */
 	private JPanel createPaneConfigurationReview(NetworkProperties prop) {
@@ -542,7 +581,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 
 	/**
 	 * Création d'un pane concernant la simulation.
-	 * 
+	 *
 	 * @return
 	 */
 	private JPanel createPaneSimulation() {
@@ -563,15 +602,15 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 		final ChartPanel chartPanelDensityOverProba = new ChartPanel(chartDensityOverProba);
 		chartPanelDensityOverProba.setPreferredSize(new java.awt.Dimension(500, 270));
 		paneThree.add(chartPanelDensityOverProba);
-		
+
 		return paneThree;
 	}
 
 	/**
 	 * Crée et renvoi un pane qui permet l'ouverture d'un fichier texte de
-	 * giteri.network, l'analyse des données de ce réseau, la comparaison avec le
+	 * network, l'analyse des données de ce réseau, la comparaison avec le
 	 * réseau en cours.
-	 * 
+	 *
 	 * @return
 	 */
 	private JPanel createPaneNetworkFitting() {
@@ -610,7 +649,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 		btToggleStep = new JButton("Rien");
 		btRandomConfig = new JButton("Find Stability");
 		btSemiAutomaticStep= new JButton("ToggleSemiautoAction");
-		
+
 		plNetworkPlaying = new JPanel();
 		plNetworkRead = new JPanel();
 		jlWorkInProgress = new JLabel("-");
@@ -646,10 +685,10 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 										hauteurComponent, hauteurComponent)
 								.addComponent(btRandomConfig,
 										GroupLayout.DEFAULT_SIZE,
-										hauteurComponent, hauteurComponent)	
+										hauteurComponent, hauteurComponent)
 								.addComponent(btSemiAutomaticStep,
 										GroupLayout.DEFAULT_SIZE,
-										hauteurComponent, hauteurComponent)	
+										hauteurComponent, hauteurComponent)
 								.addComponent(jlWorkInProgress,
 										GroupLayout.DEFAULT_SIZE,
 										hauteurComponent, hauteurComponent))
@@ -666,13 +705,13 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 										GroupLayout.DEFAULT_SIZE))
 				.addGroup(
 						layout.createParallelGroup(
-							GroupLayout.Alignment.LEADING)
-							.addComponent(jlScore,
-									GroupLayout.DEFAULT_SIZE,
-									GroupLayout.DEFAULT_SIZE,
-									GroupLayout.DEFAULT_SIZE))
-				
-				);
+								GroupLayout.Alignment.LEADING)
+								.addComponent(jlScore,
+										GroupLayout.DEFAULT_SIZE,
+										GroupLayout.DEFAULT_SIZE,
+										GroupLayout.DEFAULT_SIZE))
+
+		);
 
 		layout.setHorizontalGroup(layout
 				.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -702,7 +741,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 										hauteurComponent, hauteurComponent)
 								.addComponent(btSemiAutomaticStep,
 										GroupLayout.DEFAULT_SIZE,
-										hauteurComponent, hauteurComponent)		
+										hauteurComponent, hauteurComponent)
 								.addComponent(jlWorkInProgress,
 										GroupLayout.DEFAULT_SIZE,
 										largeurButton, largeurButton)
@@ -720,12 +759,12 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 										GroupLayout.DEFAULT_SIZE))
 				.addGroup(
 						layout.createSequentialGroup()
-										.addComponent(jlScore,
+								.addComponent(jlScore,
 										GroupLayout.DEFAULT_SIZE,
 										GroupLayout.DEFAULT_SIZE,
 										GroupLayout.DEFAULT_SIZE))
-				
-				);
+
+		);
 
 		return paneNet;
 	}
@@ -733,7 +772,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 	/**
 	 * Création d'un panel de génération de réseau, propose différent bouton
 	 * pour créer des réseaux d'un certains type.
-	 * 
+	 *
 	 * @return
 	 */
 	private JPanel createPaneNetworkGenerator() {
@@ -809,9 +848,9 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 	}
 
 	/**
-	 * Génération du selecteur de giteri.meme. Regarde les giteri.meme disponibles dans le
+	 * Génération du selecteur de meme. Regarde les meme disponibles dans le
 	 * code et les proposes pour l'initialisation dans la simulation.
-	 * 
+	 *
 	 * @return
 	 */
 	private JPanel createComponentMemeSelector() {
@@ -835,7 +874,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 	}
 
 	/** génération du panneau contenant les informations sur les nodes.
-	 * 
+	 *
 	 * @return
 	 */
 	private JPanel createComponentLabelMemeInformation() {
@@ -846,7 +885,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
 		for (Meme meme : selectedMemeOnSimulation) {
-			// Création du label pour la série de noeud possédant tel giteri.meme
+			// Création du label pour la série de noeud possédant tel meme
 			memesTitle.put(meme.toString(), meme);
 			JLabel li = new JLabel();
 			JLabel la = new JLabel();
@@ -876,8 +915,8 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 	}
 
 	/**
-	 * Génération d'un panneau contenant les informations sur le giteri.network.
-	 * 
+	 * Génération d'un panneau contenant les informations sur le network.
+	 *
 	 * @return
 	 */
 	private JPanel createComponentLabelNetworkInformation() {
@@ -898,7 +937,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 	/**
 	 * Génération d'un panneau contenant les informations sur les temps
 	 * d'execution .
-	 * 
+	 *
 	 * @return
 	 */
 	private JPanel createComponentLabelTimeInformation() {
@@ -928,7 +967,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 	/**
 	 * Génération d'un panel contenant les informations du réseau qui a ete
 	 * analysé.
-	 * 
+	 *
 	 * @return
 	 */
 	private JPanel createComponentLabelNetworkAnalyzedInformation(
@@ -992,7 +1031,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 	/**
 	 * Création d'un formated textfield avec la vérification des valeurs dans
 	 * cette dite textbox
-	 * 
+	 *
 	 * @param initialValue
 	 *            la valeur contenue a l'initialisaiton
 	 * @param doubleValue
@@ -1007,14 +1046,14 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 	 *            précisée
 	 * @param setter
 	 *            Une interface contenant une fonction setValue(Double [...])
-	 *            qui sera appelé si la fonction est correcte . 
+	 *            qui sera appelé si la fonction est correcte .
 	 * @return Le groupe TextField + label de vérification dans un panel,
 	 *         boxlayout en X_AXIS
 	 */
 	private JPanel createComponentTextFieldWithRegex(String initialValue,
-			boolean doubleValue, Optional<Pattern> opRegex,
-			Optional<Double> opMinValue, Optional<Double> opMaxValue,
-			ISetValues setter) {
+													 boolean doubleValue, Optional<Pattern> opRegex,
+													 Optional<Double> opMinValue, Optional<Double> opMaxValue,
+													 ISetValues setter) {
 
 		JPanel TextFieldNValidator = new JPanel();
 		JLabel validated = new JLabel(ok);
@@ -1068,7 +1107,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 
 	/**
 	 * Création du graphe pour la distribution de degrée
-	 * 
+	 *
 	 * @param dataset
 	 * @return
 	 */
@@ -1082,7 +1121,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 				PlotOrientation.VERTICAL, true, // include legend
 				true, // tooltips
 				false // urls
-				);
+		);
 
 		// NOW DO SOME OPTIONAL CUSTOMISATION OF THE CHART...
 		chart.setBackgroundPaint(Color.white);
@@ -1112,7 +1151,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 
 	/**
 	 * Création du graphe pour la distribution de degrée
-	 * 
+	 *
 	 * @param dataset
 	 * @return
 	 */
@@ -1127,7 +1166,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 				PlotOrientation.VERTICAL, true, // include legend
 				true, // tooltips
 				false // urls
-				);
+		);
 
 		// NOW DO SOME OPTIONAL CUSTOMISATION OF THE CHART...
 		chart.setBackgroundPaint(Color.white);
@@ -1157,7 +1196,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 
 	/**
 	 * Création du graphe pour la distribution de degrée
-	 * 
+	 *
 	 * @param dataset
 	 * @return
 	 */
@@ -1172,7 +1211,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 				PlotOrientation.VERTICAL, true, // include legend
 				true, // tooltips
 				false // urls
-				);
+		);
 
 		// NOW DO SOME OPTIONAL CUSTOMISATION OF THE CHART...
 		chart.setBackgroundPaint(Color.white);
@@ -1202,7 +1241,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 
 	/**
 	 * Associe les comportements aux boutons.
-	 * 
+	 *
 	 */
 	private void associateComportementToButton() {
 		btDisplayDD.addActionListener(new ActionListener() {
@@ -1250,7 +1289,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 //		launchSimu.addActionListener(new ActionListener() {
 //			public void actionPerformed(ActionEvent e) {
 //				(new Thread() {
-//					public void giteri.run() {
+//					public void run() {
 //					}
 //				}).start();
 //
@@ -1279,15 +1318,15 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 				IReadNetwork nl = modelController.getReader();
 				NetworkProperties readedProperties;
 				NetworkProperties cNetworkProperties;
-				try {
-					WriteNRead.getInstance().readAndCreateNetwork(Configurator.defaultPathForReadingNetwork, nl,
-							" ", "#");
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+
+//				try {
+//				//	writeNRead.readAndCreateNetwork("" + Configurator.defaultPathForReadingNetwork, nl," ", "#");
+//				} catch (IOException e1) {
+//					e1.printStackTrace();
+//				}
 
 //				nl.test();
-				
+
 				readedProperties = nl.getNetworkProperties();
 				cNetworkProperties = modelController.getCurrentNetProperties(Configurator.activationCodeAllAttrib);
 				// Mettre dnas les bons JP
@@ -1326,9 +1365,9 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 		btToggleStep.addActionListener(e -> modelController.toggleStep());
 
 		btRandomConfig.addActionListener(e -> modelController.rdmConfig());
-		
+
 		btSemiAutomaticStep.addActionListener(e -> modelController.toggleActionSemiAuto());
-		
+
 		btGenerateEmptyNetwork.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				modelController.generateEmptyGraph();
@@ -1372,7 +1411,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 
 	/**
 	 * Association des actions au keystroke.
-	 * 
+	 *
 	 * @param focusedElmt
 	 */
 	private void associateKeyBinding(JTabbedPane focusedElmt) {
@@ -1382,7 +1421,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 	}
 
 	/** Retire et ajouter X serie d'un coup
-	 * 
+	 *
 	 */
 	private void addXYseries(){
 		int numbSerie = 0;
@@ -1393,29 +1432,29 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 		Color serieColor;
 		// Pour chaque série qu'on veut ajouter
 		for (XYSeries serie : seriesAppliances) {
-			// on crée les série dans l'ordre a partir de 0 et regarde le giteri.meme associé a cet index dans MemeFactory
-			memeConcerne = MemeFactory.getInstance().getMemeFromInteger(numbSerie);
+			// on crée les série dans l'ordre a partir de 0 et regarde le meme associé a cet index dans MemeFactory
+			memeConcerne = memeFactory.getMemeFromInteger(numbSerie);
 			if(memeConcerne != null){
 				// label son petit nom
-				labelSerie = EntiteHandler.getInstance().translateMemeCombinaisonReadable(memeConcerne.toFourCharString());
+				labelSerie = entiteHandler.translateMemeCombinaisonReadable(memeConcerne.toFourCharString());
 				// Couleur associé a cet index
-				serieColor = DrawerGraphStream.getInstance().getColorAsColor(numbSerie);
+				serieColor = drawerGraphStream.getColorAsColor(numbSerie);
 			}
 			else{
 				labelSerie = numbSerie+"";
-				serieColor = new Color(0, 0, 0); 
+				serieColor = new Color(0, 0, 0);
 			}
-			
+
 			serie.setKey(labelSerie);
 			datasetDensityOverProba.addSeries(serie);
 			chartDensityOverProba.getXYPlot().getRenderer().setSeriesPaint(numbSerie, serieColor);
 			numbSerie++;
 		}
 	}
-	
+
 	/**
 	 * toggle les boutons de l'interface
-	 * 
+	 *
 	 */
 	public void toggleEnableInterface() {
 		jpPaneTwo.setEnabled(jpPaneTwo.isEnabled());
@@ -1425,36 +1464,35 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 	// EndRegion
 
 	// Region concernant la mise a jour des informations de l'interface
-	
+
 	/** Plot dans la série "Density Over Proba". DEPRECATED.
-     * 
-     */
+	 *
+	 */
 	public void addValueToDensityOverProbaSerie(double x, double y) {
 		seriesDensityOverProba.add(x, y);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param time
-	 * @param values
 	 */
 	public void addValueToApplianceSerie(double time, Hashtable<Integer, Double> kvIndexValue){
-		int diff = kvIndexValue.size() - datasetDensityOverProba.getSeriesCount(); 
+		int diff = kvIndexValue.size() - datasetDensityOverProba.getSeriesCount();
 		int cpt = 0;
 		for (int i = 0; i < diff; i++) {
 			addXYseries();
 		}
-		
+
 		for (int indexMeme : kvIndexValue.keySet()) {
 			seriesAppliances.get(indexMeme).add(time, kvIndexValue.get(indexMeme));
 		}
-		
+
 	}
-	
+
 	/**
-	 * Met a jour les entrées des clefs des hashtable en fonction des giteri.meme
+	 * Met a jour les entrées des clefs des hashtable en fonction des meme
 	 * choisi pour la simulation
-	 * 
+	 *
 	 */
 	private void resetHashTableKeys() {
 
@@ -1473,116 +1511,116 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 	/** Mise a jour des données d'affichage concernant les memes et action Fait
 	 * le lien entre les données contenues dans les hashtable et l'affichage de
 	 * ces dernière dans les labels ou autres.
-	 * 
+	 *
 	 */
 	private void updateInformationDisplay() {
-		if (Configurator.displayPlotWhileSimulation) 
+		if (Configurator.displayPlotWhileSimulation)
 		{
-		try
-		{
-		
-		int lastAddCount = 0;
-		int lastEvapCount = 0;
-		int nbAppelInLast100;
-		int totalAppel = 0;
-		int nbAppel;
-		String memeRef = "";
-		boolean refreshDDArray = (compteurSerieDensity % 20 == 0);
-		// densité seul
-		int activator = 1;
-		Color associatedColor;
-		
-		if(refreshDDArray)
-			activator = 9;//Configurator.AllAttribActivator;
-		// TODO est ce que ca vaut le coup de mettre a jour l'information en direct?
-		netProp = modelController.getCurrentNetProperties(activator);
-//			netProp = modelController.getCurrentNetProperties(-1);
-		
-		for (Meme meme : selectedMemeOnSimulation) {
-			associatedColor = DrawerGraphStream.getInstance().getColorAsColor( 
-					MemeFactory.getInstance().getColorIndexStringConversion(meme.toFourCharString()));
-			
-			// NOMBRE DE POSSESSION DE MEME PAR LES ENTITES
-			// Savoir quel noeud possède quel giteri.meme;
-			JLabel lbl = nodesHavingXoxoMemesLabel.get(meme.toString());
-			// Nom sous forme "add+"
-			memeRef = EntiteHandler.getInstance().translateMemeCombinaisonReadable(meme.toString()) ;
-			String toPut = memeRef + ": [";
-			// Si tout les noeuds possede ce giteri.meme
-			if (nodesHavingXoxoMemes.get(meme.toString()) != null
-				&& nodesHavingXoxoMemes.get(meme.toString()).size() == Configurator.nbNode){
-				toPut += "ALL]";
-			}
-			// Si tout les noeuds ne sont pas de ce type
-			else 
+			try
 			{
-				int nbNodesWithThisMeme = 0;
-				nbNodesWithThisMeme = nodesHavingXoxoMemes.get(meme.toString()).size();
-				toPut += nbNodesWithThisMeme;
-				toPut += "]";
+
+				int lastAddCount = 0;
+				int lastEvapCount = 0;
+				int nbAppelInLast100;
+				int totalAppel = 0;
+				int nbAppel;
+				String memeRef = "";
+				boolean refreshDDArray = (compteurSerieDensity % 20 == 0);
+				// densité seul
+				int activator = 1;
+				Color associatedColor;
+
+				if(refreshDDArray)
+					activator = 9;//Configurator.AllAttribActivator;
+				// TODO est ce que ca vaut le coup de mettre a jour l'information en direct?
+				netProp = modelController.getCurrentNetProperties(activator);
+//			netProp = modelController.getCurrentNetProperties(-1);
+
+				for (Meme meme : selectedMemeOnSimulation) {
+					associatedColor = drawerGraphStream.getColorAsColor(
+							memeFactory.getColorIndexStringConversion(meme.toFourCharString()));
+
+					// NOMBRE DE POSSESSION DE MEME PAR LES ENTITES
+					// Savoir quel noeud possède quel meme;
+					JLabel lbl = nodesHavingXoxoMemesLabel.get(meme.toString());
+					// Nom sous forme "add+"
+					memeRef = entiteHandler.translateMemeCombinaisonReadable(meme.toString()) ;
+					String toPut = memeRef + ": [";
+					// Si tout les noeuds possede ce meme
+					if (nodesHavingXoxoMemes.get(meme.toString()) != null
+							&& nodesHavingXoxoMemes.get(meme.toString()).size() == Configurator.nbNode){
+						toPut += "ALL]";
+					}
+					// Si tout les noeuds ne sont pas de ce type
+					else
+					{
+						int nbNodesWithThisMeme = 0;
+						nbNodesWithThisMeme = nodesHavingXoxoMemes.get(meme.toString()).size();
+						toPut += nbNodesWithThisMeme;
+						toPut += "]";
+					}
+
+					if (lbl != null) {
+						lbl.setText(toPut);
+						lbl.setForeground(associatedColor);
+
+						// NOMBRE D'APPEL DES MEMES DEPUIS LE DEBUT DE LA SIMULATION
+						// Savoir combien de fois le meme a été appelé depuis le début de la simulation
+						nbAppel = nbActivationByMemes.get(meme.toString());
+						// LABEL générique
+						nbActivationByMemesLabel.get(meme.toString()).setText(memeRef + ":" + nbAppel );
+						nbActivationByMemesLabel.get(meme.toString()).setForeground(associatedColor);
+						totalAppel += nbAppel;
+						nbAppelInLast100 = countOfLastMemeActivation.contains(meme.toString()) ? countOfLastMemeActivation
+								.get(meme.toString()) : 0;
+
+						// Partie last 100 compte du nombre
+						nbLastActivationByMemesLabel.get(meme.toString()).setText(memeRef + ": "
+								+ countOfLastMemeActivation.get(meme.toString()) + "("
+								+ countOfLastMemeActivation.get(meme.toString()) * 100 / Configurator.nbNode
+								+"%)");
+						nbLastActivationByMemesLabel.get(meme.toString()).setForeground(associatedColor);
+					}
+				}
+
+				String oldText;
+				// On refait une passe pour mettre a jour les % de possession
+				for (Meme meme : selectedMemeOnSimulation) {
+					if(totalAppel != 0){
+						oldText = nbActivationByMemesLabel.get(meme.toString()).getText();
+						nbActivationByMemesLabel.get(meme.toString()).setText(oldText +
+								"(" + nbActivationByMemes.get(meme.toString()) * 100 / totalAppel +"%)");
+					}
+				}
+
+				densityValue = netProp.getDensity();
+				jlDensityLabel.setText("Density: " + Double.parseDouble(decimal.format(densityValue)));
+
+				if (densityValue > densityMaxValue) {
+					densityMaxValue = densityValue;
+					jlDensityMaxLabel.setText("Density max : " + Double.parseDouble(decimal.format(densityMaxValue)));
+				}
+
+				seriesDensity.add(compteurSerieDensity++, netProp.getDensity());
+				if (refreshDDArray) {
+					displayDDChart(netProp.getDd());
+
+				}
+			}catch (Exception e){
+				if(!Configurator.autrucheMode) 	System.err.println("Erreur de mise a jour de l'interface "+ e.getMessage());
 			}
-
-			if (lbl != null) {
-				lbl.setText(toPut);
-				lbl.setForeground(associatedColor);
-				
-				// NOMBRE D'APPEL DES MEMES DEPUIS LE DEBUT DE LA SIMULATION
-				// Savoir combien de fois le giteri.meme a été appelé depuis le début de la simulation
-				nbAppel = nbActivationByMemes.get(meme.toString());
-				// LABEL générique
-				nbActivationByMemesLabel.get(meme.toString()).setText(memeRef + ":" + nbAppel );
-				nbActivationByMemesLabel.get(meme.toString()).setForeground(associatedColor);
-				totalAppel += nbAppel;
-				nbAppelInLast100 = countOfLastMemeActivation.contains(meme.toString()) ? countOfLastMemeActivation
-						.get(meme.toString()) : 0;
-			
-				// Partie last 100 compte du nombre
-				nbLastActivationByMemesLabel.get(meme.toString()).setText(memeRef + ": "
-						+ countOfLastMemeActivation.get(meme.toString()) + "(" 
-						+ countOfLastMemeActivation.get(meme.toString()) * 100 / Configurator.nbNode
-							+"%)");
-				nbLastActivationByMemesLabel.get(meme.toString()).setForeground(associatedColor);
-			}
 		}
-		
-		String oldText;
-		// On refait une passe pour mettre a jour les % de possession
-		for (Meme meme : selectedMemeOnSimulation) {
-			if(totalAppel != 0){
-				oldText = nbActivationByMemesLabel.get(meme.toString()).getText();
-				nbActivationByMemesLabel.get(meme.toString()).setText(oldText +
-					"(" + nbActivationByMemes.get(meme.toString()) * 100 / totalAppel +"%)");
-			}
-		}
-
-		densityValue = netProp.getDensity();
-		jlDensityLabel.setText("Density: " + Double.parseDouble(decimal.format(densityValue)));
-
-		if (densityValue > densityMaxValue) {
-			densityMaxValue = densityValue;
-			jlDensityMaxLabel.setText("Density max : " + Double.parseDouble(decimal.format(densityMaxValue)));
-		}
-
-		seriesDensity.add(compteurSerieDensity++, netProp.getDensity());
-		if (refreshDDArray) {
-			displayDDChart(netProp.getDd());
-
-		}
-		}catch (Exception e){
-			if(!Configurator.autrucheMode) 	System.err.println("Erreur de mise a jour de l'interface "+ e.getMessage());
-		}
-	}
 	}
 
 	/**
 	 * mise a jour des valeurs de la série qui défini le graph de degré de
 	 * distribution.
-	 * 
+	 *
 	 * @param dd
 	 */
 	private void displayDDChart(int[] dd) {
 		// Cas qui peut arriver quand on reset les données du réseau et quo'n
-		// demnade dans le giteri.meme temps une mise a jour des vlaeurs de l'interfaxe
+		// demnade dans le meme temps une mise a jour des vlaeurs de l'interfaxe
 		if (dd != null) {
 			synchronized (seriesDegreeDistribution) {
 				seriesDegreeDistribution.clear();
@@ -1597,7 +1635,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 
 	// Region Autres CLASSE
 	/** Action de faire avancer step par step.
-	 * 
+	 *
 	 */
 	private class StepAction extends AbstractAction {
 
@@ -1612,7 +1650,7 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 	}
 
 	/** Action de faire avancer step par step.
-	 * 
+	 *
 	 */
 	public class PauseAction extends AbstractAction {
 

@@ -39,87 +39,86 @@ public class EntiteHandler extends ThreadHandler {
 
 	private VueController ihmController;
 	private NetworkConstructor networkConstruct;
+	private MemeFactory memeFactory;
+
+	private WorkerFactory workerFactory;
 
 	// les entités du réseau
 	protected ArrayList<Entite> entites;
-	
+
 	// Entite possedant des actions
 	private ArrayList<Entite> entitesActive;
 	private Hashtable<String, String> memeTranslationReadable;
-	
-	// Listener pour les évènements issu de l'obtention de giteri.meme ou application
+
+	// Listener pour les évènements issu de l'obtention de meme ou application
 	// de ce dernier.
 	private ArrayList<ActionApplyListener> entityListeners;
 	private ArrayList<BehaviorTransmissionListener> memeListeners;
-	
+
 	StopWatchFactory watcher ;
 	private Meme addRandom = null, removeRandom = null;
 
-	// Variable d'utilisation 
+	// Variable d'utilisation
 	private static int indexOfMemesCombinaisonRecursion;
 	private long atmLastTime;
 	private int cptModulo;
 	private int cptActionAddTried = 1, cptActionRmvTried = 1;
 	private ActionType lastAction = ActionType.RETRAITLIEN;
 	private int nbActionBySecond;
-	
+
 	// EndRegion
 
 	// Region constructeur Singleton
 	protected static EntiteHandler INSTANCE = null;
 
-	/** Constructeur sans param. Crée les memes de la map 
-	 * 
+	/** Constructeur sans param. Crée les memes de la map
+	 *
 	 */
-	protected EntiteHandler() {
+	public EntiteHandler(NetworkConstructor networkC, MemeFactory memeF, WorkerFactory workF) {
 
 		if (Configurator.DisplayLogdebugInstantiation)
 			System.out.println("EntiteHandler constructor Initialisation");
 
-		networkConstruct = NetworkConstructor.getInstance();
+		networkConstruct = networkC;
+		memeFactory = memeF;
+		workerFactory = workF;
+
 		entites = new ArrayList<Entite>();
 		entitesActive = new ArrayList<Entite>();
 		entityListeners = new ArrayList<ActionApplyListener>();
 		memeListeners = new ArrayList<BehaviorTransmissionListener>();
 		memeTranslationReadable = new Hashtable<String, String>();
 
-		generateMemeAvailableForMap();
 
-		if (Configurator.displayLogTimeEating){
-			watcher = StopWatchFactory.getInstance();
-			watcher.addWatch("Main", "SelectionEntite");
-			watcher.addWatch("Main", "ChoixAction");
-			watcher.addWatch("ChoixAction", "one");
-			watcher.addWatch("ChoixAction", "two");
-			watcher.addWatch("ChoixAction", "three");
-			watcher.addWatch("Main", "FaireAction");
-			watcher.addWatch("FaireAction", "SelectionCible");
-			watcher.addWatch("FaireAction", "ApplyAction");
-		}
-		
 		if (Configurator.DisplayLogdebugInstantiation)
 			System.out.println("EntiteHandler constructor Closing");
-	
-		bindNodeWithEntite(NetworkConstructor.getInstance().getNetwork());
+
+
+	}
+
+	public void initialisation(){
+		generateMemeAvailableForMap();
+		bindNodeWithEntite(networkConstruct.getNetwork());
 		giveMemeToEntite(Configurator.methodOfGeneration);
+
 	}
 
 	/** instance d'EH qui commune a tous.
-	 * 
+	 *
 	 * @return
 	 */
-	public static EntiteHandler getInstance() {
-		if (INSTANCE == null)
-			INSTANCE = new EntiteHandler();
-		return INSTANCE;
-	}
+//	public static EntiteHandler getInstance() {
+//		if (INSTANCE == null)
+//			INSTANCE = new EntiteHandler();
+//		return INSTANCE;
+//	}
 
 	// EndRegion
 
 	// Region PUBLIC
 
 	/** Les joies des constructeurs nécessitant l'un et l'autre
-	 * 
+	 *
 	 * @param control
 	 */
 	public void setIHMController(VueController control) {
@@ -127,7 +126,7 @@ public class EntiteHandler extends ThreadHandler {
 	}
 
 	/** Obtenir un thread a partir de la classe
-	 * 
+	 *
 	 */
 	public Thread getThread() {
 		Thread returnThread = new Thread(this);
@@ -136,19 +135,19 @@ public class EntiteHandler extends ThreadHandler {
 	}
 
 //	/** Mise en place du worker factory
-//	 * 
+//	 *
 //	 * @param wf
 //	 */
 //	public void setWorkerFactory(WorkerFactory wf){
 //		workerFacto = wf;
 //	}
-	
-	/** Run pour la création de lien, passage de giteri.meme, etc.
-	 * 
+
+	/** Run pour la création de lien, passage de meme, etc.
+	 *
 	 */
 	public void doRun() {
 		if (!Configurator.turboMode){
-			try 
+			try
 			{
 				Thread.sleep(Configurator.getThreadSleepMultiplicateur());
 			} catch (InterruptedException e) {
@@ -163,7 +162,7 @@ public class EntiteHandler extends ThreadHandler {
 
 	/**
 	 * Fait ce qui correspond à une execution du thread.
-	 * 
+	 *
 	 * @return les actions qui ont été réalisé
 	 */
 	public void OneStep() {
@@ -185,10 +184,10 @@ public class EntiteHandler extends ThreadHandler {
 	}
 
 	/**
-	 * Méthode de génération de giteri.network. A placer dans le NC? Va générer les
+	 * Méthode de génération de network. A placer dans le NC? Va générer les
 	 * liens, mais les noeuds doivent déjà etre présent. 0 empty, 1 30%, 2 full,
 	 * 3 scalefree, 4 smallworld, 5 complet
-	 * 
+	 *
 	 * @param activator
 	 */
 	public void generateNetwork(int activator) {
@@ -203,7 +202,7 @@ public class EntiteHandler extends ThreadHandler {
 	 * aucune action n'a pu effectivement etre réalisée, la fonction renvoi
 	 * false. Permet de débloquer des situations. l'ordre d'appel des agents est
 	 * volontairement aléatoire.
-	 * 
+	 *
 	 */
 	public boolean forceAction() {
 		boolean actionDone = false;
@@ -229,7 +228,7 @@ public class EntiteHandler extends ThreadHandler {
 	}
 
 	/** Va retirer au noeud un edge aléatoirement si plus d'un noeud
-	 * 
+	 *
 	 */
 	public void purgeLink() {
 
@@ -265,19 +264,19 @@ public class EntiteHandler extends ThreadHandler {
 		}
 	}
 
-	/** Ajout d'un lien entre deux entitées, dans la couche giteri.network.
-	 * 
+	/** Ajout d'un lien entre deux entitées, dans la couche network.
+	 *
 	 * @param from
 	 *            depuis cette entitées
-	 * @param indexTo
+	 * @param to
 	 *            jusqu'a celle la
 	 */
 	public boolean addLink(Entite from, Entite to) {
 		if (!isEntiteLinked(from, to, false)) {
-			// ajout dans la couche giteri.network; Ajout dans la couche giteri.meme
+			// ajout dans la couche network; Ajout dans la couche meme
 			// automatique car les entitées ont leur edges en passant par la
 			// propriété dans les nodes.
-			NetworkConstructor.getInstance().NMAddLink(
+			networkConstruct.NMAddLink(
 					from.getNode().getIndex(), to.getNode().getIndex(), false);
 			// Ajout dans la liste des entités pour faire la correspondance
 			// lien, temps de connection
@@ -290,7 +289,7 @@ public class EntiteHandler extends ThreadHandler {
 
 	/**
 	 * Retrait d'un lien, s'il existe, entre deux nodes.
-	 * 
+	 *
 	 * @param from
 	 *            Depuis le noeud
 	 * @param to
@@ -301,7 +300,7 @@ public class EntiteHandler extends ThreadHandler {
 		if (isEntiteLinked(from, to, false)) {
 			from.removeConnectedEntite(to);
 			to.removeConnectedEntite(from);
-			return NetworkConstructor.getInstance().NMRemoveLink(
+			return networkConstruct.NMRemoveLink(
 					from.getIndex(), to.getIndex(), false);
 		}
 
@@ -309,7 +308,7 @@ public class EntiteHandler extends ThreadHandler {
 	}
 
 	/** Renvoi une sous liste des agents auxquels est connecté l'asker
-	 * 
+	 *
 	 * @param asker
 	 * @return une sous liste d'entité
 	 */
@@ -318,7 +317,7 @@ public class EntiteHandler extends ThreadHandler {
 	}
 
 	/** Retourne l'entite correspondant au node en parametre, null sinon.
-	 * 
+	 *
 	 * @param node
 	 * @return
 	 */
@@ -333,8 +332,8 @@ public class EntiteHandler extends ThreadHandler {
 	}
 
 	/** Retourne l'entite correspondant au node en parametre, null sinon.
-	 * 
-	 * @param node
+	 *
+	 * @param nodeIndex
 	 * @return
 	 */
 	public Entite getEntityCorresponding(int nodeIndex) {
@@ -348,8 +347,8 @@ public class EntiteHandler extends ThreadHandler {
 	}
 
 	/** Replace en situation de base les éléments, c'est a dire des noeuds sans
-	 * lien et sans giteri.meme.
-	 * 
+	 * lien et sans meme.
+	 *
 	 */
 	public void resetStat(boolean complete) {
 		for (Entite entite : entites) {
@@ -358,19 +357,19 @@ public class EntiteHandler extends ThreadHandler {
 
 		entitesActive.clear();
 		// TODO POTENTIAL ERROR Il ne semble pas qu'il soit nécessaire de tout reset puis le TRUE reset
-		// vient de l'appel dans le giteri.fitting qui réapply lui giteri.meme les IModelMachin.
+		// vient de l'appel dans le fitting qui réapply lui meme les IModelMachin.
 		if (complete){
 			giveMemeToEntite(Configurator.methodOfGeneration);
 		}
 	}
-	
+
 	// EndRegion
 
 	// Region EVENT
 
-	/** Pour lancer les évènements de type giteri.meme transmis
+	/** Pour lancer les évènements de type meme transmis
 	 * crée un evenement pour la mise a jour de l'interface Il s'agit d'un
-	 * evenement de type acquisition ou perte d'un giteri.meme.
+	 * evenement de type acquisition ou perte d'un meme.
 	 */
 	public void eventMemeChanged(Entite entiteConcernee, Meme ajoutOrR, String message) {
 
@@ -378,19 +377,19 @@ public class EntiteHandler extends ThreadHandler {
 		synchronized (entitesActive) {
 			entitesActive.add(entiteConcernee);
 		}
-		
+
 		BehavTransmEvent myEvent = new BehavTransmEvent(this, entiteConcernee, ajoutOrR, message);
 
-		// On prévient les entites qui listen 
+		// On prévient les entites qui listen
 		for (BehaviorTransmissionListener memeListener : memeListeners) {
 			memeListener.handlerBehavTransm(myEvent);
 		}
 	}
 
 	/** Pour lancer les évènements de type action réalisée.
-	 * 
+	 *
 	 * @param entiteConcernee
-	 * @param actionRealisee
+	 * @param memeRealisee
 	 * @param message
 	 */
 	public void eventActionDone(Entite entiteConcernee, Meme memeRealisee, String message) {
@@ -406,7 +405,7 @@ public class EntiteHandler extends ThreadHandler {
 
 	/** Ajout d'un listener a la liste des listeners a prévenir en cas d'event de
 	 * type entity
-	 * 
+	 *
 	 * @param myListener
 	 */
 	public void addEntityListener(ActionApplyListener myListener) {
@@ -416,7 +415,7 @@ public class EntiteHandler extends ThreadHandler {
 	}
 
 	/** Retrait d'un listener depuis la liste des listeners
-	 * 
+	 *
 	 * @param myListener
 	 */
 	public void removeEntityListener(ActionApplyListener myListener) {
@@ -426,8 +425,8 @@ public class EntiteHandler extends ThreadHandler {
 	}
 
 	/** Ajout d'un listener a la liste des listeners a prévenir en cas d'event de
-	 * type giteri.meme
-	 * 
+	 * type meme
+	 *
 	 * @param myListener
 	 */
 	public void addMemeListener(BehaviorTransmissionListener myListener) {
@@ -437,7 +436,7 @@ public class EntiteHandler extends ThreadHandler {
 	}
 
 	/** Retrait d'un listener depuis la liste des listeners
-	 * 
+	 *
 	 * @param myListener
 	 */
 	public void removeMemeListener(BehaviorTransmissionListener myListener) {
@@ -451,44 +450,44 @@ public class EntiteHandler extends ThreadHandler {
 	// Region MEME
 
 	/** Distribut les memes aux entités suivant certain mode.
-	 * 
+	 *
 	 * @param distrib
 	 */
 	public void giveMemeToEntite(MemeDistributionType distrib) {
 
 		switch (distrib) {
-		case SingleBasic:
-			giveMemeToEntiteOnlyBasis();
-			break;
-		case SingleCombinaison:
-			giveMemeToEntiteOnlyCombinaison();
-			break;
-		case AllCombinaison:
-			giveMemeToEntiteGeneric();
-			break;
-		case FourWithInverted:
-			giveMemeWithInvertd();
-			break;
-		case OnlyOneAgent:
-			giveMemeToEntiteExceptPurple();
-			break;
-		case FollowingFitting:
-			giveMemeToEntiteFollowingFitting();
-			break;
-		case AllSingle:
-			giveMemeBasicAllNodes();
-			break;
-		case specificDistrib:
-			giveMemeToEntiteSpecific();
-			break;
-		default:
-			break;
+			case SingleBasic:
+				giveMemeToEntiteOnlyBasis();
+				break;
+			case SingleCombinaison:
+				giveMemeToEntiteOnlyCombinaison();
+				break;
+			case AllCombinaison:
+				giveMemeToEntiteGeneric();
+				break;
+			case FourWithInverted:
+				giveMemeWithInvertd();
+				break;
+			case OnlyOneAgent:
+				giveMemeToEntiteExceptPurple();
+				break;
+			case FollowingFitting:
+				giveMemeToEntiteFollowingFitting();
+				break;
+			case AllSingle:
+				giveMemeBasicAllNodes();
+				break;
+			case specificDistrib:
+				giveMemeToEntiteSpecific();
+				break;
+			default:
+				break;
 		}
 	}
 
 	/** Applique directement depuis une hash d'index // comportements les
 	 * behavior au nodes spécifiées par la key.
-	 * 
+	 *
 	 * @param affectation
 	 */
 	public void giveMemeToEntite(Hashtable<Integer, ArrayList<Meme>> affectation) {
@@ -501,10 +500,10 @@ public class EntiteHandler extends ThreadHandler {
 		}
 	}
 
-	/** Applique directement depuis une liste de giteri.meme au X premier agents pour les
+	/** Applique directement depuis une liste de meme au X premier agents pour les
 	 * recevoir. Si option de défault behavior, donne des memes fluides aux autres agent.
-	 * 
-	 * @param affectation
+	 *
+	 * @param memes
 	 */
 	public void giveMemeToEntiteXFirst(ArrayList<Meme> memes) {
 		int i = 0;
@@ -514,28 +513,28 @@ public class EntiteHandler extends ThreadHandler {
 			entiteContente.add(entites.get(i));
 			i++;
 		}
-		
+
 		if(Configurator.initializeDefaultBehavior) giveFluideMeme(entiteContente);
 	}
 
-	/** Obtention de la liste des memes disponibles sur la map, soit les simples, 
+	/** Obtention de la liste des memes disponibles sur la map, soit les simples,
 	 * soit les combinaisons de deux memes existantes, en fonction du param de configuration.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param setAsked
 	 *            Défini si on veut les comportements simples, leur combinaison
 	 *            ou les deux.
 	 * @return
 	 */
 	public Hashtable<Integer, ArrayList<Meme>> getMemeAvailable(FittingBehavior setAsked) {
-		
+
 		Hashtable<Integer, ArrayList<Meme>> memes = new Hashtable<Integer, ArrayList<Meme>>();
 		if (setAsked == FittingBehavior.onlyComplex || setAsked == FittingBehavior.simpleAndComplex) {
 			memes = getMemeCombinaisonAvailable();
 		}
 		if (setAsked == FittingBehavior.onlySimple || setAsked == FittingBehavior.simpleAndComplex) {
 			int lastIndex = memes.size();
-			for (Meme meme : MemeFactory.getInstance().getMemeAvailable(false))
+			for (Meme meme : memeFactory.getMemeAvailable(false))
 				Toolz.addElementInHashArray(memes, ++lastIndex, meme);
 		}
 
@@ -544,7 +543,7 @@ public class EntiteHandler extends ThreadHandler {
 
 	// TODO REFACTORING A delete probablement
 	/** Obtient les memes effectivements présent sur la map.
-	 * 
+	 *
 	 * @return la liste des memes possédés par les agents
 	 */
 	public ArrayList<Meme> getMemeOnMap() {
@@ -558,10 +557,10 @@ public class EntiteHandler extends ThreadHandler {
 
 		return memes;
 	}
-	
-	/** Renvoi la liste des memes dispo sur la map en liste de string. 
+
+	/** Renvoi la liste des memes dispo sur la map en liste de string.
 	 * Utilisé pour les couleurs sur le graphe
-	 * 
+	 *
 	 * @param setAsked Voir @getMemeAvailable
 	 * @return
 	 */
@@ -595,19 +594,19 @@ public class EntiteHandler extends ThreadHandler {
 	/** Transforme les adlkminesup en add+;
 	 * TODO [WayPoint]- traduction .add+ <= ADLKMTNTSPMN etc
 	 * @param memeCombinaison
-	 * @return un truc plus clair a lire. 
+	 * @return un truc plus clair a lire.
 	 */
 	public String translateMemeCombinaisonReadable(String memeCombinaison) {
 		String compo = "";
-		for (String string : memeTranslationReadable.keySet()) 
+		for (String string : memeTranslationReadable.keySet())
 			if(memeCombinaison.contains(string))
 				compo += "." + memeTranslationReadable.get(string);
 		return compo;
 	}
 
 	/** Regarde le propriété des éléments du réseau, en fonction de la
-	 * combinaison de giteri.meme qu'ils possedent.
-	 * 
+	 * combinaison de meme qu'ils possedent.
+	 *
 	 */
 	public String checkPropertiesByMemePossession() {
 		Hashtable<String, ArrayList<Entite>> entiteByMemePossession = new Hashtable<String, ArrayList<Entite>>();
@@ -656,13 +655,13 @@ public class EntiteHandler extends ThreadHandler {
 			resultat += "("
 					+ entiteByMemePossession.get(memeCombinaison).size()
 					+ ") - "
-					+ "Degree moyen pour la combinaison de giteri.meme "
+					+ "Degree moyen pour la combinaison de meme "
 					+ translateMemeCombinaisonReadable(memeCombinaison)
 					+ ": "
 					+ Toolz.getAvg(SelfDegrees)
 					+ " values: "
 					+ Toolz.getNumberCutToPrecision(
-							Toolz.getAvg(othersDegrees), 2);
+					Toolz.getAvg(othersDegrees), 2);
 			resultat += "\n";
 		}
 
@@ -678,13 +677,13 @@ public class EntiteHandler extends ThreadHandler {
 	// Region ACTION
 
 	/** va lancer l'action d'une entitée
-	 * 
+	 *
 	 */
 	private String runEntite() {
 
 		String rez;
-		synchronized (WorkerFactory.getInstance().waitingForReset) {
-			
+		synchronized (workerFactory.waitingForReset) {
+
 			if (Configurator.displayLogTimeEating)
 			{
 				watcher.startWatch("Main");
@@ -696,7 +695,7 @@ public class EntiteHandler extends ThreadHandler {
 			Entite movingOne = SelectActingEntite();
 
 			if (movingOne == null) {
-				if(!Configurator.jarMode) System.err.println("Bullshit de liste entiteActive et de .giteri.run() qui s'arrete pas immédiatement");
+				if(!Configurator.jarMode) System.err.println("Bullshit de liste entiteActive et de .run() qui s'arrete pas immédiatement");
 				return ("Nope pas d'entite prete");
 			}
 			if (Configurator.displayLogTimeEating)
@@ -714,14 +713,14 @@ public class EntiteHandler extends ThreadHandler {
 			if (Configurator.displayLogTimeEating)
 				watcher.startWatch("FaireAction");
 			rez = doAction(movingOne, memeAction);
-			
+
 			if (Configurator.displayLogTimeEating)
 				watcher.stopWatch("FaireAction");
 
 			if (Configurator.displayLogTimeEating)
 				watcher.stopWatch("Main");
 
-			WorkerFactory.getInstance().getCalculator().incrementNbActionRelative();
+			workerFactory.getCalculator().incrementNbActionRelative();
 
 			if (Configurator.displayLogTimeEating)
 				watcher.publishResult();
@@ -735,7 +734,7 @@ public class EntiteHandler extends ThreadHandler {
 				System.out.println("Tried Add/rmv " + (double) cptActionAddTried / cptActionRmvTried);
 			}
 
-			if (Configurator.semiStepProgression) 
+			if (Configurator.semiStepProgression)
 			{
 				giveEntiteBaseColor();
 				System.out.println("Remise a zero des couleurs");
@@ -747,7 +746,7 @@ public class EntiteHandler extends ThreadHandler {
 	}
 
 	/** Selection de l'entité qui va agir
-	 * 
+	 *
 	 * @return
 	 */
 	private Entite SelectActingEntite() {
@@ -758,9 +757,9 @@ public class EntiteHandler extends ThreadHandler {
 	}
 
 	/** Selection d'une action pour l'entité en action rules version
-	 * 
+	 *
 	 * @param movingOne
-	 * @return le giteri.meme sélectionné
+	 * @return le meme sélectionné
 	 */
 	private Meme actionSelectionRulesVersion(Entite movingOne) {
 		return movingOne.chooseAction();
@@ -768,7 +767,7 @@ public class EntiteHandler extends ThreadHandler {
 
 	/** Selection d'une action, en excluant la derniere choisi si il s'agit d'un
 	 * ajout ou d'un retrait, et mis a jour de la dernier action faite.
-	 * 
+	 *
 	 * @param movingOne
 	 * @return
 	 */
@@ -784,7 +783,7 @@ public class EntiteHandler extends ThreadHandler {
 	}
 
 	/** Application de l'action de l'entité
-	 * 
+	 *
 	 * @param movingOne
 	 * @param memeAction
 	 * @return
@@ -797,7 +796,7 @@ public class EntiteHandler extends ThreadHandler {
 		ArrayList<Integer> ciblesIndex = new ArrayList<Integer>();
 		IAgregator currentFilter = null;
 
-		// Execution d'un giteri.meme de l'entite.
+		// Execution d'un meme de l'entite.
 		if (memeAction != null) {
 			if (Configurator.displayLogTimeEating)
 				watcher.startWatch("SelectionCible");
@@ -822,7 +821,7 @@ public class EntiteHandler extends ThreadHandler {
 							ciblesIndex.add(entite.getIndex());
 						System.out.println("Application du filtre suivant: " + currentFilter.getFourCharName());
 						this.giveEntiteTargetedColor(movingOne.getIndex(), ciblesIndex);
-						pauseStepInSemiAutoAction(); 
+						pauseStepInSemiAutoAction();
 					}
 				}
 			}
@@ -831,13 +830,13 @@ public class EntiteHandler extends ThreadHandler {
 				watcher.stopWatch("SelectionCible");
 			if (Configurator.displayLogTimeEating)
 				watcher.startWatch("ApplyAction");
-			
+
 			if (cibles.size() == 1) {
 				actionDone += memeAction.getAction().applyAction(movingOne, cibles);
 
-				// PROPAGATION du giteri.meme
+				// PROPAGATION du meme
 				if (Configurator.usePropagation)
-					for (Entite entite : cibles) 
+					for (Entite entite : cibles)
 					{
 						// Transmission de l'un de behavior possédé par l'acting.
 						if (Configurator.usePropagationSecondGeneration) {
@@ -845,9 +844,9 @@ public class EntiteHandler extends ThreadHandler {
 							memeApply = selectedMeme.toFourCharString();
 							if (entite.receiveMeme(selectedMeme))
 								eventMemeChanged(entite, selectedMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());}
-						else 
-							if (entite.receiveMeme(memeAction))
-								eventMemeChanged(entite, memeAction,	Configurator.MemeActivityPossibility.AjoutMeme.toString());
+						else
+						if (entite.receiveMeme(memeAction))
+							eventMemeChanged(entite, memeAction,	Configurator.MemeActivityPossibility.AjoutMeme.toString());
 					}
 
 				// evenement d'application d'une action
@@ -857,8 +856,8 @@ public class EntiteHandler extends ThreadHandler {
 			} else {
 				if (cibles.size() > 1) System.err.println("Plusieurs cibles pour une action, pas normal");
 
-				actionDone = "Nope, Entite " + movingOne.getIndex() 
-						   + " Aucune(ou trop de) cible pour l'action" + memeAction.toFourCharString();
+				actionDone = "Nope, Entite " + movingOne.getIndex()
+						+ " Aucune(ou trop de) cible pour l'action" + memeAction.toFourCharString();
 				eventActionDone(movingOne, null, "NOTARGET " + actionDone);
 			}
 			if (Configurator.displayLogTimeEating)
@@ -877,70 +876,70 @@ public class EntiteHandler extends ThreadHandler {
 
 	// Region MEME
 
-	/** Donne des memes aux entités. Ici chaque giteri.meme est donnée une fois pour une
+	/** Donne des memes aux entités. Ici chaque meme est donnée une fois pour une
 	 * entité dans le réseau.
-	 * x = nb de giteri.meme la map. Nombre d'agent avec comportement = x
+	 * x = nb de meme la map. Nombre d'agent avec comportement = x
 	 */
 	private void giveMemeToEntiteOnlyBasis() {
 		int i = 0;
 		ArrayList<Entite> entiteContente = new ArrayList<Entite>();
-		for (Meme meme : MemeFactory.getInstance().getMemeAvailable(true)) {
+		for (Meme meme : memeFactory.getMemeAvailable(true)) {
 			entites.get(++i).addMeme(meme, true);
 			eventMemeChanged(entites.get(i), meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			entiteContente.add(entites.get(i));
 		}
-		
+
 		if(Configurator.initializeDefaultBehavior) giveFluideMeme(entiteContente);
 	}
 
-	/** Donne les combinaisons de giteri.meme existantes sur la map à tous les agents, un par un.
-	 * 
+	/** Donne les combinaisons de meme existantes sur la map à tous les agents, un par un.
+	 *
 	 */
 	private void giveMemeToEntiteGeneric() {
 		Hashtable<Integer, ArrayList<Meme>> composition ;//= new Hashtable<Integer, ArrayList<Meme>>();
 		composition = getMemeCombinaisonAvailable();
-		
-		for (Entite entite : entites) 
-			for (Meme meme : composition.get( entite.getIndex()%composition.keySet().size() )) 
+
+		for (Entite entite : entites)
+			for (Meme meme : composition.get( entite.getIndex()%composition.keySet().size() ))
 				eventMemeChanged(entite, entite.addMeme(meme, true), Configurator.MemeActivityPossibility.AjoutMeme.toString());
-		
+
 	}
 
 	/** Bullshit.
-	 * 
+	 *
 	 */
 	private void giveMemeToEntiteExceptPurple() {
 
 	}
 
 	/** Donne tout les memes basics réparti équitablement sur tout les nodes
-	 * 
+	 *
 	 */
 	private void giveMemeBasicAllNodes() {
-		int nbMeme = MemeFactory.getInstance().getMemeAvailable(false).size();
+		int nbMeme = memeFactory.getMemeAvailable(false).size();
 		int partSize = entites.size() / nbMeme;
 		int lastIndex = 0;
 		int part = 0;
 
-		for (Meme meme : MemeFactory.getInstance().getMemeAvailable(false)) {
+		for (Meme meme : memeFactory.getMemeAvailable(false)) {
 			part++;
-			for (int i = lastIndex; i < partSize * part; i++) 
+			for (int i = lastIndex; i < partSize * part; i++)
 				eventMemeChanged(entites.get(i),entites.get(i).addMeme(meme, true),
-								Configurator.MemeActivityPossibility.AjoutMeme.toString());
+						Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			lastIndex = partSize * part;
 		}
 	}
 
 	/** BULLSHIT
-	 * 
+	 *
 	 */
 	private void giveMemeWithInvertd() {
-		
+
 	}
 
 	/**
 	 * Donne une instance de chaque combinaison a un agent.
-	 * 
+	 *
 	 */
 	private void giveMemeToEntiteOnlyCombinaison() {
 		Hashtable<ActionType, ArrayList<Meme>> memesByCategory = new Hashtable<ActionType, ArrayList<Meme>>();
@@ -949,7 +948,7 @@ public class EntiteHandler extends ThreadHandler {
 
 		for (ActionType action : Configurator.ActionType.values()) {
 			if (action == ActionType.AJOUTLIEN || action == ActionType.RETRAITLIEN) {
-				memeOfOneCategory = MemeFactory.getInstance().getMemeAvailable(action, false);
+				memeOfOneCategory = memeFactory.getMemeAvailable(action, false);
 				if (memeOfOneCategory.size() > 0) {
 					memesByCategory.put(action, memeOfOneCategory);
 					key.add(action);
@@ -970,19 +969,19 @@ public class EntiteHandler extends ThreadHandler {
 		for (Integer integer : composition.keySet())
 			for (Meme meme : composition.get(integer))
 				eventMemeChanged(entites.get(integer), entites.get(integer).addMeme(meme, true),
-								Configurator.MemeActivityPossibility.AjoutMeme.toString());
+						Configurator.MemeActivityPossibility.AjoutMeme.toString());
 
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void giveMemeToEntiteFollowingFitting() {
 
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void giveMemeToEntiteSpecific() {
 		int i = 0;
@@ -992,9 +991,9 @@ public class EntiteHandler extends ThreadHandler {
 		Entite entiteReceptrice;
 		ArrayList<Double> scParamSet = new ArrayList<Double>(Arrays.asList(0.788335449538696,0.373092466173732,0.292052580578804,0.438882845642738,0.109153677952613));
 		ArrayList<Double> swParamSet3 = new ArrayList<Double>(Arrays.asList(0.907489970963927,0.363546615459677,0.458976194767827,0.247873953220028,0.984710568248182));
-		ArrayList<Double> currentParamSet = swParamSet3 ; 
-		
-		for (Meme meme : MemeFactory.getInstance().getMemeAvailable(true)) {
+		ArrayList<Double> currentParamSet = swParamSet3 ;
+
+		for (Meme meme : memeFactory.getMemeAvailable(true)) {
 			entiteReceptrice = entites.get(i);
 			if(meme.getName().compareTo("Add∞") == 0){
 				meme.probaOfPropagation = currentParamSet.get(i);
@@ -1021,14 +1020,14 @@ public class EntiteHandler extends ThreadHandler {
 				entiteReceptrice.addMeme(meme, true);
 				eventMemeChanged(entiteReceptrice, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			}
-			
+
 			i++;
 		}
-//		
 //
-//		for (Meme giteri.meme : MemeFactory.getInstance().getMemeAvailable(false)) {
-//			Toolz.addElementInHashArray(behaviors, i, giteri.meme);
-//			nameKVindex.put(giteri.meme.toFourCharString(), i);
+//
+//		for (Meme meme : memeFactory.getMemeAvailable(false)) {
+//			Toolz.addElementInHashArray(behaviors, i, meme);
+//			nameKVindex.put(meme.toFourCharString(), i);
 //			i++;
 //		}
 //
@@ -1080,8 +1079,8 @@ public class EntiteHandler extends ThreadHandler {
 	}
 
 	// TODO REFACTORING Prendre les memes a appliquer a tous en parametre plutot qu'avoir des variables statics
-	/** Dote les entités qui n'ont pas encore d'action des actions Add et remove de base. 
-	 *  
+	/** Dote les entités qui n'ont pas encore d'action des actions Add et remove de base.
+	 *
 	 * @param entiteAlreadyDone
 	 */
 	private void giveFluideMeme(ArrayList<Entite> entiteAlreadyDone){
@@ -1092,8 +1091,8 @@ public class EntiteHandler extends ThreadHandler {
 			}
 		}
 	}
-	
-	
+
+
 	/**
 	 * Fait le lien entre les agents et les noeuds du réseaux A appeler une fois
 	 * avant de commencer les routines de simulation
@@ -1106,7 +1105,7 @@ public class EntiteHandler extends ThreadHandler {
 		// Iterator sur les nodes du réseau pour leur associer des memes
 		for (Iterator<Node> iterator = nodes.iterator(); iterator.hasNext();) {
 			node = (Node) iterator.next();
-			toBindToNode = new Entite();
+			toBindToNode = new Entite(this);
 			toBindToNode.setNode(node);
 			entites.add(toBindToNode);
 		}
@@ -1122,19 +1121,18 @@ public class EntiteHandler extends ThreadHandler {
 	}
 
 	/**
-	 * 
-	 * @param targeted
+	 *
 	 */
 	private void giveEntiteTargetedColor(Integer actingEntite,
-			ArrayList<Integer> targeted) {
-		NetworkConstructor.getInstance().changeColorClass(actingEntite,targeted);
+										 ArrayList<Integer> targeted) {
+		networkConstruct.changeColorClass(actingEntite,targeted);
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void giveEntiteBaseColor() {
-		NetworkConstructor.getInstance().resetColorClass();
+		networkConstruct.resetColorClass();
 	}
 
 	public void synchronizeNodeConnectionWithEntiteConnection(Network network) {
@@ -1154,18 +1152,17 @@ public class EntiteHandler extends ThreadHandler {
 	/**
 	 * Génère les memes disponibles sur la map, qui seront associés ou non aux
 	 * entités. Ajouté directement dans la liste des memes dispos du memeHandler
-	 * 
+	 *
 	 */
 	private void generateMemeAvailableForMap() {
 
-		MemeFactory memeFactory = MemeFactory.getInstance();
 		ArrayList<AttributType> attributs = new ArrayList<AttributType>();
 		Hashtable<AttributType, Hashtable<Integer, AgregatorType>> KVAttributAgregator = new Hashtable<AttributType, Hashtable<Integer, AgregatorType>>();
 		Hashtable<Integer, AgregatorType> agregators = new Hashtable<Integer, AgregatorType>();
 
 		ActionType add = ActionType.AJOUTLIEN;
 		ActionType remove = ActionType.RETRAITLIEN;
-		
+
 		@SuppressWarnings("unused")
 		ActionType puri = ActionType.PURIFY;
 		AttributType degree = AttributType.DEGREE;
@@ -1206,7 +1203,7 @@ public class EntiteHandler extends ThreadHandler {
 		agregators.put(0, notLinked);
 		agregators.put(1, random);
 //		addRandom = memeFactory.registerMemeAction("AddØ",0.,add, attributs, KVAttributAgregator, true);
-		
+
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, random);
@@ -1223,7 +1220,7 @@ public class EntiteHandler extends ThreadHandler {
 		agregators.put(1, mineInf);
 		agregators.put(2, random);
 		memeFactory.registerMemeAction("Rmv+", .4, remove, attributs, KVAttributAgregator, true);
-		
+
 		agregators.clear();
 		agregators.put(0, hopAWay);
 		agregators.put(1, random);
@@ -1233,22 +1230,22 @@ public class EntiteHandler extends ThreadHandler {
 		// memeFactory.getMemeAction("Puri",0,puri, attributs,
 		// KVAttributAgregator, true);
 
-		for (Meme memeDispo : MemeFactory.getInstance().getMemeAvailable(false)) {
+		for (Meme memeDispo : memeFactory.getMemeAvailable(false)) {
 			memeTranslationReadable.put(memeDispo.toFourCharString(),memeDispo.getName());
 		}
-	
-		MemeFactory lol = MemeFactory.getInstance();
+
+		MemeFactory lol = memeFactory;
 		lol.getClass();
-	
+
 	}
 
 	/**
-	 * Renvoi une hashtable contenant les combinaisons possibles de giteri.meme avec
-	 * les memes sur la map. Un giteri.meme du giteri.meme type par agent par combinaison.
+	 * Renvoi une hashtable contenant les combinaisons possibles de meme avec
+	 * les memes sur la map. Un meme du meme type par agent par combinaison.
 	 * (Type: Ajout, retrait .. ) dépend de l'action appliquée
-	 * 
+	 *
 	 * @return une hash Int ( qui n'a pas de signification ), combinaison de
-	 *         giteri.meme.
+	 *         meme.
 	 */
 	private Hashtable<Integer, ArrayList<Meme>> getMemeCombinaisonAvailable() {
 		Hashtable<ActionType, ArrayList<Meme>> memesByCategory = new Hashtable<ActionType, ArrayList<Meme>>();
@@ -1257,7 +1254,7 @@ public class EntiteHandler extends ThreadHandler {
 
 		for (ActionType action : Configurator.ActionType.values()) {
 			if (action == ActionType.AJOUTLIEN || action == ActionType.RETRAITLIEN) {
-				memeOfOneCategory = MemeFactory.getInstance().getMemeAvailable(action, false);
+				memeOfOneCategory = memeFactory.getMemeAvailable(action, false);
 				if (memeOfOneCategory.size() > 0) {
 					memesByCategory.put(action, memeOfOneCategory);
 					key.add(action);
@@ -1278,8 +1275,6 @@ public class EntiteHandler extends ThreadHandler {
 	}
 
 	/**
-	 * 
-	 * @param compo
 	 *            Renvoi
 	 * @param indexAction
 	 * @param memesByCategory
@@ -1288,8 +1283,8 @@ public class EntiteHandler extends ThreadHandler {
 	 */
 	@SuppressWarnings("unchecked")
 	private void recursive(Hashtable<ActionType, ArrayList<Meme>> memesByCategory,
-						  ArrayList<Meme> memes, ActionType[] actions,
-						  Hashtable<Integer, ArrayList<Meme>> selection, int indexAction) {
+						   ArrayList<Meme> memes, ActionType[] actions,
+						   Hashtable<Integer, ArrayList<Meme>> selection, int indexAction) {
 
 		if ((++indexAction) < actions.length) {
 			for (Meme meme : memesByCategory.get(actions[indexAction])) {
@@ -1310,7 +1305,7 @@ public class EntiteHandler extends ThreadHandler {
 	/**
 	 * Utilisé pour mettre a jour l'affichage du nombre d'action par seconde
 	 * réalisée.
-	 * 
+	 *
 	 */
 	private void checkAPM() {
 		long elapsed = System.nanoTime() - atmLastTime;
@@ -1335,7 +1330,7 @@ public class EntiteHandler extends ThreadHandler {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param meme
 	 * @param actualFilter
 	 * @return
@@ -1349,9 +1344,7 @@ public class EntiteHandler extends ThreadHandler {
 
 	/**
 	 * Si un lien existe entre one et two, renvoi true.
-	 * 
-	 * @param one
-	 * @param two
+	 *
 	 * @return
 	 */
 	@SuppressWarnings("unused")
@@ -1374,9 +1367,6 @@ public class EntiteHandler extends ThreadHandler {
 
 	/**
 	 * Si un lien existe entre one et two, renvoi true.
-	 * 
-	 * @param one
-	 * @param two
 	 * @return
 	 */
 	private boolean isEntiteLinked(Entite first, Entite second, boolean directed) {
@@ -1399,16 +1389,16 @@ public class EntiteHandler extends ThreadHandler {
 	// Region getter//Setter
 
 	/**
-	 * Renvoi, pour affichage, en condensé index, obj et giteri.meme. ttes entités
-	 * 
-	 * @return index + obj + <giteri.meme.toShortString()>
+	 * Renvoi, pour affichage, en condensé index, obj et meme. ttes entités
+	 *
+	 * @return index + obj + <meme.toShortString()>
 	 */
 	public String getEntitesInfoAsString() {
 		String resultat = "";
 		for (Entite entitee : entites) {
 			resultat += "\n né" + entitee.getIndex();
 			for (Meme meme : entitee.getMyMemes()) {
-				resultat += "giteri/meme " + meme.toShortString();
+				resultat += "\n \t meme " + meme.toShortString();
 			}
 		}
 		return resultat;
@@ -1428,7 +1418,7 @@ public class EntiteHandler extends ThreadHandler {
 		public int compare(Meme arg0, Meme arg1) {
 			return -1
 					* arg0.toFourCharString()
-							.compareTo(arg1.toFourCharString());
+					.compareTo(arg1.toFourCharString());
 		}
 
 	}

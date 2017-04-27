@@ -31,50 +31,35 @@ import giteri.meme.event.BehavTransmEvent;
 /** Classe de dessin pour graphStream
  *
  */
-@SuppressWarnings("unused")
 public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInterface {
 
-	// Region singleton Stuff
-	private static DrawerGraphStream INSTANCE = null;
-	
 	/** Constructeur sans paramètre.
-	 * 
+	 *
 	 */
-	private DrawerGraphStream() {
-		super();
+	public DrawerGraphStream(EntiteHandler entiteHandler, MemeFactory memeFactory, NetworkConstructor networkConstructor,
+							 WriteNRead wnr, NetworkFileLoader nfl, WorkerFactory wf) {
+		super(entiteHandler, memeFactory, networkConstructor, wnr, nfl, wf);
 		if(Configurator.DisplayLogdebugInstantiation)
 			System.out.println("DrawerGraphStream Constructor");
 		colorPieAsString = new Hashtable<Integer, String>();
 		colorPieAsColor = new Hashtable<Integer, Color>();
 		setColorPie();
-		fs = new FileSinkImages("pre", FileSinkImages.OutputType.PNG, FileSinkImages.Resolutions.HD1080, 
+		fs = new FileSinkImages("pre", FileSinkImages.OutputType.PNG, FileSinkImages.Resolutions.HD1080,
 				FileSinkImages.OutputPolicy.NONE);
 		fs.setLayoutPolicy(LayoutPolicy.COMPUTED_FULLY_AT_NEW_IMAGE);
 	}
 
-	/** Fourni l'unique instance de la classe.
-	 * 
-	 */
-	public static DrawerGraphStream getInstance()
-	{
-		if( INSTANCE == null)
-			INSTANCE = new DrawerGraphStream();
-		
-		return INSTANCE;
-	}
-	
-	// EndRegion
-	
-	// Graphe associé 
+
+	// Graphe associé
 	private Graph graph;
 	private Hashtable<Integer, String> colorPieAsString;
 	private Hashtable<Integer, Color> colorPieAsColor;
-	
+
 	FileSinkImages fs;
 	private int nbAction = 0;
-	
+
 	/** Permet de transmettre l'instance du graph.
-	 * 
+	 *
 	 * @param thisgraph
 	 */
 	public void setGraph(Graph thisgraph){
@@ -83,28 +68,28 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 		fs.setLayoutPolicy(LayoutPolicy.COMPUTED_ONCE_AT_NEW_IMAGE);
 		defineGraphAttributes(graph);
 	}
-	
+
 	// Region Interface MemeListener
-	
-	/** Lorsqu'un giteri.meme est ajouté ou retiré d'une entité
-	 * 
+
+	/** Lorsqu'un meme est ajouté ou retiré d'une entité
+	 *
 	 */
-	public void handlerBehavTransm(BehavTransmEvent e) {	
-		// A priori inutile de parler du cas de remplacement car la classe de node écrase 
+	public void handlerBehavTransm(BehavTransmEvent e) {
+		// A priori inutile de parler du cas de remplacement car la classe de node écrase
 		// la précédente. A revoir si des memes peuvent etre spontanement perdu.
 		if(e.message == Configurator.MemeActivityPossibility.AjoutMeme.toString()){
 			// On cherche le noeud concerné
-			Node noeud = graph.getNode(""+e.entite.getIndex());	
-			setNodeClass(noeud, e.entite.getGraphStreamClass());					
+			Node noeud = graph.getNode(""+e.entite.getIndex());
+			setNodeClass(noeud, e.entite.getGraphStreamClass());
 			if(Configurator.displayLogMemeTransmission)
 				System.out.println(noeud+" "+e.meme.getName());
-			}
 		}
+	}
 
 	/** En tte logique c'est ici que devrait etre géré
 	 * l'évoluation du réseau graphique par rapport a celui
 	 * du programme.
-	 * 
+	 *
 	 */
 	public void handlerActionApply(ActionApplyEvent e) {
 //		nbAction++;
@@ -113,31 +98,31 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 //			CommunicationModel.getInstance().suspend();
 //		}
 		// TODO En toute logique, c'est en fonction de ces events que des éléments
-		// du graphe devrait etre ajouté et retiré. Néanmoins, déjà fait dans la classe giteri.network,
+		// du graphe devrait etre ajouté et retiré. Néanmoins, déjà fait dans la classe network,
 		// la flemme de le refaire.
-		// Si fait, retirer les ajouts et retrait de lien des appeles addNodes etc du giteri.network,
+		// Si fait, retirer les ajouts et retrait de lien des appeles addNodes etc du network,
 		// le faire ici a la reception des events. Ca donnera une meilleur dissociation entre la partie
-		// Réseau et affichage de ce dernier. 
+		// Réseau et affichage de ce dernier.
 	}
 
 	// EndRegion
-	
+
 	// Region Interface DrawerInterface
 
 	/** Dessin d'un graphe initial, va aussi regarder les memes possédé par les
 	 * noeuds pour l'initialisation des couleurs.
-	 * 
+	 *
 	 */
 	public void drawThisNetwork(Network net) {
 		if(Configurator.DisplayLogdebugInstantiation)
 			System.out.println("DrawThisNetwork Initialisation");
-		
+
 		String attrib;
 		for (giteri.network.network.Node node : net.getNodes())
 		{
 			this.addNode(node.getIndex());
 			// Etape pour connaitre les memes initiaux
-			Entite entity = EntiteHandler.getInstance().getEntityCorresponding(node);
+			Entite entity = entiteHandler.getEntityCorresponding(node);
 			if (entity != null) {
 				attrib = entity.getGraphStreamClass();
 				Node noeud = graph.getNode("" + entity.getIndex());
@@ -145,25 +130,25 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 			}
 		}
 
-		for (Edge edge : net.getEdges()) 
+		for (Edge edge : net.getEdges())
 		{
 			this.addEdge(edge.getNodeFrom().getIndex(), edge.getNodeTo().getIndex());
 		}
-		
+
 		if(Configurator.DisplayLogdebugInstantiation)
 			System.out.println("DrawThisNetwork Ending");
 	}
-	
-	/** Associe aux noeuds du réseau des classes qui permettront de changer leur couleurs d'affichage. 
-	 * Prend un giteri.network et des noeuds sur lesquels il faut appliquer la couleur propore au target
+
+	/** Associe aux noeuds du réseau des classes qui permettront de changer leur couleurs d'affichage.
+	 * Prend un network et des noeuds sur lesquels il faut appliquer la couleur propore au target
 	 * Sur les autres noeuds, les passer en noirs. Le noeud qui fait l'action rester dans sa couleur
-	 * d'origine. 
-	 * 
+	 * d'origine.
+	 *
 	 * @param net
 	 * @param nodeToDesignAsTarget
 	 */
 	public void applyTargetColor(Network net, Integer actingEntite ,ArrayList<Integer> nodeToDesignAsTarget){
-		
+
 		String attrib;
 		boolean found = false;
 		// On regarde tous les nodes du réseau
@@ -186,13 +171,13 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 					setNodeClass(noeud, "NOTTARGET");
 				}
 			}
-		
-		found = false;
+
+			found = false;
 		}
 	}
-	
-	/** Rend aux noeuds du réseau les classes de couleurs correspondant a leur comportements. 
-	 * 
+
+	/** Rend aux noeuds du réseau les classes de couleurs correspondant a leur comportements.
+	 *
 	 * @param net
 	 */
 	public void resetGoodColor(Network net){
@@ -200,7 +185,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 		for (giteri.network.network.Node node : net.getNodes())
 		{
 			// Etape pour connaitre les memes initiaux
-			Entite entity = EntiteHandler.getInstance().getEntityCorresponding(node);
+			Entite entity = entiteHandler.getEntityCorresponding(node);
 			if (entity != null) {
 				attrib = entity.getGraphStreamClass();
 				Node noeud = graph.getNode("" + entity.getIndex());
@@ -208,31 +193,31 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 			}
 		}
 	}
-	
+
 	/** Print un apercu du graphe dans la console.
-	 * 
+	 *
 	 */
 	public void networkOverview() {
 		System.out.println("GraphStream view");
 		for(org.graphstream.graph.Edge e:graph.getEachEdge()) {
-		    System.out.println(e.getId());
+			System.out.println(e.getId());
 		}
 		System.out.println("GraphStreamVeiw : stop");
 	}
 
-	/** Faire une capture d'écran du réseau en cours. 
-	 * 
+	/** Faire une capture d'écran du réseau en cours.
+	 *
 	 */
 	public void screenshotDisplay(ArrayList<String> rep){
 		try {
-			fs.writeAll(graph, WriteNRead.getInstance().createAndGetDirFromString(rep).getAbsolutePath());
+			fs.writeAll(graph, writeNRead.createAndGetDirFromString(rep).getAbsolutePath());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/** Reset les states du graph
-	 * 
+	 *
 	 */
 	public void resetDisplay(){
 		graph.clear();
@@ -240,80 +225,80 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 //		indexDensityAdded = 0;
 		defineGraphAttributes(graph);
 	}
-	
+
 	/** Ajout d'un edge dans le graphe visuel
-	 * 
+	 *
 	 */
 	public void addEdge(int from, int to) {
 		graph.addEdge(""+from+"-"+to, from, to, false);
-		
-		
-	}	
-	
+
+
+	}
+
 	/** Ajout d'un node dans le graphe visuel
-	 * 
+	 *
 	 */
 	public void addNode(int nod) {
-		graph.addNode(""+ nod);	
+		graph.addNode(""+ nod);
 	}
 
 	/** Suppression d'un edge du graphe.
-	 * 
+	 *
 	 */
-	public void removeEdge(int from, int to) {		
-		graph.removeEdge(from, to);			
+	public void removeEdge(int from, int to) {
+		graph.removeEdge(from, to);
 	}
-	
+
 	// EndRegion interface DrawerInterface
 
 	// Region Fonction propre à ce moteur graphique
-	
+
 	/** va associer une classe au node en fonction des memes qu'il contient
-	 * 
+	 *
 	 * @param node
 	 * @param attribut
 	 */
 	private void setNodeClass(Node node, String attribut){
 		if(node != null)
-			node.addAttribute("ui.class", attribut); 
+			node.addAttribute("ui.class", attribut);
 	}
-	
+
 	/** Défini les attributs sur le graphe.
-	 * 
+	 *
 	 * @param graph
 	 */
 	private void defineGraphAttributes(Graph graph){
-		
+
 		String attribut = "";
 //		int index = -1;
 		Integer officialIndex;
-		int nbMemeSolo = MemeFactory.getInstance().getMemeAvailable(false).size();
+		int nbMemeSolo = memeFactory.getMemeAvailable(false).size();
 		nbMemeSolo--;
 		int aAppliquer;
-		
-		for (String combi : EntiteHandler.getInstance().getMemeAvailableAsString(Configurator.memeCombinaisonOnMap)) {
-			officialIndex = MemeFactory.getInstance().getColorIndexStringConversion(combi);
+
+		for (String combi : entiteHandler.getMemeAvailableAsString(Configurator.memeCombinaisonOnMap)) {
+			officialIndex = memeFactory.getColorIndexStringConversion(combi);
 
 			if(officialIndex != null)
 				aAppliquer = officialIndex;
 			else
 				aAppliquer = ++nbMemeSolo;
-			
+
 			attribut += "node. "+combi+" {fill-color: "+ colorPieAsString.get(aAppliquer)+";}";
 			if(Configurator.DisplayLogBehaviorColors){
-				System.out.println(EntiteHandler.getInstance().translateMemeCombinaisonReadable(combi) + ":" + colorPieAsString.get(aAppliquer));
+				System.out.println(entiteHandler.translateMemeCombinaisonReadable(combi) + ":" + colorPieAsString.get(aAppliquer));
 			}
 		}
-		
+
 		attribut += "node.TARGET {fill-color: "+ colorPieAsString.get(100)+";}";
 		attribut += "node.NONTARGET {fill-color: "+ colorPieAsString.get(101)+";}";
-		
+
 		graph.addAttribute("ui.stylesheet", attribut);
 
 	}
-	
+
 	/** Retourne la couleur correspondant a l'index en param
-	 * 
+	 *
 	 * @param index
 	 * @return une java.awt.color
 	 */
@@ -321,9 +306,9 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 		synchronized(this.colorPieAsColor){
 			return colorPieAsColor.get(index);
 		}
-	}	
+	}
 	/** Retourne la couleur correspondant a l'index en param
-	 * 
+	 *
 	 * @param index
 	 * @return une java.awt.color
 	 */
@@ -332,9 +317,9 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 			return colorPieAsString.get(index);
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private void setColorPie(){
 		colorPieAsString.put(0, "rgb(204,0,0)");
@@ -383,33 +368,33 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 	private double getDensity() {
 		return Toolkit.density(graph);
 	}
-	
+
 	/** Obtient un tableau du degree de distribution. 
 	 * [index] = n. N noeud possède un degré d'index. 
-	 * 
+	 *
 	 */
 	private int[] getDegreeDistribution(){
 		return Toolkit.degreeDistribution(graph);
 	}
-	
+
 	/** Renvoi le degre moyen de?? densité?
-	 * 
+	 *
 	 */
 	private double getAvgDegree() {
 		Toolkit.averageDegree(graph);
 		return 0;
 	}
-	
+
 	/** TODO PAS EXACT DU TOUT DU TOUT
-	 * 
+	 *
 	 */
 	private double getDDInterQrt() {
 		Toolkit.degreeAverageDeviation(graph);
 		return 0;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	private int getNbEdges(){
@@ -417,7 +402,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 	}
 
 	/** Calcul du chemin le plus court moyen
-	 * 
+	 *
 	 */
 	public double getAPL(){
 		APSP apsp = new APSP();
@@ -434,9 +419,9 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 				nbValue++;
 			}
 		}
-		
+
 		return  total / nbValue;
 	}
-	
+
 	// EndRegion
 }

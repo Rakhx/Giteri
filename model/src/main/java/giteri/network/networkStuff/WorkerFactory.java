@@ -7,59 +7,70 @@ import giteri.network.network.Network;
 import giteri.run.configurator.Configurator;
 
 
+
 /** Classe permettant d'accéder aux classes de dessin et de calcul
- * associé au réseau etc. 
+ * associé au réseau etc.
  *  TODO possibilité de merger ca dans communicationModel et faire passer
- *  ce dernier en singleton? 
+ *  ce dernier en singleton?
  */
 public class WorkerFactory {
 
 	protected StatAndPlotInterface calculator;
 	protected DrawerInterface drawer;
 	public Object waitingForReset;
-	
-	// Region singleton Stuff
-	private static WorkerFactory INSTANCE = null;
-	
-	/** Constructeur sans paramètre.
-	 * 
-	 */
-	protected WorkerFactory() {
+
+	public WorkerFactory(){
 		waitingForReset = new Object();
-		if(Configurator.withGraphicalDisplay)
-		{
-			calculator = DrawerGraphStream.getInstance();
-			drawer = DrawerGraphStream.getInstance();
-		}else {
-			calculator = NetworkAnalyzer.getInstance();
-			drawer = new DrawerStub();
-		}
 	}
 
-	/** Fourni l'unique instance de la classe.
-	 * 
-	 */
-	public static WorkerFactory getInstance()
-	{
-		if( INSTANCE == null)
-			if(!Configurator.jarMode)
-				INSTANCE = new WorkerFactory();
-			else
-				INSTANCE = WorkerFactoryJarVersion.getInstance();
-		
-		return INSTANCE;
+	public void setNecessary(StatAndPlotInterface statAnd, DrawerInterface dra ){
+		calculator = statAnd;
+		drawer = dra;
 	}
-	// EndRegion
-	
+
+	/** Constructeur sans paramètre.
+	 *
+	 */
+	public WorkerFactory(DrawerGraphStream dra) {
+		waitingForReset = new Object();
+		calculator = dra;
+		drawer = dra;
+	}
+
+	public WorkerFactory(NetworkAnalyzer anal ) {
+		waitingForReset = new Object();
+		calculator = anal;
+		drawer = new DrawerStub();
+	}
+
+	/** Bouger la condition du boolean an l'appel du worker factory.
+	 *
+	 * @param statAnd
+	 * @param dra
+	 */
+//	public WorkerFactory(StatAndPlotInterface statAnd, DrawerInterface dra ) {
+//		waitingForReset = new Object();
+//		calculator = statAnd;
+//		drawer = dra;
+//	}
+
+//	public static WorkerFactory getInstance()
+//	{
+//		if( INSTANCE == null)
+//			if(!Configurator.jarMode)
+//				INSTANCE = new WorkerFactory();
+//			else
+//				INSTANCE = WorkerFactoryJarVersion.getInstance();
+//
+//		return INSTANCE;
+//	}
+
 	public StatAndPlotInterface getCalculator(){
 		return calculator;
 	}
-	
+
 	public DrawerInterface getDrawer(){
 		return drawer;
 	}
-	
-	public void setNetwork(Network net){
-//		calculator.init(net);
-	}
+
 }
