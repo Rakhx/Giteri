@@ -175,11 +175,14 @@ public class Result {
 	/** Renvoi les scores en fonction des ID en fonction des distributions
 	 * TODO [Refact2.0] ici que ca se passe pour les multiscore nombreux?
 	 */
-	public void displayResult(){
+	public double displayResult(){
+		double res = 0;
 		if(Configurator.jarMode){
 			for (Integer networkId : parameterSetById.keySet())
-				System.out.println(Toolz.getAvg(scoreById.get(networkId)));
-			return;
+				res = Toolz.getAvg(scoreById.get(networkId));
+				System.out.println(res);
+
+
 		}
 
 		for (Integer networkId : parameterSetById.keySet()) {
@@ -190,6 +193,8 @@ public class Result {
 			System.out.println("◊ Propriété du premier network obtenu "+ networkPropertiesById.get(networkId).get(0).toString());
 			System.out.println("◊ Configuration "+ parameterSetById.get(networkId));
 		}
+
+		return res;
 	}
 
 	/** Retourne a partir du UUID d'un réseau lae string des set de
@@ -463,7 +468,7 @@ public class Result {
 	/** Renvoi une série correspondant a un NetworkProperties, sur les attributs de la liste.
 	 *
 	 * @param name
-	 * @param netProp
+
 	 * @param attribs
 	 * @return
 	 */
@@ -483,7 +488,7 @@ public class Result {
 	/** Obtient la division de 360 par l'emplacement dans la liste de l'attribut en question.
 	 *
 	 * @param attribType
-	 * @param nbAttribut
+
 	 * @return
 	 */
 	private double convertAttributeToRadial(ArrayList<NetworkAttribType> usedAttrib ,NetworkAttribType attribType){

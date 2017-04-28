@@ -335,10 +335,12 @@ public class FittingClass implements BehaviorTransmissionListener, ActionApplyLi
 	/** Fin de la simulation, affiche le résultat final.
 	 *
 	 */
-	public void endSimu(){
-		resultNetwork.displayResult();
+	public double endSimu(){
+		double res;
+		res = resultNetwork.displayResult();
 		if(!Configurator.jarMode)
 			resultNetwork.displayPolar();
+		return res;
 	}
 
 	/** Ajout d'une densité à l'issu d'un relevé. C'est avec l'ensemble des densités

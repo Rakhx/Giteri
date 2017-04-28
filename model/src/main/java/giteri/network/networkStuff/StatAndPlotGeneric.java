@@ -73,19 +73,20 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	/** Lancement de thread qui va comparer un réseau lu et le réseau en cours.
 	 *
 	 */
-	public void fitNetwork(int activator){
-		(new Thread(){
-			public void run() {
+	public Double fitNetwork(int activator){
+//		(new Thread(){
+	//		public void run() {
 				boolean stability = activator == 0? true: false;
-				callFactorisedFunction(stability);
-			}
-		}).start();
+				return callFactorisedFunction(stability);
+	//		}
+	//	}).start();
 	}
 
 	/** PREMIERE FONCTION APPELEE DANS LA LONGUE SERIE DES FITTING SEARCHING
 	 *
 	 */
-	public void callFactorisedFunction(boolean stabilityRun){
+	public double callFactorisedFunction(boolean stabilityRun){
+		double resultat;
 		// Classe de configuration qui contient tout ce qu'il faut pour faire une simu
 		FittingClass configuration = new FittingClass(stabilityRun, writeNRead,communicationModel,
 				memeFactory, networkFileLoader, workerFactory, entiteHandler, networkConstructor);
@@ -98,11 +99,12 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		initializeConfigForStability(configuration);
 
 		// Lancement d'une simulation
-		factorisation(configuration);
+		resultat = factorisation(configuration);
 
 		// retrait de la fitting classe des listener
 		entiteHandler.removeEntityListener(configuration);
 //		EntiteHandler.getInstance().removeMemeListener(configuration);
+		return resultat;
 	}
 
 	/** Initialise et instancie pour préparer le fitting. Behavior présent sur la map,
@@ -151,7 +153,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 *
 	 * @param config
 	 */
-	private void factorisation(FittingClass config){
+	private double factorisation(FittingClass config){
 		config.init();
 		int nbActionPassee = 0;
 
@@ -219,7 +221,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			networkConstructor.stop();
 			networkConstructor.resume();
 		}
-		config.endSimu();
+		return config.endSimu();
 	}
 
 	// EndRegion

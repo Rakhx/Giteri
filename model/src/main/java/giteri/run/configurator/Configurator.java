@@ -10,22 +10,22 @@ import giteri.tool.math.Toolz;
 public final class Configurator {
 
 
-
+/*
 	// NORMAL
 	public static MemeDistributionType methodOfGeneration = MemeDistributionType.AllCombinaison;
 	public static boolean displayPlotWhileSimulation = true;
 	public static boolean withGraphicalDisplay = true;
 	public static boolean jarMode = false;
 	public static boolean systemPaused = true;
+*/
 
-	/*
 	// JAR MODE
 	public static MemeDistributionType methodOfGeneration = MemeDistributionType.FollowingFitting;
 	public static boolean displayPlotWhileSimulation = false;
 	public static boolean withGraphicalDisplay =  false;
 	public static boolean jarMode = true;
 	public static boolean systemPaused = false;
-	*/
+
 
 
 

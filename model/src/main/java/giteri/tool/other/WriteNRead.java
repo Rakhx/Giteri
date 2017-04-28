@@ -120,6 +120,32 @@ public class WriteNRead {
 		return networkLoader;
 	}
 
+
+	public IReadNetwork readAndCreateNetwork(File aFile, IReadNetwork networkLoader, String separator ,String comString) throws IOException{
+
+		Path path = aFile.toPath();
+		String line;
+		networkLoader.init();
+		try (Scanner scanner =  new Scanner(path, ENCODING.name())){
+			while (scanner.hasNextLine()){
+				line = scanner.nextLine();
+				// # for instance
+				if(!line.startsWith(comString))
+					//process each line in some way
+					networkLoader.whatToDoWithOneLine(line , separator);
+			}
+
+			scanner.close();
+		}
+		catch (Exception e){
+			System.out.println("TROPLOL");
+		}
+
+		return networkLoader;
+	}
+
+
+
 	/** Transcrit le réseau en liste d'edge.
 	 *
 	 * @param reps

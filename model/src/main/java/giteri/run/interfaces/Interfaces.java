@@ -69,7 +69,7 @@ public class Interfaces {
 		
 		public void updateNetworkProperties(TinyNetwork net, NetworkProperties netProp, int activationCode);
 		public double getAPL();
-		public void fitNetwork(int activator);
+		public Double fitNetwork(int activator);
 //		public void searchStability();
 		public void fitNextStep();
 		public void testStability();
