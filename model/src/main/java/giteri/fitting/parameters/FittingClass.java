@@ -117,7 +117,7 @@ public class FittingClass implements BehaviorTransmissionListener, ActionApplyLi
 
 	// every nbActionThreshrising rise threshold of risingPourcentage
 
-	private double risingPourcentage = .1;
+	private double risingPourcentage = .4;
 	private int nbActionThreshRising = 7;
 
 	// EndRegion
@@ -166,7 +166,7 @@ public class FittingClass implements BehaviorTransmissionListener, ActionApplyLi
 	 *
 	 */
 	private void setDefaultValue(){
-		nbRepetitionByConfig = 3;
+		nbRepetitionByConfig = 4;
 		nbActionByStep = 50;
 		cfqDensityValuesOnOneRun = new CircularFifoQueue<Double>(boucleExterneSize);
 		cqLastXActionDone = new CircularFifoQueue<Meme>(circularSize);
@@ -383,18 +383,16 @@ public class FittingClass implements BehaviorTransmissionListener, ActionApplyLi
 
 	/** Version utilisée pour savoir s'il faut continuer a faire du fitting ou si on a
 	 * attend une stabilité.
-	 *
+	 * // TODO [WayPoint]- Choix de continuité d'une simulation pour une config. 
 	 * @return
 	 */
 	public boolean continuFittingCleanVersion(){
-
 		boolean useDensity = true;
-		boolean useMemeAppliance = true;
+		boolean useMemeAppliance = false;
 
 		boolean stepByStep = false;
 		boolean debug = Configurator.debugFittingClass && !Configurator.jarMode;
 		boolean fastDebug = Configurator.debugFittingClassFast && !Configurator.jarMode;
-
 
 		boolean oneMoreTurn = true;
 		boolean canStillApplyAction;
@@ -417,7 +415,6 @@ public class FittingClass implements BehaviorTransmissionListener, ActionApplyLi
 
 		// Si: pas de probleme avec les actions
 		if(canStillApplyAction){
-
 			// STEP Variation de la densité.
 			// Dans le cas ou il est possible de jouer des actions & assez de donnée on regarde la variation de densité
 			if(useDensity)
@@ -428,28 +425,23 @@ public class FittingClass implements BehaviorTransmissionListener, ActionApplyLi
 				scoreTotal += scoreEcartDensite;
 				scoreCoeffDirDensite = readingDensityCoeffDir(new ArrayList<Double>(Arrays.asList(cfqDensityValuesOnOneRun.toArray(new Double[1]))), message) ;
 				resume += message.getValue();
-				scoreTotal += scoreCoeffDirDensite;
-			}
+				scoreTotal += scoreCoeffDirDensite;	}
 
 			// STEP Variation de l'application des memes.
 			if(useMemeAppliance)
 			{
 				scoreMemeAppliance = readingMemeAppliance(false, message);
 				resume += message.getValue();
-				scoreTotal += scoreMemeAppliance;
-			}
+				scoreTotal += scoreMemeAppliance;	}
 		}
 
 		// EndRegion
-
 		// Region STEP Utilisation des scores
-
 		if(canStillApplyAction)
 		{
 			// Density
 			if(useDensity)
 			{
-
 				if(debug) System.out.println("Ecart densité " + scoreEcartDensite + " Coeff directeur " + scoreCoeffDirDensite );
 
 				// Définition du hard et soft end pour l'écart a la densité
@@ -460,8 +452,7 @@ public class FittingClass implements BehaviorTransmissionListener, ActionApplyLi
 
 				// Définition du hard et soft pour le coeff directeur
 				if(scoreCoeffDirDensite < threshSeCoeff)
-					seCoeff = true;
-			}
+					seCoeff = true;}
 
 			// Appliance
 			if(useMemeAppliance)
@@ -471,8 +462,7 @@ public class FittingClass implements BehaviorTransmissionListener, ActionApplyLi
 				if(scoreMemeAppliance < (memesAvailables.size() * threshSeAppliance))
 					seAppliance = true;
 				if(scoreMemeAppliance < (memesAvailables.size() * threshHeAppliance))
-					heAppliance = true;
-			}
+					heAppliance = true;}
 		}
 
 		// EndRegion
@@ -483,38 +473,31 @@ public class FittingClass implements BehaviorTransmissionListener, ActionApplyLi
 		if(!canStillApplyAction)
 		{
 			if(fastDebug) System.out.println("[ContinuFitting] Plus d'action réalisable");
-			if(!stepByStep) oneMoreTurn = false;
-		}
+			if(!stepByStep) oneMoreTurn = false;}
 
 		if(useDensity)
 			if(heCoeff || heDensity)
 			{
 				if(!stepByStep) oneMoreTurn = false;
-				if(fastDebug) System.out.println("Hard End sur density " + (heCoeff ? "coeff" : "ecart type"));
-			}
+				if(fastDebug) System.out.println("Hard End sur density " + (heCoeff ? "coeff" : "ecart type"));}
 
 		if(useMemeAppliance)
 			if(heAppliance)
 			{
 				if(!stepByStep) oneMoreTurn = false;
-				if(fastDebug) System.out.println("Hard End sur appliance ");
-			}
+				if(fastDebug) System.out.println("Hard End sur appliance ");}
 
 		// SOFTEND
 		if( (useDensity ? (seDensity && seCoeff) : true) && ( useMemeAppliance ? (seAppliance) : true)  ){
 			if(!stepByStep) oneMoreTurn = false;
-			if(fastDebug) System.out.println("Soft end sur tout le monde");
-		}
+			if(fastDebug) System.out.println("Soft end sur tout le monde");}
 
 		// SOMME DES SCORES
 		seuilScore += (useDensity ? threshHeDensity + threshHeAppliance : 0) + (useMemeAppliance ? threshHeAppliance: 0 );
 		if(scoreTotal < seuilScore){
 			if(!stepByStep) oneMoreTurn = false;
-			if(fastDebug) System.out.println("Somme des scores inférieur a somme des SE");
-		}
-
+			if(fastDebug) System.out.println("Somme des scores inférieur a somme des SE");}
 		if(debug && !oneMoreTurn)  System.out.println( resume );
-
 		// EndRegion
 
 		return oneMoreTurn;
@@ -875,7 +858,7 @@ public class FittingClass implements BehaviorTransmissionListener, ActionApplyLi
 	 */
 	private void resetSeuilValue(){
 		threshSeDensity = 0.5 ;
-		threshHeDensity = 0.001;
+		threshHeDensity = 0.005;
 		threshSeCoeff = 0.01;
 //		threshHeCoeff = 0.001;
 		threshSeAppliance = 0.3;

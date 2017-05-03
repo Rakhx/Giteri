@@ -29,7 +29,7 @@ import giteri.run.configurator.Configurator.NetworkAttribType;
 /** Classe de résultat des réseaux pendant l'étape de fitting.
  * les réseaux sont identifiés par un GUID, et des map <Guid, parametre> // Score>
  * sont la pour associer réseau, paramètre et résultat suivant des métriques calculées
- * pendant l'étape de fitting.
+ * pendant l'étape de fitting. blabl
  */
 public class Result {
 

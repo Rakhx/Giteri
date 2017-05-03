@@ -1,27 +1,32 @@
 package giteri.run;
 
-import giteri.meme.mecanisme.ActionFactory;
-import giteri.meme.mecanisme.AgregatorFactory;
-import giteri.meme.mecanisme.AttributFactory;
-import giteri.meme.mecanisme.MemeFactory;
-import giteri.network.networkStuff.*;
-import giteri.run.configurator.Configurator;
-import giteri.run.controller.Controller;
-import giteri.run.interfaces.Interfaces.IView;
-
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import giteri.tool.other.WriteNRead;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.view.Viewer;
 
 import giteri.meme.entite.EntiteHandler;
+import giteri.meme.mecanisme.ActionFactory;
+import giteri.meme.mecanisme.AgregatorFactory;
+import giteri.meme.mecanisme.AttributFactory;
+import giteri.meme.mecanisme.MemeFactory;
+import giteri.network.networkStuff.CommunicationModel;
+import giteri.network.networkStuff.DrawerGraphStream;
+import giteri.network.networkStuff.NetworkConstructor;
+import giteri.network.networkStuff.NetworkFileLoader;
+import giteri.network.networkStuff.WorkerFactory;
+import giteri.run.configurator.Configurator;
+import giteri.run.controller.Controller;
+import giteri.run.interfaces.Interfaces.IReadNetwork;
+import giteri.run.interfaces.Interfaces.IView;
+import giteri.tool.other.WriteNRead;
 
 public final class Main {
 
@@ -76,10 +81,18 @@ public final class Main {
 			drawerGraphStream.setGraph(graph);
 			@SuppressWarnings("unused")
 			Viewer lol = graph.display();
+		}else{
+//			drawerGraphStream.setGraph();
 		}
 
 
-
+		IReadNetwork nl = mControl.getReader();
+		try {
+			writeNRead.readAndCreateNetwork("" + Configurator.defaultPathForReadingNetwork, nl, " ", "#");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
 
 		fenetre.setVisible(true);
 		entiteHandler.setIHMController(vControl);

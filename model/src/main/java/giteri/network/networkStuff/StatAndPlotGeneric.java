@@ -74,12 +74,20 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 *
 	 */
 	public Double fitNetwork(int activator){
-//		(new Thread(){
-	//		public void run() {
+		if(!Configurator.jarMode){
+		
+		(new Thread(){
+			public void run() {
 				boolean stability = activator == 0? true: false;
-				return callFactorisedFunction(stability);
-	//		}
-	//	}).start();
+				 callFactorisedFunction(stability);
+			}
+		}).start();
+		return 0.;
+		}else{
+			boolean stability = activator == 0? true: false;
+			return callFactorisedFunction(stability);
+		}
+			
 	}
 
 	/** PREMIERE FONCTION APPELEE DANS LA LONGUE SERIE DES FITTING SEARCHING

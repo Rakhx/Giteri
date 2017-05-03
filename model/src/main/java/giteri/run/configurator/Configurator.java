@@ -10,13 +10,14 @@ import giteri.tool.math.Toolz;
 public final class Configurator {
 
 
-/*
+/* 
 	// NORMAL
 	public static MemeDistributionType methodOfGeneration = MemeDistributionType.AllCombinaison;
 	public static boolean displayPlotWhileSimulation = true;
 	public static boolean withGraphicalDisplay = true;
 	public static boolean jarMode = false;
 	public static boolean systemPaused = true;
+	public static boolean writeNetworkResultOnFitting = true;
 */
 
 	// JAR MODE
@@ -25,9 +26,20 @@ public final class Configurator {
 	public static boolean withGraphicalDisplay =  false;
 	public static boolean jarMode = true;
 	public static boolean systemPaused = false;
+	public static boolean writeNetworkResultOnFitting = false;
 
 
-
+	/*
+	// Work in progress
+	public static MemeDistributionType methodOfGeneration = MemeDistributionType.FollowingFitting;
+	public static boolean displayPlotWhileSimulation = true;
+	public static boolean withGraphicalDisplay =  true;
+	public static boolean jarMode = false;
+	public static boolean systemPaused = true;
+	public static boolean writeNetworkResultOnFitting = false;
+	
+	*/
+	
 
 	public static boolean doNotApplyMemeAvailability = false;
 
@@ -104,7 +116,7 @@ public final class Configurator {
 	// Affichage
 //	public static boolean displayPlotWhileSimulation = lotOfNodes ? false: true;
 	public static boolean displayMemePosessionDuringSimulation = lotOfNodes ? false: true;
-	public static boolean writeNetworkResultOnFitting = true;
+	
 
 
 	// Config Temporaire
