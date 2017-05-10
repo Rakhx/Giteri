@@ -132,9 +132,10 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		// classe truqué pour tjrs renvoyer tous les behaviors. Trop chiant a refaire en l'enlevant et pas forcement
 		// pertinent.
-		MemeAvailability memeProvider = new MemeAvailability(memeDispo); memeProvider.setEntiteHandler(entiteHandler);
+		MemeAvailability memeProvider = new MemeAvailability(memeDispo);
+		memeProvider.setEntiteHandler(entiteHandler);
 		providers.put(1,memeProvider);
-		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeProvider.availableMeme, new GenericDoubleParameter(.0,.0,.2,.1));
+		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeFactory.getMemeAvailable(true), new GenericDoubleParameter(.0,.0,.2,.1));
 		memeDiffu.setEntiteHandler(entiteHandler);
 		providers.put(0,memeDiffu);
 

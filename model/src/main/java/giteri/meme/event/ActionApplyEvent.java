@@ -7,7 +7,7 @@ import giteri.meme.entite.Meme;
  * réalisés. 
  * 
  */
-public class ActionApplyEvent extends GlobalEvent {
+public class ActionApplyEvent extends MemeEvent {
 
 	private static final long serialVersionUID = 1L;
 	public Meme memeApply;

@@ -7,7 +7,7 @@ import giteri.meme.entite.Entite;
 /** Commun element of every event send by object, giteri.meme or entity.
  *
  */
-public abstract class  GlobalEvent extends EventObject {
+public abstract class MemeEvent extends EventObject {
 	
 	private static final long serialVersionUID = 1L;
 	public Entite entite;
@@ -19,7 +19,7 @@ public abstract class  GlobalEvent extends EventObject {
 	 * @param entity
 	 * @param message
 	 */
-	public GlobalEvent(Object source, Entite entity, String message){
+	public MemeEvent(Object source, Entite entity, String message){
 		super(source);
 		this.message = message;
 		entite = entity;

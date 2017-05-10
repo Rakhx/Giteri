@@ -114,7 +114,7 @@ public class WriteNRead {
 			scanner.close();
 		}
 		catch (Exception e){
-			System.out.println("TROPLOL");
+			System.out.println("[WriteNRead.readAndCreateNetwork]- Erreur de lecture de fichier associé");
 		}
 
 		return networkLoader;
@@ -138,7 +138,7 @@ public class WriteNRead {
 			scanner.close();
 		}
 		catch (Exception e){
-			System.out.println("TROPLOL");
+			System.out.println("[WriteNRead.readAndCreateNetwork]Erreur de lecture de fichier associé");
 		}
 
 		return networkLoader;

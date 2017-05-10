@@ -49,7 +49,7 @@ public class StatAndPlotJarVersion extends NetworkAnalyzer {
 		// pertinent.
 		MemeAvailability memeProvider = new MemeAvailability(memeDispo);
 		providers.put(1,memeProvider); memeProvider.setEntiteHandler(entiteHandler);
-		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeProvider.availableMeme);//, new GenericDoubleParameter(.1,.1,.2,.05));
+		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeFactory.getMemeAvailable(true));//, new GenericDoubleParameter(.1,.1,.2,.05));
 		providers.put(0,memeDiffu); memeDiffu.setEntiteHandler(entiteHandler);
 
 		for (Meme meme : memeFactory.getMemeAvailable(true)){

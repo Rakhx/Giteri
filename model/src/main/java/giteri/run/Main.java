@@ -60,6 +60,8 @@ public final class Main {
 		Controller.VueController vControl = c.new VueController();
 		Controller.ModelController mControl = c.new ModelController(vControl, communicationModel);
 
+		entiteHandler.initialisation();
+		
 		// La fenetre en elle meme Controller de Model donné a l'IHM
 		IHM fenetre = new IHM(mControl,
 				networkConstructor,
@@ -72,14 +74,10 @@ public final class Main {
 
 		vControl.setView((IView)fenetre);
 
-		entiteHandler.initialisation();
-
-
 		// Le graph associé lors de l'affichage avec graphstream
 		if(Configurator.withGraphicalDisplay){
 			Graph graph = new SingleGraph("Embedded");
 			drawerGraphStream.setGraph(graph);
-			@SuppressWarnings("unused")
 			Viewer lol = graph.display();
 		}else{
 //			drawerGraphStream.setGraph();
@@ -144,18 +142,8 @@ class JSlideListener implements ChangeListener
 	    if (!source.getValueIsAdjusting()) {
 	    	source.setToolTipText("Value "+(int)(source.getValue()));
 	        int fps = (int)source.getValue();
-	        if(fps > 0)
-	        {
-	        	if(Configurator.turboMode = true)
-	        		Configurator.turboMode = false;
-	        }
-	        else 
-	        {
-	        	Configurator.turboMode = true;
-	        }
-	        
 	        Configurator.setThreadSpeed(fps);
-	        Configurator.refreshInfoRate = Configurator.turboMode  ? 3000 : 100;
+
 	    }		
 	}
 }

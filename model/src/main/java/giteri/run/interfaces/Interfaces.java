@@ -13,8 +13,8 @@ import org.graphstream.graph.Graph;
 import org.jfree.chart.JFreeChart;
 
 import giteri.meme.entite.Meme;
-import giteri.meme.event.ActionApplyListener;
-import giteri.meme.event.BehaviorTransmissionListener;
+import giteri.meme.event.IActionApplyListener;
+import giteri.meme.event.IBehaviorTransmissionListener;
 
 /** Ensemble des interfaces utilisées dans le programme.
  * 
@@ -43,7 +43,7 @@ public class Interfaces {
 	/** Interface des classes qui s'occupe de rendre le giteri.network.
 	 *
 	 */
-	public interface DrawerInterface extends BehaviorTransmissionListener {
+	public interface DrawerInterface extends IBehaviorTransmissionListener {
 
 		public void resetDisplay();
 		public void drawThisNetwork(Network net);
@@ -62,7 +62,7 @@ public class Interfaces {
 	/** Interface des classes permettant de calculer les différentes
 	 * stats sur le graph.
 	 */
-	public interface StatAndPlotInterface extends ActionApplyListener{
+	public interface StatAndPlotInterface extends IActionApplyListener {
 		
 		// Fonction d'obtention des stats
 		public String getDDInfos();

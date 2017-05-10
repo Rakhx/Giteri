@@ -28,9 +28,9 @@ import giteri.run.configurator.Configurator.NetworkAttribType;
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
 import giteri.meme.event.ActionApplyEvent;
-import giteri.meme.event.ActionApplyListener;
+import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.BehavTransmEvent;
-import giteri.meme.event.BehaviorTransmissionListener;
+import giteri.meme.event.IBehaviorTransmissionListener;
 
 /** Classe de configuration pour lancer un fitting
  * ou autre recherche de stabilité.
@@ -42,7 +42,7 @@ import giteri.meme.event.BehaviorTransmissionListener;
  * de la simulation. Ne change pas pendant un run.
  *
  */
-public class FittingClass implements BehaviorTransmissionListener, ActionApplyListener {
+public class FittingClass implements IBehaviorTransmissionListener, IActionApplyListener {
 
 	// Region Variables
 

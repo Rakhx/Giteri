@@ -14,7 +14,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -67,16 +66,16 @@ import giteri.run.controller.Controller.ModelController;
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
 import giteri.meme.event.ActionApplyEvent;
-import giteri.meme.event.ActionApplyListener;
+import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.BehavTransmEvent;
-import giteri.meme.event.BehaviorTransmissionListener;
+import giteri.meme.event.IBehaviorTransmissionListener;
 
 /**
  * JFrame qui gère l'affichage de l'application.
  *
  */
 @SuppressWarnings("unused")
-public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmissionListener, IView {
+public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransmissionListener, IView {
 
 	// Region properties
 
@@ -365,14 +364,12 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 	 * Mise a jour des hashTable de données
 	 */
 	public void handlerBehavTransm(BehavTransmEvent e) {
-		if(Configurator.displayMemePosessionDuringSimulation){
-			if(e.message == Configurator.MemeActivityPossibility.AjoutMeme.toString())
-				// Ajout dans la liste des meme possédé par des entités
-				Toolz.addElementInHashArray(nodesHavingXoxoMemes, e.meme.toString(), e.entite.getIndex());
-			else if((e.message == Configurator.MemeActivityPossibility.RetraitMeme.toString()))
-				Toolz.removeElementInHashArray(nodesHavingXoxoMemes, e.meme.toString(), e.entite.getIndex());
-			// RETRAIT
-		}
+		if(e.message == Configurator.MemeActivityPossibility.AjoutMeme.toString())
+			// Ajout dans la liste des meme possédé par des entités
+			Toolz.addElementInHashArray(nodesHavingXoxoMemes, e.meme.toString(), e.entite.getIndex());
+		else if((e.message == Configurator.MemeActivityPossibility.RetraitMeme.toString()))
+			Toolz.removeElementInHashArray(nodesHavingXoxoMemes, e.meme.toString(), e.entite.getIndex());
+		// RETRAIT
 	}
 
 	// Region INTERFACE IVIEW
@@ -1518,7 +1515,6 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 		{
 			try
 			{
-
 				int lastAddCount = 0;
 				int lastEvapCount = 0;
 				int nbAppelInLast100;
@@ -1534,11 +1530,9 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 					activator = 9;//Configurator.AllAttribActivator;
 				// TODO est ce que ca vaut le coup de mettre a jour l'information en direct?
 				netProp = modelController.getCurrentNetProperties(activator);
-//			netProp = modelController.getCurrentNetProperties(-1);
 
 				for (Meme meme : selectedMemeOnSimulation) {
-					associatedColor = drawerGraphStream.getColorAsColor(
-							memeFactory.getColorIndexStringConversion(meme.toFourCharString()));
+					associatedColor = drawerGraphStream.getColorAsColor(memeFactory.getColorIndexStringConversion(meme.toFourCharString()));
 
 					// NOMBRE DE POSSESSION DE MEME PAR LES ENTITES
 					// Savoir quel noeud possède quel meme;
@@ -1555,7 +1549,9 @@ public class IHM extends JFrame implements ActionApplyListener, BehaviorTransmis
 					else
 					{
 						int nbNodesWithThisMeme = 0;
-						nbNodesWithThisMeme = nodesHavingXoxoMemes.get(meme.toString()).size();
+						
+						nbNodesWithThisMeme = nodesHavingXoxoMemes.get(meme.toString()) == null? 0 :
+							nodesHavingXoxoMemes.get(meme.toString()).size();
 						toPut += nbNodesWithThisMeme;
 						toPut += "]";
 					}

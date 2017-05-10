@@ -10,16 +10,21 @@ import giteri.tool.math.Toolz;
 public final class Configurator {
 
 
-/* 
+
 	// NORMAL
-	public static MemeDistributionType methodOfGeneration = MemeDistributionType.AllCombinaison;
+	public static MemeDistributionType methodOfGeneration = MemeDistributionType.SingleBasic;
 	public static boolean displayPlotWhileSimulation = true;
 	public static boolean withGraphicalDisplay = true;
 	public static boolean jarMode = false;
-	public static boolean systemPaused = true;
+	public static boolean systemPaused = false;
 	public static boolean writeNetworkResultOnFitting = true;
-*/
 
+
+
+
+
+
+/*
 	// JAR MODE
 	public static MemeDistributionType methodOfGeneration = MemeDistributionType.FollowingFitting;
 	public static boolean displayPlotWhileSimulation = false;
@@ -27,25 +32,28 @@ public final class Configurator {
 	public static boolean jarMode = true;
 	public static boolean systemPaused = false;
 	public static boolean writeNetworkResultOnFitting = false;
+*/
 
-
-	/*
+/*
 	// Work in progress
 	public static MemeDistributionType methodOfGeneration = MemeDistributionType.FollowingFitting;
+	public static boolean writeNetworkResultOnFitting = true;
+	public static boolean systemPaused = false;
+
 	public static boolean displayPlotWhileSimulation = true;
 	public static boolean withGraphicalDisplay =  true;
-	public static boolean jarMode = false;
-	public static boolean systemPaused = true;
-	public static boolean writeNetworkResultOnFitting = false;
-	
-	*/
-	
+	public static boolean jarMode = true;
+*/
 
+
+
+
+	public final static EnumExplorationMethod explorator = EnumExplorationMethod.random;
 	public static boolean doNotApplyMemeAvailability = false;
 
 	// Comportement modèle
 
-	public final static EnumExplorationMethod explorator = EnumExplorationMethod.exhaustive;
+
 	//	public final static MemeDistributionType methodOfGeneration = MemeDistributionType.AllCombinaison;
 //	public final static MemeDistributionType methodOfGeneration = MemeDistributionType.FollowingFitting;
 //	public static MemeDistributionType methodOfGeneration = MemeDistributionType.SingleBasic;
@@ -56,7 +64,7 @@ public final class Configurator {
 	public static FittingBehavior memeCombinaisonOnMap = FittingBehavior.simpleAndComplex;
 	public static boolean displayFittingProviderApplied = true;
 	public static boolean manuelNextStep = false;
-	public static boolean autoPauseIfNexted = false;
+	public static boolean autoPauseIfNexted = true;
 
 	// Propagation de meme
 	public static boolean usePropagation = true;
@@ -99,7 +107,7 @@ public final class Configurator {
 
 	// Configuration Modèle
 //	public static boolean jarMode = false;
-	public static boolean turboMode = jarMode ? true : false;
+
 	public static boolean overallDebug = jarMode ? false : true;
 
 	public static final boolean lotOfNodes = false;
@@ -108,27 +116,26 @@ public final class Configurator {
 	public final static int nbNode = lotOfNodes? 10000 : 100;
 	//	public static boolean withGraphicalDisplay = lotOfNodes? false: true;
 	public static boolean resetDensityOverTimeBetweenRun = true;
-	public static int refreshInfoRate = turboMode? 3000 : 100;
+	public static int refreshInfoRate = 500;
 	public final static int nbSimulationByStep = lotOfNodes? 1: 3;
 
 	public final static boolean osefResultat = false;
 
 	// Affichage
 //	public static boolean displayPlotWhileSimulation = lotOfNodes ? false: true;
-	public static boolean displayMemePosessionDuringSimulation = lotOfNodes ? false: true;
+	public static boolean displayMemePosessionDuringSimulation = true;
 	
 
 
 	// Config Temporaire
 	public static boolean debugHopAway = false;
-	public static boolean autrucheMode = true;
+	public static boolean autrucheMode = false;
 
 	// Region ancien boolean, osef, etc
 
 	public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-d_HH'h'mm'm'ss's'");
 	public static File defaultPathForReadingNetwork = new File("/Users/Felix/Documents/W/S/Giteri/Rulez/default.txt");
 	public static File rightHerePathForReadingNetwork = new File("default.txt");
-//	public static File defaultPathForConfig = new File("/Users/Felix/Documents/W/S/Giteri/Rulez/config.txt");
 
 
 	public static Integer baseSleepTimeMulti = 0;//turboMode ? 0 : 1;
@@ -141,7 +148,7 @@ public final class Configurator {
 
 	// Ancien mecanismes
 	public static boolean desgressiveLearningProba = false;
-	public final static double reLearningThreshold = 0.001;
+//	public final static double reLearningThreshold = 0.001;
 	public static boolean useEntitePropagationProba = false;
 	public static boolean learningOnlyOnce = false;
 

@@ -9,24 +9,30 @@ import giteri.tool.math.Toolz;
 import giteri.fitting.parameters.IModelParameter;
 import giteri.run.configurator.Configurator.EnumExplorationMethod;
 
+/** Interface des classes d'exploration de l'espace de paramètre pour
+ * la fonction de fitting.
+ *
+ */
 public interface IExplorationMethod {
 	boolean gotoNext();
 	void apply();
-	public String toString();
-	public ArrayList<IModelParameter<?>> getModelParameterSet();
+	String toString();
+	ArrayList<IModelParameter<?>> getModelParameterSet();
 
 	/** CLASSE ABSTRAITE commune a tte les méthodes d'explorations.
 	 * 
 	 */
 	public abstract class ExplorationMethod implements IExplorationMethod{
-	
+
+//		La liste des paramètres sur laquelle tourne les explorations. L'integer indique
+//		l'ordre d'application des param. 0 ou 1 lol : le premier
 		public Hashtable<Integer, IModelParameter<?>> provider;
-		
+
 		protected ExplorationMethod(Hashtable<Integer, IModelParameter<?>> provids){
 			provider = provids;
 		}
 		
-		/** Renvoi l'ensemble des string de la configuration du model. 
+		/** Renvoi l'ensemble des string de la configuration actuelle du model.
 		 * 
 		 */
 		public String toString(){
@@ -53,15 +59,23 @@ public interface IExplorationMethod {
 				provider.get(i).apply();
 			}
 		}
-		
+
+		/** Obtenir un explorateur spécifique.
+		 *
+		 * @param explo L'explo voulu
+		 * @param provids les providers demandé
+		 * @return
+		 */
 		public static  IExplorationMethod getSpecificExplorator(EnumExplorationMethod explo, Hashtable<Integer, IModelParameter<?>> provids){
 			switch (explo) {
 			case random:
 				return new ExplorationRandom(provids);
 			case exhaustive:
 				return new ExplorationExhaustive(provids);
-			default:
+			case oneShot:
 				return new ExplorationOneShot(provids);
+			default:
+				return null;
 			}
 		}
 	}
@@ -73,7 +87,7 @@ public interface IExplorationMethod {
 	public class ExplorationExhaustive extends ExplorationMethod {
 
 		/** Constructeurs qui prend un map de paramètre, avec en clef l'ordre d'application.
-		 * Premier a etre appliqué = 0
+		 * Cycle en premier sur la key 0, applique en premier la key max.
 		 * 
 		 * @param parameters
 		 */
@@ -99,8 +113,6 @@ public interface IExplorationMethod {
 			
 			return hasGo;
 		}
-
-		
 	}
 
 	/** Classe intanciation de la méthode d'exploration, le fait de facon random
@@ -137,7 +149,7 @@ public interface IExplorationMethod {
 				for (String string : list) {
 					HashMap<IModelParameter<?>, String> element = new HashMap<IModelParameter<?>, String>();
 					element.put(champion, string);
-			    	matrice.add( element);
+			    	matrice.add(element);
 				}
 			}
 

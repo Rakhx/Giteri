@@ -7,7 +7,7 @@ import giteri.meme.entite.Meme;
  * d'un agent. 
  *
  */
-public class BehavTransmEvent extends GlobalEvent {
+public class BehavTransmEvent extends MemeEvent {
 
 	private static final long serialVersionUID = 1L;
 	public Meme meme;

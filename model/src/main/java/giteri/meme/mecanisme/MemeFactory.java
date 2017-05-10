@@ -109,7 +109,7 @@ public class MemeFactory {
 		if(addToList)
 			memeAvailableFitting.add(toReturn);
 		memeAvailable.add(toReturn);
-		kvMemeIndexColor.put(toReturn, 0 + ++lastIndexUsed);
+		kvMemeIndexColor.put(toReturn, ++lastIndexUsed);
 
 		return toReturn;
 	}

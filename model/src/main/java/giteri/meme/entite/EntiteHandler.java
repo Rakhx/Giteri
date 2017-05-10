@@ -1,11 +1,6 @@
 package giteri.meme.entite;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.*;
 
 import giteri.tool.math.Toolz;
 import giteri.meme.mecanisme.AgregatorFactory.IAgregator;
@@ -25,9 +20,9 @@ import giteri.run.configurator.Configurator.FittingBehavior;
 import giteri.run.configurator.Configurator.MemeDistributionType;
 import giteri.run.controller.Controller.VueController;
 import giteri.meme.event.ActionApplyEvent;
-import giteri.meme.event.ActionApplyListener;
+import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.BehavTransmEvent;
-import giteri.meme.event.BehaviorTransmissionListener;
+import giteri.meme.event.IBehaviorTransmissionListener;
 
 /**
  * Classe qui gère les entités du réseau.
@@ -52,8 +47,8 @@ public class EntiteHandler extends ThreadHandler {
 
 	// Listener pour les évènements issu de l'obtention de meme ou application
 	// de ce dernier.
-	private ArrayList<ActionApplyListener> entityListeners;
-	private ArrayList<BehaviorTransmissionListener> memeListeners;
+	private ArrayList<IActionApplyListener> entityListeners;
+	private ArrayList<IBehaviorTransmissionListener> memeListeners;
 
 	StopWatchFactory watcher ;
 	private Meme addRandom = null, removeRandom = null;
@@ -67,9 +62,6 @@ public class EntiteHandler extends ThreadHandler {
 	private int nbActionBySecond;
 
 	// EndRegion
-
-	// Region constructeur Singleton
-	protected static EntiteHandler INSTANCE = null;
 
 	/** Constructeur sans param. Crée les memes de la map
 	 *
@@ -85,14 +77,13 @@ public class EntiteHandler extends ThreadHandler {
 
 		entites = new ArrayList<Entite>();
 		entitesActive = new ArrayList<Entite>();
-		entityListeners = new ArrayList<ActionApplyListener>();
-		memeListeners = new ArrayList<BehaviorTransmissionListener>();
+		entityListeners = new ArrayList<IActionApplyListener>();
+		memeListeners = new ArrayList<IBehaviorTransmissionListener>();
 		memeTranslationReadable = new Hashtable<String, String>();
 
 
 		if (Configurator.DisplayLogdebugInstantiation)
 			System.out.println("EntiteHandler constructor Closing");
-
 
 	}
 
@@ -102,16 +93,6 @@ public class EntiteHandler extends ThreadHandler {
 		giveMemeToEntite(Configurator.methodOfGeneration);
 
 	}
-
-	/** instance d'EH qui commune a tous.
-	 *
-	 * @return
-	 */
-//	public static EntiteHandler getInstance() {
-//		if (INSTANCE == null)
-//			INSTANCE = new EntiteHandler();
-//		return INSTANCE;
-//	}
 
 	// EndRegion
 
@@ -146,13 +127,12 @@ public class EntiteHandler extends ThreadHandler {
 	 *
 	 */
 	public void doRun() {
-		if (!Configurator.turboMode){
-			try
-			{
-				Thread.sleep(Configurator.getThreadSleepMultiplicateur());
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+
+		try
+		{
+			Thread.sleep(Configurator.getThreadSleepMultiplicateur());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 
 		OneStep();
@@ -381,7 +361,7 @@ public class EntiteHandler extends ThreadHandler {
 		BehavTransmEvent myEvent = new BehavTransmEvent(this, entiteConcernee, ajoutOrR, message);
 
 		// On prévient les entites qui listen
-		for (BehaviorTransmissionListener memeListener : memeListeners) {
+		for (IBehaviorTransmissionListener memeListener : memeListeners) {
 			memeListener.handlerBehavTransm(myEvent);
 		}
 	}
@@ -398,7 +378,7 @@ public class EntiteHandler extends ThreadHandler {
 		ActionApplyEvent myEvent = new ActionApplyEvent(this, entiteConcernee, memeRealisee, message);
 
 		// ON PREVIENT LES ENTITES QUI LISTEN
-		for (ActionApplyListener entityListener : entityListeners) {
+		for (IActionApplyListener entityListener : entityListeners) {
 			entityListener.handlerActionApply(myEvent);
 		}
 	}
@@ -408,7 +388,7 @@ public class EntiteHandler extends ThreadHandler {
 	 *
 	 * @param myListener
 	 */
-	public void addEntityListener(ActionApplyListener myListener) {
+	public void addEntityListener(IActionApplyListener myListener) {
 		if (!entityListeners.contains(myListener)) {
 			entityListeners.add(myListener);
 		}
@@ -418,7 +398,7 @@ public class EntiteHandler extends ThreadHandler {
 	 *
 	 * @param myListener
 	 */
-	public void removeEntityListener(ActionApplyListener myListener) {
+	public void removeEntityListener(IActionApplyListener myListener) {
 		if (entityListeners.contains(myListener)) {
 			entityListeners.remove(myListener);
 		}
@@ -429,7 +409,7 @@ public class EntiteHandler extends ThreadHandler {
 	 *
 	 * @param myListener
 	 */
-	public void addMemeListener(BehaviorTransmissionListener myListener) {
+	public void addMemeListener(IBehaviorTransmissionListener myListener) {
 		if (!memeListeners.contains(myListener)) {
 			memeListeners.add(myListener);
 		}
@@ -439,7 +419,7 @@ public class EntiteHandler extends ThreadHandler {
 	 *
 	 * @param myListener
 	 */
-	public void removeMemeListener(BehaviorTransmissionListener myListener) {
+	public void removeMemeListener(IBehaviorTransmissionListener myListener) {
 		if (memeListeners.contains(myListener)) {
 			memeListeners.remove(myListener);
 		}
@@ -465,12 +445,12 @@ public class EntiteHandler extends ThreadHandler {
 			case AllCombinaison:
 				giveMemeToEntiteGeneric();
 				break;
-			case FourWithInverted:
-				giveMemeWithInvertd();
-				break;
-			case OnlyOneAgent:
-				giveMemeToEntiteExceptPurple();
-				break;
+//			case FourWithInverted:
+//				giveMemeWithInvertd();
+//				break;
+//			case OnlyOneAgent:
+//				giveMemeToEntiteExceptPurple();
+//				break;
 			case FollowingFitting:
 				giveMemeToEntiteFollowingFitting();
 				break;
@@ -485,27 +465,28 @@ public class EntiteHandler extends ThreadHandler {
 		}
 	}
 
-	/** Applique directement depuis une hash d'index // comportements les
-	 * behavior au nodes spécifiées par la key.
-	 *
-	 * @param affectation
-	 */
-	public void giveMemeToEntite(Hashtable<Integer, ArrayList<Meme>> affectation) {
-		for (Integer index : affectation.keySet()) {
-			if (entites.size() > index)
-				for (Meme memeToAdd : affectation.get(index)) {
-					eventMemeChanged(entites.get(index), entites.get(index).addMeme(memeToAdd, true),
-							Configurator.MemeActivityPossibility.AjoutMeme.toString());
-				}
-		}
-	}
+//
+//	/** Applique directement depuis une hash d'index // comportements les
+//	 * behavior au nodes spécifiées par la key.
+//	 *
+//	 * @param affectation
+//	 */
+//	public void giveMemeToEntite(Hashtable<Integer, ArrayList<Meme>> affectation) {
+//		for (Integer index : affectation.keySet()) {
+//			if (entites.size() > index)
+//				for (Meme memeToAdd : affectation.get(index)) {
+//					eventMemeChanged(entites.get(index), entites.get(index).addMeme(memeToAdd, true),
+//							Configurator.MemeActivityPossibility.AjoutMeme.toString());
+//				}
+//		}
+//	}
 
 	/** Applique directement depuis une liste de meme au X premier agents pour les
 	 * recevoir. Si option de défault behavior, donne des memes fluides aux autres agent.
 	 *
 	 * @param memes
 	 */
-	public void giveMemeToEntiteXFirst(ArrayList<Meme> memes) {
+	public void giveMemeToEntiteXFirst(List<Meme> memes) {
 		int i = 0;
 		ArrayList<Entite> entiteContente = new ArrayList<Entite>();
 		for (Meme meme : memes) {
