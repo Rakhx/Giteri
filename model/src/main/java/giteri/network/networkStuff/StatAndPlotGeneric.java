@@ -26,7 +26,7 @@ import giteri.run.configurator.Configurator.NetworkAttribType;
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
 
-/** Classe commune à tous les statAndGraphe
+/** Classe commune à tous les statAndPlot
  *
  */
 public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
@@ -47,7 +47,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	// public boolean manuelNextStep = false;
 	// Met en pause automatiquement quand l'algo essaye de passer au cran suivant
 	public boolean autoPauseIfNexted = Configurator.autoPauseIfNexted;
-
 	public boolean goNextStepInManuelMode = !Configurator.manuelNextStep;
 
 	boolean debugBeforeSkip = true;
@@ -75,17 +74,14 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 */
 	public Double fitNetwork(int activator){
 		if(!Configurator.jarMode){
-		
-		(new Thread(){
-			public void run() {
-				boolean stability = activator == 0? true: false;
-				 callFactorisedFunction(stability);
-			}
-		}).start();
+			(new Thread(){
+				public void run() {
+					 fittingLauncher();
+				}
+			}).start();
 		return 0.;
 		}else{
-			boolean stability = activator == 0? true: false;
-			return callFactorisedFunction(stability);
+			return fittingLauncher();
 		}
 			
 	}
@@ -93,15 +89,14 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	/** PREMIERE FONCTION APPELEE DANS LA LONGUE SERIE DES FITTING SEARCHING
 	 *
 	 */
-	public double callFactorisedFunction(boolean stabilityRun){
+	public double fittingLauncher(){
 		double resultat;
 		// Classe de configuration qui contient tout ce qu'il faut pour faire une simu
-		FittingClass configuration = new FittingClass(stabilityRun, writeNRead,communicationModel,
+		FittingClass configuration = new FittingClass(writeNRead,communicationModel,
 				memeFactory, networkFileLoader, workerFactory, entiteHandler, networkConstructor);
 
 		// ajout de la fitting classe au listener
 		entiteHandler.addEntityListener(configuration);
-//		EntiteHandler.getInstance().addMemeListener(configuration);
 
 		// initialise les config de simulation genre répartition des comportments etc
 		initializeConfigForStability(configuration);
@@ -111,7 +106,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		// retrait de la fitting classe des listener
 		entiteHandler.removeEntityListener(configuration);
-//		EntiteHandler.getInstance().removeMemeListener(configuration);
+
 		return resultat;
 	}
 
@@ -122,7 +117,9 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 * @param fitting
 	 */
 	protected void initializeConfigForStability(FittingClass fitting){
+
 		Hashtable<Meme, GenericBooleanParameter> memeDispo = new Hashtable<Meme,GenericBooleanParameter>();
+		ArrayList<Meme> memeOnMap = new ArrayList<Meme>();
 		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<Integer, IModelParameter<?>>();
 
 		for (Meme meme : memeFactory.getMemeAvailable(true)) {
@@ -134,7 +131,8 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		// pertinent.
 		MemeAvailability memeProvider = new MemeAvailability(memeDispo);
 		memeProvider.setEntiteHandler(entiteHandler);
-		providers.put(1,memeProvider);
+		// providers.put(1,memeProvider);
+
 		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeFactory.getMemeAvailable(true), new GenericDoubleParameter(.0,.0,.2,.1));
 		memeDiffu.setEntiteHandler(entiteHandler);
 		providers.put(0,memeDiffu);
@@ -148,13 +146,17 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 	}
 
-	private void setPreciseValue(ArrayList<Double> probaVoulu,MemeDiffusionProba memeDiffu){
+	/**
+	 *
+	 * @param probaVoulu
+	 * @param memeDiffu
+	 */
+	private void setPreciseValue(ArrayList<Double> probaVoulu, MemeDiffusionProba memeDiffu){
 		Double value;
 		int i = 0;
 		for (Meme meme : memeFactory.getMemeAvailable(true)){
-			value = probaVoulu.get(i);
-			i++;
-			memeDiffu.specifyMemeBound(meme, new GenericDoubleParameter(value,value, value,.1));
+			value = probaVoulu.get(i++);
+			memeDiffu.getValue().put(meme, new GenericDoubleParameter(value,value, value,.1));
 		}
 	}
 

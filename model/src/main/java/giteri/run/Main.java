@@ -32,90 +32,91 @@ public final class Main {
 
 	public static void main(String[] args)  {
 
-		WriteNRead writeNRead = new WriteNRead();
-		AttributFactory attributFactory = new AttributFactory();
-		AgregatorFactory agregatorFactory = new AgregatorFactory();
-		ActionFactory actionFactory = new ActionFactory() ;
-		MemeFactory memeFactory = new MemeFactory(actionFactory, agregatorFactory, attributFactory);
-		WorkerFactory workerFactory = new WorkerFactory();
-		NetworkConstructor networkConstructor = new NetworkConstructor();
-		EntiteHandler entiteHandler = new EntiteHandler(networkConstructor, memeFactory, workerFactory);
-		NetworkFileLoader networkFileLoader = new NetworkFileLoader( memeFactory, writeNRead);
-		DrawerGraphStream drawerGraphStream = new DrawerGraphStream(entiteHandler, memeFactory,
-				networkConstructor, writeNRead, networkFileLoader, workerFactory);
-
-		// Communication model
-
-		CommunicationModel communicationModel = new CommunicationModel(entiteHandler, networkConstructor, networkFileLoader, workerFactory,drawerGraphStream);
-		drawerGraphStream.setCommunicationModel(communicationModel);
-		networkFileLoader.setCommunicationModel(communicationModel);
-		actionFactory.setEntiteHandler(entiteHandler);
-		agregatorFactory.setEntiteHandler(entiteHandler);
-		workerFactory.setNecessary(drawerGraphStream, drawerGraphStream);
-		networkConstructor.setDrawer(drawerGraphStream);
-
-
-		// Controller
-		Controller c = new Controller();
-		Controller.VueController vControl = c.new VueController();
-		Controller.ModelController mControl = c.new ModelController(vControl, communicationModel);
-
-		entiteHandler.initialisation();
-		
-		// La fenetre en elle meme Controller de Model donné a l'IHM
-		IHM fenetre = new IHM(mControl,
-				networkConstructor,
-				memeFactory,
-				workerFactory,
-				entiteHandler,
-				actionFactory ,
-				drawerGraphStream,
-				writeNRead);
-
-		vControl.setView((IView)fenetre);
-
-		// Le graph associé lors de l'affichage avec graphstream
-		if(Configurator.withGraphicalDisplay){
-			Graph graph = new SingleGraph("Embedded");
-			drawerGraphStream.setGraph(graph);
-			Viewer lol = graph.display();
-		}else{
-//			drawerGraphStream.setGraph();
-		}
-
-
-		IReadNetwork nl = mControl.getReader();
-		try {
-			writeNRead.readAndCreateNetwork("" + Configurator.defaultPathForReadingNetwork, nl, " ", "#");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		
-
-		fenetre.setVisible(true);
-		entiteHandler.setIHMController(vControl);
-
-		// fait le lien entre les entités d'action et de transmission de meme
-		// avec l'IHM, pour permettre la mise a jour des affichages etc
-		entiteHandler.addEntityListener(fenetre);
-		entiteHandler.addMemeListener(fenetre);
-
-		// De meme, le dessinateur graphique s'abonne aux évènements de type transmission de meme
-		// Dans le but de faire changer la couleur du noeud en fonction des memes possédés par ce dernier
-		entiteHandler.addMemeListener(workerFactory.getDrawer());
-		entiteHandler.addEntityListener(workerFactory.getCalculator());
-
-		networkConstructor.start();
-		if(! Configurator.isSystemPaused()){
-			networkConstructor.start();
-			entiteHandler.start();
-		}
-		else {
-			networkConstructor.start();
-			networkConstructor.suspend();
-			entiteHandler.start();
-			entiteHandler.suspend();
-		}
+		Initializer.initialize(Configurator.EnumLauncher.ihm, null, null);
+//		WriteNRead writeNRead = new WriteNRead();
+//		AttributFactory attributFactory = new AttributFactory();
+//		AgregatorFactory agregatorFactory = new AgregatorFactory();
+//		ActionFactory actionFactory = new ActionFactory() ;
+//		MemeFactory memeFactory = new MemeFactory(actionFactory, agregatorFactory, attributFactory);
+//		WorkerFactory workerFactory = new WorkerFactory();
+//		NetworkConstructor networkConstructor = new NetworkConstructor();
+//		EntiteHandler entiteHandler = new EntiteHandler(networkConstructor, memeFactory, workerFactory);
+//		NetworkFileLoader networkFileLoader = new NetworkFileLoader( memeFactory, writeNRead);
+//		DrawerGraphStream drawerGraphStream = new DrawerGraphStream(entiteHandler, memeFactory,
+//				networkConstructor, writeNRead, networkFileLoader, workerFactory);
+//
+//		// Communication model
+//
+//		CommunicationModel communicationModel = new CommunicationModel(entiteHandler, networkConstructor, networkFileLoader, workerFactory,drawerGraphStream);
+//		drawerGraphStream.setCommunicationModel(communicationModel);
+//		networkFileLoader.setCommunicationModel(communicationModel);
+//		actionFactory.setEntiteHandler(entiteHandler);
+//		agregatorFactory.setEntiteHandler(entiteHandler);
+//		workerFactory.setNecessary(drawerGraphStream, drawerGraphStream);
+//		networkConstructor.setDrawer(drawerGraphStream);
+//
+//
+//		// Controller
+//		Controller c = new Controller();
+//		Controller.VueController vControl = c.new VueController();
+//		Controller.ModelController mControl = c.new ModelController(vControl, communicationModel);
+//
+//		entiteHandler.initialisation();
+//
+//		// La fenetre en elle meme Controller de Model donné a l'IHM
+//		IHM fenetre = new IHM(mControl,
+//				networkConstructor,
+//				memeFactory,
+//				workerFactory,
+//				entiteHandler,
+//				actionFactory ,
+//				drawerGraphStream,
+//				writeNRead);
+//
+//		vControl.setView((IView)fenetre);
+//
+//		// Le graph associé lors de l'affichage avec graphstream
+//		if(Configurator.withGraphicalDisplay){
+//			Graph graph = new SingleGraph("Embedded");
+//			drawerGraphStream.setGraph(graph);
+//			Viewer lol = graph.display();
+//		}else{
+////			drawerGraphStream.setGraph();
+//		}
+//
+//
+//		IReadNetwork nl = mControl.getReader();
+//		try {
+//			writeNRead.readAndCreateNetwork("" + Configurator.defaultPathForReadingNetwork, nl, " ", "#");
+//		} catch (IOException e1) {
+//			e1.printStackTrace();
+//		}
+//
+//
+//		fenetre.setVisible(true);
+//		entiteHandler.setIHMController(vControl);
+//
+//		// fait le lien entre les entités d'action et de transmission de meme
+//		// avec l'IHM, pour permettre la mise a jour des affichages etc
+//		entiteHandler.addEntityListener(fenetre);
+//		entiteHandler.addMemeListener(fenetre);
+//
+//		// De meme, le dessinateur graphique s'abonne aux évènements de type transmission de meme
+//		// Dans le but de faire changer la couleur du noeud en fonction des memes possédés par ce dernier
+//		entiteHandler.addMemeListener(workerFactory.getDrawer());
+//		entiteHandler.addEntityListener(workerFactory.getCalculator());
+//
+//		networkConstructor.start();
+//		if(! Configurator.isSystemPaused()){
+//			networkConstructor.start();
+//			entiteHandler.start();
+//		}
+//		else {
+//			networkConstructor.start();
+//			networkConstructor.suspend();
+//			entiteHandler.start();
+//			entiteHandler.suspend();
+//		}
 	}
 } 
 

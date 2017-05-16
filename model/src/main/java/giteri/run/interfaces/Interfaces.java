@@ -164,4 +164,8 @@ public class Interfaces {
 		 */
 		public ArrayList<String> getNetworkEdges();
 	}
+
+	public interface ILauncherCompanion {
+		Runnable provideRunable();
+	}
 }

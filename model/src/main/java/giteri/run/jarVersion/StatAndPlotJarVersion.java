@@ -45,22 +45,18 @@ public class StatAndPlotJarVersion extends NetworkAnalyzer {
 		for (Meme meme : memeFactory.getMemeAvailable(true))
 			memeDispo.put(meme, new GenericBooleanParameter());
 
-		// classe truqué pour tjrs renvoyer tous les behaviors. Trop chiant a refaire en l'enlevant et pas forcement
-		// pertinent.
 		MemeAvailability memeProvider = new MemeAvailability(memeDispo);
-		providers.put(1,memeProvider); memeProvider.setEntiteHandler(entiteHandler);
-		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeFactory.getMemeAvailable(true));//, new GenericDoubleParameter(.1,.1,.2,.05));
-		providers.put(0,memeDiffu); memeDiffu.setEntiteHandler(entiteHandler);
+		providers.put(1,memeProvider);
+		memeProvider.setEntiteHandler(entiteHandler);
 
 		for (Meme meme : memeFactory.getMemeAvailable(true)){
-			value = probaVoulu.get(i);
-			i++;
+			value = probaVoulu.get(i++);
 			kvMemeValue.put(meme, new GenericDoubleParameter(value,value, value,1.));
-			memeDiffu.specifyMemeBound(meme, new GenericDoubleParameter(value,value, value,.1));
-
 		}
 
-		memeDiffu.setValue(kvMemeValue);
+		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(kvMemeValue);//, new GenericDoubleParameter(.1,.1,.2,.05));
+		providers.put(0,memeDiffu);
+		memeDiffu.setEntiteHandler(entiteHandler);
 
 		fitting.explorator = new ExplorationOneShot(providers);
 	}

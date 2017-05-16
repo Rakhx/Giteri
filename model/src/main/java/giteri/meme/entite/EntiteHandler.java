@@ -676,7 +676,7 @@ public class EntiteHandler extends ThreadHandler {
 			Entite movingOne = SelectActingEntite();
 
 			if (movingOne == null) {
-				if(!Configurator.jarMode) System.err.println("Bullshit de liste entiteActive et de .run() qui s'arrete pas immédiatement");
+				if(!Configurator.jarMode) System.err.println("[EH.runEntite()]- Bullshit de liste entiteActive et de .run() qui s'arrete pas immédiatement");
 				return ("Nope pas d'entite prete");
 			}
 			if (Configurator.displayLogTimeEating)

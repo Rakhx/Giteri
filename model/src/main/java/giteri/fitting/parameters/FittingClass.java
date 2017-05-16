@@ -147,9 +147,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 	/**	Constructeur.
 	 *
-	 * @param stabilityRun
 	 */
-	public FittingClass(boolean stabilityRun, WriteNRead wnr, CommunicationModel com, MemeFactory memeF,
+	public FittingClass(WriteNRead wnr, CommunicationModel com, MemeFactory memeF,
 						NetworkFileLoader nfl, WorkerFactory wf, EntiteHandler eh, NetworkConstructor nc){
 		resultNetwork = new Result(wnr);
 		this.com = com;
@@ -166,7 +165,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 *
 	 */
 	private void setDefaultValue(){
-		nbRepetitionByConfig = 4;
+		nbRepetitionByConfig = 1;
 		nbActionByStep = 50;
 		cfqDensityValuesOnOneRun = new CircularFifoQueue<Double>(boucleExterneSize);
 		cqLastXActionDone = new CircularFifoQueue<Meme>(circularSize);
@@ -414,9 +413,9 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		// TODO Refact[3.0] que se passe t'il pour le score quand aucune action ne peut etre appliquée?
 
 		// Si: pas de probleme avec les actions
-		if(canStillApplyAction){
-			// STEP Variation de la densité.
-			// Dans le cas ou il est possible de jouer des actions & assez de donnée on regarde la variation de densité
+		if(canStillApplyAction)
+		{
+			// STEP Variation de la densité Dans le cas ou il est possible de jouer des actions & assez de donnée on regarde la variation de densité
 			if(useDensity)
 			{
 				// meanDensityValueOnOneRun est mise a jour dans la boucle du fitting avant l'appel de cette fonction

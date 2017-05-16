@@ -1,10 +1,12 @@
 package giteri.fitting.parameters;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 
+import giteri.meme.entite.Entite;
+import giteri.meme.event.ActionApplyEvent;
+import giteri.meme.event.IActionApplyListener;
+import giteri.meme.event.IMemeAvailableListener;
+import giteri.meme.event.MemeAvailableEvent;
 import giteri.tool.math.Toolz;
 import giteri.run.configurator.Configurator;
 import giteri.meme.entite.EntiteHandler;
@@ -27,7 +29,7 @@ public interface IModelParameter<T> {
 	public void apply();
 	/** Va a la donnée suivante. Si int, i++
 	 *
-	 * @return la nouvelle valeur que va avoir la donnée.
+	 * @return true si la valeur existe
 	 */
 	public boolean gotoNext();
 	/** Va à une valeur random de la plage disponible.
@@ -39,11 +41,6 @@ public interface IModelParameter<T> {
 	 *
 	 */
 	public void gotoMinValue();
-	/** Obtenir une copie de la donnée.
-	 *
-	 * @return
-	 */
-	public T getCopyMyValue();
 	/** La donnée sous forme string pour affichage. La rendre explicite en 
 	 * précisant de quelle donnée il s'agit.
 	 *
@@ -55,11 +52,21 @@ public interface IModelParameter<T> {
 	 * @return
 	 */
 	public String nameString();
-
+	/** Obtient une liste de string définissant les valeurs possibles.
+	 * Doit etre réutilisable dans setPossibleValue
+	 *
+	 * @return
+	 */
 	public List<String> getPossibleValue();
-
+	/** Permet de partir d'un string et
+	 *
+	 * @param ref
+	 */
 	public void setPossibleValue(String ref);
-
+	/**
+	 *
+	 * @param eh
+	 */
 	public void setEntiteHandler(EntiteHandler eh);
 
 	/** CLASSE ABSTRAITE qui implémente une partie de l'interface, définissant
@@ -73,12 +80,11 @@ public interface IModelParameter<T> {
 		T value;
 		T minValue;
 		T maxValue;
-		EntiteHandler moche ;
+		EntiteHandler entiteHandler;
 
 		public void setEntiteHandler(EntiteHandler eh){
-			moche = eh;
+			entiteHandler = eh;
 		}
-
 
 		public T getValue() {
 			return value;
@@ -89,7 +95,7 @@ public interface IModelParameter<T> {
 		}
 	}
 
-	/** CLASSE ABSTRAITE qui définit T comme un boolean. Valeur de base false.
+	/** CLASSE ABSTRAITE qui définit T comme un boolean. Valeur de base true.
 	 *
 	 *
 	 */
@@ -116,24 +122,16 @@ public interface IModelParameter<T> {
 				value = false;
 		}
 
-		public Boolean getCopyMyValue(){
-			return new Boolean(value);
-		}
-
 		public String valueString(){
-			return value? "TRUE":"FALSE";
+			return value ? "TRUE":"FALSE";
 		}
 
 		public String nameString(){
-			return "boolean";
+			return "Boolean";
 		}
 
 		public void setValue(boolean valeur){
-			value = valeur? true: false;
-//			if(valeur)
-//				value = val;
-//			else
-//				value = minValue;
+			value = valeur? true : false;
 		}
 
 		public List<String> getPossibleValue(){
@@ -150,12 +148,15 @@ public interface IModelParameter<T> {
 	}
 
 	/** CLASSE ABSTRAITE qui définit T comme un double. Défini un champs step pour connaitre la
-	 * vitesse de progression de minvalue (0.0) a maxvalue
+	 * vitesse de progression de minvalue a maxvalue
 	 *
 	 *
 	 */
 	public abstract class AbstractDoubleParameter extends AbstractModelParameter<Double>{
 		Double step;
+		// détermine l'arrondi fait lors de l'ajout de step a la valeur courante.
+		// Problème de précision autrement ( 0.400000001 au lieu de 0.4 )
+		int precision = 4;
 
 		protected AbstractDoubleParameter(){
 			minValue = .0;
@@ -163,9 +164,9 @@ public interface IModelParameter<T> {
 		}
 
 		public boolean gotoNext(){
-			double calcul =Toolz.getNumberCutToPrecision(value + step, 4);
-			if(calcul <= maxValue){
-				value = calcul;
+			double nextValue =Toolz.getNumberCutToPrecision(value + step, precision);
+			if(nextValue <= maxValue){
+				value = nextValue;
 				return true;
 			}
 			return false;
@@ -216,7 +217,9 @@ public interface IModelParameter<T> {
 			}
 		}
 
-		/**
+		/** renvoi une liste de string définissant la liste des valeurs possibles pour la map en question.
+		 * Va dépendre du type de parametre P sur lequel sera appelé la meme fonction, et créer une projection de
+		 * meme x P.getPossibleValue.
 		 *
 		 */
 		public List<String> getPossibleValue(){
@@ -232,7 +235,7 @@ public interface IModelParameter<T> {
 
 			if(debug)System.out.println("Memes " + memes);
 
-			// Avoir les IModelParameter associé a chaque meme
+			// Avoir les IModelParameter associés à chaque meme
 			ArrayList<P> elements = new ArrayList<P>();
 			for (Meme meme : memes)
 				elements.add(value.get(meme));
@@ -251,6 +254,7 @@ public interface IModelParameter<T> {
 			for (int j = 0; j < memes.size(); j++)
 				indexValueCourante.add(0);
 
+			// Boucle qui va flat map les listes de valeurs possibles
 			do
 			{
 				String config = "";
@@ -297,7 +301,8 @@ public interface IModelParameter<T> {
 			return res;
 		}
 
-		/**
+		/** prend un string et l'applique en tant que valeur effective.
+		 * //TODO [Refact5.0]- non implémenté encore
 		 *
 		 */
 		public void setPossibleValue(String val){
@@ -324,13 +329,8 @@ public interface IModelParameter<T> {
 	 */
 	public class GenericBooleanParameter extends AbstractBooleanParameter{
 
-		public GenericBooleanParameter(){
-		}
+		public GenericBooleanParameter(){}
 
-		/**
-		 *
-		 * @param valeur
-		 */
 		public GenericBooleanParameter(Boolean valeur){
 			value = valeur;
 		}
@@ -348,38 +348,26 @@ public interface IModelParameter<T> {
 	 *
 	 */
 	public class GenericDoubleParameter extends AbstractDoubleParameter {
-		public GenericDoubleParameter(){
+		public GenericDoubleParameter(){}
 
-		}
-
-		/**
-		 *
-		 * @param valeur
-		 */
 		public GenericDoubleParameter(Double valeur){
 			value = valeur;
 		}
 
-		/**
-		 *
-		 * @param valeur
-		 */
 		public GenericDoubleParameter(Double valeur, Double min, Double max, Double step){
 			value = new Double(valeur);
 			minValue = min;
 			maxValue = max;
 			this.step = step;
+			if(step < 1)
+				precision = (int)Math.log10(((double)1) / step) + 1;
+
 		}
 
 		@Override
 		public void apply() {
 			// Rien, normal.
 
-		}
-
-		@Override
-		public Double getCopyMyValue() {
-			return new Double(getValue());
 		}
 
 		@Override
@@ -394,53 +382,35 @@ public interface IModelParameter<T> {
 	}
 
 	/** CLASSE qui permet de définir si un meme est présent sur la map ou non au début de la
-	 * simulation. Ne prends pas de set<Meme> mais jsute un meme et l'applique successivement
+	 * simulation. Ne prends pas de set<Meme> mais juste un meme et l'applique successivement
 	 * a la liste de node disponible.
 	 *
 	 *
 	 */
 	public class MemeAvailability extends AbstractMapParameter<GenericBooleanParameter> {
-		public ArrayList<Meme> availableMeme;
-//		GenericDoubleParameter defaultValue;
+		private List<Meme> activatedMeme = new ArrayList<>();
+		private List<IMemeAvailableListener> memeAvailableListeners = new ArrayList<>();
+
+		/** Constructeur le plus simple. Prend un set de Meme. Y associe un BooleanParam
+		 * initialisé a la valeur par défault. ( true )
+		 *
+		 * @param memes
+		 */
+		public MemeAvailability(List<Meme> memes){
+			memes.sort(null);
+			for (Meme meme : memes) {
+				value.put(meme, new GenericBooleanParameter());
+			}
+		}
+
 
 		/** Constructeur prenant un ensemble de meme; booleanParameter.
-		 *
+		 * Permet d'associer une valeur précise pour le boolean du meme.
+		 * /!\ valeur sera perdu en cas d'exploration exhaustive ou random.
 		 * @param p
 		 */
 		public MemeAvailability(Hashtable<Meme, GenericBooleanParameter> p ){
 			value = p;
-			availableMeme = new ArrayList<Meme>();
-			for (Meme meme : p.keySet()) {
-				if(p.get(meme).getValue())
-					availableMeme.add(meme);
-			}
-
-			availableMeme.sort(null);
-		}
-
-		/** Constructeur prenant un ensemble de meme; booleanParameter.
-		 *
-		 * @param p
-		 */
-		public MemeAvailability(Hashtable<Meme, GenericBooleanParameter> p, GenericDoubleParameter defautDoubleParam){
-			value = p;
-			availableMeme = new ArrayList<Meme>();
-			for (Meme meme : p.keySet()) {
-				if(p.get(meme).getValue())
-					availableMeme.add(meme);
-			}
-
-			availableMeme.sort(null);
-//			defaultValue = defautDoubleParam;
-		}
-
-		/** valeur minimum pour tous les éléments. Ici, false.
-		 *
-		 */
-		public void gotoMinValue(){
-			for (GenericBooleanParameter bool : value.values()) {
-				bool.gotoMinValue();
-			}
 		}
 
 		/** Enchaine sur la valeur suivante, applique si possible gotoNext() sur le parametre
@@ -448,10 +418,10 @@ public interface IModelParameter<T> {
 		 *
 		 */
 		public boolean gotoNext() {
-
 			ArrayList<Meme> memes = new ArrayList<Meme>();
 			memes.addAll(value.keySet());
-			memes.sort(null);
+			memes.sort(null); // TODO [Opti 1.0]- Peut etre inutile a sort, puisque le constructeur le fait déjà
+			// dans sa version la plus simple
 			for (Meme meme : memes) {
 				if(value.get(meme).gotoNext())
 					return true;
@@ -469,29 +439,57 @@ public interface IModelParameter<T> {
 			System.err.println("Pas implémenté");
 		}
 
-		/** Donne au entité prise successivement les memes
+		/** Donne aux entités les memes actifs.
+		 * TODO [Refact4.0]- Faire en sorte de créer un nouveau MemeDiffusionProba avec les bons memes actifs
 		 *
 		 */
 		public void apply() {
-			availableMeme.clear();
+			activatedMeme.clear();
 			for (Meme meme : value.keySet()) {
 				if(value.get(meme).getValue())
-					availableMeme.add(meme);
+					activatedMeme.add(meme);
 			}
-			availableMeme.sort(null);
-			if(!Configurator.doNotApplyMemeAvailability) moche.giveMemeToEntiteXFirst(availableMeme);
+
+			// TODO [Refactoring 4.0]- Ne devrait pas avoir a utiliser ce boolean
+			if(!Configurator.doNotApplyMemeAvailability) {
+				this.memesAvailablesChange(activatedMeme, "New list of active memes on map");
+//				entiteHandler.giveMemeToEntiteXFirst(activatedMeme);
+			}
 		}
 
-		/**
+		/** Pour lancer les évènements de type action réalisée.
 		 *
 		 */
-		public Hashtable<Meme, GenericBooleanParameter> getCopyMyValue(){
-			Hashtable<Meme, GenericBooleanParameter> copy = new Hashtable<Meme, GenericBooleanParameter>();
-			for (Meme meme : value.keySet()) {
-				copy.put(meme, new GenericBooleanParameter( value.get(meme).getValue()));
-			}
+		private void memesAvailablesChange(List<Meme> listAvailableMemes, String message) {
 
-			return copy;
+			// On crée un événement rappelant l'état courant concernant les memes;
+			MemeAvailableEvent myEvent = new MemeAvailableEvent(this, listAvailableMemes, message);
+
+			// ON PREVIENT LES ENTITES QUI LISTEN
+			for (IMemeAvailableListener memeAvailableListener : memeAvailableListeners) {
+				memeAvailableListener.handlerMemeAvailable(myEvent);
+			}
+		}
+
+		/** Ajout d'un listener a la liste des listeners a prévenir en cas d'event de
+		 * type entity
+		 *
+		 * @param myListener
+		 */
+		public void addMemeListListener(IMemeAvailableListener myListener) {
+			if (!memeAvailableListeners.contains(myListener)) {
+				memeAvailableListeners.add(myListener);
+			}
+		}
+
+		/** Retrait d'un listener depuis la liste des listeners
+		 *
+		 * @param myListener
+		 */
+		public void removeMemeListListener(IMemeAvailableListener myListener) {
+			if (memeAvailableListeners.contains(myListener)) {
+				memeAvailableListeners.remove(myListener);
+			}
 		}
 
 		/** Retourne en lisible le contenu.
@@ -501,7 +499,7 @@ public interface IModelParameter<T> {
 			String res = "MemeActivated: ";
 			for (Meme meme : value.keySet()) {
 				if(value.get(meme).getValue())
-					res += "&" + moche.translateMemeCombinaisonReadable(meme.toFourCharString()) + " ";
+					res += "&" + entiteHandler.translateMemeCombinaisonReadable(meme.toFourCharString()) + " ";
 			}
 
 			return res;
@@ -515,42 +513,39 @@ public interface IModelParameter<T> {
 	/** CLASSE pour la probabilité de diffusion des memes.
 	 *
 	 */
-	public class MemeDiffusionProba extends AbstractMapParameter<GenericDoubleParameter>{
+	public class MemeDiffusionProba extends AbstractMapParameter<GenericDoubleParameter> implements IMemeAvailableListener {
 
-		ArrayList<Meme> availableMeme;
-		Hashtable<Meme, GenericDoubleParameter> precisedMeme;
-		boolean memeSetWillChange = true;
-		GenericDoubleParameter defautDoubleParam = null;
+		GenericDoubleParameter defautDoubleParam;
 
 		/** Constructeur sans paramètre.
 		 *
 		 */
 		public MemeDiffusionProba(){
 			value = new Hashtable<Meme, GenericDoubleParameter>();
-			precisedMeme = new Hashtable<Meme, GenericDoubleParameter>();
 		}
 
-		/** si avec memeAvailability, doit etre la meme arraylist pour mise a jour
-		 * lorsque des memes se désactivent.
+		/** Prend un hashmap de meme associé a un doubleParameter
+		 *
+		 */
+		public MemeDiffusionProba(Hashtable<Meme, GenericDoubleParameter> kvMemesParameter){
+			this();
+			ArrayList<Meme> memesSorted = new ArrayList<Meme>(kvMemesParameter.keySet());
+			memesSorted.sort(null);
+			for (Meme meme: memesSorted) {
+				value.put(meme, kvMemesParameter.get(meme));
+			}
+		}
+
+		/** Prend une liste de meme et un parameter generic de double
 		 *
 		 * @param memes
+		 * @param defautParam
 		 */
-		public MemeDiffusionProba(ArrayList<Meme> memes){
-			this();
-			availableMeme = memes;
-			for (Meme meme : availableMeme)
-			{
-				value.put(meme, new GenericDoubleParameter(.0, .0, 1., .1));
-			}
-		}
-
 		public MemeDiffusionProba(ArrayList<Meme> memes, GenericDoubleParameter defautParam){
 			this();
-			availableMeme = memes;
-			for (Meme meme : availableMeme)
-			{
+			memes.sort(null);
+			for (Meme meme : memes)
 				value.put(meme, defautParam.copyMe());
-			}
 
 			defautDoubleParam = defautParam;
 		}
@@ -561,7 +556,7 @@ public interface IModelParameter<T> {
 		 */
 		public boolean gotoNext() {
 			// les memes d'available sont sort()
-			for (Meme meme : availableMeme) {
+			for (Meme meme : value.keySet()) {
 				if(value.get(meme).gotoNext())
 					return true;
 				else
@@ -575,25 +570,7 @@ public interface IModelParameter<T> {
 		 *
 		 */
 		public void apply() {
-			if(memeSetWillChange)
-			{
-				value.clear();
-				for (Meme meme : availableMeme){
-					if(precisedMeme.containsKey(meme)){
-						value.put(meme, precisedMeme.get(meme));
-					}
-					else{
-						if(defautDoubleParam != null)
-							value.put(meme, defautDoubleParam.copyMe());
-						else{
-							value.put(meme, new GenericDoubleParameter(.0, .0, 1., .1));
-							System.err.println("[IModelParameter:MemeDiffusionProba:Apply()] Utilisation d'un genericDoubleParameter aux valeurs de base douteuses");
-						}
-					}
-				}
-				memeSetWillChange = false;
-			}
-			for (Meme meme : availableMeme) {
+			for (Meme meme : value.keySet()) {
 				meme.probaOfPropagation = value.get(meme).value;
 			}
 		}
@@ -603,7 +580,7 @@ public interface IModelParameter<T> {
 		 *
 		 */
 		public void gotoRandom(){
-			Meme meme = availableMeme.get(Toolz.getRandomNumber(availableMeme.size()));
+			Meme meme = new ArrayList<Meme>(value.keySet()).get(Toolz.getRandomNumber(value.keySet().size()));
 			value.get(meme).gotoRandom();
 		}
 
@@ -614,17 +591,6 @@ public interface IModelParameter<T> {
 		 */
 		public void gotoMinValue(){
 			super.gotoMinValue();
-			memeSetWillChange = true;
-		}
-
-		/** Précise les valeurs des bornes de recherche pour un meme.
-		 *
-		 * @param meme Meme cible
-		 * @param newParam
-		 * @return Retourne false si le meme n'existe pas dans la liste
-		 */
-		public void specifyMemeBound(Meme meme, GenericDoubleParameter newParam){
-			precisedMeme.put(meme, newParam);
 		}
 
 		public void setValue(Hashtable<Meme, GenericDoubleParameter> value){
@@ -632,15 +598,10 @@ public interface IModelParameter<T> {
 		}
 
 		@Override
-		public Hashtable<Meme, GenericDoubleParameter> getCopyMyValue() {
-			return null;
-		}
-
-		@Override
 		public String valueString() {
 			String rez = "ProbaPropagation: ";
-			for (Meme meme : availableMeme) {
-				rez += moche.translateMemeCombinaisonReadable(meme.toFourCharString()) + ":" + value.get(meme).value + " ";
+			for (Meme meme : value.keySet()) {
+				rez += entiteHandler.translateMemeCombinaisonReadable(meme.toFourCharString()) + ":" + value.get(meme).value + " ";
 			}
 
 			return rez;
@@ -648,6 +609,19 @@ public interface IModelParameter<T> {
 
 		public String nameString(){
 			return "Proba Diffusion";
+		}
+
+		/** Implemente la réception de l'évènement changement de liste de meme actif sur la map.
+		 * Ne devrait arriver pour l'instant que lors de l'utilisation de l'IModelParameter @MemeAvailability
+		 *
+		 * @param e
+		 */
+		@Override
+		public void handlerMemeAvailable(MemeAvailableEvent e) {
+			value.clear();
+			for (Meme meme:e.listOfMeme) {
+				value.put(meme, defautDoubleParam.copyMe());
+			}
 		}
 	}
 }

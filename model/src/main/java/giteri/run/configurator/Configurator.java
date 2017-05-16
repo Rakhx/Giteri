@@ -8,51 +8,14 @@ import java.util.ArrayList;
 import giteri.tool.math.Toolz;
 
 public final class Configurator {
-
-
-
-	// NORMAL
-	public static MemeDistributionType methodOfGeneration = MemeDistributionType.SingleBasic;
-	public static boolean displayPlotWhileSimulation = true;
-	public static boolean withGraphicalDisplay = true;
-	public static boolean jarMode = false;
-	public static boolean systemPaused = false;
-	public static boolean writeNetworkResultOnFitting = true;
-
-
-
-
-
-
-/*
-	// JAR MODE
-	public static MemeDistributionType methodOfGeneration = MemeDistributionType.FollowingFitting;
-	public static boolean displayPlotWhileSimulation = false;
-	public static boolean withGraphicalDisplay =  false;
+	public static boolean withGraphicalDisplay = false;
 	public static boolean jarMode = true;
 	public static boolean systemPaused = false;
-	public static boolean writeNetworkResultOnFitting = false;
-*/
-
-/*
-	// Work in progress
-	public static MemeDistributionType methodOfGeneration = MemeDistributionType.FollowingFitting;
 	public static boolean writeNetworkResultOnFitting = true;
-	public static boolean systemPaused = false;
-
-	public static boolean displayPlotWhileSimulation = true;
-	public static boolean withGraphicalDisplay =  true;
-	public static boolean jarMode = true;
-*/
-
-
-
-
-	public final static EnumExplorationMethod explorator = EnumExplorationMethod.random;
 	public static boolean doNotApplyMemeAvailability = false;
 
 	// Comportement modèle
-
+	public static MemeDistributionType methodOfGeneration = MemeDistributionType.FollowingFitting;
 
 	//	public final static MemeDistributionType methodOfGeneration = MemeDistributionType.AllCombinaison;
 //	public final static MemeDistributionType methodOfGeneration = MemeDistributionType.FollowingFitting;
@@ -61,10 +24,11 @@ public final class Configurator {
 //	public  static MemeDistributionType methodOfGeneration = MemeDistributionType.specificDistrib;
 
 	// Fitting
+	public static EnumExplorationMethod explorator = EnumExplorationMethod.oneShot;
 	public static FittingBehavior memeCombinaisonOnMap = FittingBehavior.simpleAndComplex;
 	public static boolean displayFittingProviderApplied = true;
 	public static boolean manuelNextStep = false;
-	public static boolean autoPauseIfNexted = true;
+	public static boolean autoPauseIfNexted = false;
 
 	// Propagation de meme
 	public static boolean usePropagation = true;
@@ -82,7 +46,6 @@ public final class Configurator {
 
 	public static boolean useMemePropagationProba = true;
 	public final static double probaEntiteLearning = 0;
-
 
 	// Affichage log
 	public static boolean DisplayLogBehaviorColors = false;
@@ -108,25 +71,18 @@ public final class Configurator {
 	// Configuration Modèle
 //	public static boolean jarMode = false;
 
-	public static boolean overallDebug = jarMode ? false : true;
+	public static boolean overallDebug = !jarMode;
 
 	public static final boolean lotOfNodes = false;
 
 	public final static boolean autoRedoActionIfNoAction = false;
 	public final static int nbNode = lotOfNodes? 10000 : 100;
-	//	public static boolean withGraphicalDisplay = lotOfNodes? false: true;
-	public static boolean resetDensityOverTimeBetweenRun = true;
 	public static int refreshInfoRate = 500;
-	public final static int nbSimulationByStep = lotOfNodes? 1: 3;
-
-	public final static boolean osefResultat = false;
 
 	// Affichage
-//	public static boolean displayPlotWhileSimulation = lotOfNodes ? false: true;
+	public static boolean displayPlotWhileSimulation = !jarMode;
 	public static boolean displayMemePosessionDuringSimulation = true;
 	
-
-
 	// Config Temporaire
 	public static boolean debugHopAway = false;
 	public static boolean autrucheMode = false;
@@ -156,12 +112,19 @@ public final class Configurator {
 
 	// EndRegion
 
+	public enum EnumLauncher
+	{
+		ihm,
+		jar,
+		test
+	}
+
 	// Region Concernant Meme and co
 
 	/** Exhaustive..
 	 *
 	 */
-	public static enum EnumExplorationMethod
+	public enum EnumExplorationMethod
 	{
 		exhaustive,
 		random,
@@ -172,7 +135,7 @@ public final class Configurator {
 	/** Basic Combinaison..
 	 *
 	 */
-	public static enum MemeDistributionType {
+	public enum MemeDistributionType {
 		SingleBasic,
 		SingleCombinaison,
 		AllCombinaison,
@@ -183,7 +146,7 @@ public final class Configurator {
 		FollowingFitting
 	}
 
-	public static enum MemeActivityPossibility{
+	public enum MemeActivityPossibility{
 		AjoutMeme,
 		RetraitMeme
 	}
@@ -191,21 +154,10 @@ public final class Configurator {
 	/**
 	 *
 	 */
-	public static enum FittingBehavior {
+	public enum FittingBehavior {
 		onlySimple,
 		onlyComplex,
 		simpleAndComplex
-	}
-
-	/** Distribution de cmpt, boolean relearn..
-	 *
-	 */
-	public static enum FittingParamType{
-		LEARNINGPROBA,
-		DISTRIB,
-		DIFFUSIONPROBA,
-		RELEARN,
-		TRANSMITPROBA
 	}
 
 	/** Retourne quelques éléments de la configuration pour les fichiers
@@ -265,7 +217,6 @@ public final class Configurator {
 			case nbEdgesOnNbNodes:
 				return 9;
 			default:
-
 				return -1;
 		}
 	}
@@ -284,7 +235,6 @@ public final class Configurator {
 
 		return activator;
 	}
-
 
 	/** The most...
 	 *
@@ -331,33 +281,15 @@ public final class Configurator {
 			return Toolz.getProba() * max;
 	}
 
-	public static double getProbaRetraitLien() {
-		return probaRetraitLien;
-	}
-
-	public static synchronized void setProbaRetraitLien(double probaEvaporation) {
-		Configurator.probaRetraitLien = probaEvaporation;
-	}
-
 	public static void setThreadSpeed(int speedToSet){
 		synchronized(threadSleepMultiplicateur){
 			threadSleepMultiplicateur = speedToSet;
 		}
 	}
 
-	public static Integer getBaseThreadSleepMulti() {
-		return baseSleepTimeMulti;
-	}
-
 	public static int getThreadSleepMultiplicateur(){
 		synchronized(threadSleepMultiplicateur){
 			return threadSleepMultiplicateur;
-		}
-	}
-
-	public static void setThreadSleepMultiplicateur(Integer threadSpeedMultiplicateur) {
-		synchronized(threadSpeedMultiplicateur){
-			Configurator.threadSleepMultiplicateur = threadSpeedMultiplicateur;
 		}
 	}
 
@@ -375,17 +307,6 @@ public final class Configurator {
 
 	public static synchronized DateFormat getDateFormat() {
 		return dateFormat;
-	}
-
-	public static synchronized void setDateFormat(DateFormat dateFormat) {
-		Configurator.dateFormat = dateFormat;
-	}
-
-	public static boolean toggleSystemPause(){
-		synchronized(lockOnPause){
-			systemPaused = !systemPaused;
-			return systemPaused;
-		}
 	}
 
 	// EndRegion
