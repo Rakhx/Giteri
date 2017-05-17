@@ -12,10 +12,10 @@ public final class Configurator {
 	public static boolean jarMode = true;
 	public static boolean systemPaused = false;
 	public static boolean writeNetworkResultOnFitting = true;
-	public static boolean doNotApplyMemeAvailability = false;
+	public static boolean doNotApplyMemeAvailability = true;
 
 	// Comportement modèle
-	public static MemeDistributionType methodOfGeneration = MemeDistributionType.FollowingFitting;
+	public static MemeDistributionType methodOfGeneration = MemeDistributionType.SingleBasic;
 
 	//	public final static MemeDistributionType methodOfGeneration = MemeDistributionType.AllCombinaison;
 //	public final static MemeDistributionType methodOfGeneration = MemeDistributionType.FollowingFitting;

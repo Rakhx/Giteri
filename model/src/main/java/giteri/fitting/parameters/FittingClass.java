@@ -165,7 +165,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 *
 	 */
 	private void setDefaultValue(){
-		nbRepetitionByConfig = 1;
+		nbRepetitionByConfig = 2;
 		nbActionByStep = 50;
 		cfqDensityValuesOnOneRun = new CircularFifoQueue<Double>(boucleExterneSize);
 		cqLastXActionDone = new CircularFifoQueue<Meme>(circularSize);
@@ -221,10 +221,11 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 				}
 			}
 
-
 			toWriteDetailCSV += ";moyenne des scores";
 			toWriteDetailCSV += ";Variance des scores";
 			writeNRead.writeSmallFile2(repOfTheSearch, "NetworkDetailsCSV", Arrays.asList(toWriteDetailCSV));
+
+			// Donner aux entités les memes originaux?
 		}
 	}
 
@@ -267,7 +268,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			System.out.println(explorator.toString());
 		}
 
-		if(debug) System.out.println(numeroRunAsString + " at " + numeroTurnAsString  );
+		if(debug) System.out.println(numeroRunAsString + " at " + numeroTurnAsString);
 		entiteHandler.resetProba();
 		turnCount = 0;
 		cqLastXActionDone.clear();

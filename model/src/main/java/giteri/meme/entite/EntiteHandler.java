@@ -81,17 +81,14 @@ public class EntiteHandler extends ThreadHandler {
 		memeListeners = new ArrayList<IBehaviorTransmissionListener>();
 		memeTranslationReadable = new Hashtable<String, String>();
 
-
 		if (Configurator.DisplayLogdebugInstantiation)
 			System.out.println("EntiteHandler constructor Closing");
-
 	}
 
 	public void initialisation(){
 		generateMemeAvailableForMap();
 		bindNodeWithEntite(networkConstruct.getNetwork());
 		giveMemeToEntite(Configurator.methodOfGeneration);
-
 	}
 
 	// EndRegion
@@ -115,19 +112,10 @@ public class EntiteHandler extends ThreadHandler {
 		return returnThread;
 	}
 
-//	/** Mise en place du worker factory
-//	 *
-//	 * @param wf
-//	 */
-//	public void setWorkerFactory(WorkerFactory wf){
-//		workerFacto = wf;
-//	}
-
 	/** Run pour la création de lien, passage de meme, etc.
 	 *
 	 */
 	public void doRun() {
-
 		try
 		{
 			Thread.sleep(Configurator.getThreadSleepMultiplicateur());
@@ -675,8 +663,9 @@ public class EntiteHandler extends ThreadHandler {
 			// Choix d'une entitée au hasard
 			Entite movingOne = SelectActingEntite();
 
+
 			if (movingOne == null) {
-				if(!Configurator.jarMode) System.err.println("[EH.runEntite()]- Bullshit de liste entiteActive et de .run() qui s'arrete pas immédiatement");
+//				if(!Configurator.jarMode) System.err.println("[EH.runEntite()]- Bullshit de liste entiteActive et de .run() qui s'arrete pas immédiatement");
 				return ("Nope pas d'entite prete");
 			}
 			if (Configurator.displayLogTimeEating)
@@ -701,8 +690,6 @@ public class EntiteHandler extends ThreadHandler {
 			if (Configurator.displayLogTimeEating)
 				watcher.stopWatch("Main");
 
-			workerFactory.getCalculator().incrementNbActionRelative();
-
 			if (Configurator.displayLogTimeEating)
 				watcher.publishResult();
 
@@ -723,6 +710,8 @@ public class EntiteHandler extends ThreadHandler {
 					pauseStepInSemiAutoAction();
 			}
 		}
+
+		workerFactory.getCalculator().incrementNbAction();
 		return rez;
 	}
 
@@ -822,6 +811,9 @@ public class EntiteHandler extends ThreadHandler {
 						// Transmission de l'un de behavior possédé par l'acting.
 						if (Configurator.usePropagationSecondGeneration) {
 							Meme selectedMeme = movingOne.chooseAction();
+							if(selectedMeme == null){
+								System.out.println("Meme joué par " + movingOne.toString() + " disparu");
+							}
 							memeApply = selectedMeme.toFourCharString();
 							if (entite.receiveMeme(selectedMeme))
 								eventMemeChanged(entite, selectedMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());}
@@ -1366,6 +1358,21 @@ public class EntiteHandler extends ThreadHandler {
 
 		return returnValue;
 	}
+
+
+	private void checkConsistency(){
+		ArrayList<Meme> myMemes;
+		for (Entite entite: entites) {
+			myMemes = entite.getMyMemes();
+			if(myMemes.size() > 2)
+				System.out.println("TROP DE COMPORTEMENT");
+			if(myMemes.size() == 2 && myMemes.get(0).equals(myMemes.get(1)))
+			System.out.println("Scandale deux fois le meme");
+
+		}
+
+	}
+
 
 	// Region getter//Setter
 

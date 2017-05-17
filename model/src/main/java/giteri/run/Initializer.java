@@ -35,7 +35,7 @@ public class Initializer {
         Runnable willBeRun;
 
         if(launcher == Configurator.EnumLauncher.jar){
-//            Configurator.methodOfGeneration = Configurator.MemeDistributionType.FollowingFitting;
+            Configurator.methodOfGeneration = Configurator.MemeDistributionType.FollowingFitting;
 //            Configurator.displayPlotWhileSimulation = false;
 //            Configurator.withGraphicalDisplay = false;
 //            Configurator.systemPaused = false;
@@ -127,11 +127,10 @@ public class Initializer {
             IHMStub fenetre = new IHMStub();
 
             vControl.setView((Interfaces.IView)fenetre);
-
             entiteHandler.initialisation();
 
-            entiteHandler.addMemeListener(workerFactory.getDrawer());
-            entiteHandler.addEntityListener(workerFactory.getCalculator());
+            entiteHandler.addMemeListener(workerFactoryJar.getDrawer());
+            entiteHandler.addEntityListener(workerFactoryJar.getCalculator());
 
             Interfaces.IReadNetwork nl = mControl.getReader();
             try {
@@ -216,7 +215,7 @@ public class Initializer {
 
             IModelParameter.MemeAvailability memeProvider = new IModelParameter.MemeAvailability(memeDispo);
             memeProvider.setEntiteHandler(entiteHandler);
-            providers.put(1,memeProvider);
+//            providers.put(1,memeProvider);
 
             IModelParameter.MemeDiffusionProba memeDiffu = new IModelParameter.MemeDiffusionProba(memeFactory.getMemeAvailable(true), new IModelParameter.GenericDoubleParameter(.0,.0,.2,.1));
             memeDiffu.setEntiteHandler(entiteHandler);

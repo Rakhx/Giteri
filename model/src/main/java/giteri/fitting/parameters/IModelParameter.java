@@ -453,7 +453,6 @@ public interface IModelParameter<T> {
 			// TODO [Refactoring 4.0]- Ne devrait pas avoir a utiliser ce boolean
 			if(!Configurator.doNotApplyMemeAvailability) {
 				this.memesAvailablesChange(activatedMeme, "New list of active memes on map");
-//				entiteHandler.giveMemeToEntiteXFirst(activatedMeme);
 			}
 		}
 
@@ -570,8 +569,13 @@ public interface IModelParameter<T> {
 		 *
 		 */
 		public void apply() {
+			ArrayList<Meme> memeo = new ArrayList<>();
 			for (Meme meme : value.keySet()) {
 				meme.probaOfPropagation = value.get(meme).value;
+				memeo.add(meme);
+			}
+			if(Configurator.doNotApplyMemeAvailability) {
+				entiteHandler.giveMemeToEntiteXFirst(memeo);
 			}
 		}
 

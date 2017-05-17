@@ -74,77 +74,9 @@ public class JarVersion {
      * @return
      */
     public static Double run(File fileInput, double param1, double param2, double param3, double param4, double param5) {
-
         ArrayList<Double> probaBehavior = new ArrayList<Double>();
         probaBehavior.addAll(Arrays.asList(param1,param2,param3,param4,param5));
         return Initializer.initialize(Configurator.EnumLauncher.jar, fileInput, probaBehavior);
-
-
-//        if (!fromMain) {
-//            Configurator.methodOfGeneration = Configurator.MemeDistributionType.FollowingFitting;
-//            Configurator.displayPlotWhileSimulation = false;
-//            Configurator.withGraphicalDisplay = false;
-//            Configurator.systemPaused = false;
-//            Configurator.jarMode = true;
-//        }
-//
-//        boolean debug = false;
-//        if(debug) System.out.println("Proba Recup "+ probaBehavior);
-//
-//
-//        WriteNRead writeNRead = new WriteNRead();
-//        AttributFactory attributFactory = new AttributFactory();
-//        AgregatorFactory agregatorFactory = new AgregatorFactory();
-//        ActionFactory actionFactory = new ActionFactory() ;
-//        MemeFactory memeFactory = new MemeFactory(actionFactory, agregatorFactory, attributFactory);
-//        WorkerFactoryJarVersion workerFactory = new WorkerFactoryJarVersion();
-//        NetworkConstructor networkConstructor = new NetworkConstructor();
-//        EntiteHandler entiteHandler = new EntiteHandler(networkConstructor, memeFactory, workerFactory);
-//        NetworkFileLoader networkFileLoader = new NetworkFileLoader( memeFactory, writeNRead);
-//        StatAndPlotJarVersion stat = new StatAndPlotJarVersion(entiteHandler, memeFactory, networkConstructor,
-//                writeNRead, networkFileLoader, workerFactory);
-//
-//        // Communication model
-//
-//        CommunicationModel communicationModel = new CommunicationModel(entiteHandler, networkConstructor,
-//                networkFileLoader, workerFactory,stat);
-//        networkFileLoader.setCommunicationModel(communicationModel);
-//        stat.setCommunicationModel(communicationModel);
-//        actionFactory.setEntiteHandler(entiteHandler);
-//        agregatorFactory.setEntiteHandler(entiteHandler);
-//        workerFactory.setNecessary(stat, new DrawerStub());
-//        networkConstructor.setDrawer(new DrawerStub());
-//
-//        // Controller
-//        Controller c = new Controller();
-//        VueController vControl = c.new VueController();
-//        ModelController mControl = c.new ModelController(vControl, communicationModel);
-//
-//        // La fenetre en elle meme Controller de Model donné a l'IHM
-//        IHMStub fenetre = new IHMStub();
-//
-//        vControl.setView((IView)fenetre);
-//
-//        entiteHandler.initialisation();
-//
-//        entiteHandler.addMemeListener(workerFactory.getDrawer());
-//        entiteHandler.addEntityListener(workerFactory.getCalculator());
-//
-//        IReadNetwork nl = mControl.getReader();
-//        try {
-//            writeNRead.readAndCreateNetwork(fileInput, nl," ","#");
-//        } catch (IOException e1) {
-//            e1.printStackTrace();
-//        }
-//
-//        stat.probaVoulu = probaBehavior;
-//        entiteHandler.suspend();
-//        networkConstructor.suspend();
-//        networkConstructor.start();
-//        entiteHandler.start();
-//
-//        return stat.fitNetwork(0);
     }
-
 
 }

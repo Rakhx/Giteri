@@ -9,9 +9,7 @@ import giteri.run.configurator.Configurator;
  */
 public class TestProvider {
     public static void main(String[] args)  {
-
         Initializer.initialize(Configurator.EnumLauncher.test, null, null);
-
     }
 
     public static class Companion {

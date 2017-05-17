@@ -40,7 +40,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	protected WorkerFactory workerFactory;
 
 	// Element autres
-	private Integer nbActionRelative = 0;
+	private Integer nbAction = 0;
 
 	// Empeche l'algo de passer au step suivant de fitting sans le passage manuel
 	// Mis au niveau du configuraztor.
@@ -117,7 +117,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 * @param fitting
 	 */
 	protected void initializeConfigForStability(FittingClass fitting){
-
 		Hashtable<Meme, GenericBooleanParameter> memeDispo = new Hashtable<Meme,GenericBooleanParameter>();
 		ArrayList<Meme> memeOnMap = new ArrayList<Meme>();
 		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<Integer, IModelParameter<?>>();
@@ -131,7 +130,9 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		// pertinent.
 		MemeAvailability memeProvider = new MemeAvailability(memeDispo);
 		memeProvider.setEntiteHandler(entiteHandler);
+
 		// providers.put(1,memeProvider);
+//		entiteHandler.giveMemeToEntiteXFirst(memeFactory.getMemeAvailable(true));
 
 		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeFactory.getMemeAvailable(true), new GenericDoubleParameter(.0,.0,.2,.1));
 		memeDiffu.setEntiteHandler(entiteHandler);
@@ -143,6 +144,9 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		}
 
 		fitting.explorator = ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
+
+		if(!Configurator.jarMode)
+			Configurator.methodOfGeneration = Configurator.MemeDistributionType.FollowingFitting;
 
 	}
 
@@ -187,13 +191,13 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 					for (int x = 0; x < config.boucleExterneSize; x++)
 					{
 						do{
-							nbActionPassee  = getNbActionRelative();
+							nbActionPassee  = getNbAction();
 						}while(nbActionPassee <= config.nbActionByStep);
 
 						NetworkProperties np = networkConstructor.updatePreciseNetworkProperties(Configurator.getIndicateur(NetworkAttribType.DENSITY));
 						config.addDensity(np.getDensity());
 						config.computeMemeAppliance();
-						resetNbActionRelative();
+						resetNbAction();
 					}
 
 					debugBeforeSkip = config.continuFittingCleanVersion();
@@ -438,23 +442,23 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		autoPauseIfNexted = false;
 	}
 
-	protected int getNbActionRelative() {
-		synchronized(nbActionRelative)
+	protected int getNbAction() {
+		synchronized(nbAction)
 		{
-			return nbActionRelative;
+			return nbAction;
 		}
 	}
 
-	public void incrementNbActionRelative(){
-		synchronized(nbActionRelative)
+	public void incrementNbAction(){
+		synchronized(nbAction)
 		{
-			nbActionRelative++;
+			nbAction++;
 		}
 	}
 
-	protected void resetNbActionRelative(){
-		synchronized(nbActionRelative){
-			nbActionRelative = 0;
+	protected void resetNbAction(){
+		synchronized(nbAction){
+			nbAction = 0;
 		}
 	}
 
