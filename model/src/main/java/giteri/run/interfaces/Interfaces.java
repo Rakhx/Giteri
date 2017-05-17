@@ -73,7 +73,7 @@ public class Interfaces {
 //		public void searchStability();
 		public void fitNextStep();
 		public void testStability();
-		public void incrementNbActionRelative();
+		public void incrementNbAction();
 	}
 	
 	/** Interface qui définit les actions possibles sur l'IHM
