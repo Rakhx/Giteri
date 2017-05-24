@@ -1,24 +1,24 @@
 package giteri.run.jarVersion;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-
-import giteri.meme.entite.EntiteHandler;
-import giteri.network.networkStuff.NetworkConstructor;
-import giteri.network.networkStuff.NetworkFileLoader;
-import giteri.network.networkStuff.WorkerFactory;
-import giteri.run.configurator.Configurator;
-import giteri.meme.mecanisme.MemeFactory;
-import giteri.network.networkStuff.NetworkAnalyzer;
+import giteri.fitting.algo.IExplorationMethod;
 import giteri.fitting.parameters.FittingClass;
 import giteri.fitting.parameters.IModelParameter;
 import giteri.fitting.parameters.IModelParameter.GenericBooleanParameter;
 import giteri.fitting.parameters.IModelParameter.GenericDoubleParameter;
 import giteri.fitting.parameters.IModelParameter.MemeAvailability;
 import giteri.fitting.parameters.IModelParameter.MemeDiffusionProba;
-import giteri.fitting.algo.IExplorationMethod.ExplorationOneShot;
+import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
+import giteri.meme.mecanisme.MemeFactory;
+import giteri.network.networkStuff.NetworkAnalyzer;
+import giteri.network.networkStuff.NetworkConstructor;
+import giteri.network.networkStuff.NetworkFileLoader;
+import giteri.network.networkStuff.WorkerFactory;
+import giteri.run.configurator.Configurator;
 import giteri.tool.other.WriteNRead;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
 
 public class StatAndPlotJarVersion extends NetworkAnalyzer {
 
@@ -38,8 +38,6 @@ public class StatAndPlotJarVersion extends NetworkAnalyzer {
 		double value;
 		Hashtable<Meme, GenericBooleanParameter> memeDispo = new Hashtable<Meme,GenericBooleanParameter>();
 		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<Integer, IModelParameter<?>>();
-
-
 		Hashtable<Meme, GenericDoubleParameter> kvMemeValue = new Hashtable<Meme, IModelParameter.GenericDoubleParameter>();
 
 		for (Meme meme : memeFactory.getMemeAvailable(true))
@@ -54,11 +52,13 @@ public class StatAndPlotJarVersion extends NetworkAnalyzer {
 			kvMemeValue.put(meme, new GenericDoubleParameter(value,value, value,1.));
 		}
 
-		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(kvMemeValue);//, new GenericDoubleParameter(.1,.1,.2,.05));
+		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(kvMemeValue);
 		providers.put(0,memeDiffu);
 		memeDiffu.setEntiteHandler(entiteHandler);
 
-		fitting.explorator = new ExplorationOneShot(providers);
+		fitting.explorator = IExplorationMethod.ExplorationMethod.getSpecificExplorator(Configurator.EnumExplorationMethod.oneShot, providers);
+		if(Configurator.debugOpenMole)
+			System.out.println("Config lancee avec " + probaVoulu);
 	}
 
 }

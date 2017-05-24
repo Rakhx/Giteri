@@ -13,7 +13,7 @@ public class TreeNode<T> {
     public TreeNode(String name, T rootData) {
         leafName = name;
     	data = rootData;
-        children = new ArrayList<TreeNode<T>>();
+        children = new ArrayList<>();
     }
 
     /** recherche d'un node dans les enfants.

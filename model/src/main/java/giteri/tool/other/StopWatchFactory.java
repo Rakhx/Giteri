@@ -32,7 +32,6 @@ public class StopWatchFactory {
 	 * 
 	 * @param parentName
 	 * @param name
-	 * @param toAdd
 	 * @return
 	 */
 	public boolean addWatch(String parentName, String name){

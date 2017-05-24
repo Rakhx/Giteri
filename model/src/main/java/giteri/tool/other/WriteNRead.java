@@ -25,21 +25,15 @@ import giteri.network.network.INetworkRepresentations;
 public class WriteNRead {
 
 	// Region Singleton
-	private static WriteNRead instance = null;
 	public WriteNRead(){
 
 	}
-//	public static WriteNRead getInstance(){
-//		if(instance == null)
-//			instance = new WriteNRead();
-//		return instance;
-//	}
 
 	// EndRegion
 
 	final static File defaultPath = new File("DefaultPath");
 	final static Charset ENCODING = StandardCharsets.UTF_8;
-	Hashtable<String, Path> rscNameToPath = new Hashtable<String, Path>();
+	Hashtable<String, Path> rscNameToPath = new Hashtable<>();
 
 	/** Ecriture rapide dasn un fichier texte
 	 *
@@ -49,14 +43,6 @@ public class WriteNRead {
 	 */
 	public void writeSmallFile2(File reps, String fileName, List<String> toWrite){
 		// Si il n'y a pas encore d'entrée de path dans la hashtable
-
-//		if(!rscNameToPath.containsKey(fileName)){
-//			Path path = Paths.get(reps  + System.getProperty("file.separator")	+ fileName + ".txt");
-//			buildWriter(fileName, Optional.of(path) );
-//		}
-//
-//		Path path = rscNameToPath.get(fileName);
-
 		Path path = Paths.get(reps  + System.getProperty("file.separator")	+ fileName + ".txt");
 
 		try {

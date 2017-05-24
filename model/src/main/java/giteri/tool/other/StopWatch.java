@@ -19,7 +19,7 @@ public class StopWatch
     
     /** Création d'un timer, mise a zéro.
      * 
-     * @param name
+     * @param name Nom de la montre
      */
     public StopWatch(String name){
     	this.name = name;

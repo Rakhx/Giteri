@@ -9,8 +9,8 @@ import giteri.run.configurator.Configurator;
  */
 public abstract class ThreadHandler implements Runnable {
 	
-	boolean suspend = Configurator.isSystemPaused();
-	Boolean working = true;
+	private boolean suspend = Configurator.isSystemPaused();
+	private Boolean working = true;
 	public Thread t;
 	public abstract void doRun();
 	public abstract Thread getThread();
@@ -33,6 +33,7 @@ public abstract class ThreadHandler implements Runnable {
     	}
     }
 
+	@SuppressWarnings("WeakerAccess")
 	public void start(){
 		if(t == null){
 			t = getThread();

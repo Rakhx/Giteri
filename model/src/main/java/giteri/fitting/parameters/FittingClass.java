@@ -2,12 +2,9 @@ package giteri.fitting.parameters;
 
 import java.io.File;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Optional;
+import java.util.*;
 
+import giteri.fitting.algo.ResultSet;
 import giteri.tool.math.Toolz;
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.network.NetworkProperties;
@@ -22,7 +19,6 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 import giteri.tool.other.WriteNRead;
 import scala.util.Random;
 import giteri.fitting.algo.IExplorationMethod;
-import giteri.fitting.algo.Result;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.NetworkAttribType;
 import giteri.meme.entite.EntiteHandler;
@@ -52,7 +48,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	private WriteNRead writeNRead;
 	private WorkerFactory workerFactory;
 	private NetworkConstructor networkConstructor;
-
 
 	public boolean debug = false;
 	public CommunicationModel com ;
@@ -126,18 +121,13 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 	// relevés des différentes densité pour une meme configuration
 	public ArrayList<NetworkProperties> networksSameTurn = new ArrayList<NetworkProperties>();
-
 	public CircularFifoQueue<Double> cfqDensityValuesOnOneRun;
-//	public CircularFifoQueue<Double> meanDensityValuesOnOneRun;
-
-	// Variance sur ces densité
-//	public double currentDensity;
 
 	NetworkProperties targetNetProperties;
 	NetworkProperties currentNetProperties = new NetworkProperties();
 
 	public double currentNetworkScore;
-	Result resultNetwork ;
+	ResultSet resultNetwork ;
 
 	ArrayList<String> repertoires ;
 
@@ -150,7 +140,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 */
 	public FittingClass(WriteNRead wnr, CommunicationModel com, MemeFactory memeF,
 						NetworkFileLoader nfl, WorkerFactory wf, EntiteHandler eh, NetworkConstructor nc){
-		resultNetwork = new Result(wnr);
+		resultNetwork = new ResultSet(wnr);
 		this.com = com;
 		this.memeFactory = memeF;
 		this.writeNRead = wnr;
@@ -161,19 +151,19 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		setDefaultValue();
 	}
 
-	/**
+	/** Mise en place des valeurs par défault pour les variables d'utilisation
 	 *
 	 */
 	private void setDefaultValue(){
 		nbRepetitionByConfig = 2;
 		nbActionByStep = 50;
-		cfqDensityValuesOnOneRun = new CircularFifoQueue<Double>(boucleExterneSize);
-		cqLastXActionDone = new CircularFifoQueue<Meme>(circularSize);
-		kvLastActionDone = new Hashtable<Meme, Integer>();
-		kvOverallProportionActionDone = new Hashtable<Meme, Double>();
-		kvOverallNumberOfActionDone = new Hashtable<Meme, Integer>();
-		cfqMemeAppliancePropOnFitting = new CircularFifoQueue<Hashtable<Meme,Double>>(nbEltCircularQFitting);
-		cfqMemeApplianceNumberOnFitting = new CircularFifoQueue<Hashtable<Meme,Integer>>(nbEltCircularQFitting);
+		cfqDensityValuesOnOneRun = new CircularFifoQueue<>(boucleExterneSize);
+		cqLastXActionDone = new CircularFifoQueue<>(circularSize);
+		kvLastActionDone = new Hashtable<>();
+		kvOverallProportionActionDone = new Hashtable<>();
+		kvOverallNumberOfActionDone = new Hashtable<>();
+		cfqMemeAppliancePropOnFitting = new CircularFifoQueue<>(nbEltCircularQFitting);
+		cfqMemeApplianceNumberOnFitting = new CircularFifoQueue<>(nbEltCircularQFitting);
 		memesAvailables = memeFactory.getMemeAvailable(false);
 		currentNetProperties.createStub();
 	}
@@ -189,41 +179,41 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		targetNetProperties = networkFileLoader.getNetworkProperties();
 
 		// ECRITURE
-		repertoires = new ArrayList<String>(Arrays.asList("Stability"));
+		repertoires = new ArrayList<>(Arrays.asList("Stability"));
 		DateFormat dateFormat = Configurator.getDateFormat();
 		repertoires.add(dateFormat.format(new Date()));
 		repOfTheSearch = null;
 		String toWriteNormalCSV = "";
-		String toWriteDetailCSV = "";
+		StringBuilder toWriteDetailCSV = new StringBuilder();
 
 		if(Configurator.writeNetworkResultOnFitting)
 		{
 			// STEP: HEADER
 			repOfTheSearch = writeNRead.createAndGetDirFromString(repertoires);
-			String header = "Name";
+			StringBuilder header = new StringBuilder("Name");
 			for (IModelParameter<?> model : explorator.getModelParameterSet())
-				header += ";" + model.nameString();
+				header.append(";").append(model.nameString());
 
 			// STEP: NORMAL
 			toWriteNormalCSV += header;
 			toWriteNormalCSV += currentNetProperties.getCsvHeader(Configurator.activationCodeForScore);
 			toWriteNormalCSV += ";moyenne des scores";
 			toWriteNormalCSV += ";Variance des scores";
-			writeNRead.writeSmallFile2(repOfTheSearch, "NetworkCSV", Arrays.asList(toWriteNormalCSV));
+			writeNRead.writeSmallFile2(repOfTheSearch, "NetworkCSV", Collections.singletonList(toWriteNormalCSV));
 
 			// STEP: DETAILLED
-			toWriteDetailCSV += header;
+			toWriteDetailCSV.append(header);
 			for (Configurator.NetworkAttribType attrib : Configurator.NetworkAttribType.values()) {
 				if(Configurator.isAttribActived(Configurator.activationCodeAllAttribExceptDD, attrib))
 				{
-					toWriteDetailCSV += ";" + attrib.toString();
-					toWriteDetailCSV += ";" + "SD " + attrib.toString();
+					toWriteDetailCSV.append(";").append(attrib.toString());
+					toWriteDetailCSV.append(";" + "SD ").append(attrib.toString());
 				}
 			}
 
-			toWriteDetailCSV += ";moyenne des scores";
-			toWriteDetailCSV += ";Variance des scores";
-			writeNRead.writeSmallFile2(repOfTheSearch, "NetworkDetailsCSV", Arrays.asList(toWriteDetailCSV));
+			toWriteDetailCSV.append(";moyenne des scores");
+			toWriteDetailCSV.append(";Variance des scores");
+			writeNRead.writeSmallFile2(repOfTheSearch, "NetworkDetailsCSV", Collections.singletonList(toWriteDetailCSV.toString()));
 
 			// Donner aux entités les memes originaux?
 		}
@@ -310,7 +300,9 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		}
 
 		resultNetwork.addScore(numeroRun, configAsString, currentNetworkScore, networkConstructor.getNetworkProperties().getCopyMe());
-		com.takeSnapshot(currentSeed, Optional.ofNullable(repertoires));
+		if(Configurator.writeNetworkResultOnFitting)
+			com.takeSnapshot(currentSeed, Optional.ofNullable(repertoires));
+
 		repertoires.remove(numeroTurnAsString);
 
 		if(Configurator.writeNetworkResultOnFitting)
@@ -384,7 +376,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	/** Version utilisée pour savoir s'il faut continuer a faire du fitting ou si on a
 	 * attend une stabilité.
 	 * // TODO [WayPoint]- Choix de continuité d'une simulation pour une config. 
-	 * @return
+	 * @return true s'il faut continuer la simulation sur la config courante
 	 */
 	public boolean continuFittingCleanVersion(){
 		boolean useDensity = true;
@@ -488,12 +480,12 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 				if(fastDebug) System.out.println("Hard End sur appliance ");}
 
 		// SOFTEND
-		if( (useDensity ? (seDensity && seCoeff) : true) && ( useMemeAppliance ? (seAppliance) : true)  ){
+		if((useDensity ? (seDensity && seCoeff) : true) && ( useMemeAppliance ? (seAppliance) : true)){
 			if(!stepByStep) oneMoreTurn = false;
 			if(fastDebug) System.out.println("Soft end sur tout le monde");}
 
 		// SOMME DES SCORES
-		seuilScore += (useDensity ? threshHeDensity + threshHeAppliance : 0) + (useMemeAppliance ? threshHeAppliance: 0 );
+		seuilScore += (useDensity ? threshHeDensity + threshHeAppliance : 0) + (useMemeAppliance ? threshHeAppliance: 0);
 		if(scoreTotal < seuilScore){
 			if(!stepByStep) oneMoreTurn = false;
 			if(fastDebug) System.out.println("Somme des scores inférieur a somme des SE");}

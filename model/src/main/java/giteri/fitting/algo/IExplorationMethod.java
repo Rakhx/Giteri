@@ -14,41 +14,60 @@ import giteri.run.configurator.Configurator.EnumExplorationMethod;
  *
  */
 public interface IExplorationMethod {
+	/** Passer le IModelParameter au step suivant
+	 *
+	 * @return true si il existe un step suivant
+	 */
 	boolean gotoNext();
+	/** Appliquer au modèle la valeur courante du IModel parameter
+	 *
+	 */
 	void apply();
+	/** Affichage lisible de la valeur courante des ensembles des IModelParameters
+	 * contenu dans l'explorateur.
+	 *
+	 * @return un string détaillant les informations de la configuration courante.
+	 */
 	String toString();
-	ArrayList<IModelParameter<?>> getModelParameterSet();
+
+	/** Renvoi une liste des IModelParameter contenu dans le provider.
+	 *
+	 * @return la liste des parametre de l'explorateur
+	 */
+	List<IModelParameter<?>> getModelParameterSet();
 
 	/** CLASSE ABSTRAITE commune a tte les méthodes d'explorations.
 	 * 
 	 */
-	public abstract class ExplorationMethod implements IExplorationMethod{
+	 abstract class ExplorationMethod implements IExplorationMethod{
 
-//		La liste des paramètres sur laquelle tourne les explorations. L'integer indique
-//		l'ordre d'application des param. 0 ou 1 lol : le premier
-		public Hashtable<Integer, IModelParameter<?>> provider;
+		/** La liste des paramètres sur laquelle tourne les explorations. L'integer indique
+		 * l'ordre d'application des param. Le premier IModelParameter à cycler est celui en position
+		 * 0.
+		 */
+		Hashtable<Integer, IModelParameter<?>> provider;
 
-		protected ExplorationMethod(Hashtable<Integer, IModelParameter<?>> provids){
+		ExplorationMethod(Hashtable<Integer, IModelParameter<?>> provids){
 			provider = provids;
 		}
 		
 		/** Renvoi l'ensemble des string de la configuration actuelle du model.
-		 * 
+		 *
 		 */
 		public String toString(){
-			String res = "";
+			StringBuilder res = new StringBuilder();
 			for (IModelParameter<?> iConfigProvider : provider.values()) {
-				res += "\n"+iConfigProvider.valueString();
+				res.append("\n").append(iConfigProvider.valueString());
 			}
 		
-		return res;
+		return res.toString();
 		}
 		
 		/**
 		 * 
 		 */
 		public ArrayList<IModelParameter<?>> getModelParameterSet(){
-			return new ArrayList<IModelParameter<?>>(provider.values()) ;
+			return new ArrayList<>(provider.values()) ;
 		}
 		
 		/** APplication au modèle dans l'ordre indiqué par la hashtable.
@@ -64,7 +83,7 @@ public interface IExplorationMethod {
 		 *
 		 * @param explo L'explo voulu
 		 * @param provids les providers demandé
-		 * @return
+		 * @return L'explorateur voulu
 		 */
 		public static  IExplorationMethod getSpecificExplorator(EnumExplorationMethod explo, Hashtable<Integer, IModelParameter<?>> provids){
 			switch (explo) {
@@ -84,14 +103,14 @@ public interface IExplorationMethod {
 	 * Nouvelle version utilisant les nouveaux type de paramètre.
 	 *
 	 */
-	public class ExplorationExhaustive extends ExplorationMethod {
+	 class ExplorationExhaustive extends ExplorationMethod {
 
 		/** Constructeurs qui prend un map de paramètre, avec en clef l'ordre d'application.
 		 * Cycle en premier sur la key 0, applique en premier la key max.
 		 * 
-		 * @param parameters
+		 * @param parameters liste des params de config.
 		 */
-		public ExplorationExhaustive(Hashtable<Integer, IModelParameter<?>> parameters){
+		ExplorationExhaustive(Hashtable<Integer, IModelParameter<?>> parameters){
 			super(parameters);
 		}
 		
@@ -115,11 +134,11 @@ public interface IExplorationMethod {
 		}
 	}
 
-	/** Classe intanciation de la méthode d'exploration, le fait de facon random
+	/** Classe instanciation de la méthode d'exploration, le fait de facon random
 	 * 
 	 *
 	 */
-	public class ExplorationRandom extends ExplorationMethod {
+	 class ExplorationRandom extends ExplorationMethod {
 		
 		// Numéro de profil, map<IModelParameter,String de configuration>
 		List<HashMap<IModelParameter<?>, String>> matrice;
@@ -127,15 +146,15 @@ public interface IExplorationMethod {
 		/** Constructeur qui prend une map de parametre, avec comme clef l'ordre d'application. 
 		 * Premier a etre appliqué @key = 0
 		 * 
-		 * @param provids
+		 * @param provids La liste des providers sur lesquels varier
 		 */
-		public ExplorationRandom(Hashtable<Integer, IModelParameter<?>> provids) {
+		ExplorationRandom(Hashtable<Integer, IModelParameter<?>> provids) {
 			super(provids);
 
 			IModelParameter<?> champion = null;
 			
 			// valeur possible par provider
-		    List<List<String>> possibleValues = new ArrayList<List<String>>();
+		    List<List<String>> possibleValues = new ArrayList<>();
 		    for (IModelParameter<?> providers : provids.values()) {
 		    	// Cheat code
 		    	if(providers.nameString().compareToIgnoreCase("Proba Diffusion") == 0){
@@ -144,10 +163,10 @@ public interface IExplorationMethod {
 		    	}
 			}
 		    
-		    matrice = new ArrayList<HashMap<IModelParameter<?>,String>>();
+		    matrice = new ArrayList<>();
 		    for (List<String> list : possibleValues) {
 				for (String string : list) {
-					HashMap<IModelParameter<?>, String> element = new HashMap<IModelParameter<?>, String>();
+					HashMap<IModelParameter<?>, String> element = new HashMap<>();
 					element.put(champion, string);
 			    	matrice.add(element);
 				}
@@ -179,12 +198,10 @@ public interface IExplorationMethod {
 		}
 	}
 	
-	/** Exploration pour un seul type de réseau.
+	/** Exploration pour un seul type de configuration.
 	 * 
-	 * @author Felix
-	 *
 	 */
-	public class ExplorationOneShot extends ExplorationMethod {
+	 class ExplorationOneShot extends ExplorationMethod {
 
 		public ExplorationOneShot(Hashtable<Integer, IModelParameter<?>> provids) {
 			super(provids);

@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import static giteri.run.configurator.Configurator.debugOpenMole;
+
 /** Classe d'initialisation des objets nécessaires a l'utilisation du framework
  * Commun a ttes les classes.
  */
@@ -34,12 +36,8 @@ public class Initializer {
         // A instancier dans les if. a lancer dans tous les cas a la fin?
         Runnable willBeRun;
 
-        if(launcher == Configurator.EnumLauncher.jar){
-            Configurator.methodOfGeneration = Configurator.MemeDistributionType.FollowingFitting;
-//            Configurator.displayPlotWhileSimulation = false;
-//            Configurator.withGraphicalDisplay = false;
-//            Configurator.systemPaused = false;
-//            Configurator.jarMode = true;
+        if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.jarOpenMole){
+//            Configurator.methodOfGeneration = Configurator.MemeDistributionType.FollowingFitting;
         }else if(launcher == Configurator.EnumLauncher.ihm){
             Configurator.methodOfGeneration = Configurator.MemeDistributionType.SingleBasic;
             Configurator.displayPlotWhileSimulation = true;
@@ -48,7 +46,8 @@ public class Initializer {
             Configurator.systemPaused = true;
             Configurator.writeNetworkResultOnFitting = true;
             Configurator.explorator = Configurator.EnumExplorationMethod.exhaustive;
-        }else if(launcher == Configurator.EnumLauncher.test){
+//            Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
+        }else if(launcher == Configurator.EnumLauncher.testProvider){
             Configurator.methodOfGeneration = Configurator.MemeDistributionType.SingleBasic;
             Configurator.displayPlotWhileSimulation = false;
             Configurator.withGraphicalDisplay = false;
@@ -67,7 +66,8 @@ public class Initializer {
         WorkerFactory workerFactory = null ;
         WorkerFactoryJarVersion workerFactoryJar = null;
 
-        if(launcher == Configurator.EnumLauncher.jar|| launcher == Configurator.EnumLauncher.test){
+        if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.testProvider
+                || launcher == Configurator.EnumLauncher.jarOpenMole){
             workerFactoryJar = new WorkerFactoryJarVersion();
         }else if(launcher == Configurator.EnumLauncher.ihm ){
             workerFactory = new WorkerFactory();
@@ -76,7 +76,8 @@ public class Initializer {
         NetworkConstructor networkConstructor = new NetworkConstructor();
         EntiteHandler entiteHandler  = null;
 
-        if(launcher == Configurator.EnumLauncher.jar|| launcher == Configurator.EnumLauncher.test){
+        if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.testProvider
+                || launcher == Configurator.EnumLauncher.jarOpenMole){
             entiteHandler = new EntiteHandler(networkConstructor, memeFactory, workerFactoryJar);
         }else if(launcher == Configurator.EnumLauncher.ihm ){
             entiteHandler = new EntiteHandler(networkConstructor, memeFactory, workerFactory);
@@ -86,7 +87,8 @@ public class Initializer {
         DrawerGraphStream drawerGraphStream = null;
         StatAndPlotJarVersion stat = null;
 
-        if(launcher == Configurator.EnumLauncher.jar|| launcher == Configurator.EnumLauncher.test){
+        if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.testProvider
+                || launcher == Configurator.EnumLauncher.jarOpenMole){
              stat = new StatAndPlotJarVersion(entiteHandler, memeFactory, networkConstructor,
                      writeNRead, networkFileLoader, workerFactoryJar);
         }else if(launcher == Configurator.EnumLauncher.ihm){
@@ -97,7 +99,8 @@ public class Initializer {
         // Communication model
         CommunicationModel communicationModel = null;
 
-        if(launcher == Configurator.EnumLauncher.jar|| launcher == Configurator.EnumLauncher.test) {
+        if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.testProvider
+                || launcher == Configurator.EnumLauncher.jarOpenMole) {
             communicationModel = new CommunicationModel(entiteHandler, networkConstructor, networkFileLoader, workerFactoryJar, stat);
             stat.setCommunicationModel(communicationModel);
         }else if (launcher == Configurator.EnumLauncher.ihm) {
@@ -109,7 +112,8 @@ public class Initializer {
         actionFactory.setEntiteHandler(entiteHandler);
         agregatorFactory.setEntiteHandler(entiteHandler);
 
-        if(launcher == Configurator.EnumLauncher.jar|| launcher == Configurator.EnumLauncher.test)  {
+        if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.testProvider
+                || launcher == Configurator.EnumLauncher.jarOpenMole)  {
             workerFactoryJar.setNecessary(stat, new DrawerStub());
             networkConstructor.setDrawer(new DrawerStub());
         }else if (launcher == Configurator.EnumLauncher.ihm) {
@@ -122,7 +126,7 @@ public class Initializer {
         Controller.VueController vControl = c.new VueController();
         Controller.ModelController mControl = c.new ModelController(vControl, communicationModel);
 
-        if(launcher == Configurator.EnumLauncher.jar)  {
+        if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.jarOpenMole)  {
             // La fenetre en elle meme Controller de Model donné a l'IHM
             IHMStub fenetre = new IHMStub();
 
@@ -140,6 +144,7 @@ public class Initializer {
             }
 
             stat.probaVoulu = probaBehavior;
+            if(debugOpenMole) System.out.println("Proba donnée au launcher:" + probaBehavior);
             entiteHandler.suspend();
             networkConstructor.suspend();
             networkConstructor.start();
@@ -202,11 +207,10 @@ public class Initializer {
 
             return 0.;
         }
-        else if(launcher == Configurator.EnumLauncher.test){
+        else if(launcher == Configurator.EnumLauncher.testProvider){
             entiteHandler.initialisation();
 
             Hashtable<Meme, IModelParameter.GenericBooleanParameter> memeDispo = new Hashtable<Meme,IModelParameter.GenericBooleanParameter>();
-            ArrayList<Meme> memeOnMap = new ArrayList<Meme>();
             Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<Integer, IModelParameter<?>>();
 
             for (Meme meme : memeFactory.getMemeAvailable(true)) {

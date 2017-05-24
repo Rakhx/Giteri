@@ -8,20 +8,15 @@ import java.util.ArrayList;
 import giteri.tool.math.Toolz;
 
 public final class Configurator {
+	// La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
+	// depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent
+	// cette configuration initiale
 	public static boolean withGraphicalDisplay = false;
 	public static boolean jarMode = true;
 	public static boolean systemPaused = false;
-	public static boolean writeNetworkResultOnFitting = true;
+	public static boolean writeNetworkResultOnFitting = false;
 	public static boolean doNotApplyMemeAvailability = true;
-
-	// Comportement modèle
-	public static MemeDistributionType methodOfGeneration = MemeDistributionType.SingleBasic;
-
-	//	public final static MemeDistributionType methodOfGeneration = MemeDistributionType.AllCombinaison;
-//	public final static MemeDistributionType methodOfGeneration = MemeDistributionType.FollowingFitting;
-//	public static MemeDistributionType methodOfGeneration = MemeDistributionType.SingleBasic;
-//	public final static MemeDistributionType methodOfGeneration = MemeDistributionType.FollowingFitting;
-//	public  static MemeDistributionType methodOfGeneration = MemeDistributionType.specificDistrib;
+	public static MemeDistributionType methodOfGeneration = MemeDistributionType.FollowingFitting;
 
 	// Fitting
 	public static EnumExplorationMethod explorator = EnumExplorationMethod.oneShot;
@@ -67,14 +62,13 @@ public final class Configurator {
 	public static boolean debugStatAndPlot = false;
 	public static boolean debugFittingClassFast = false;
 	public static boolean debugFittingClass = false;
+	public static boolean overallDebug = !jarMode;
+	public static boolean debugHopAway = false;
+	public static boolean autrucheMode = false;
+	public static boolean debugOpenMole = true;
 
 	// Configuration Modèle
-//	public static boolean jarMode = false;
-
-	public static boolean overallDebug = !jarMode;
-
 	public static final boolean lotOfNodes = false;
-
 	public final static boolean autoRedoActionIfNoAction = false;
 	public final static int nbNode = lotOfNodes? 10000 : 100;
 	public static int refreshInfoRate = 500;
@@ -84,39 +78,33 @@ public final class Configurator {
 	public static boolean displayMemePosessionDuringSimulation = true;
 	
 	// Config Temporaire
-	public static boolean debugHopAway = false;
-	public static boolean autrucheMode = false;
 
 	// Region ancien boolean, osef, etc
-
 	public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-d_HH'h'mm'm'ss's'");
 	public static File defaultPathForReadingNetwork = new File("/Users/Felix/Documents/W/S/Giteri/Rulez/default.txt");
 	public static File rightHerePathForReadingNetwork = new File("default.txt");
-
-
-	public static Integer baseSleepTimeMulti = 0;//turboMode ? 0 : 1;
+	public static Integer baseSleepTimeMulti = 0;
 	private static Integer threadSleepMultiplicateur = baseSleepTimeMulti;
 
 	// Construction aléatoire du réseau ou non // systeme en pause au lancement
-//	public static boolean systemPaused = turboMode ? false :true;
 	private static double probaRetraitLien = 0.;
 	private static Object lockOnPause = new Object();
 
 	// Ancien mecanismes
 	public static boolean desgressiveLearningProba = false;
-//	public final static double reLearningThreshold = 0.001;
 	public static boolean useEntitePropagationProba = false;
 	public static boolean learningOnlyOnce = false;
 
-	public static long randomSeed;
+//	public static long randomSeed;
 
 	// EndRegion
 
 	public enum EnumLauncher
 	{
 		ihm,
-		jar,
-		test
+		jarC,
+		jarOpenMole,
+		testProvider
 	}
 
 	// Region Concernant Meme and co
@@ -174,7 +162,7 @@ public final class Configurator {
 	/** Density..
 	 *
 	 */
-	public static enum NetworkAttribType{
+	public enum NetworkAttribType{
 		DENSITY,
 		DDAVG,
 		DDINTERQRT,
@@ -239,7 +227,7 @@ public final class Configurator {
 	/** The most...
 	 *
 	 */
-	public static enum AgregatorType{
+	public enum AgregatorType{
 		THEMOST,
 		THELEAST,
 		THEMOSTLINKED,
@@ -257,7 +245,7 @@ public final class Configurator {
 	/** Ajout lien...
 	 *
 	 */
-	public static enum ActionType {
+	public enum ActionType {
 		AJOUTLIEN,
 		RETRAITLIEN,
 		COPIERANDOMMEME,
@@ -269,7 +257,7 @@ public final class Configurator {
 	/** degree
 	 *
 	 */
-	public static enum AttributType {
+	public enum AttributType {
 		DEGREE
 	}
 

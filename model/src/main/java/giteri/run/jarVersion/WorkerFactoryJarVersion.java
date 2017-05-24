@@ -10,7 +10,6 @@ public class WorkerFactoryJarVersion extends WorkerFactory {
 	 *
 	 */
 	public WorkerFactoryJarVersion() {
-		waitingForReset = true;
 	}
 
 	public void setNecessary(Interfaces.StatAndPlotInterface statAnd, Interfaces.DrawerInterface dra ){
