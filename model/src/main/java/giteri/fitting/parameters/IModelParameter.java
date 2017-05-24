@@ -58,6 +58,11 @@ public interface IModelParameter<T> {
 	 * @return
 	 */
 	public List<String> getPossibleValue();
+	/** Obtient la valeur actuelle qui pourra etre remise par le setPossibleValue
+	 *
+	 * @return
+	 */
+	public String getActualValue();
 	/** Permet de partir d'un string et
 	 *
 	 * @param ref
@@ -145,6 +150,9 @@ public interface IModelParameter<T> {
 				value = false;
 		}
 
+		public String getActualValue(){
+			return valueString();
+		}
 	}
 
 	/** CLASSE ABSTRAITE qui définit T comme un double. Défini un champs step pour connaitre la
@@ -180,6 +188,10 @@ public interface IModelParameter<T> {
 			value = minValue + stepChoose * step;
 		}
 
+		public String valueString() {
+			return ""+value;
+		}
+
 		public String nameString(){
 			return "Double";
 		}
@@ -201,6 +213,10 @@ public interface IModelParameter<T> {
 		public void setPossibleValue(String value){
 			double valueToSet = Double.parseDouble(value);
 			this.value = valueToSet;
+		}
+
+		public String getActualValue(){
+			return valueString();
 		}
 	}
 
@@ -232,14 +248,12 @@ public interface IModelParameter<T> {
 			// Meme dont il est question
 			ArrayList<Meme> memes = new ArrayList<Meme>(value.keySet());
 			memes.sort(null);
-
 			if(debug)System.out.println("Memes " + memes);
 
 			// Avoir les IModelParameter associés à chaque meme
 			ArrayList<P> elements = new ArrayList<P>();
 			for (Meme meme : memes)
 				elements.add(value.get(meme));
-
 			if(debug)System.out.println("Elements " + elements);
 
 			// Valeur possible pour chaque element
@@ -261,7 +275,7 @@ public interface IModelParameter<T> {
 				indexMeme = 0;
 				// on trouve les valeurs correspondantes aux index indexValueCourante
 				for(int integer = 0; integer < memes.size() ;integer++){
-					config += memes.get(indexMeme) + ";" +
+					config += memes.get(indexMeme) + "=" +
 							possibleValues.get(elements.get(indexMeme)).
 									get(indexValueCourante.get(integer)) + ":";
 					indexMeme++;
@@ -320,6 +334,16 @@ public interface IModelParameter<T> {
 			}
 		}
 
+		public String getActualValue(){
+			String result = "";
+
+			for (Meme meme : value.keySet()) {
+				result += meme + "=" + value.get(meme).getActualValue() +":";
+			}
+
+			return result;
+		}
+
 	}
 
 	/** CLASSE de boolean générique, utilisé pour etre utilisé dans la map<Meme, P>. Donc pas d'apply en tant que tel.
@@ -368,12 +392,6 @@ public interface IModelParameter<T> {
 		public void apply() {
 			// Rien, normal.
 
-		}
-
-		@Override
-		public String valueString() {
-			// Rien, ~~ normal
-			return null;
 		}
 
 		public GenericDoubleParameter copyMe(){

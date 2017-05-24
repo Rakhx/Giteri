@@ -121,6 +121,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		ArrayList<Meme> memeOnMap = new ArrayList<Meme>();
 		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<Integer, IModelParameter<?>>();
 
+
 		for (Meme meme : memeFactory.getMemeAvailable(true)) {
 			memeDispo.put(meme, new GenericBooleanParameter());
 
@@ -139,7 +140,9 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		providers.put(0,memeDiffu);
 
 		if(Configurator.explorator == EnumExplorationMethod.oneShot){
-			ArrayList<Double> probaVoulu = new ArrayList<Double>(Arrays.asList(0.788335449538696,0.373092466173732,0.292052580578804,0.438882845642738,0.109153677952613));
+//			ArrayList<Double> probaVoulu = new ArrayList<Double>(Arrays.asList(0.788335449538696,0.373092466173732,0.292052580578804,0.438882845642738,0.109153677952613));
+			ArrayList<Double> probaVoulu = new ArrayList<Double>(Arrays.asList(0.,0.,0.3,0.4,0.5));
+
 			setPreciseValue(probaVoulu, memeDiffu);
 		}
 
@@ -147,7 +150,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		if(!Configurator.jarMode)
 			Configurator.methodOfGeneration = Configurator.MemeDistributionType.FollowingFitting;
-
 	}
 
 	/**
@@ -170,7 +172,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 */
 	private double factorisation(FittingClass config){
 		config.init();
-		int nbActionPassee = 0;
+		int nbActionPassee;
 
 		// boucle changement de config RUN++
 		do {

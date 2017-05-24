@@ -3,13 +3,11 @@ package giteri.fitting.algo;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Optional;
+import java.util.*;
 
 import javax.swing.JFrame;
 
+import giteri.fitting.parameters.IModelParameter;
 import giteri.tool.math.Toolz;
 import giteri.network.network.NetworkProperties;
 
@@ -37,38 +35,44 @@ public class ResultSet {
 
 	// Structure de donnée
 
-	// Identifiant et paramètre d'une config
-	private Hashtable<Integer, String> parameterSetById;
-	// Ensemble des scores calculés pour les différents runs d'une config
-	private Hashtable<Integer, ArrayList<Double>> scoreById;
-	// Ensemble des propriétés des réseaux obtenues pour différents run sur une meme config
-	private Hashtable<Integer, ArrayList<NetworkProperties>> networkPropertiesById;
+	// Identifiant et resultat d'une simulation
+	private Map<Integer, Result> resultById;
+
+//	// Identifiant et paramètre d'une config
+//	private Hashtable<Integer, String> parameterSetById;
+//	// Ensemble des scores calculés pour les différents runs d'une config
+//	private Hashtable<Integer, ArrayList<Double>> scoreById;
+//	// Ensemble des propriétés des réseaux obtenues pour différents run sur une meme config
+//	private Hashtable<Integer, ArrayList<NetworkProperties>> networkPropertiesById;
 
 	// Affichage stuff
 	XYDataset dataset;
 	JFreeChart chart;
 	ChartPanel chartPanel;
-	boolean debugMode = false;
-	int lastNetworkId;
+	boolean debugMode = true;
+//	int lastNetworkId;
 
 	/** Constructeur.
 	 *
 	 */
 	public ResultSet(WriteNRead wnr) {
 		writeNRead = wnr;
-		parameterSetById = new Hashtable<>();
-		scoreById = new Hashtable<>();
-		networkPropertiesById = new Hashtable<>();
+		resultById = new Hashtable<>();
+//		parameterSetById = new Hashtable<>();
+//		scoreById = new Hashtable<>();
+//		networkPropertiesById = new Hashtable<>();
 	}
 
 	// Region Public Method
 
+	// TODO a refaire éventuellement.
 	/** Parcourt tout les réseaux de la liste, et choisi ceux qui ont des valeurs
 	 * extremes ( min ou max) dans au moins l'une des propriétés regardé.
 	 * Va ensuite afficher le résultat.
 	 *
 	 */
-	public void displayPolar(){
+
+	/*public void displayPolar(){
 		int activationCode = 23;
 		// choix de ceux qui ont une valeur min/max dans un domaine
 		Hashtable<Integer, Integer> scoreMax = new Hashtable<>();
@@ -170,31 +174,29 @@ public class ResultSet {
 
 		processData(interestingNetwork, 23);
 	}
+	*/
 
 	/** Renvoi les scores en fonction des ID en fonction des distributions
 	 *
-	 * TODO [Refact2.0] ici que ca se passe pour les multiscore nombreux?
+	 *
 	 */
 	public double displayResult(){
 		double res = 0;
 		if(Configurator.jarMode){
-			for (Integer networkId : parameterSetById.keySet())
-				res = Toolz.getAvg(scoreById.get(networkId));
+			for (Integer networkId : resultById.keySet())
+				res = resultById.get(networkId).getAvgScore();
 				System.out.println(res);
 		}
 		else {
-			for (Integer networkId : parameterSetById.keySet()) {
+			for (Integer networkId : resultById.keySet()) {
 				System.out.println("_____________________________________");
-				parameterSetById.get(networkId);
-				System.out.println("◊ Moyenne score: " + Toolz.getAvg(scoreById.get(networkId)));
-				System.out.println("◊ EcartType: " + Toolz.getDeviation((scoreById.get(networkId)), Optional.ofNullable(null)));
-				System.out.println("◊ Propriété du premier network obtenu " + networkPropertiesById.get(networkId).get(0).toString());
-				System.out.println("◊ Configuration " + parameterSetById.get(networkId));
+				System.out.println("Configuration " + resultById.get(networkId).getCurrentConfig());
 			}
 		}
 		return res;
 	}
 
+	// TODO A virer.
 	/** Retourne a partir du UUID d'un réseau lae string des set de
 	 * parameter ParameterSetOfValue.
 	 *
@@ -202,29 +204,32 @@ public class ResultSet {
 	 * @return
 	 */
 	public String getConfigAsStringForId(Integer networkId){
-		String resultat="";
-		if(parameterSetById.containsKey(networkId)){
-			resultat = parameterSetById.get(networkId);
-			return resultat;
-		}
-		else{
-			System.err.println("[Result] L'id du network n'est pas trouvable dans les hashtable, ca ne devrait pas arriver");
-			return "FAIL";
-		}
+		return "";
+//		String resultat="";
+//		if(parameterSetById.containsKey(networkId)){
+//			resultat = parameterSetById.get(networkId);
+//			return resultat;
+//		}
+//		else{
+//			System.err.println("[Result] L'id du network n'est pas trouvable dans les hashtable, ca ne devrait pas arriver");
+//			return "FAIL";
+//		}
+	}
+
+	public void addInitialConfigurationToResult(int networkId, Collection<IModelParameter<?>> parameters){
+		resultById.put(networkId, new Result(parameters));
 	}
 
 	/**
 	 *
 	 * @param networkId
-	 * @param paramAsString
 	 * @param value
-	 * @param result
 	 */
-	public void addScore(int networkId, String paramAsString, double value, NetworkProperties result) {
-		Toolz.addElementInHashArray(scoreById, networkId, value);
-		Toolz.addElementInHashArray(networkPropertiesById, networkId, result);
-		parameterSetById.put(networkId, paramAsString);
-		lastNetworkId = networkId;
+	public void addScore(int networkId, double value, NetworkProperties properties) {
+		Result result = resultById.get(networkId);
+		result.addScore(value);
+		result.addProperties(properties.toString());
+//		lastNetworkId = networkId;
 	}
 
 	/** Ecriture dans le fichier détaillé des propriétés du dernier network.
@@ -233,22 +238,24 @@ public class ResultSet {
 	 *
 	 * @param rep
 	 */
-	public void writelastTurnOnDetailCSV(File rep){
-		String toWrite = "";
+	public void writelastTurnOnDetailCSV(File rep, int networkId ,NetworkProperties properties){
 
-		toWrite += lastNetworkId;
-		toWrite += ";" + parameterSetById.get(lastNetworkId);
+		Result result = resultById.get(networkId);
+
+		String toWrite = "";
+		toWrite += networkId;
+		toWrite += ";" + result.getCurrentConfig();
 		toWrite += "; -";
 
 		// On prend le dernier élément de la liste
-		NetworkProperties lastProp = networkPropertiesById.get(lastNetworkId).get (
-				networkPropertiesById.get(lastNetworkId).size() - 1 );
+		NetworkProperties lastProp = properties;
 
+		// Prendre la moyenne a chaque fois?
 		// à encadrer avec l'entete etc
 		toWrite += lastProp.getCSVFormatDoubleColonne(null, Configurator.activationCodeAllAttribExceptDD);
 
 		// Concernant les scores
-		toWrite += ";" + scoreById.get(lastNetworkId).get( scoreById.get(lastNetworkId).size() - 1) ;
+		toWrite += ";" + result.getLastScore();
 		toWrite += ";" + -1;
 
 		writeNRead.writeSmallFile2(rep, "NetworkDetailsCSV", Arrays.asList(toWrite)) ;
@@ -259,17 +266,18 @@ public class ResultSet {
 	 * Pour le CSV détaillé : écartType et moyenne pour chaque attribut
 	 *
 	 */
-	public void writeLastRunOnCSV(File rep, int activator){
+	public void writeLastRunOnCSV(File rep,int networkId,List<NetworkProperties> ListOfproperties ,int activator){
 		NetworkProperties netMean = new NetworkProperties(); netMean.createStub();
 		NetworkProperties netSD = new NetworkProperties(); netSD.createStub();
-		ArrayList<Double> scores = scoreById.get(lastNetworkId);
+		Result result = resultById.get(networkId);
+		List<Double> scores = result.getScores();
 		Double[] scoreMeanAndSd;
 		String toWriteSimple = "", toWriteDetailled = "";
-		String parameter = parameterSetById.get(lastNetworkId);
+		String parameter = result.getCurrentConfig();
 
-		updateMeanAndSD(networkPropertiesById.get(lastNetworkId), Configurator.activationCodeAllAttribExceptDD, netMean, netSD);
-		toWriteSimple += lastNetworkId;
-		toWriteDetailled += lastNetworkId;
+		updateMeanAndSD(ListOfproperties, Configurator.activationCodeAllAttribExceptDD, netMean, netSD);
+		toWriteSimple += networkId;
+		toWriteDetailled += networkId;
 
 		toWriteSimple += ";" + parameter;
 		toWriteDetailled += ";" + parameter;
@@ -314,7 +322,7 @@ public class ResultSet {
 	 * @param netSD IN/OUT
 	 * @return
 	 */
-	private void updateMeanAndSD(ArrayList<NetworkProperties> networksToRead, int activationCode, NetworkProperties netMean, NetworkProperties netSD){
+	private void updateMeanAndSD(List<NetworkProperties> networksToRead, int activationCode, NetworkProperties netMean, NetworkProperties netSD){
 		netMean.createStub();
 		netSD.createStub();
 
@@ -346,154 +354,155 @@ public class ResultSet {
 		}
 	}
 
+	// TODO a refaire.
 	/** Va les mettres sous forme string:config du réseau arraydouble : valeur des attributs
 	 * ordonnée
 	 *
 	 * @param bestNetwork
 	 */
-	private void processData(ArrayList<Integer> bestNetwork, int activationCode){
-
-		double valeurMax, valeurCourante, valeurNormalisee;
-		String networkBlaze;
-
-		// Data formaté, sous forme nom du réseau :: list d'attribut & value
-		Hashtable<String, Hashtable<NetworkAttribType, Double>> dataFormat =
-				new Hashtable<String,Hashtable<NetworkAttribType, Double>>();
-
-		// attribut qui sont utilisé pour les réseaux
-		final ArrayList<NetworkAttribType> usedAttrib = new ArrayList<Configurator.NetworkAttribType>();
-
-		// Valeur max par type d'attrib
-		Hashtable<NetworkAttribType, Double> maxValues = new Hashtable<Configurator.NetworkAttribType, Double>();
-
-		// Renseigne les attributs effectivement utilisés
-		for (NetworkAttribType type : NetworkAttribType.values())
-			if(Configurator.isAttribActived(activationCode, type))
-				usedAttrib.add(type);
-
-		// Recherche des meilleurs valeurs pour tous les attribs
-		for (NetworkAttribType type : usedAttrib) {
-			valeurMax = 0;
-			for (Integer networkId : bestNetwork) {
-				valeurCourante = Double.parseDouble(""+networkPropertiesById.get(networkId).get(0).getValue(type));
-				if(valeurMax < valeurCourante)
-					valeurMax = valeurCourante;
-			}
-
-			maxValues.put(type, valeurMax);
-		}
-
-		// Création de valeur normalisée pour les valeurs de chacun de ces networks
-		for (Integer networkId : bestNetwork) {
-
-			// le nom du réseau par ses propriétés
-			networkBlaze = parameterSetById.get(networkId);
-			// sa liste de donnée normalisé, classé en hash par le type d'attribut du réseau
-			Hashtable<NetworkAttribType, Double> formatValues = new Hashtable<NetworkAttribType, Double>();
-			dataFormat.put(networkBlaze, formatValues);
-
-			// on rempli la structure de données normalisées
-			for (NetworkAttribType type : usedAttrib) {
-				valeurNormalisee = Double.parseDouble(""+networkPropertiesById.get(networkId).get(0).getValue(type)) / maxValues.get(type);
-				formatValues.put(type, valeurNormalisee);
-			}
-		}
-
-		displayShit(dataFormat, activationCode);
-	}
+//	private void processData(ArrayList<Integer> bestNetwork, int activationCode){
+//
+//		double valeurMax, valeurCourante, valeurNormalisee;
+//		String networkBlaze;
+//
+//		// Data formaté, sous forme nom du réseau :: list d'attribut & value
+//		Hashtable<String, Hashtable<NetworkAttribType, Double>> dataFormat =
+//				new Hashtable<String,Hashtable<NetworkAttribType, Double>>();
+//
+//		// attribut qui sont utilisé pour les réseaux
+//		final ArrayList<NetworkAttribType> usedAttrib = new ArrayList<Configurator.NetworkAttribType>();
+//
+//		// Valeur max par type d'attrib
+//		Hashtable<NetworkAttribType, Double> maxValues = new Hashtable<Configurator.NetworkAttribType, Double>();
+//
+//		// Renseigne les attributs effectivement utilisés
+//		for (NetworkAttribType type : NetworkAttribType.values())
+//			if(Configurator.isAttribActived(activationCode, type))
+//				usedAttrib.add(type);
+//
+//		// Recherche des meilleurs valeurs pour tous les attribs
+//		for (NetworkAttribType type : usedAttrib) {
+//			valeurMax = 0;
+//			for (Integer networkId : bestNetwork) {
+//				valeurCourante = Double.parseDouble(""+networkPropertiesById.get(networkId).get(0).getValue(type));
+//				if(valeurMax < valeurCourante)
+//					valeurMax = valeurCourante;
+//			}
+//
+//			maxValues.put(type, valeurMax);
+//		}
+//
+//		// Création de valeur normalisée pour les valeurs de chacun de ces networks
+//		for (Integer networkId : bestNetwork) {
+//
+//			// le nom du réseau par ses propriétés
+//			networkBlaze = parameterSetById.get(networkId);
+//			// sa liste de donnée normalisé, classé en hash par le type d'attribut du réseau
+//			Hashtable<NetworkAttribType, Double> formatValues = new Hashtable<NetworkAttribType, Double>();
+//			dataFormat.put(networkBlaze, formatValues);
+//
+//			// on rempli la structure de données normalisées
+//			for (NetworkAttribType type : usedAttrib) {
+//				valeurNormalisee = Double.parseDouble(""+networkPropertiesById.get(networkId).get(0).getValue(type)) / maxValues.get(type);
+//				formatValues.put(type, valeurNormalisee);
+//			}
+//		}
+//
+//		displayShit(dataFormat, activationCode);
+//	}
 
 	// REGION DISPLAY ETC
 
-	/**  Affiche les données sélectionnées,
-	 *
-	 * @param dataFormat key::Nom du réseau, to string de ses propriétés
-	 * Value::Hashtable
-	 * 		Key:: Type de propriété considéré ( clustering, densité... )
-	 * 		Value:: Valeur de cette propriété pour le réseau en question.
-	 * @param activationCode
-	 */
-	private void displayShit(Hashtable<String, Hashtable<NetworkAttribType, Double>> dataFormat, int activationCode){
-		JFrame radar = new JFrame("Result");
-		final XYDataset dataset = createDataset(dataFormat, activationCode);
-		final JFreeChart chart = createChart(dataset);
-		final ChartPanel chartPanel = new PolarChartPanel(chart);
-		chartPanel.setPreferredSize(new Dimension(500, 270));
-		chartPanel.setEnforceFileExtensions(false);
-		radar.getContentPane().add(chartPanel, BorderLayout.CENTER);
-		radar.pack();
-		radar.setVisible(true);
-	}
-
-	/** création a partir d'un data set du polar.
-	 *
-	 * @param dataset
-	 * @return
-	 */
-	private JFreeChart createChart(final XYDataset dataset) {
-		final JFreeChart chart = ChartFactory.createPolarChart("Chart polar",
-				dataset, true, true, false);
-		final PolarPlot plot = (PolarPlot) chart.getPlot();
-		final DefaultPolarItemRenderer renderer = (DefaultPolarItemRenderer) plot
-				.getRenderer();
-		renderer.setSeriesFilled(2, true);
-		return chart;
-	}
-
-	/** Crée et retourne le dataset
-	 *
-	 * @return
-	 */
-	private XYDataset createDataset(Hashtable<String, Hashtable<NetworkAttribType, Double>> dataFormat, int activationCode){
-		final XYSeriesCollection data = new XYSeriesCollection();
-		Hashtable<NetworkAttribType, Double> values;
-
-		// On recherche les type d'attributs qui sont effectivement utilisés.
-		final ArrayList<NetworkAttribType> usedAttrib = new ArrayList<Configurator.NetworkAttribType>();
-
-		// Devrait ne pas etre obligatoire, redondance des données puisque déja présenter dnas les hashtables
-		for (NetworkAttribType type : NetworkAttribType.values())
-			if(Configurator.isAttribActived(activationCode, type))
-				usedAttrib.add(type);
-
-		for (String networkName : dataFormat.keySet()) {
-			values = dataFormat.get(networkName);
-			data.addSeries(createSeries(networkName, values,usedAttrib));
-		}
-
-		return data;
-	}
-
-	/** Renvoi une série correspondant a un NetworkProperties, sur les attributs de la liste.
-	 *
-	 * @param name
-
-	 * @param attribs
-	 * @return
-	 */
-	private XYSeries createSeries(String name, Hashtable<NetworkAttribType, Double> values, ArrayList<NetworkAttribType> attribs){
-		final XYSeries series = new XYSeries(name);
-		double placementRadius;
-		double value;
-		for (NetworkAttribType type : attribs) {
-			placementRadius = convertAttributeToRadial(attribs, type);
-			value = values.get(type);
-			series.add(placementRadius, value);
-		}
-
-		return series;
-	}
-
-	/** Obtient la division de 360 par l'emplacement dans la liste de l'attribut en question.
-	 *
-	 * @param attribType
-
-	 * @return
-	 */
-	private double convertAttributeToRadial(ArrayList<NetworkAttribType> usedAttrib ,NetworkAttribType attribType){
-		double tranche = Math.round(360 / usedAttrib.size());
-		int indexConcerne = usedAttrib.indexOf(attribType);
-		return tranche * indexConcerne;
-	}
+//	/**  Affiche les données sélectionnées,
+//	 *
+//	 * @param dataFormat key::Nom du réseau, to string de ses propriétés
+//	 * Value::Hashtable
+//	 * 		Key:: Type de propriété considéré ( clustering, densité... )
+//	 * 		Value:: Valeur de cette propriété pour le réseau en question.
+//	 * @param activationCode
+//	 */
+//	private void displayShit(Hashtable<String, Hashtable<NetworkAttribType, Double>> dataFormat, int activationCode){
+//		JFrame radar = new JFrame("Result");
+//		final XYDataset dataset = createDataset(dataFormat, activationCode);
+//		final JFreeChart chart = createChart(dataset);
+//		final ChartPanel chartPanel = new PolarChartPanel(chart);
+//		chartPanel.setPreferredSize(new Dimension(500, 270));
+//		chartPanel.setEnforceFileExtensions(false);
+//		radar.getContentPane().add(chartPanel, BorderLayout.CENTER);
+//		radar.pack();
+//		radar.setVisible(true);
+//	}
+//
+//	/** création a partir d'un data set du polar.
+//	 *
+//	 * @param dataset
+//	 * @return
+//	 */
+//	private JFreeChart createChart(final XYDataset dataset) {
+//		final JFreeChart chart = ChartFactory.createPolarChart("Chart polar",
+//				dataset, true, true, false);
+//		final PolarPlot plot = (PolarPlot) chart.getPlot();
+//		final DefaultPolarItemRenderer renderer = (DefaultPolarItemRenderer) plot
+//				.getRenderer();
+//		renderer.setSeriesFilled(2, true);
+//		return chart;
+//	}
+//
+//	/** Crée et retourne le dataset
+//	 *
+//	 * @return
+//	 */
+//	private XYDataset createDataset(Hashtable<String, Hashtable<NetworkAttribType, Double>> dataFormat, int activationCode){
+//		final XYSeriesCollection data = new XYSeriesCollection();
+//		Hashtable<NetworkAttribType, Double> values;
+//
+//		// On recherche les type d'attributs qui sont effectivement utilisés.
+//		final ArrayList<NetworkAttribType> usedAttrib = new ArrayList<Configurator.NetworkAttribType>();
+//
+//		// Devrait ne pas etre obligatoire, redondance des données puisque déja présenter dnas les hashtables
+//		for (NetworkAttribType type : NetworkAttribType.values())
+//			if(Configurator.isAttribActived(activationCode, type))
+//				usedAttrib.add(type);
+//
+//		for (String networkName : dataFormat.keySet()) {
+//			values = dataFormat.get(networkName);
+//			data.addSeries(createSeries(networkName, values,usedAttrib));
+//		}
+//
+//		return data;
+//	}
+//
+//	/** Renvoi une série correspondant a un NetworkProperties, sur les attributs de la liste.
+//	 *
+//	 * @param name
+//
+//	 * @param attribs
+//	 * @return
+//	 */
+//	private XYSeries createSeries(String name, Hashtable<NetworkAttribType, Double> values, ArrayList<NetworkAttribType> attribs){
+//		final XYSeries series = new XYSeries(name);
+//		double placementRadius;
+//		double value;
+//		for (NetworkAttribType type : attribs) {
+//			placementRadius = convertAttributeToRadial(attribs, type);
+//			value = values.get(type);
+//			series.add(placementRadius, value);
+//		}
+//
+//		return series;
+//	}
+//
+//	/** Obtient la division de 360 par l'emplacement dans la liste de l'attribut en question.
+//	 *
+//	 * @param attribType
+//
+//	 * @return
+//	 */
+//	private double convertAttributeToRadial(ArrayList<NetworkAttribType> usedAttrib ,NetworkAttribType attribType){
+//		double tranche = Math.round(360 / usedAttrib.size());
+//		int indexConcerne = usedAttrib.indexOf(attribType);
+//		return tranche * indexConcerne;
+//	}
 
 
 

@@ -233,6 +233,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			System.out.println(explorator.toString());
 		}
 		repertoires.add(numeroRunAsString);
+		resultNetwork.addInitialConfigurationToResult(numeroRun, explorator.getModelParameterSet());
 	}
 
 	/** Nouveau run, donc reset du network et pas de chg sur la config. courante du modèle.
@@ -299,7 +300,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			configAsString += model.valueString();
 		}
 
-		resultNetwork.addScore(numeroRun, configAsString, currentNetworkScore, networkConstructor.getNetworkProperties().getCopyMe());
+		resultNetwork.addScore(numeroRun, currentNetworkScore, networkConstructor.getNetworkProperties().getCopyMe());
 		if(Configurator.writeNetworkResultOnFitting)
 			com.takeSnapshot(currentSeed, Optional.ofNullable(repertoires));
 
@@ -307,7 +308,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 		if(Configurator.writeNetworkResultOnFitting)
 			// Va écrire les résultats détaillés dans le CSV correspondant
-			resultNetwork.writelastTurnOnDetailCSV(repOfTheSearch);
+			resultNetwork.writelastTurnOnDetailCSV(repOfTheSearch, numeroRun,networkConstructor.getNetworkProperties() );
 	}
 
 	/** Fin du tour, enregistre les variances sur les résultats des différents run sur meme config,
@@ -317,7 +318,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public void endRun(){
 		repertoires.remove(numeroRunAsString);
 		if(Configurator.writeNetworkResultOnFitting)
-			resultNetwork.writeLastRunOnCSV(repOfTheSearch, Configurator.activationCodeForScore);
+			resultNetwork.writeLastRunOnCSV(repOfTheSearch, numeroRun, networksSameTurn,Configurator.activationCodeForScore);
 
 		// ici, ecrire: La chart de density sur les 4 runs, le fichier de config des runs?
 //		explorator.rememberNetwork(currentNetworkId);
@@ -330,8 +331,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public double endSimu(){
 		double res;
 		res = resultNetwork.displayResult();
-		if(!Configurator.jarMode)
-			resultNetwork.displayPolar();
+//		if(!Configurator.jarMode)
+//			resultNetwork.displayPolar();
 		return res;
 	}
 

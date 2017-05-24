@@ -6,15 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.math3.distribution.BetaDistribution;
@@ -277,7 +269,7 @@ public class Toolz {
 	 * @param entry
 	 * @return
 	 */
-	public static <T extends Number> Double getAvg(ArrayList<T> entry){
+	public static <T extends Number> Double getAvg(List<T> entry){
 		Double resultat = 0.0;
 		try {
 		for (Number number : entry) {
@@ -338,7 +330,7 @@ public class Toolz {
 	 * @param entry
 	 * @return
 	 */
-	public static <T extends Number> Double[] getDeviationAndMean(ArrayList<T> entry){
+	public static <T extends Number> Double[] getDeviationAndMean(List<T> entry){
 		Double avg = 0., sd = 0.;
 		double sumFreq = 0;
 		for (T value : entry)
