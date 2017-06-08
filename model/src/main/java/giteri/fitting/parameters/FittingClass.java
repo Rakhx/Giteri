@@ -4,8 +4,7 @@ import java.io.File;
 import java.text.DateFormat;
 import java.util.*;
 
-import com.sun.tools.internal.xjc.reader.gbind.OneOrMore;
-import giteri.fitting.algo.Result;
+
 import giteri.fitting.algo.ResultSet;
 import giteri.tool.math.Toolz;
 import giteri.meme.mecanisme.MemeFactory;
