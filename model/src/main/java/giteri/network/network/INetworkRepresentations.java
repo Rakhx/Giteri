@@ -98,9 +98,10 @@ public interface INetworkRepresentations extends INetworkRepresentation{
 				
 				if(avgClust) 
 					clustByNode = new Hashtable<Integer, Double>();
-				
-				for (ArrayList<Integer> connections : nodesAndConnections.values()) 
-		 			distrib[connections.size()] = ++(distrib[connections.size()]);
+
+				for (ArrayList<Integer> connections : nodesAndConnections.values()) {
+					distrib[connections.size()] = ++(distrib[connections.size()]);
+				}
 				
 				networkPropertiesResulting.setDd(distrib);
 				

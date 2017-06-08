@@ -29,7 +29,7 @@ public class JarVersion {
 		ArrayList<Double> probaBehavior = new ArrayList<Double>();
 		String filePath ;
 		File inputFile;
-		boolean debug = true;
+		boolean debug = false;
 
 		launcher = Configurator.EnumLauncher.jarC;
 

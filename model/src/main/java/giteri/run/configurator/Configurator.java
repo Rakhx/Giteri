@@ -65,7 +65,7 @@ public final class Configurator {
 	public static boolean overallDebug = !jarMode;
 	public static boolean debugHopAway = false;
 	public static boolean autrucheMode = false;
-	public static boolean debugOpenMole = true;
+	public static boolean debugOpenMole = false;
 
 	// Configuration Modèle
 	public static final boolean lotOfNodes = false;

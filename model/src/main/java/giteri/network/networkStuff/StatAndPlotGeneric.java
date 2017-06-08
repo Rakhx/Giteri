@@ -201,7 +201,9 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 						resetNbAction();
 					}
 
-					debugBeforeSkip = config.continuFittingCleanVersion();
+//					debugBeforeSkip = config.continuFittingCleanVersion();
+					debugBeforeSkip = config.continuFittingSimpleVersion();
+
 					if(!debugBeforeSkip){
 						if(debug) System.out.println("Voudrait passer au step suivant");
 					}
@@ -228,7 +230,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			config.endRun();
 
 			// Configuration distribution suivante
-		}while(config.explorator.gotoNext());
+		} while(config.explorator.gotoNext());
 
 		if(!Configurator.jarMode)
 			System.out.println(" - Fin de l'exploration - ");

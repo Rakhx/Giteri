@@ -4,6 +4,7 @@ import java.io.File;
 import java.text.DateFormat;
 import java.util.*;
 
+import com.sun.tools.internal.xjc.reader.gbind.OneOrMore;
 import giteri.fitting.algo.Result;
 import giteri.fitting.algo.ResultSet;
 import giteri.tool.math.Toolz;
@@ -494,6 +495,33 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		resultNetwork.addthresholdStuff(numeroTurn, scoreTotal);
 		return oneMoreTurn;
 	}
+
+	/** Continu fitting version simple.
+	 *
+	 * @return
+	 */
+	public boolean continuFittingSimpleVersion(){
+		boolean debug = Configurator.debugFittingClass && !Configurator.jarMode;
+		boolean fastDebug = Configurator.debugFittingClassFast && !Configurator.jarMode;
+		boolean oneMoreTurn = true;
+		boolean canStillApplyAction;
+		ObjectRef<String> message = new ObjectRef<String>("");
+		String resume = "";
+		double scoreEcartDensite = 100;
+
+
+		oneMoreTurn = readingActionCanContinue(message);
+
+		nbCallContinuOnThisConfig++;
+		if(nbCallContinuOnThisConfig % nbActionThreshRising == 0)
+			riseThresholdValue(nbCallContinuOnThisConfig);
+
+		if(nbCallContinuOnThisConfig / nbActionThreshRising > 4)
+			oneMoreTurn &= false;
+
+		return oneMoreTurn;
+	}
+
 
 	/** Verification de la possibilité de jouer des actions valeur pas relevé de
 	 *  facon synchronisé, le but étant de savoir si une action est encore possible ou si le systeme est bloqué.
