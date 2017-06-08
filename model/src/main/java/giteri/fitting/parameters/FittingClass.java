@@ -4,6 +4,7 @@ import java.io.File;
 import java.text.DateFormat;
 import java.util.*;
 
+import giteri.fitting.algo.Result;
 import giteri.fitting.algo.ResultSet;
 import giteri.tool.math.Toolz;
 import giteri.meme.mecanisme.MemeFactory;
@@ -62,7 +63,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public int nbActionByStep = 500;
 	public int boucleExterneSize = 30;
 
-
 	// EndRegion
 
 	// Region VARIABLES DE FONCTIONNEMENT
@@ -77,16 +77,11 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 	// Compteur du nombre de relevé fait pour un meme run
 	public int turnCount = 0;
-
 	File repOfTheSearch ;
-
 	private Integer nbActionCount = 0;
 	private Integer nbTransmissionCount = 0;
-
 	public int nbActionLocal = 0;
-
 	public long currentSeed ;
-
 
 	public int circularSize = 200;
 	// Cette liste est changée pendant le fitting a chaque event action
@@ -96,7 +91,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	private Hashtable<Meme, Double> kvOverallProportionActionDone;
 	private Hashtable<Meme, Integer> kvOverallNumberOfActionDone;
 
-
 	// Liste qui sont utlisées pour définir si on s'arrete de fitter sur une configuration ou non
 	private CircularFifoQueue<Hashtable<Meme, Double>> cfqMemeAppliancePropOnFitting;
 	private CircularFifoQueue<Hashtable<Meme, Integer>> cfqMemeApplianceNumberOnFitting;
@@ -104,7 +98,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 	private ArrayList<Meme> memesAvailables;
 	private int nbCallContinuOnThisConfig = 0;
-
 
 	private double threshSeDensity, threshSeCoeff, threshSeAppliance;
 	private double threshHeDensity, threshHeAppliance;
@@ -127,9 +120,11 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	NetworkProperties currentNetProperties = new NetworkProperties();
 
 	public double currentNetworkScore;
-	ResultSet resultNetwork ;
-
 	ArrayList<String> repertoires ;
+
+
+	ResultSet resultNetwork;
+
 
 	// EndRegion
 
@@ -381,7 +376,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 */
 	public boolean continuFittingCleanVersion(){
 		boolean useDensity = true;
-		boolean useMemeAppliance = false;
+		boolean useMemeAppliance = true;
 
 		boolean stepByStep = false;
 		boolean debug = Configurator.debugFittingClass && !Configurator.jarMode;
@@ -399,7 +394,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		if(nbCallContinuOnThisConfig % nbActionThreshRising == 0)
 			riseThresholdValue(nbCallContinuOnThisConfig);
 
-		// REGION Vérification état du network
+		//region Vérification état du network
 
 		// STEP Verification de la possibilité de jouer des actions
 		canStillApplyAction = readingActionCanContinue(message);
@@ -418,17 +413,20 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 				scoreTotal += scoreEcartDensite;
 				scoreCoeffDirDensite = readingDensityCoeffDir(new ArrayList<Double>(Arrays.asList(cfqDensityValuesOnOneRun.toArray(new Double[1]))), message) ;
 				resume += message.getValue();
-				scoreTotal += scoreCoeffDirDensite;	}
+				scoreTotal += scoreCoeffDirDensite;
+			}
 
 			// STEP Variation de l'application des memes.
 			if(useMemeAppliance)
 			{
 				scoreMemeAppliance = readingMemeAppliance(false, message);
 				resume += message.getValue();
-				scoreTotal += scoreMemeAppliance;	}
+				scoreTotal += scoreMemeAppliance;
+			}
 		}
 
-		// EndRegion
+		//endregion
+
 		// Region STEP Utilisation des scores
 		if(canStillApplyAction)
 		{
@@ -493,6 +491,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		if(debug && !oneMoreTurn)  System.out.println( resume );
 		// EndRegion
 
+		resultNetwork.addthresholdStuff(numeroTurn, scoreTotal);
 		return oneMoreTurn;
 	}
 

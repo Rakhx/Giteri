@@ -5,7 +5,8 @@ import giteri.tool.math.Toolz;
 
 import java.util.*;
 
-/** Classe contenant les résultats d'une configuration particulière.
+/** Classe contenant les résultats d'une configuration particulière -
+ * Mais contenant chacun des TURN sur cette config.
  *
  */
 public class Result {
@@ -18,13 +19,15 @@ public class Result {
     // Liste de properties as string pour les config
     List<String> propertiesAsString;
 
-
     // TODO structure quelconque pour les bornes de fin de simulation
+    // huhum
+   List<Double> nextStepScore;
 
     Result(){
         kvProviderValues = new Hashtable<String, String>();
         score = new ArrayList<>();
         propertiesAsString = new ArrayList<>();
+        nextStepScore = new ArrayList<>();
     }
 
     /** Constructeur qui prend en param les providers contenant la configuration courante
@@ -45,6 +48,9 @@ public class Result {
         propertiesAsString.add(property);
     }
 
+    public void addNextStepperScore(double nexter){
+        nextStepScore.add(nexter);
+    }
 
     public String getCurrentConfig(){
         String result="";

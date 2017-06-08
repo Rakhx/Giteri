@@ -44,7 +44,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 	// Empeche l'algo de passer au step suivant de fitting sans le passage manuel
 	// Mis au niveau du configuraztor.
-	// public boolean manuelNextStep = false;
 	// Met en pause automatiquement quand l'algo essaye de passer au cran suivant
 	public boolean autoPauseIfNexted = Configurator.autoPauseIfNexted;
 	public boolean goNextStepInManuelMode = !Configurator.manuelNextStep;
