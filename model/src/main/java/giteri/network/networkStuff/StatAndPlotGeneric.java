@@ -50,6 +50,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 	boolean debugBeforeSkip = true;
 	boolean debug = Configurator.debugStatAndPlot;
+	private ArrayList<Double> probaVoulu;
 
 	/** Constructeur de cet élément de base.
 	 * Ne peut etre appelé directement, classe abstract
@@ -139,8 +140,25 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		providers.put(0,memeDiffu);
 
 		if(Configurator.explorator == EnumExplorationMethod.oneShot){
+//			ArrayList<Double> InOrderOfParameter = new ArrayList<Double>(Arrays.asList(0.1,0.2,0.3,0.4,0.5));
+//			ArrayList<Double> InOrderOfParameter = new ArrayList<Double>(Arrays.asList(0.322473705093587,0.0,0.118473909277875,0.0,0.294338449033475));
+//			ArrayList<Double> InOrderOfParameter = new ArrayList<Double>(Arrays.asList(0.821981155996358,0.060978874368629,0.133017650106079,0.688986849303714,0.0));
+//			ArrayList<Double> InOrderOfParameter = new ArrayList<Double>(Arrays.asList(0.079441541559308,0.0,0.554434659909259,1.,0.573923623781773));
+			ArrayList<Double> InOrderOfParameter = new ArrayList<Double>(Arrays.asList(1.,0.365018173274458,0.089130672733655,0.484877681454417,1.));
+
+			ArrayList<Double> probaVoulu = new ArrayList<Double>();
+			probaVoulu.add(InOrderOfParameter.get(3));
+			probaVoulu.add(InOrderOfParameter.get(0));
+			probaVoulu.add(InOrderOfParameter.get(1));
+			probaVoulu.add(InOrderOfParameter.get(4));
+			probaVoulu.add(InOrderOfParameter.get(2));
+
+
 //			ArrayList<Double> probaVoulu = new ArrayList<Double>(Arrays.asList(0.788335449538696,0.373092466173732,0.292052580578804,0.438882845642738,0.109153677952613));
-			ArrayList<Double> probaVoulu = new ArrayList<Double>(Arrays.asList(0.,0.,0.3,0.4,0.5));
+//			ArrayList<Double> probaVoulu = new ArrayList<Double>(Arrays.asList(0.788335449538696,0.373092466173732,0.292052580578804,0.438882845642738,0.109153677952613));
+//			ArrayList<Double> probaVoulu = new ArrayList<Double>(Arrays.asList(0.1,0.2,0.3,0.4,0.5));
+//			ArrayList<Double> probaVoulu = new ArrayList<Double>(Arrays.asList(0.322473,0.,0.1184,0.0,0.29433));
+//			0.322473705093587	0	0.118473909277875	0	0.294338449033475	4.64684984370249
 
 			setPreciseValue(probaVoulu, memeDiffu);
 		}

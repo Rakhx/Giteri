@@ -23,7 +23,7 @@ import java.util.Hashtable;
 public class StatAndPlotJarVersion extends NetworkAnalyzer {
 
 	public ArrayList<Double> probaVoulu = new ArrayList<Double>();
-	boolean debug = Configurator.overallDebug;
+//	boolean debug = Configurator.overallDebug;
 
 	/** Constructeur sans paramètre.
 	 *

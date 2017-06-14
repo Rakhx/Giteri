@@ -360,7 +360,7 @@ public class EntiteHandler extends ThreadHandler {
 	 * @param memeRealisee
 	 * @param message
 	 */
-	public void eventActionDone(Entite entiteConcernee, Meme memeRealisee, String message) {
+	public synchronized void eventActionDone(Entite entiteConcernee, Meme memeRealisee, String message) {
 
 		// On crée un événement rappelant l'état courant concernant les memes;
 		ActionApplyEvent myEvent = new ActionApplyEvent(this, entiteConcernee, memeRealisee, message);

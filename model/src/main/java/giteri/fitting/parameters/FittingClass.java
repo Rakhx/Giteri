@@ -50,7 +50,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	private WorkerFactory workerFactory;
 	private NetworkConstructor networkConstructor;
 
-	public boolean debug = false;
+	public boolean debug = Configurator.debugFittingClass;
 	public CommunicationModel com ;
 	public IExplorationMethod explorator;
 

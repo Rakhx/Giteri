@@ -23,7 +23,7 @@ public final class Configurator {
 	public static FittingBehavior memeCombinaisonOnMap = FittingBehavior.simpleAndComplex;
 	public static boolean displayFittingProviderApplied = true;
 	public static boolean manuelNextStep = false;
-	public static boolean autoPauseIfNexted = false;
+	public static boolean autoPauseIfNexted = true;
 
 	// Propagation de meme
 	public static boolean usePropagation = true;
