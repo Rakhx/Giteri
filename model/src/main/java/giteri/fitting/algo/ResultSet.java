@@ -232,10 +232,6 @@ public class ResultSet {
 //		lastNetworkId = networkId;
 	}
 
-	public void addthresholdStuff(int networkId, double nextStepScore){
-
-	}
-
 
 	/** Ecriture dans le fichier détaillé des propriétés du dernier network.
 	 * Ecrit ttes les propriétés, et laisse un espace pour leur SD qui sera écrit a la fin de

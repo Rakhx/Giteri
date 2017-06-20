@@ -720,10 +720,12 @@ public class EntiteHandler extends ThreadHandler {
 	 * @return
 	 */
 	private Entite SelectActingEntite() {
-		if (entitesActive.size() == 0) {
-			return null; //entites.get(0);
-		}
-		return entitesActive.get(Toolz.getRandomNumber(entitesActive.size()));
+//		synchronized (entitesActive) {
+			if (entitesActive.size() == 0) {
+				return null; //entites.get(0);
+			}
+			return entitesActive.get(Toolz.getRandomNumber(entitesActive.size()));
+//		}
 	}
 
 	/** Selection d'une action pour l'entité en action rules version

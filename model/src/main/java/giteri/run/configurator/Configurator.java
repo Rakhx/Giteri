@@ -23,7 +23,7 @@ public final class Configurator {
 	public static FittingBehavior memeCombinaisonOnMap = FittingBehavior.simpleAndComplex;
 	public static boolean displayFittingProviderApplied = true;
 	public static boolean manuelNextStep = false;
-	public static boolean autoPauseIfNexted = true;
+	public static boolean autoPauseIfNexted = false;
 
 	// Propagation de meme
 	public static boolean usePropagation = true;
@@ -62,15 +62,16 @@ public final class Configurator {
 	public static boolean debugStatAndPlot = false;
 	public static boolean debugFittingClassFast = false;
 	public static boolean debugFittingClass = false;
+	public static boolean debugEntite = true;
 	public static boolean overallDebug = !jarMode;
 	public static boolean debugHopAway = false;
 	public static boolean autrucheMode = false;
 	public static boolean debugOpenMole = false;
 
 	// Configuration Modèle
-	public static final boolean lotOfNodes = false;
+	public static final boolean lotOfNodes = true;
 	public final static boolean autoRedoActionIfNoAction = false;
-	public final static int nbNode = lotOfNodes? 10000 : 100;
+	public final static int nbNode = lotOfNodes? 1000 : 100;
 	public static int refreshInfoRate = 500;
 
 	// Affichage

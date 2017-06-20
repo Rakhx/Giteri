@@ -4,7 +4,6 @@ import java.io.File;
 import java.text.DateFormat;
 import java.util.*;
 
-
 import giteri.fitting.algo.ResultSet;
 import giteri.tool.math.Toolz;
 import giteri.meme.mecanisme.MemeFactory;
@@ -324,10 +323,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 *
 	 */
 	public double endSimu(){
-		double res;
-		res = resultNetwork.displayResult();
-//		if(!Configurator.jarMode)
-//			resultNetwork.displayPolar();
+		double res = resultNetwork.displayResult();
 		return res;
 	}
 
@@ -491,7 +487,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		if(debug && !oneMoreTurn)  System.out.println( resume );
 		// EndRegion
 
-		resultNetwork.addthresholdStuff(numeroTurn, scoreTotal);
 		return oneMoreTurn;
 	}
 

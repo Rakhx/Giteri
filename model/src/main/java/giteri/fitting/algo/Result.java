@@ -11,6 +11,7 @@ import java.util.*;
  */
 public class Result {
     // Provider associé a une string définissant sa valeur (GetPossibleValue() appelé sur une config du provider)
+    // <Provider.nameString(), provider.getActualValue()>
     private Map<String,String> kvProviderValues;
 
     // liste des scores obtenus; score direct de distance entre deux réseaux
@@ -20,7 +21,7 @@ public class Result {
     List<String> propertiesAsString;
 
     // TODO structure quelconque pour les bornes de fin de simulation
-    // huhum
+    // huhum pas utilisé pour le moment
    List<Double> nextStepScore;
 
     Result(){
@@ -40,18 +41,29 @@ public class Result {
             kvProviderValues.put(provider.nameString(), provider.getActualValue());
     }
 
+    /** Ajout du score a la fin d'un run pour la config
+     *
+     * @param score double
+     */
     public void addScore(double score){
         this.score.add(score);
     }
 
+    /** ajout du toString sur le networkProperties. Seul l'ordre d'ajout
+     * dans la liste fait la corrélation avec le score obtenu par cette propriété.
+     * Pas top.
+     *
+     * @param property
+     */
     public void addProperties(String property){
         propertiesAsString.add(property);
     }
 
-    public void addNextStepperScore(double nexter){
-        nextStepScore.add(nexter);
-    }
-
+    /** Obtient la string de la configuration associée aux scores.
+     * Ensemble des providers et de leur getActualValue()
+     *
+     * @return
+     */
     public String getCurrentConfig(){
         String result="";
         for (String s : kvProviderValues.keySet())

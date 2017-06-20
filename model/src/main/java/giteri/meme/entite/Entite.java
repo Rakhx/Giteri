@@ -186,11 +186,10 @@ public class Entite implements Comparable<Entite>{
 			}
 		}
 
-		if(toSelect == 1)
-			System.out.println("[Entite:chooseAction()] MERDE");
-		if(resultat == null ){
-			System.out.println("Choose action null on cherchait un toSelect a: " + toSelect + "et on avait de dispo " + intervalOfSelection.keySet().toString() + " avec un interval "+intervalOfSelection.values());
-		}
+		if(Configurator.debugEntite)
+			if(resultat == null ){
+				System.out.println("Choose action null on cherchait un toSelect a: " + toSelect + "et on avait de dispo " + intervalOfSelection.keySet().toString() + " avec un interval "+intervalOfSelection.values());
+			}
 		return resultat;
 	}
 
