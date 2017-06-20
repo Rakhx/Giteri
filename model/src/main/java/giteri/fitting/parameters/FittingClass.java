@@ -375,8 +375,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		boolean useMemeAppliance = true;
 
 		boolean stepByStep = false;
-		boolean debug = Configurator.debugFittingClass && !Configurator.jarMode;
-		boolean fastDebug = Configurator.debugFittingClassFast && !Configurator.jarMode;
+		boolean debug = Configurator.debugFittingClass;// && !Configurator.jarMode;
+		boolean fastDebug = Configurator.debugFittingClassFast;// && !Configurator.jarMode;
 
 		boolean oneMoreTurn = true;
 		boolean canStillApplyAction;
@@ -490,7 +490,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		return oneMoreTurn;
 	}
 
-	/** Continu fitting version simple.
+	/** Continu fitting version simple - c'est a dire en nombre de step
 	 *
 	 * @return
 	 */
@@ -502,7 +502,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		ObjectRef<String> message = new ObjectRef<String>("");
 		String resume = "";
 		double scoreEcartDensite = 100;
-
 
 		oneMoreTurn = readingActionCanContinue(message);
 

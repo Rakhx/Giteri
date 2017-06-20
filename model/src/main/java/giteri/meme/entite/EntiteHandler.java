@@ -652,46 +652,28 @@ public class EntiteHandler extends ThreadHandler {
 
 		String rez;
 		synchronized (workerFactory.waitingForReset) {
-
-			if (Configurator.displayLogTimeEating)
-			{
-				watcher.startWatch("Main");
-				watcher.startWatch("SelectionEntite");
-			}
 			Meme memeAction;
 
 			// Choix d'une entitée au hasard
 			Entite movingOne = SelectActingEntite();
-
+			if(Configurator.debugEntiteHandler)
+				System.out.println("[EH.runEntite]- entite choisie " + movingOne.getIndex());
 
 			if (movingOne == null) {
-//				if(!Configurator.jarMode) System.err.println("[EH.runEntite()]- Bullshit de liste entiteActive et de .run() qui s'arrete pas immédiatement");
+				if(Configurator.debugEntiteHandler) System.err.println("[EH.runEntite()]- Aucune entité sélectionnée");
 				return ("Nope pas d'entite prete");
 			}
-			if (Configurator.displayLogTimeEating)
-				watcher.stopWatch("SelectionEntite");
 
 			// CHOIX DE L'ACTION POUR CETTE ENTITE
-			if (Configurator.displayLogTimeEating)
-				watcher.startWatch("ChoixAction");
-
 			memeAction = actionSelectionRulesVersion(movingOne);
-			if (Configurator.displayLogTimeEating)
-				watcher.stopWatch("ChoixAction");
+			if(Configurator.debugEntiteHandler)
+				System.out.println("[EH.runEntite]- action choisie " + memeAction.toFourCharString());
 
 			// APPLICATION DE L'ACTION
-			if (Configurator.displayLogTimeEating)
-				watcher.startWatch("FaireAction");
 			rez = doAction(movingOne, memeAction);
+			if(Configurator.debugEntiteHandler)
+				System.out.println("[EH.runEntite]- resultat de l'action" + rez);
 
-			if (Configurator.displayLogTimeEating)
-				watcher.stopWatch("FaireAction");
-
-			if (Configurator.displayLogTimeEating)
-				watcher.stopWatch("Main");
-
-			if (Configurator.displayLogTimeEating)
-				watcher.publishResult();
 
 			if (Configurator.displayLogRatioTryAddOverTryRmv) {
 				if (memeAction != null)
@@ -770,8 +752,6 @@ public class EntiteHandler extends ThreadHandler {
 
 		// Execution d'un meme de l'entite.
 		if (memeAction != null) {
-			if (Configurator.displayLogTimeEating)
-				watcher.startWatch("SelectionCible");
 			cibles = (ArrayList<Entite>) entites.clone();
 			cibles.remove(movingOne);
 
@@ -798,11 +778,6 @@ public class EntiteHandler extends ThreadHandler {
 				}
 			}
 
-			if (Configurator.displayLogTimeEating)
-				watcher.stopWatch("SelectionCible");
-			if (Configurator.displayLogTimeEating)
-				watcher.startWatch("ApplyAction");
-
 			if (cibles.size() == 1) {
 				actionDone += memeAction.getAction().applyAction(movingOne, cibles);
 
@@ -814,7 +789,7 @@ public class EntiteHandler extends ThreadHandler {
 						if (Configurator.usePropagationSecondGeneration) {
 							Meme selectedMeme = movingOne.chooseAction();
 							if(selectedMeme == null){
-								System.out.println("Meme joué par " + movingOne.toString() + " disparu");
+								if(Configurator.debugEntiteHandler) System.out.println("Meme joué par " + movingOne.toString() + " disparu");
 							}
 							memeApply = selectedMeme.toFourCharString();
 							if (entite.receiveMeme(selectedMeme))
@@ -835,8 +810,6 @@ public class EntiteHandler extends ThreadHandler {
 						+ " Aucune(ou trop de) cible pour l'action" + memeAction.toFourCharString();
 				eventActionDone(movingOne, null, "NOTARGET " + actionDone);
 			}
-			if (Configurator.displayLogTimeEating)
-				watcher.stopWatch("ApplyAction");
 		} else {
 			actionDone = "Nope, Entite " + movingOne.getIndex() + " Liste d'action vide ou aucune action sélectionnée";
 			eventActionDone(movingOne, null, "NOACTION");}

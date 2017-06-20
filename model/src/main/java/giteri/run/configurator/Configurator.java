@@ -46,9 +46,9 @@ public final class Configurator {
 	public static boolean DisplayLogBehaviorColors = false;
 	public static boolean displayLogTimeEating = false;
 
+	public static boolean displayLogMemeApplication = false;
 	public static boolean displayLogAvgDegreeByMeme = false;
 	public static boolean displayLogMemeTransmission = false;
-	public static boolean displayLogMemeApplication = false;
 
 	public static boolean displayLogRatioLogFailOverFail = false;
 	public static boolean displayLogRatioLogFailOverSuccess= false;
@@ -59,10 +59,12 @@ public final class Configurator {
 
 	// affichage de debug
 	// Affiche le fait de vouloir passer au step suivant
-	public static boolean debugStatAndPlot = false;
-	public static boolean debugFittingClassFast = false;
-	public static boolean debugFittingClass = false;
+	public static boolean debugStatAndPlot = true;
+	public static boolean debugFittingClassFast = true;
+	public static boolean debugFittingClass = true;
 	public static boolean debugEntite = true;
+	public static boolean debugEntiteHandler = false;
+
 	public static boolean overallDebug = !jarMode;
 	public static boolean debugHopAway = false;
 	public static boolean autrucheMode = false;

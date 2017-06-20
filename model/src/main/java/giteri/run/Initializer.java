@@ -45,8 +45,8 @@ public class Initializer {
             Configurator.jarMode = false;
             Configurator.systemPaused = true;
             Configurator.writeNetworkResultOnFitting = true;
-//            Configurator.explorator = Configurator.EnumExplorationMethod.exhaustive;
-            Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
+            Configurator.explorator = Configurator.EnumExplorationMethod.exhaustive;
+//            Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
         }else if(launcher == Configurator.EnumLauncher.testProvider){
             Configurator.methodOfGeneration = Configurator.MemeDistributionType.SingleBasic;
             Configurator.displayPlotWhileSimulation = false;
