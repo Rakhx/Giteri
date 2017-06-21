@@ -131,8 +131,6 @@ public final class Configurator {
 		SingleCombinaison,
 		AllCombinaison,
 		AllSingle,
-		FourWithInverted,
-		OnlyOneAgent,
 		specificDistrib,
 		FollowingFitting
 	}

@@ -30,19 +30,18 @@ import giteri.meme.event.IBehaviorTransmissionListener;
  */
 public class EntiteHandler extends ThreadHandler {
 
-	// Region properties
+	// region properties
 
 	private VueController ihmController;
 	private NetworkConstructor networkConstruct;
 	private MemeFactory memeFactory;
-
 	private WorkerFactory workerFactory;
 
 	// les entités du réseau
 	protected ArrayList<Entite> entites;
-
 	// Entite possedant des actions
 	private ArrayList<Entite> entitesActive;
+
 	private Hashtable<String, String> memeTranslationReadable;
 
 	// Listener pour les évènements issu de l'obtention de meme ou application
@@ -50,7 +49,6 @@ public class EntiteHandler extends ThreadHandler {
 	private ArrayList<IActionApplyListener> entityListeners;
 	private ArrayList<IBehaviorTransmissionListener> memeListeners;
 
-	StopWatchFactory watcher ;
 	private Meme addRandom = null, removeRandom = null;
 
 	// Variable d'utilisation
@@ -61,7 +59,7 @@ public class EntiteHandler extends ThreadHandler {
 	private ActionType lastAction = ActionType.RETRAITLIEN;
 	private int nbActionBySecond;
 
-	// EndRegion
+	// endregion
 
 	/** Constructeur sans param. Crée les memes de la map
 	 *
@@ -91,9 +89,7 @@ public class EntiteHandler extends ThreadHandler {
 		giveMemeToEntite(Configurator.methodOfGeneration);
 	}
 
-	// EndRegion
-
-	// Region PUBLIC
+	// region Thread
 
 	/** Les joies des constructeurs nécessitant l'un et l'autre
 	 *
@@ -124,8 +120,6 @@ public class EntiteHandler extends ThreadHandler {
 		}
 
 		OneStep();
-		if(Configurator.displayLogTimeEating)
-			watcher.publishResult();
 	}
 
 	/**
@@ -151,6 +145,10 @@ public class EntiteHandler extends ThreadHandler {
 		}
 	}
 
+	// endregion
+
+	// region Entité
+
 	/**
 	 * Méthode de génération de network. A placer dans le NC? Va générer les
 	 * liens, mais les noeuds doivent déjà etre présent. 0 empty, 1 30%, 2 full,
@@ -162,10 +160,8 @@ public class EntiteHandler extends ThreadHandler {
 		networkConstruct.generateNetwork(activator);
 	}
 
-	// Region ENTITE
-
 	/**
-	 * Action qui va forcer chaque entité a essayer chacune des actions de son
+	 * fonction qui va forcer chaque entité a essayer chacune des actions de son
 	 * panel. La fonction s'arrête si une action est effectivement réalisée. Si
 	 * aucune action n'a pu effectivement etre réalisée, la fonction renvoi
 	 * false. Permet de débloquer des situations. l'ordre d'appel des agents est
@@ -193,33 +189,6 @@ public class EntiteHandler extends ThreadHandler {
 		}
 
 		return actionDone;
-	}
-
-	/** Va retirer au noeud un edge aléatoirement si plus d'un noeud
-	 *
-	 */
-	public void purgeLink() {
-
-		Entite target;
-		ArrayList<Entite> connectedNodeSeveralConnection = new ArrayList<Entite>();
-
-		for (Entite entite : entites) {
-			connectedNodeSeveralConnection.clear();
-			if (entite.getDegree() > 1) {
-				for (Integer indexEventuality : entite.getConnectedNodesIndex()) {
-					if (entites.get(indexEventuality).getDegree() > 1) {
-						connectedNodeSeveralConnection.add(entites
-								.get(indexEventuality));
-					}
-				}
-
-				if (connectedNodeSeveralConnection.size() > 1) {
-					target = connectedNodeSeveralConnection.get
-							(Toolz.getRandomNumber(connectedNodeSeveralConnection.size()));
-					removeLink(entite, target);
-				}
-			}
-		}
 	}
 
 	// TODO REFACTORING A voir pour le positionnement de l'appel a cette fonction.
@@ -331,9 +300,9 @@ public class EntiteHandler extends ThreadHandler {
 		}
 	}
 
-	// EndRegion
+	// endregion
 
-	// Region EVENT
+	// region Event
 
 	/** Pour lancer les évènements de type meme transmis
 	 * crée un evenement pour la mise a jour de l'interface Il s'agit d'un
@@ -413,16 +382,15 @@ public class EntiteHandler extends ThreadHandler {
 		}
 	}
 
-	// EndRegion
+	// endregion
 
-	// Region MEME
+	// region Meme
 
 	/** Distribut les memes aux entités suivant certain mode.
 	 *
 	 * @param distrib
 	 */
 	public void giveMemeToEntite(MemeDistributionType distrib) {
-
 		switch (distrib) {
 			case SingleBasic:
 				giveMemeToEntiteOnlyBasis();
@@ -433,12 +401,6 @@ public class EntiteHandler extends ThreadHandler {
 			case AllCombinaison:
 				giveMemeToEntiteGeneric();
 				break;
-//			case FourWithInverted:
-//				giveMemeWithInvertd();
-//				break;
-//			case OnlyOneAgent:
-//				giveMemeToEntiteExceptPurple();
-//				break;
 			case FollowingFitting:
 				giveMemeToEntiteFollowingFitting();
 				break;
@@ -452,22 +414,6 @@ public class EntiteHandler extends ThreadHandler {
 				break;
 		}
 	}
-
-//
-//	/** Applique directement depuis une hash d'index // comportements les
-//	 * behavior au nodes spécifiées par la key.
-//	 *
-//	 * @param affectation
-//	 */
-//	public void giveMemeToEntite(Hashtable<Integer, ArrayList<Meme>> affectation) {
-//		for (Integer index : affectation.keySet()) {
-//			if (entites.size() > index)
-//				for (Meme memeToAdd : affectation.get(index)) {
-//					eventMemeChanged(entites.get(index), entites.get(index).addMeme(memeToAdd, true),
-//							Configurator.MemeActivityPossibility.AjoutMeme.toString());
-//				}
-//		}
-//	}
 
 	/** Applique directement depuis une liste de meme au X premier agents pour les
 	 * recevoir. Si option de défault behavior, donne des memes fluides aux autres agent.
@@ -505,23 +451,6 @@ public class EntiteHandler extends ThreadHandler {
 			int lastIndex = memes.size();
 			for (Meme meme : memeFactory.getMemeAvailable(false))
 				Toolz.addElementInHashArray(memes, ++lastIndex, meme);
-		}
-
-		return memes;
-	}
-
-	// TODO REFACTORING A delete probablement
-	/** Obtient les memes effectivements présent sur la map.
-	 *
-	 * @return la liste des memes possédés par les agents
-	 */
-	public ArrayList<Meme> getMemeOnMap() {
-		ArrayList<Meme> memes = new ArrayList<Meme>();
-		for (Entite entite : entites) {
-			for (Meme meme : entite.getMyMemes()) {
-				if (!memes.contains(meme))
-					memes.add(meme);
-			}
 		}
 
 		return memes;
@@ -637,13 +566,11 @@ public class EntiteHandler extends ThreadHandler {
 		return resultat;
 	}
 
-	// EndRegion
-
-	// EndRegion
+	// endregion
 
 	// Region PRIVATE
 
-	// Region ACTION
+	// region Action
 
 	/** va lancer l'action d'une entitée
 	 *
@@ -702,12 +629,10 @@ public class EntiteHandler extends ThreadHandler {
 	 * @return
 	 */
 	private Entite SelectActingEntite() {
-//		synchronized (entitesActive) {
 			if (entitesActive.size() == 0) {
-				return null; //entites.get(0);
+				return null;
 			}
 			return entitesActive.get(Toolz.getRandomNumber(entitesActive.size()));
-//		}
 	}
 
 	/** Selection d'une action pour l'entité en action rules version
@@ -719,22 +644,6 @@ public class EntiteHandler extends ThreadHandler {
 		return movingOne.chooseAction();
 	}
 
-	/** Selection d'une action, en excluant la derniere choisi si il s'agit d'un
-	 * ajout ou d'un retrait, et mis a jour de la dernier action faite.
-	 *
-	 * @param movingOne
-	 * @return
-	 */
-	private Meme actionSelectionControlledVersion(Entite movingOne) {
-		Meme selected = null;
-		selected = movingOne.chooseActionExclusionVersion(lastAction);
-		if (selected != null)
-			if (selected.action.getActionType() == ActionType.RETRAITLIEN
-					|| selected.action.getActionType() == ActionType.AJOUTLIEN)
-				lastAction = selected.action.getActionType();
-
-		return selected;
-	}
 
 	/** Application de l'action de l'entité
 	 *
@@ -746,7 +655,7 @@ public class EntiteHandler extends ThreadHandler {
 	private String doAction(Entite movingOne, Meme memeAction) {
 		String actionDone = "";
 		String memeApply = "";
-		ArrayList<Entite> cibles = new ArrayList<Entite>();
+		ArrayList<Entite> cibles ;
 		ArrayList<Integer> ciblesIndex = new ArrayList<Integer>();
 		IAgregator currentFilter = null;
 
@@ -778,6 +687,7 @@ public class EntiteHandler extends ThreadHandler {
 				}
 			}
 
+			// Le dernier filtre appliqué est tjrs un random() unitaire
 			if (cibles.size() == 1) {
 				actionDone += memeAction.getAction().applyAction(movingOne, cibles);
 
@@ -795,8 +705,9 @@ public class EntiteHandler extends ThreadHandler {
 							if (entite.receiveMeme(selectedMeme))
 								eventMemeChanged(entite, selectedMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());}
 						else
+							// ou transmission du behavior appliqué
 						if (entite.receiveMeme(memeAction))
-							eventMemeChanged(entite, memeAction,	Configurator.MemeActivityPossibility.AjoutMeme.toString());
+							eventMemeChanged(entite, memeAction,Configurator.MemeActivityPossibility.AjoutMeme.toString());
 					}
 
 				// evenement d'application d'une action
@@ -820,9 +731,9 @@ public class EntiteHandler extends ThreadHandler {
 		return actionDone;
 	}
 
-	// EndRegion
+	// endregion
 
-	// Region MEME
+	// region Meme
 
 	/** Donne des memes aux entités. Ici chaque meme est donnée une fois pour une
 	 * entité dans le réseau.
@@ -853,13 +764,6 @@ public class EntiteHandler extends ThreadHandler {
 
 	}
 
-	/** Bullshit.
-	 *
-	 */
-	private void giveMemeToEntiteExceptPurple() {
-
-	}
-
 	/** Donne tout les memes basics réparti équitablement sur tout les nodes
 	 *
 	 */
@@ -876,13 +780,6 @@ public class EntiteHandler extends ThreadHandler {
 						Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			lastIndex = partSize * part;
 		}
-	}
-
-	/** BULLSHIT
-	 *
-	 */
-	private void giveMemeWithInvertd() {
-
 	}
 
 	/**
@@ -921,7 +818,7 @@ public class EntiteHandler extends ThreadHandler {
 
 	}
 
-	/**
+	/** Vide car les memes dispo sur la map devraient etre gérés par un IModelParameter
 	 *
 	 */
 	private void giveMemeToEntiteFollowingFitting() {
@@ -971,59 +868,6 @@ public class EntiteHandler extends ThreadHandler {
 
 			i++;
 		}
-//
-//
-//		for (Meme meme : memeFactory.getMemeAvailable(false)) {
-//			Toolz.addElementInHashArray(behaviors, i, meme);
-//			nameKVindex.put(meme.toFourCharString(), i);
-//			i++;
-//		}
-//
-//		for (Entite entite : entites) {
-//
-//			if (entite.getIndex() >= 1 && entite.getIndex() < 2) {
-//				toAdd = behaviors.get(nameKVindex.get("RMLKDGRDMMNSPLK"))
-//						.get(0);
-//				// eventMemeChanged(entite, entite.addMeme(toAdd, true),
-//				// Configurator.MemeActivityPossibility.AjoutMeme.toString());
-//				toAdd = behaviors.get(nameKVindex.get("ADLKDGRDMNTLK")).get(0);
-//				eventMemeChanged(entite, entite.addMeme(toAdd, true),
-//						Configurator.MemeActivityPossibility.AjoutMeme
-//								.toString());
-//			}
-//
-//			if (entite.getIndex() >= 2 && entite.getIndex() < 3) {
-//				toAdd = behaviors.get(nameKVindex.get("RMLKDGRDMMNIFLK"))
-//						.get(0);
-//				eventMemeChanged(entite, entite.addMeme(toAdd, true),
-//						Configurator.MemeActivityPossibility.AjoutMeme
-//								.toString());
-//			}
-//
-//			// Hop away en ajout
-//			if (entite.getIndex() >= 3 && entite.getIndex() < 4) {
-//				toAdd = behaviors.get(nameKVindex.get("ADLKDGRDMNTLKHA"))
-//						.get(0);
-//				// eventMemeChanged(entite, entite.addMeme(toAdd, true),
-//				// Configurator.MemeActivityPossibility.AjoutMeme.toString());
-//			}
-//			// ajout not linked mine inf
-//			if (entite.getIndex() >= 4 && entite.getIndex() < 5) {
-//				toAdd = behaviors.get(nameKVindex.get("ADLKDGRDMMNIFNTLK"))
-//						.get(0);
-//				// eventMemeChanged(entite, entite.addMeme(toAdd, true),
-//				// Configurator.MemeActivityPossibility.AjoutMeme.toString());
-//				toAdd = behaviors.get(nameKVindex.get("RMLKDGRDMLK")).get(0);
-//				// eventMemeChanged(entite, entite.addMeme(toAdd, true),
-//				// Configurator.MemeActivityPossibility.AjoutMeme.toString());
-//			}
-//			// add the most - si deja add pas d'effet
-//			if (entite.getIndex() >= 5 && entite.getIndex() < 6) {
-//				toAdd = behaviors.get(nameKVindex.get("ADLKDGRDMMT")).get(0);
-//				// eventMemeChanged(entite, entite.addMeme(toAdd, true),
-//				// Configurator.MemeActivityPossibility.AjoutMeme.toString());
-//			}
-//		}
 	}
 
 	// TODO REFACTORING Prendre les memes a appliquer a tous en parametre plutot qu'avoir des variables statics
@@ -1100,6 +944,7 @@ public class EntiteHandler extends ThreadHandler {
 	/**
 	 * Génère les memes disponibles sur la map, qui seront associés ou non aux
 	 * entités. Ajouté directement dans la liste des memes dispos du memeHandler
+	 * TODO [WayPoint] - Génération des memes disponibles sur la map
 	 *
 	 */
 	private void generateMemeAvailableForMap() {
@@ -1182,8 +1027,9 @@ public class EntiteHandler extends ThreadHandler {
 			memeTranslationReadable.put(memeDispo.toFourCharString(),memeDispo.getName());
 		}
 
-		MemeFactory lol = memeFactory;
-		lol.getClass();
+//		MemeFactory lol = memeFactory;
+//		lol.getClass();
+		// uhhum.
 
 	}
 
@@ -1248,7 +1094,7 @@ public class EntiteHandler extends ThreadHandler {
 		}
 	}
 
-	// EndRegion
+	// endregion
 
 	/**
 	 * Utilisé pour mettre a jour l'affichage du nombre d'action par seconde
@@ -1388,4 +1234,80 @@ public class EntiteHandler extends ThreadHandler {
 
 	// EndRegion
 
+
+	// region deprecated
+
+	/** Va retirer au noeud un edge aléatoirement si plus d'un noeud
+	 *
+	 */
+	public void purgeLink() {
+
+		Entite target;
+		ArrayList<Entite> connectedNodeSeveralConnection = new ArrayList<Entite>();
+
+		for (Entite entite : entites) {
+			connectedNodeSeveralConnection.clear();
+			if (entite.getDegree() > 1) {
+				for (Integer indexEventuality : entite.getConnectedNodesIndex()) {
+					if (entites.get(indexEventuality).getDegree() > 1) {
+						connectedNodeSeveralConnection.add(entites
+								.get(indexEventuality));
+					}
+				}
+
+				if (connectedNodeSeveralConnection.size() > 1) {
+					target = connectedNodeSeveralConnection.get
+							(Toolz.getRandomNumber(connectedNodeSeveralConnection.size()));
+					removeLink(entite, target);
+				}
+			}
+		}
+	}
+
+	/** Obtient les memes effectivements présent sur la map.
+	 *
+	 * @return la liste des memes possédés par les agents
+	 */
+	public ArrayList<Meme> getMemeOnMap() {
+		ArrayList<Meme> memes = new ArrayList<Meme>();
+		for (Entite entite : entites) {
+			for (Meme meme : entite.getMyMemes()) {
+				if (!memes.contains(meme))
+					memes.add(meme);
+			}
+		}
+
+		return memes;
+	}
+//	/** Applique directement depuis une hash d'index // comportements les
+//	 * behavior au nodes spécifiées par la key.
+//	 *
+//	 * @param affectation
+//	 */
+//	public void giveMemeToEntite(Hashtable<Integer, ArrayList<Meme>> affectation) {
+//		for (Integer index : affectation.keySet()) {
+//			if (entites.size() > index)
+//				for (Meme memeToAdd : affectation.get(index)) {
+//					eventMemeChanged(entites.get(index), entites.get(index).addMeme(memeToAdd, true),
+//							Configurator.MemeActivityPossibility.AjoutMeme.toString());
+//				}
+//		}
+//	}
+
+	/** Selection d'une action, en excluant la derniere choisi si il s'agit d'un
+	 * ajout ou d'un retrait, et mis a jour de la dernier action faite.
+	 *
+	 * @param movingOne
+	 * @return
+	 */
+	private Meme actionSelectionControlledVersion(Entite movingOne) {
+		Meme selected = null;
+		selected = movingOne.chooseActionExclusionVersion(lastAction);
+		if (selected != null)
+			if (selected.action.getActionType() == ActionType.RETRAITLIEN
+					|| selected.action.getActionType() == ActionType.AJOUTLIEN)
+				lastAction = selected.action.getActionType();
+
+		return selected;
+	}
 }

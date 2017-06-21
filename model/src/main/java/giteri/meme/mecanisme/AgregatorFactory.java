@@ -12,22 +12,13 @@ import giteri.meme.entite.EntiteHandler;
 
 public class AgregatorFactory {
 
-	private static AgregatorFactory instance = null;
-
 	EntiteHandler entiteHandler;
-
 	public AgregatorFactory(){
-
-	}
-
-	public AgregatorFactory(EntiteHandler eh){
-		entiteHandler = eh;
 	}
 
 	public void setEntiteHandler(EntiteHandler eh){
 		entiteHandler = eh;
 	}
-
 
 	/** FACTORY Renvoi un agregator depuis l'enum du configurator.
 	 *
@@ -71,13 +62,11 @@ public class AgregatorFactory {
 	 */
 	public interface IAgregator
 	{
-		public abstract <T extends Comparable<T>> ArrayList<Entite> applyAggregator(Entite asker, ArrayList<Entite> entites, AttributFactory.IAttribut<T> attribut);
+		<T extends Comparable<T>> ArrayList<Entite> applyAggregator(Entite asker, ArrayList<Entite> entites, AttributFactory.IAttribut<T> attribut);
 
-		public AgregatorType getEnumType();
+		AgregatorType getEnumType();
 
-		public String getFourCharName();
-
-//		public EntiteHandler handler = EntiteHandler.getInstance();
+		String getFourCharName();
 
 	}
 
@@ -89,11 +78,14 @@ public class AgregatorFactory {
 		/** Méthode qui renvoi le sous ensemble des entités linked
 		 * a l'entité asker.
 		 *
-		 * @param asker
-		 * @param entites
+		 * @param asker l'entité qui recherche les liés a elle
+		 * @param entites la liste d'entité d'ou il faut extraire les connectés
 		 * @return
 		 */
 		protected ArrayList<Entite> getLinked(Entite asker, ArrayList<Entite> entites){
+
+//			entites.retainAll(asker.getConnectedEntite());
+
 			ArrayList<Entite> linked = new ArrayList<Entite>();
 			for (Entite entite : entites) {
 				if(asker.getConnectedNodesIndex().contains(entite.getIndex())){

@@ -30,8 +30,9 @@ public class Entite implements Comparable<Entite>{
 	private ArrayList<Meme> myMemes;
 	// répartie sur 0 -> 1, réévalué a chaque ajout ou (retrait de meme)
 	Hashtable<Meme, Double> intervalOfSelection;
-	//	Hashtable<Entite, Integer> connectedTimeNodes;
+//	Hashtable<Entite, Integer> connectedTimeNodes;
 	Set<Entite> connectedNodes;
+
 	// défini sur quels memes l'entité fourni le réseau
 	Set<IAction> breederOn;
 
@@ -88,23 +89,6 @@ public class Entite implements Comparable<Entite>{
 		return false;
 	}
 
-	/** Après application d'une action de la part d'une entité A, recoit l'un des
-	 * memes possédé par A.
-	 *
-	 * @param actingOnMe
-	 * @return
-	 */
-	public Boolean receiveRandomMemeFromActing(Entite actingOnMe){
-		boolean ok;
-		Meme selectedMeme = actingOnMe.chooseAction();
-		// Concernant l'usage de la proba propre au meme
-		ok = !Configurator.useMemePropagationProba || Toolz.rollDice(selectedMeme.probaOfPropagation);
-		ok = ok && (!Configurator.useEntitePropagationProba || Toolz.rollDice(this.probaLearning));
-		if(ok)
-			return addOrReplaceSlotVersion(selectedMeme);
-		return false;
-	}
-
 	/** ajoute un meme ou remplace un meme déja existant,
 	 * avec une notion de slot pour meme d'ajout et meme de retrait.
 	 *
@@ -114,7 +98,7 @@ public class Entite implements Comparable<Entite>{
 	public boolean addOrReplaceSlotVersion(Meme meme){
 		boolean okToBeAdded = true;
 		boolean addedOrReplaced = false;
-		Meme memeToReplace = null  ;
+		Meme memeToReplace = null ;
 
 
 		// On parcourt les meme existant et regarde si un meme de la meme catégorie existe
@@ -160,7 +144,6 @@ public class Entite implements Comparable<Entite>{
 			if(Configurator.learningOnlyOnce)
 				probaLearning = 0;
 			myMemes.sort(null);
-//			defineRulesProbaLimited();
 			addedOrReplaced = true;
 		}
 
@@ -216,7 +199,6 @@ public class Entite implements Comparable<Entite>{
 	 *
 	 */
 	public void resetStat(){
-
 		getMyMemes().clear();
 		intervalOfSelection.clear();
 		associatedNode.resetStat();
@@ -327,13 +309,6 @@ public class Entite implements Comparable<Entite>{
 	 */
 	public Set<Entite> getConnectedEntite(){
 		return connectedNodes;
-//		ArrayList<Entite> entites = new ArrayList<Entite>(connectedTimeNodes.keySet());
-	}
-
-
-	public Point getPosition(){
-//		return myPlace.get
-		return null;
 	}
 
 	public int getDegree(){
@@ -342,7 +317,6 @@ public class Entite implements Comparable<Entite>{
 
 	public void setIndex(int indexxx){
 		this.index = indexxx;
-
 	}
 
 	public int getIndex(){
@@ -386,28 +360,6 @@ public class Entite implements Comparable<Entite>{
 		}
 
 		return resultat;
-	}
-
-	public int getNbMemes() {
-		synchronized(myMemes){
-			return myMemes.size();
-		}
-	}
-
-	public ArrayList<ActionType> getActionsAvailables(){
-		ArrayList<ActionType> actions = new ArrayList<>();
-		synchronized(myMemes){
-			for (Meme meme : myMemes) {
-				if(!actions.contains(meme.action.getActionType()))
-					actions.add(meme.action.getActionType());
-			}
-		}
-
-		return actions;
-	}
-
-	public void setBreederOn(Set<IAction> breederOn) {
-		this.breederOn = breederOn;
 	}
 
 	/** Comparaison sur l'index.
