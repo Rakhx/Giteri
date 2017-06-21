@@ -2,6 +2,7 @@ package giteri.meme.mecanisme;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Set;
 
 import giteri.tool.math.Toolz;
 import giteri.run.configurator.Configurator;
@@ -247,29 +248,30 @@ public class AgregatorFactory {
 		 */
 		public <T extends Comparable<T>> ArrayList<Entite> applyAggregator(Entite asker,ArrayList<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			ArrayList<Entite> resultat = new ArrayList<Entite>();
-			Entite bestEntitee = null ;
+			Entite bestEntite = null ;
+			Set<Entite> entitees = entiteHandler.getLinkedEntite(asker);
+			boolean firstStep = true;
 
-			entites = entiteHandler.getLinkedEntite(asker);
-
-			// on extrait de la liste
-			if(entites.size() > 0){
-				resultat.add(entites.get(0));
-				bestEntitee = entites.get(0);
-			}else
+			if(entitees.size() == 0)
 				return entites;
 
-			entites.remove(0);
-			for (Entite entite : entites) {
+			for (Entite entite : entitees) {
+				if(firstStep){
+					firstStep = false;
+					resultat.add(entite);
+					bestEntite = entite;
+					continue;
+				}
 				// Si égalité, on rajoute le node a la liste
-				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(bestEntitee.getNode())) == 0)
+				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(bestEntite.getNode())) == 0)
 				{
 					resultat.add(entite);
 				}
-				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(bestEntitee.getNode())) == 1)
+				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(bestEntite.getNode())) == 1)
 				{
 					resultat.clear();
 					resultat.add(entite);
-					bestEntitee = entite;
+					bestEntite = entite;
 				}
 			}
 
@@ -311,16 +313,20 @@ public class AgregatorFactory {
 		public <T extends Comparable<T>> ArrayList<Entite> applyAggregator(	Entite asker, ArrayList<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			ArrayList<Entite> resultat = new ArrayList<Entite>();
 			Entite bestEntite = null ;
-			entites = entiteHandler.getLinkedEntite(asker);
+			Set<Entite> entitees = entiteHandler.getLinkedEntite(asker);
+			boolean firstStep = true;
 
-			if(entites.size() > 0){
-				resultat.add(entites.get(0));
-				bestEntite = entites.get(0);
-			}else
+			if(entitees.size() == 0)
 				return entites;
 
-			entites.remove(0);
-			for (Entite entite : entites) {
+			for (Entite entite : entitees) {
+				if(firstStep){
+					firstStep = false;
+					resultat.add(entite);
+					bestEntite = entite;
+					continue;
+				}
+
 				// Si égalité, on rajoute le node a la liste
 				if(attribut.getAttributValue(entite.getNode()).compareTo(
 						attribut.getAttributValue(bestEntite.getNode())) == 0)

@@ -2,7 +2,9 @@ package giteri.meme.entite;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 
 import giteri.tool.math.Toolz;
 import giteri.meme.mecanisme.ActionFactory;
@@ -28,9 +30,10 @@ public class Entite implements Comparable<Entite>{
 	private ArrayList<Meme> myMemes;
 	// répartie sur 0 -> 1, réévalué a chaque ajout ou (retrait de meme)
 	Hashtable<Meme, Double> intervalOfSelection;
-	Hashtable<Entite, Integer> connectedTimeNodes;
+	//	Hashtable<Entite, Integer> connectedTimeNodes;
+	Set<Entite> connectedNodes;
 	// défini sur quels memes l'entité fourni le réseau
-	ArrayList<IAction> breederOn;
+	Set<IAction> breederOn;
 
 	// EndRegion
 
@@ -41,8 +44,9 @@ public class Entite implements Comparable<Entite>{
 		associatedNode = null;
 		myMemes = new ArrayList<Meme>();
 		intervalOfSelection = new Hashtable<Meme, Double>();
-		connectedTimeNodes = new Hashtable<Entite, Integer>();
-		breederOn = new ArrayList<ActionFactory.IAction>();
+//		connectedTimeNodes = new Hashtable<Entite, Integer>();
+		connectedNodes = new HashSet<>();
+		breederOn = new HashSet<>();
 		probaLearning = Configurator.getProbaLearning(Configurator.probaEntiteLearning * - 1);
 		eh = ent;
 	}
@@ -216,11 +220,11 @@ public class Entite implements Comparable<Entite>{
 		getMyMemes().clear();
 		intervalOfSelection.clear();
 		associatedNode.resetStat();
-		connectedTimeNodes.clear();
+		connectedNodes.clear();
 	}
 
 	public void resetEntiteStuff(){
-		connectedTimeNodes.clear();
+		connectedNodes.clear();
 	}
 
 	/** Remet le temps des links a zero.
@@ -230,20 +234,20 @@ public class Entite implements Comparable<Entite>{
 	 */
 	public ArrayList<Boolean> refreshLinks(ArrayList<Entite> entites){
 		ArrayList<Boolean> succes = new ArrayList<Boolean>();
-		synchronized (connectedTimeNodes) {
+		synchronized (connectedNodes) {
 			for (Entite entite : entites) {
 				if(!isConnectedTo(entite)){
 					succes.add(false);
 				}
 				else{
-					connectedTimeNodes.put(entite, 0);
+					connectedNodes.add(entite);
 					succes.add(true);
 				}
 			}
 		}
 
-		for (Entite entity : connectedTimeNodes.keySet()) {
-			connectedTimeNodes.put(entity, 0);
+		for (Entite entity : connectedNodes) {
+			connectedNodes.add(entity);
 		}
 
 		return succes;
@@ -257,8 +261,8 @@ public class Entite implements Comparable<Entite>{
 	 * @return
 	 */
 	private boolean isConnectedTo(Entite entite){
-		synchronized (connectedTimeNodes) {
-			return connectedTimeNodes.keySet().contains(entite);
+		synchronized (connectedNodes) {
+			return connectedNodes.contains(entite);
 		}
 	}
 
@@ -268,8 +272,8 @@ public class Entite implements Comparable<Entite>{
 	 * @param toAdd
 	 */
 	void addConnectedEntite(Entite toAdd){
-		synchronized (connectedTimeNodes) {
-			connectedTimeNodes.put(toAdd, 0);
+		synchronized (connectedNodes) {
+			connectedNodes.add(toAdd);
 		}
 	}
 
@@ -278,9 +282,9 @@ public class Entite implements Comparable<Entite>{
 	 * @param toRemove
 	 */
 	void removeConnectedEntite(Entite toRemove){
-		//synchronized (connectedTimeNodes) {
-		connectedTimeNodes.remove(toRemove);
-		//}
+		synchronized (connectedNodes) {
+		connectedNodes.remove(toRemove);
+		}
 	}
 
 	/** Obtenir la classe graph stream a laquelle appartient le noeud.
@@ -321,9 +325,9 @@ public class Entite implements Comparable<Entite>{
 	 *
 	 * @return
 	 */
-	public ArrayList<Entite> getConnectedEntite(){
-		ArrayList<Entite> entites = new ArrayList<Entite>(connectedTimeNodes.keySet());
-		return entites;
+	public Set<Entite> getConnectedEntite(){
+		return connectedNodes;
+//		ArrayList<Entite> entites = new ArrayList<Entite>(connectedTimeNodes.keySet());
 	}
 
 
@@ -402,7 +406,7 @@ public class Entite implements Comparable<Entite>{
 		return actions;
 	}
 
-	public void setBreederOn(ArrayList<IAction> breederOn) {
+	public void setBreederOn(Set<IAction> breederOn) {
 		this.breederOn = breederOn;
 	}
 

@@ -280,7 +280,7 @@ public class EntiteHandler extends ThreadHandler {
 	 * @param asker
 	 * @return une sous liste d'entité
 	 */
-	public ArrayList<Entite> getLinkedEntite(Entite asker) {
+	public Set<Entite> getLinkedEntite(Entite asker) {
 		return asker.getConnectedEntite();
 	}
 
