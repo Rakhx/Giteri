@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Set;
 
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.network.Edge;
@@ -147,7 +148,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 	 * @param net
 	 * @param nodeToDesignAsTarget
 	 */
-	public void applyTargetColor(Network net, Integer actingEntite ,ArrayList<Integer> nodeToDesignAsTarget){
+	public void applyTargetColor(Network net, Integer actingEntite ,Set<Integer> nodeToDesignAsTarget){
 
 		String attrib;
 		boolean found = false;

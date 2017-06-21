@@ -1,5 +1,6 @@
 package giteri.meme.mecanisme;
 import java.util.ArrayList;
+import java.util.Set;
 
 import giteri.tool.math.Toolz;
 import giteri.run.configurator.Configurator;
@@ -63,7 +64,7 @@ public class ActionFactory{
 		 * @param cibles la cible l'action de l'entite
 		 * @return String = action réalisée, vide sinon
 		 */
-		public abstract String applyAction(Entite asker,ArrayList<Entite> cibles);
+		public abstract String applyAction(Entite asker, Set<Entite> cibles);
 
 		public ActionType getActionType();
 
@@ -102,7 +103,7 @@ public class ActionFactory{
 		 *  Les conditions//aggrégation associées et propriétés définissent l'objectif.
 		 *  La fonction va choisir un meme de la liste des entitées et le copier.
 		 */
-		public String applyAction(Entite asker, ArrayList<Entite> cibles) {
+		public String applyAction(Entite asker, Set<Entite> cibles) {
 			ArrayList<Meme> memesOfTarget ;
 			ArrayList<Meme> memesOfTargetNotPosseded = new ArrayList<Meme>();
 
@@ -114,7 +115,8 @@ public class ActionFactory{
 			if(cibles.size() > 0){
 
 				// On choisit une cible au hasard dans la liste
-				modele = cibles.get(Toolz.getRandomNumber(cibles.size()));
+				modele = Toolz.getRandomElement(cibles);
+//						cibles.get(Toolz.getRandomNumber(cibles.size()));
 				memesOfTarget = modele.getMyMemes();
 				resultat += " Modèle trouvé pour copier sur lui "+ modele.getIndex();
 
@@ -184,18 +186,17 @@ public class ActionFactory{
 		/** Methode applyAction, depuis un asker vers une liste de cible.
 		 *
 		 */
-		public String applyAction(Entite asker, ArrayList<Entite> cibles) {
+		public String applyAction(Entite asker, Set<Entite> cibles) {
 			String actionDone = "";
 
 			// Va choisir une cible parmi celles disponibles.
-			cibles = Toolz.getOneElementList(cibles);
+			Entite cible = Toolz.getRandomElement(cibles);
 
 			// Application de l'action
-			for (Entite cible : cibles) {
-				if (applier.addLink(asker, cible)) {
-					actionDone += this.toString() + " " + asker.getIndex() + " => " + cible.getIndex();
-				}
+			if (applier.addLink(asker, cible)) {
+				actionDone += this.toString() + " " + asker.getIndex() + " => " + cible.getIndex();
 			}
+
 
 			if(actionDone.isEmpty()) actionDone = "Nope, lien déjà existant";
 			return actionDone;
@@ -232,17 +233,15 @@ public class ActionFactory{
 		/** Methode applyAction, depuis un asker vers une liste de cible.
 		 *
 		 */
-		public String applyAction(Entite asker, ArrayList<Entite> cibles) {
+		public String applyAction(Entite asker, Set<Entite> cibles) {
 			String actionDone = "";
 
 			// Va choisir une cible parmi celle disponible.
-			cibles = Toolz.getOneElementList(cibles);
+			Entite cible = Toolz.getRandomElement(cibles);
 
 			// Application de l'action
-			for (Entite cible : cibles) {
-				if (applier.removeLink(asker, cible)) {
-					actionDone += this.toString() + " " + asker.getIndex() + " => " + cible.getIndex();
-				}
+			if (applier.removeLink(asker, cible)) {
+				actionDone += this.toString() + " " + asker.getIndex() + " => " + cible.getIndex();
 			}
 			if(actionDone.isEmpty()) actionDone = "Nope, lien inexistant";
 
@@ -281,8 +280,9 @@ public class ActionFactory{
 		 * Fait la meme chose que la supression de lien...
 		 *
 		 */
-		public String applyAction(Entite asker, ArrayList<Entite> cibles) {
+		public String applyAction(Entite asker, Set<Entite> cibles) {
 			String actionDone = "";
+
 			for (Entite cible : cibles) {
 				if (applier.removeLink(asker, cible)) {
 					actionDone += this.toString() + " " + asker.getIndex() + " => " + cible.getIndex();
@@ -323,20 +323,21 @@ public class ActionFactory{
 		/** Application de l'action refresh links.
 		 *
 		 */
-		public String applyAction(Entite asker, ArrayList<Entite> cibles) {
-			String actionDone = asker.getIndex() + " a refresh les liens vers: ";
-			ArrayList<Boolean> resultat = asker.refreshLinks(cibles);
-			int count = 0;
-			for (Boolean bool : resultat) {
-				if(bool)
-				{
-					actionDone += "la cible " + cibles.get(count) + ";";
-					count++;
-				}
-			}
-
-			//System.out.println("applied refresh " + count);
-			return actionDone;
+		public String applyAction(Entite asker, Set<Entite> cibles) {
+//			String actionDone = asker.getIndex() + " a refresh les liens vers: ";
+//			ArrayList<Boolean> resultat = asker.refreshLinks(cibles);
+//			int count = 0;
+//			for (Boolean bool : resultat) {
+//				if(bool)
+//				{
+//					actionDone += "la cible " + cibles.get(count) + ";";
+//					count++;
+//				}
+//			}
+//
+//			//System.out.println("applied refresh " + count);
+//			return actionDone;
+			return "NOPE not implement";
 		}
 
 		/** Type de l'action en question.
@@ -395,7 +396,7 @@ public class ActionFactory{
 			super(eh);
 		}
 		@Override
-		public String applyAction(Entite asker, ArrayList<Entite> cibles) {
+		public String applyAction(Entite asker, Set<Entite> cibles) {
 			String actionDone = "";
 			Entite target;
 			ArrayList<Entite> connectedNodeSeveralConnection = new ArrayList<Entite>();

@@ -38,9 +38,9 @@ public class EntiteHandler extends ThreadHandler {
 	private WorkerFactory workerFactory;
 
 	// les entités du réseau
-	protected ArrayList<Entite> entites;
+	protected Set<Entite> entites;
 	// Entite possedant des actions
-	private ArrayList<Entite> entitesActive;
+	private Set<Entite> entitesActive;
 
 	private Hashtable<String, String> memeTranslationReadable;
 
@@ -73,8 +73,8 @@ public class EntiteHandler extends ThreadHandler {
 		memeFactory = memeF;
 		workerFactory = workF;
 
-		entites = new ArrayList<Entite>();
-		entitesActive = new ArrayList<Entite>();
+		entites = new HashSet<>();
+		entitesActive = new HashSet<>(); //new ArrayList<Entite>();
 		entityListeners = new ArrayList<IActionApplyListener>();
 		memeListeners = new ArrayList<IBehaviorTransmissionListener>();
 		memeTranslationReadable = new Hashtable<String, String>();
@@ -177,10 +177,9 @@ public class EntiteHandler extends ThreadHandler {
 		Entite acting;
 		String resultat;
 
-		for (Integer integer : nodeIndex) {
-			acting = entites.get(integer);
-			for (Meme action : acting.getMyMemes()) {
-				resultat = doAction(acting, action);
+		for (Entite entite : entites) {
+			for (Meme action : entite.getMyMemes()) {
+				resultat = doAction(entite, action);
 				if (!resultat.contains("Nope") && !resultat.contains("NOACTION")) {
 					actionDone = true;
 					return actionDone;
@@ -423,10 +422,14 @@ public class EntiteHandler extends ThreadHandler {
 	public void giveMemeToEntiteXFirst(List<Meme> memes) {
 		int i = 0;
 		ArrayList<Entite> entiteContente = new ArrayList<Entite>();
+		Iterator<Entite> entitees = entites.iterator();
+		Entite actual;
+
 		for (Meme meme : memes) {
-			eventMemeChanged(entites.get(i),entites.get(i).addMeme(meme, true), Configurator.MemeActivityPossibility.AjoutMeme.toString());
-			entiteContente.add(entites.get(i));
-			i++;
+			actual = entitees.next();
+			eventMemeChanged(actual,actual.addMeme(meme, true), Configurator.MemeActivityPossibility.AjoutMeme.toString());
+			entiteContente.add(actual);
+
 		}
 
 		if(Configurator.initializeDefaultBehavior) giveFluideMeme(entiteContente);
@@ -509,7 +512,7 @@ public class EntiteHandler extends ThreadHandler {
 	public String checkPropertiesByMemePossession() {
 		Hashtable<String, ArrayList<Entite>> entiteByMemePossession = new Hashtable<String, ArrayList<Entite>>();
 		@SuppressWarnings("unchecked")
-		ArrayList<Entite> toExamine = (ArrayList<Entite>) entites.clone();
+		HashSet<Entite> toExamine = (HashSet<Entite>) ((HashSet<Entite>) entites).clone();
 		ArrayList<Integer> SelfDegrees = new ArrayList<Integer>();
 		ArrayList<Integer> othersDegrees = new ArrayList<Integer>();
 		String memes = "";
@@ -629,10 +632,20 @@ public class EntiteHandler extends ThreadHandler {
 	 * @return
 	 */
 	private Entite SelectActingEntite() {
-			if (entitesActive.size() == 0) {
-				return null;
+		if (entitesActive.size() == 0) {
+			return null;
+		}
+
+		int randomNumber = Toolz.getRandomNumber(entitesActive.size());
+		for (Entite entite : entitesActive) {
+			if(randomNumber == 0){
+				return entite;
 			}
-			return entitesActive.get(Toolz.getRandomNumber(entitesActive.size()));
+			randomNumber--;
+		}
+
+		return null;
+
 	}
 
 	/** Selection d'une action pour l'entité en action rules version
@@ -655,13 +668,13 @@ public class EntiteHandler extends ThreadHandler {
 	private String doAction(Entite movingOne, Meme memeAction) {
 		String actionDone = "";
 		String memeApply = "";
-		ArrayList<Entite> cibles ;
-		ArrayList<Integer> ciblesIndex = new ArrayList<Integer>();
+		Set<Entite> cibles ;
+		Set<Integer> ciblesIndex = new HashSet<>();
 		IAgregator currentFilter = null;
 
 		// Execution d'un meme de l'entite.
 		if (memeAction != null) {
-			cibles = (ArrayList<Entite>) entites.clone();
+			cibles = (HashSet<Entite>) (HashSet<Entite>) ((HashSet<Entite>) entites).clone();
 			cibles.remove(movingOne);
 
 			// Pour chaque attribut sur lesquels on applique des filtres
@@ -673,7 +686,7 @@ public class EntiteHandler extends ThreadHandler {
 				// Pour chaque filtre appliqué a un attribut
 				for (int order = 0; order < memeAction.getAgregators(attribut.toString()).size(); order++) {
 					currentFilter = memeAction.getAgregators(attribut.toString()).get(order);
-					cibles = currentFilter.applyAggregator(movingOne, cibles, attribut);
+					currentFilter.applyAggregator(movingOne, cibles, attribut);
 
 					// Dans le cas ou on veut un mode semi automatique
 					if (Configurator.semiStepProgression && filterOnSemiAuto(memeAction, currentFilter)) {
@@ -742,10 +755,14 @@ public class EntiteHandler extends ThreadHandler {
 	private void giveMemeToEntiteOnlyBasis() {
 		int i = 0;
 		ArrayList<Entite> entiteContente = new ArrayList<Entite>();
+		Iterator<Entite> entitees = entites.iterator();
+		Entite actual;
+
 		for (Meme meme : memeFactory.getMemeAvailable(true)) {
-			entites.get(++i).addMeme(meme, true);
-			eventMemeChanged(entites.get(i), meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-			entiteContente.add(entites.get(i));
+			actual = entitees.next();
+			actual.addMeme(meme, true);
+			eventMemeChanged(actual, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
+			entiteContente.add(actual);
 		}
 
 		if(Configurator.initializeDefaultBehavior) giveFluideMeme(entiteContente);
@@ -772,11 +789,18 @@ public class EntiteHandler extends ThreadHandler {
 		int partSize = entites.size() / nbMeme;
 		int lastIndex = 0;
 		int part = 0;
+		Iterator<Entite> entitees = entites.iterator();
+		Entite actual;
+
+
+
+
 
 		for (Meme meme : memeFactory.getMemeAvailable(false)) {
 			part++;
+			actual = entitees.next();
 			for (int i = lastIndex; i < partSize * part; i++)
-				eventMemeChanged(entites.get(i),entites.get(i).addMeme(meme, true),
+				eventMemeChanged(actual,actual.addMeme(meme, true),
 						Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			lastIndex = partSize * part;
 		}
@@ -811,11 +835,18 @@ public class EntiteHandler extends ThreadHandler {
 		indexOfMemesCombinaisonRecursion = -1;
 		recursive(memesByCategory, memez, keyz, composition, -1);
 
-		for (Integer integer : composition.keySet())
-			for (Meme meme : composition.get(integer))
-				eventMemeChanged(entites.get(integer), entites.get(integer).addMeme(meme, true),
+
+		Iterator<Entite> entitees = entites.iterator();
+		Entite actual;
+
+		for (Integer integer : composition.keySet()) {
+			actual = entitees.next();
+			for (Meme meme : composition.get(integer)) {
+				eventMemeChanged(actual, actual.addMeme(meme, true),
 						Configurator.MemeActivityPossibility.AjoutMeme.toString());
 
+			}
+		}
 	}
 
 	/** Vide car les memes dispo sur la map devraient etre gérés par un IModelParameter
@@ -838,8 +869,12 @@ public class EntiteHandler extends ThreadHandler {
 		ArrayList<Double> swParamSet3 = new ArrayList<Double>(Arrays.asList(0.907489970963927,0.363546615459677,0.458976194767827,0.247873953220028,0.984710568248182));
 		ArrayList<Double> currentParamSet = swParamSet3 ;
 
+		Iterator<Entite> entitees = entites.iterator();
+		Entite actual;
+
+
 		for (Meme meme : memeFactory.getMemeAvailable(true)) {
-			entiteReceptrice = entites.get(i);
+			entiteReceptrice = entitees.next();
 			if(meme.getName().compareTo("Add∞") == 0){
 				meme.probaOfPropagation = currentParamSet.get(i);
 				entiteReceptrice.addMeme(meme, true);
@@ -915,8 +950,7 @@ public class EntiteHandler extends ThreadHandler {
 	/**
 	 *
 	 */
-	private void giveEntiteTargetedColor(Integer actingEntite,
-										 ArrayList<Integer> targeted) {
+	private void giveEntiteTargetedColor(Integer actingEntite, Set<Integer> targeted) {
 		networkConstruct.changeColorClass(actingEntite,targeted);
 	}
 
@@ -1136,28 +1170,28 @@ public class EntiteHandler extends ThreadHandler {
 		return false;
 	}
 
-	/**
-	 * Si un lien existe entre one et two, renvoi true.
-	 *
-	 * @return
-	 */
-	@SuppressWarnings("unused")
-	private boolean isEntiteLinked(int first, int second, boolean directed) {
-		Node one = entites.get(first).getNode();
-		Node two = entites.get(second).getNode();
-		boolean returnValue = false;
-
-		if (one.getConnectedNodes().contains(second))
-			return true;
-		if (!directed)
-			if (two.getConnectedNodes().contains(first))
-				return true;
-
-		if (first == second)
-			return true;
-
-		return returnValue;
-	}
+//	/**
+//	 * Si un lien existe entre one et two, renvoi true.
+//	 *
+//	 * @return
+//	 */
+//	@SuppressWarnings("unused")
+//	private boolean isEntiteLinked(int first, int second, boolean directed) {
+//		Node one = entites.get(first).getNode();
+//		Node two = entites.get(second).getNode();
+//		boolean returnValue = false;
+//
+//		if (one.getConnectedNodes().contains(second))
+//			return true;
+//		if (!directed)
+//			if (two.getConnectedNodes().contains(first))
+//				return true;
+//
+//		if (first == second)
+//			return true;
+//
+//		return returnValue;
+//	}
 
 	/**
 	 * Si un lien existe entre one et two, renvoi true.
@@ -1248,10 +1282,9 @@ public class EntiteHandler extends ThreadHandler {
 		for (Entite entite : entites) {
 			connectedNodeSeveralConnection.clear();
 			if (entite.getDegree() > 1) {
-				for (Integer indexEventuality : entite.getConnectedNodesIndex()) {
-					if (entites.get(indexEventuality).getDegree() > 1) {
-						connectedNodeSeveralConnection.add(entites
-								.get(indexEventuality));
+				for (Entite entite2 : entite.getConnectedEntite()) {
+					if (entite2.getDegree() > 1) {
+						connectedNodeSeveralConnection.add(entite2);
 					}
 				}
 

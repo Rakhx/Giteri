@@ -2,6 +2,7 @@ package giteri.meme.mecanisme;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import giteri.tool.math.Toolz;
@@ -31,10 +32,10 @@ public class AgregatorFactory {
 				return new TheMost();
 			case THELEAST:
 				return new TheLeast();
-			case THEMOSTLINKED:
-				return new TheMostLinked(entiteHandler);
-			case THELEASTLINKED:
-				return new TheLeastLinked(entiteHandler);
+//			case THEMOSTLINKED:
+//				return new TheMostLinked(entiteHandler);
+//			case THELEASTLINKED:
+//				return new TheLeastLinked(entiteHandler);
 			case MINESUP:
 				return new MineSup();
 			case MINEINF:
@@ -60,9 +61,8 @@ public class AgregatorFactory {
 	/** INTERFACE d'attribut
 	 *
 	 */
-	public interface IAgregator
-	{
-		<T extends Comparable<T>> ArrayList<Entite> applyAggregator(Entite asker, ArrayList<Entite> entites, AttributFactory.IAttribut<T> attribut);
+	public interface IAgregator {
+		<T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut);
 
 		AgregatorType getEnumType();
 
@@ -82,18 +82,8 @@ public class AgregatorFactory {
 		 * @param entites la liste d'entité d'ou il faut extraire les connectés
 		 * @return
 		 */
-		protected ArrayList<Entite> getLinked(Entite asker, ArrayList<Entite> entites){
-
-//			entites.retainAll(asker.getConnectedEntite());
-
-			ArrayList<Entite> linked = new ArrayList<Entite>();
-			for (Entite entite : entites) {
-				if(asker.getConnectedNodesIndex().contains(entite.getIndex())){
-					linked.add(entite);
-				}
-			}
-
-			return linked;
+		protected void getLinked(Entite asker, Set<Entite> entites){
+			entites.retainAll(asker.getConnectedEntite());
 		}
 
 		/** Méthode qui renvoi l'ensemble des entitées non linked a l'entité asker
@@ -103,11 +93,9 @@ public class AgregatorFactory {
 		 * @return
 		 */
 		@SuppressWarnings("unchecked")
-		protected ArrayList<Entite> getNotLinked(Entite asker, ArrayList<Entite> entites){
-			ArrayList<Entite> notLinked = (ArrayList<Entite>) entites.clone();
-			notLinked.removeAll(this.getLinked(asker, entites));
-
-			return notLinked;
+		protected void getNotLinked(Entite asker, Set<Entite> entites){
+			this.getLinked(asker, entites);
+			entites.removeAll(entites);
 		}
 	}
 
@@ -120,23 +108,28 @@ public class AgregatorFactory {
 		/** Renvoi, depuis la liste en entrée, et l'attribut, les éléments qui répondent aux critères.
 		 * Ici : ceux qui ont la plus grande valeur sur l'attribut spécifié.
 		 */
-		public <T extends Comparable<T>> ArrayList<Entite> applyAggregator(Entite asker, ArrayList<Entite> entites, AttributFactory.IAttribut<T> attribut) {
-			ArrayList<Entite> resultat = new ArrayList<Entite>();
+		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+
+		    ArrayList<Entite> resultat = new ArrayList<Entite>();
 			Entite bestEntitee = null ;
+			boolean firstStep = true;
 
-			if(entites.size() > 0){
-				resultat.add(entites.get(0));
-				bestEntitee = entites.get(0);
-			}
+			for (Entite entitee : entites)
+			{
+				if(firstStep){
+					resultat.add(entitee);
+					bestEntitee = entitee;
+					firstStep = false;
+					continue;
+				}
 
-			entites.remove(0);
-			for (Entite entitee : entites) {
 				// Si égalité, on rajoute le node a la liste
 				if(attribut.getAttributValue(entitee.getNode()).compareTo(
 						attribut.getAttributValue(bestEntitee.getNode())) == 0)
 				{
 					resultat.add(entitee);
 				}
+				// dans le cas contraire on a un nouveau meilleur, mise a jour des listes etc.
 				if(attribut.getAttributValue(entitee.getNode()).compareTo(
 						attribut.getAttributValue(bestEntitee.getNode())) == 1)
 				{
@@ -146,7 +139,8 @@ public class AgregatorFactory {
 				}
 			}
 
-			return resultat;
+			entites.clear();
+			entites.addAll(resultat);
 		}
 
 		/** ToString de la méthode.
@@ -176,23 +170,26 @@ public class AgregatorFactory {
 		 * les éléments qui répondent au critére suivant : Min sur la
 		 * valeur de l'attribut spécifié
 		 */
-		public <T extends Comparable<T>> ArrayList<Entite> applyAggregator(Entite asker,ArrayList<Entite> entitees, AttributFactory.IAttribut<T> attribut) {
+		public <T extends Comparable<T>> void applyAggregator(Entite asker,Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			ArrayList<Entite> resultat = new ArrayList<Entite>();
 			Entite bestEntitee = null ;
+			boolean firstStep = true;
 
-			if(entitees.size() > 0){
-				resultat.add(entitees.get(0));
-				bestEntitee = entitees.get(0);
-			}
-
-			entitees.remove(0);
-			for (Entite entitee : entitees) {
+			for (Entite entitee : entites)
+			{
+				if(firstStep){
+					resultat.add(entitee);
+					bestEntitee = entitee;
+					firstStep = false;
+					continue;
+				}
 				// Si égalité, on rajoute le node a la liste
 				if(attribut.getAttributValue(entitee.getNode()).compareTo(
 						attribut.getAttributValue(bestEntitee.getNode())) == 0)
 				{
 					resultat.add(entitee);
 				}
+				// Si meilleur résultat en regard du critère
 				if(attribut.getAttributValue(entitee.getNode()).compareTo(
 						attribut.getAttributValue(bestEntitee.getNode())) == -1)
 				{
@@ -202,7 +199,8 @@ public class AgregatorFactory {
 				}
 			}
 
-			return resultat;
+			entites.clear();
+			entites.addAll(resultat);
 		}
 
 		/** ToString de la méthode.
@@ -223,134 +221,134 @@ public class AgregatorFactory {
 		}
 	}
 
-	/** CLASSE Retourne le most depuis la liste d'entité déjé liée au demandeur
-	 *
-	 */
-	public class TheMostLinked implements IAgregator{
+//	/** CLASSE Retourne le most depuis la liste d'entité déjé liée au demandeur
+//	 *
+//	 */
+//	public class TheMostLinked implements IAgregator{
+//
+//		private EntiteHandler entiteHandler ;
+//
+//		public TheMostLinked(EntiteHandler eh){
+//			entiteHandler = eh;
+//		}
+//
+//
+//		/** Retourne le maximum deja linké a l'asker. Entites n'est pas utilisé.
+//		 *
+//		 */
+//		public <T extends Comparable<T>> ArrayList<Entite> applyAggregator(Entite asker,ArrayList<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+//			ArrayList<Entite> resultat = new ArrayList<Entite>();
+//			Entite bestEntite = null ;
+//			Set<Entite> entitees = entiteHandler.getLinkedEntite(asker);
+//			boolean firstStep = true;
+//
+//			if(entitees.size() == 0)
+//				return entites;
+//
+//			for (Entite entite : entitees) {
+//				if(firstStep){
+//					firstStep = false;
+//					resultat.add(entite);
+//					bestEntite = entite;
+//					continue;
+//				}
+//				// Si égalité, on rajoute le node a la liste
+//				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(bestEntite.getNode())) == 0)
+//				{
+//					resultat.add(entite);
+//				}
+//				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(bestEntite.getNode())) == 1)
+//				{
+//					resultat.clear();
+//					resultat.add(entite);
+//					bestEntite = entite;
+//				}
+//			}
+//
+//			return resultat;
+//		}
+//
+//		/** ToString de la méthode.
+//		 *
+//		 */
+//		public String toString(){
+//			return "TheMostLinked";
+//		}
+//
+//
+//		public AgregatorType getEnumType() {
+//			return AgregatorType.THEMOSTLINKED;
+//		}
+//		@Override
+//		public String getFourCharName() {
+//			return "MTLK";
+//		}
+//	}
 
-		private EntiteHandler entiteHandler ;
-
-		public TheMostLinked(EntiteHandler eh){
-			entiteHandler = eh;
-		}
-
-
-		/** Retourne le maximum deja linké a l'asker. Entites n'est pas utilisé.
-		 *
-		 */
-		public <T extends Comparable<T>> ArrayList<Entite> applyAggregator(Entite asker,ArrayList<Entite> entites, AttributFactory.IAttribut<T> attribut) {
-			ArrayList<Entite> resultat = new ArrayList<Entite>();
-			Entite bestEntite = null ;
-			Set<Entite> entitees = entiteHandler.getLinkedEntite(asker);
-			boolean firstStep = true;
-
-			if(entitees.size() == 0)
-				return entites;
-
-			for (Entite entite : entitees) {
-				if(firstStep){
-					firstStep = false;
-					resultat.add(entite);
-					bestEntite = entite;
-					continue;
-				}
-				// Si égalité, on rajoute le node a la liste
-				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(bestEntite.getNode())) == 0)
-				{
-					resultat.add(entite);
-				}
-				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(bestEntite.getNode())) == 1)
-				{
-					resultat.clear();
-					resultat.add(entite);
-					bestEntite = entite;
-				}
-			}
-
-			return resultat;
-		}
-
-		/** ToString de la méthode.
-		 *
-		 */
-		public String toString(){
-			return "TheMostLinked";
-		}
-
-
-		public AgregatorType getEnumType() {
-			return AgregatorType.THEMOSTLINKED;
-		}
-		@Override
-		public String getFourCharName() {
-			return "MTLK";
-		}
-	}
-
-	/** CLASSE renvoi, depuis une liste, l'entité déjé lié au demandeur
-	 * possédant la plus petit valeur de l'attribut. Liste des éléments
-	 * ayant l'attribut au minimum en cas d'égalité.
-	 */
-	public class TheLeastLinked implements IAgregator{
-
-		private EntiteHandler entiteHandler ;
-
-		public TheLeastLinked(EntiteHandler eh){
-			entiteHandler = eh;
-		}
-
-		/** Application de l'aggrégateur.
-		 *
-		 */
-		public <T extends Comparable<T>> ArrayList<Entite> applyAggregator(	Entite asker, ArrayList<Entite> entites, AttributFactory.IAttribut<T> attribut) {
-			ArrayList<Entite> resultat = new ArrayList<Entite>();
-			Entite bestEntite = null ;
-			Set<Entite> entitees = entiteHandler.getLinkedEntite(asker);
-			boolean firstStep = true;
-
-			if(entitees.size() == 0)
-				return entites;
-
-			for (Entite entite : entitees) {
-				if(firstStep){
-					firstStep = false;
-					resultat.add(entite);
-					bestEntite = entite;
-					continue;
-				}
-
-				// Si égalité, on rajoute le node a la liste
-				if(attribut.getAttributValue(entite.getNode()).compareTo(
-						attribut.getAttributValue(bestEntite.getNode())) == 0)
-				{
-					resultat.add(entite);
-				}
-				if(attribut.getAttributValue(entite.getNode()).compareTo(
-						attribut.getAttributValue(bestEntite.getNode())) == -1)
-				{
-					resultat.clear();
-					resultat.add(entite);
-					bestEntite = entite;
-				}
-			}
-
-			return resultat;
-		}
-
-		@Override
-		public AgregatorType getEnumType() {
-			return AgregatorType.THELEASTLINKED;
-		}
-
-		public String toString(){
-			return "TheLeastLinked";
-		}
-
-		@Override
-		public String getFourCharName() {
-			return "LTLK";
-		}
-	}
+//	/** CLASSE renvoi, depuis une liste, l'entité déjé lié au demandeur
+//	 * possédant la plus petit valeur de l'attribut. Liste des éléments
+//	 * ayant l'attribut au minimum en cas d'égalité.
+//	 */
+//	public class TheLeastLinked implements IAgregator{
+//
+//		private EntiteHandler entiteHandler ;
+//
+//		public TheLeastLinked(EntiteHandler eh){
+//			entiteHandler = eh;
+//		}
+//
+//		/** Application de l'aggrégateur.
+//		 *
+//		 */
+//		public <T extends Comparable<T>> ArrayList<Entite> applyAggregator(	Entite asker, ArrayList<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+//			ArrayList<Entite> resultat = new ArrayList<Entite>();
+//			Entite bestEntite = null ;
+//			Set<Entite> entitees = entiteHandler.getLinkedEntite(asker);
+//			boolean firstStep = true;
+//
+//			if(entitees.size() == 0)
+//				return entites;
+//
+//			for (Entite entite : entitees) {
+//				if(firstStep){
+//					firstStep = false;
+//					resultat.add(entite);
+//					bestEntite = entite;
+//					continue;
+//				}
+//
+//				// Si égalité, on rajoute le node a la liste
+//				if(attribut.getAttributValue(entite.getNode()).compareTo(
+//						attribut.getAttributValue(bestEntite.getNode())) == 0)
+//				{
+//					resultat.add(entite);
+//				}
+//				if(attribut.getAttributValue(entite.getNode()).compareTo(
+//						attribut.getAttributValue(bestEntite.getNode())) == -1)
+//				{
+//					resultat.clear();
+//					resultat.add(entite);
+//					bestEntite = entite;
+//				}
+//			}
+//
+//			return resultat;
+//		}
+//
+//		@Override
+//		public AgregatorType getEnumType() {
+//			return AgregatorType.THELEASTLINKED;
+//		}
+//
+//		public String toString(){
+//			return "TheLeastLinked";
+//		}
+//
+//		@Override
+//		public String getFourCharName() {
+//			return "LTLK";
+//		}
+//	}
 
 	/** CLASSE valeur de l'attribut strictement supérieur é celle des entités sélectionnées
 	 *
@@ -358,17 +356,16 @@ public class AgregatorFactory {
 	public class MineSup implements IAgregator{
 
 		@Override
-		public <T extends Comparable<T>> ArrayList<Entite> applyAggregator(Entite asker, ArrayList<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			ArrayList<Entite> resultat = new ArrayList<Entite>();
-			if(entites.size() > 0){
-				for (Entite entite : entites) {
-					if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) == -1){
-						resultat.add(entite);
-					}
+			for (Entite entite : entites) {
+				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) == -1){
+					resultat.add(entite);
 				}
 			}
 
-			return resultat;
+			entites.clear();
+			entites.addAll(resultat);
 		}
 
 		@Override
@@ -391,17 +388,16 @@ public class AgregatorFactory {
 	 */
 	public class MineInf implements IAgregator{
 		@Override
-		public <T extends Comparable<T>> ArrayList<Entite> applyAggregator(Entite asker, ArrayList<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			ArrayList<Entite> resultat = new ArrayList<Entite>();
-			if(entites.size() > 0){
-				for (Entite entite : entites) {
-					if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) == 1){
-						resultat.add(entite);
-					}
+			for (Entite entite : entites) {
+				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) == 1){
+					resultat.add(entite);
 				}
 			}
 
-			return resultat;
+			entites.clear();
+			entites.addAll(resultat);
 		}
 
 		@Override
@@ -424,17 +420,16 @@ public class AgregatorFactory {
 	 */
 	public class MineDif implements IAgregator{
 		@Override
-		public <T extends Comparable<T>> ArrayList<Entite> applyAggregator(	Entite asker, ArrayList<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+		public <T extends Comparable<T>> void applyAggregator(	Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			ArrayList<Entite> resultat = new ArrayList<Entite>();
-			if(entites.size() > 0){
-				for (Entite entite : entites) {
-					if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) != 0 ){
-						resultat.add(entite);
-					}
+			for (Entite entite : entites) {
+				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) != 0 ){
+					resultat.add(entite);
 				}
 			}
 
-			return resultat;
+			entites.clear();
+			entites.addAll(resultat);
 		}
 
 		@Override
@@ -457,17 +452,16 @@ public class AgregatorFactory {
 	 */
 	public class MineEgal implements IAgregator{
 		@Override
-		public <T extends Comparable<T>> ArrayList<Entite> applyAggregator(	Entite asker, ArrayList<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+		public <T extends Comparable<T>> void applyAggregator(	Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			ArrayList<Entite> resultat = new ArrayList<Entite>();
-			if(entites.size() > 0){
-				for (Entite entite : entites) {
-					if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) == 0){
-						resultat.add(entite);
-					}
+			for (Entite entite : entites) {
+				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) == 0){
+					resultat.add(entite);
 				}
 			}
 
-			return resultat;
+			entites.clear();
+			entites.addAll(resultat);
 		}
 
 		@Override
@@ -493,8 +487,8 @@ public class AgregatorFactory {
 		/** Renvoi la liste des éléments non connectés a l'asker
 		 *
 		 */
-		public <T extends Comparable<T>> ArrayList<Entite> applyAggregator(Entite asker, ArrayList<Entite> entites, AttributFactory.IAttribut<T> attribut) {
-			return this.getNotLinked(asker, entites);
+		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+			this.getNotLinked(asker, entites);
 		}
 
 		/**
@@ -523,8 +517,8 @@ public class AgregatorFactory {
 		 * pas connecté au noeud en question.
 		 *
 		 */
-		public <T extends Comparable<T>> ArrayList<Entite> applyAggregator(Entite asker, ArrayList<Entite> entites, AttributFactory.IAttribut<T> attribut) {
-			return this.getLinked(asker, entites);
+		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+			 this.getLinked(asker, entites);
 		}
 
 		/**
@@ -553,14 +547,22 @@ public class AgregatorFactory {
 		/** Application de l'agrégateur.
 		 *
 		 */
-		public <T extends Comparable<T>> ArrayList<Entite> applyAggregator(
-				Entite asker, ArrayList<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			if(entites.size() > 1){
-				ArrayList<Entite> randomElement = new ArrayList<Entite>();
-				randomElement.add(entites.get(Toolz.getRandomNumber(entites.size())));
-				return randomElement;
-			}else
-				return entites;
+				Entite selected = null;
+				int nbStep = Toolz.getRandomNumber(entites.size());
+				for (Entite entite : entites) {
+					if(nbStep ==  0) {
+						selected = entite;
+						break;
+					}
+
+					nbStep--;
+				}
+
+				entites.clear();
+				entites.add(selected);
+			}
 		}
 
 		/** Retourne le type d'agregator.
@@ -580,38 +582,38 @@ public class AgregatorFactory {
 		}
 	}
 
+	/** Renvoi les noeuds liés a une distance de @reach
+	 *
+	 */
 	public class HopWay extends Agregator implements IAgregator {
 
 		public int reach = 2;
 
 		@Override
-		public <T extends Comparable<T>> ArrayList<Entite> applyAggregator(Entite asker, ArrayList<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 
-			ArrayList<Entite> entiteResult = new ArrayList<Entite>();
-			Collections.sort(entites);
+			Set<Entite> entiteResult = new HashSet<>();
 
 			if(Configurator.debugHopAway){
 				String result = "before Entites";
 				for (Entite entite : entites) {
 					result +=":" + entite.getIndex();
 				}
-
 				System.out.println(result);
 			}
 
 			getNeightboor(entiteResult, entites, asker, reach);
-			Collections.sort(entiteResult);
 
 			if(Configurator.debugHopAway){
 				String result = "after Entites:";
 				for (Entite entite : entiteResult) {
 					result +=":" + entite.getIndex();
 				}
-
 				System.out.println(result);
 			}
 
-			return entiteResult;
+			entites.clear();
+			entites.addAll(entiteResult);
 		}
 
 		public String toString(){
@@ -628,16 +630,18 @@ public class AgregatorFactory {
 			return "HA";
 		}
 
-		/**
-		 *
+		/** Fonction récursive qui va chercher les noeuds liés a la @target à une distance de @deepToGo initial.
+		 * 1er appel : on regarde les voisins de @target et les rajoute dans une liste @entiteSearchSpace.
+		 *  l @deepToGo est décrementé, si égal 0 on arrete l'appel récursif.
 		 * @param entiteToReturn
 		 * @param entiteSearchSpace
 		 * @param target
 		 * @param deepToGo
 		 */
-		private void getNeightboor(ArrayList<Entite> entiteToReturn,ArrayList<Entite> entiteSearchSpace, Entite target, int deepToGo){
+		private void getNeightboor(Set<Entite> entiteToReturn, Set<Entite> entiteSearchSpace, Entite target, int deepToGo){
 			deepToGo --;
-			ArrayList<Entite> entiteAccepted = new ArrayList<Entite>();
+			Set<Entite> entiteAccepted = new HashSet<>();
+			// pout chaque voisin connecté a la cible,
 			for (Entite neighboor : target.getConnectedEntite()) {
 				// On regarde si le voisin en question est dans la liste des éléments a regarder
 				if(entiteSearchSpace.contains(neighboor)){

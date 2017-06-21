@@ -231,8 +231,8 @@ public final class Configurator {
 	public enum AgregatorType{
 		THEMOST,
 		THELEAST,
-		THEMOSTLINKED,
-		THELEASTLINKED,
+//		THEMOSTLINKED,
+//		THELEASTLINKED,
 		MINESUP,
 		MINEINF,
 		MINEDIF,

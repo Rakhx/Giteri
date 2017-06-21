@@ -34,7 +34,8 @@ public class Toolz {
 			return lastSetSeed;
 		}
 	}
-	
+
+
 	/** Obtient un integer aléatoire compris entre 0 et max, 
 	 * 0 inclu max exclu
 	 * 
@@ -64,7 +65,20 @@ public class Toolz {
 	public static <T extends Object> T getRandomElement(ArrayList<T> list){
 		return list.size() > 0 ? list.get(Toolz.getRandomNumber(list.size())) : null; 
 	}
-	
+
+	public static <T extends Object> T getRandomElement(Set<T> set){
+		int randomNumber = Toolz.getRandomNumber(set.size());
+//		T resultat = null;
+
+		for (T t : set) {
+			if(randomNumber == 0)
+				return t;
+			randomNumber--;
+		}
+
+		return null;
+	}
+
 	/** retourne la liste réduite à un élément. 
 	 * 
 	 * @param list

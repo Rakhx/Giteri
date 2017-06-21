@@ -6,6 +6,7 @@ import giteri.run.interfaces.Interfaces.StatAndPlotInterface;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Set;
 
 import giteri.tool.math.Toolz;
 import giteri.network.network.Edge;
@@ -327,7 +328,7 @@ public class NetworkConstructor extends ThreadHandler {
 		networkInstance.setColorToEdge(from, to, color);
 	}
 
-	public void changeColorClass( Integer actingEntite ,ArrayList<Integer> nodeToDesignAsTarget){
+	public void changeColorClass( Integer actingEntite , Set<Integer> nodeToDesignAsTarget){
 		drawer.applyTargetColor(networkInstance, actingEntite, nodeToDesignAsTarget);
 	}
 

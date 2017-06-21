@@ -1,6 +1,7 @@
 package giteri.network.networkStuff;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import giteri.run.interfaces.Interfaces.DrawerInterface;
 import giteri.network.network.Network;
@@ -52,7 +53,7 @@ public class DrawerStub implements DrawerInterface{
 
 	@Override
 	public void applyTargetColor(Network net, Integer actingEntite,
-			ArrayList<Integer> nodeToDesignAsTarget) {
+			Set<Integer> nodeToDesignAsTarget) {
 	}
 
 	@Override

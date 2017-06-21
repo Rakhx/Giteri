@@ -3,6 +3,7 @@ package giteri.run.interfaces;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Optional;
+import java.util.Set;
 
 import giteri.network.network.Network;
 import giteri.network.network.NetworkProperties;
@@ -50,7 +51,7 @@ public class Interfaces {
 		public void networkOverview();
 		public void screenshotDisplay(ArrayList<String> rep);
 		
-		public void applyTargetColor(Network net, Integer actingEntite ,ArrayList<Integer> nodeToDesignAsTarget);
+		public void applyTargetColor(Network net, Integer actingEntite ,Set<Integer> nodeToDesignAsTarget);
 		public void resetGoodColor(Network net);
 		
 		
