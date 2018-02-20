@@ -13,13 +13,7 @@ import giteri.meme.entite.Meme;
  */
 public class MemeFactory {
 
-	// Region Properties
-
-	// Liste des types memes existants sur le réseau
-	//ArrayList<String> typeMemeAction;
-
-	// liste des conditions sur les memes existant
-	//ArrayList<String> typeMemeCondition;
+	// region Properties
 
 	// Singleton
 	private static MemeFactory INSTANCE = null;
@@ -37,7 +31,8 @@ public class MemeFactory {
 	private ActionFactory actionFactory;
 	private AgregatorFactory agregatorFactory;
 	private AttributFactory attributFactory;
-	// EndRegion
+
+	// endregion
 
 	// Region SINGLETON Constructor & Co
 	public MemeFactory(ActionFactory actionFac, AgregatorFactory agregatorFac, AttributFactory attributFac ){
@@ -50,14 +45,6 @@ public class MemeFactory {
 		attributFactory = attributFac;
 
 	}
-
-//	public static MemeFactory getInstance()
-//	{
-//		if( INSTANCE == null)
-//			INSTANCE = new MemeFactory();
-//
-//		return INSTANCE;
-//	}
 
 	/**
 	 * Initialisation des types de meme
@@ -191,8 +178,5 @@ public class MemeFactory {
 		}
 		return null;
 	}
-
-//	public String getMemeString
-
 
 }

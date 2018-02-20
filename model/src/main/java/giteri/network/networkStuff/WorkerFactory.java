@@ -39,22 +39,6 @@ public class WorkerFactory {
 		drawer = new DrawerStub();
 	}
 
-//	public WorkerFactory(StatAndPlotInterface statAnd, DrawerInterface dra ) {
-//		calculator = statAnd;
-//		drawer = dra;
-//	}
-
-//	public static WorkerFactory getInstance()
-//	{
-//		if( INSTANCE == null)
-//			if(!Configurator.jarMode)
-//				INSTANCE = new WorkerFactory();
-//			else
-//				INSTANCE = WorkerFactoryJarVersion.getInstance();
-//
-//		return INSTANCE;
-//	}
-
 	public StatAndPlotInterface getCalculator(){
 		return calculator;
 	}

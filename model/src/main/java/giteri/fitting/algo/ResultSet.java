@@ -38,13 +38,6 @@ public class ResultSet {
 	// Identifiant et resultat d'une simulation
 	private Map<Integer, Result> resultById;
 
-//	// Identifiant et paramètre d'une config
-//	private Hashtable<Integer, String> parameterSetById;
-//	// Ensemble des scores calculés pour les différents runs d'une config
-//	private Hashtable<Integer, ArrayList<Double>> scoreById;
-//	// Ensemble des propriétés des réseaux obtenues pour différents run sur une meme config
-//	private Hashtable<Integer, ArrayList<NetworkProperties>> networkPropertiesById;
-
 	// Affichage stuff
 	XYDataset dataset;
 	JFreeChart chart;
@@ -52,8 +45,8 @@ public class ResultSet {
 	boolean debugMode = true;
 //	int lastNetworkId;
 
-	/** Constructeur.
-	 *
+	/**
+	 * Constructeur.
 	 */
 	public ResultSet(WriteNRead wnr) {
 		writeNRead = wnr;
@@ -65,129 +58,16 @@ public class ResultSet {
 
 	// Region Public Method
 
-	// TODO a refaire éventuellement.
-	/** Parcourt tout les réseaux de la liste, et choisi ceux qui ont des valeurs
-	 * extremes ( min ou max) dans au moins l'une des propriétés regardé.
-	 * Va ensuite afficher le résultat.
-	 *
+	/**
+	 * Renvoi les scores en fonction des ID en fonction des distributions
 	 */
-
-	/*public void displayPolar(){
-		int activationCode = 23;
-		// choix de ceux qui ont une valeur min/max dans un domaine
-		Hashtable<Integer, Integer> scoreMax = new Hashtable<>();
-		Hashtable<Integer, Integer> scoreMin = new Hashtable<>();
-		ArrayList<Integer> interestingNetwork = new ArrayList<>();
-
-		int rangParameter = -1;
-		int bitConcerne;
-		double maxValue , minValue , currentValue;
-		NetworkProperties netProp;
-
-		// Initialisation des meilleurs score
-		for (Integer id : parameterSetById.keySet()) {
-			scoreMax.put(id, 0);
-			scoreMin.put(id, 0);
-		}
-
-		// pour chaque type d'attribut
-		for (NetworkAttribType attributTypeLooked : NetworkAttribType.values()) {
-			if(!Configurator.isAttribActived(activationCode, attributTypeLooked))
-				continue;
-
-			maxValue = 0;
-			minValue = Double.MAX_VALUE;
-			rangParameter++;
-			// Association d'un rang a une puissance de 2 dans le int de max et min score.
-			bitConcerne = (int) Math.pow(2, rangParameter);
-
-			// pour chaque réseau.
-			for (Integer id : parameterSetById.keySet()) {
-
-				// propriété du réseau étudié.
-				netProp = networkPropertiesById.get(id).get(0);
-				currentValue = Double.parseDouble(""+netProp.getValue(attributTypeLooked));
-
-				// si on trouve un meilleur score que le score précédent
-				if(currentValue > maxValue) {
-					if(debugMode)
-						System.out.println("Meileur score battu, ancien "+maxValue +" nouveau " + currentValue);
-					// on efface le bit d'activation de meilleur score pour ce param de tous les UUID
-					for (Integer concerne : scoreMax.keySet()) {
-						scoreMax.put(concerne, (scoreMax.get(concerne) | bitConcerne) ^ bitConcerne);
-					}
-					// On place la nouvelle meilleur valeur
-					scoreMax.put(id, scoreMax.get(id) | bitConcerne);
-					maxValue = currentValue;
-				}
-
-				// Si le score est égal a la meilleure valeur, on ajoute cet id au meilleur valeur
-				else if(currentValue == maxValue ){
-					// On ajoute une nouvelle meilleur valeur
-					scoreMax.put(id, scoreMax.get(id) | bitConcerne);
-					if(debugMode)
-						System.out.println("Score egal au meilleur score courant "+ maxValue);
-				}
-
-				// Si le score trouvé est inférieur a la plus petite des valeur min
-				if(currentValue < minValue){
-					if(debugMode)
-						System.out.println("min score battu, ancien "+ minValue +" nouveau " + currentValue);
-					for(Integer concerne : scoreMin.keySet()){
-						scoreMin.put(concerne, (scoreMin.get(concerne) | bitConcerne) ^ bitConcerne);
-					}
-					scoreMin.put(id, scoreMin.get(id) | bitConcerne);
-					minValue = currentValue;
-
-					// si le socre trouvé est égal a la meilleur valeur inférieur
-				}else if(currentValue == minValue){
-					if(debugMode)
-						System.out.println(" EGALITE DE MIN ");
-					scoreMin.put(id, scoreMin.get(id) | bitConcerne);
-				}
-			}
-		}
-
-		// Initialisation des meilleurs score
-		for (Integer id : parameterSetById.keySet()) {
-			if(debugMode){
-				System.out.println("UUID: " + id);
-				System.out.println("Score " + scoreById.get(id));
-				System.out.println("MAX " + scoreMax.get(id));
-				System.out.println("MIN " + scoreMin.get(id));
-				System.out.println("elements " + getConfigAsStringForId(id));
-			}
-
-
-			// Eventuellement rarifier la selection pour avoir moins de réseau qui ressorte.
-			// genre savoir si on veut un min ou un max sur certaines propriétés ou encore
-			// sélectionner les réseaux qui sont les meilleurs sur deux attrib ou qui sont meilleurs
-			// de loin sur cette propriété. ( plus dur )
-			if(scoreMax.get(id) != 0 || scoreMin.get(id) != 0)
-				interestingNetwork.add(id);
-		}
-
-		for (Integer networkId : parameterSetById.keySet()) {
-			System.out.println("_____________________________________");
-			System.out.println(networkPropertiesById.get(networkId).get(0).toString() + " ◊score: "+scoreById.get(networkId));
-		}
-
-		processData(interestingNetwork, 23);
-	}
-	*/
-
-	/** Renvoi les scores en fonction des ID en fonction des distributions
-	 *
-	 *
-	 */
-	public double displayResult(){
+	public double displayResult() {
 		double res = 0;
-		if(Configurator.jarMode){
+		if (Configurator.jarMode) {
 			for (Integer networkId : resultById.keySet())
 				res = resultById.get(networkId).getAvgScore();
-				System.out.println(res);
-		}
-		else {
+			System.out.println(res);
+		} else {
 			for (Integer networkId : resultById.keySet()) {
 				System.out.println("_____________________________________");
 				System.out.println("Configuration " + resultById.get(networkId).getCurrentConfig());
@@ -196,32 +76,11 @@ public class ResultSet {
 		return res;
 	}
 
-	// TODO A virer.
-	/** Retourne a partir du UUID d'un réseau lae string des set de
-	 * parameter ParameterSetOfValue.
-	 *
-	 * @param networkId
-	 * @return
-	 */
-	public String getConfigAsStringForId(Integer networkId){
-		return "";
-//		String resultat="";
-//		if(parameterSetById.containsKey(networkId)){
-//			resultat = parameterSetById.get(networkId);
-//			return resultat;
-//		}
-//		else{
-//			System.err.println("[Result] L'id du network n'est pas trouvable dans les hashtable, ca ne devrait pas arriver");
-//			return "FAIL";
-//		}
-	}
-
-	public void addInitialConfigurationToResult(int networkId, Collection<IModelParameter<?>> parameters){
+	public void addInitialConfigurationToResult(int networkId, Collection<IModelParameter<?>> parameters) {
 		resultById.put(networkId, new Result(parameters));
 	}
 
 	/**
-	 *
 	 * @param networkId
 	 * @param value
 	 */
@@ -233,13 +92,14 @@ public class ResultSet {
 	}
 
 
-	/** Ecriture dans le fichier détaillé des propriétés du dernier network.
+	/**
+	 * Ecriture dans le fichier détaillé des propriétés du dernier network.
 	 * Ecrit ttes les propriétés, et laisse un espace pour leur SD qui sera écrit a la fin de
 	 * chaque RUN
 	 *
 	 * @param rep
 	 */
-	public void writelastTurnOnDetailCSV(File rep, int networkId ,NetworkProperties properties){
+	public void writelastTurnOnDetailCSV(File rep, int networkId, NetworkProperties properties) {
 
 		Result result = resultById.get(networkId);
 
@@ -259,17 +119,19 @@ public class ResultSet {
 		toWrite += ";" + result.getLastScore();
 		toWrite += ";" + -1;
 
-		writeNRead.writeSmallFile2(rep, "NetworkDetailsCSV", Arrays.asList(toWrite)) ;
+		writeNRead.writeSmallFile2(rep, "NetworkDetailsCSV", Arrays.asList(toWrite));
 	}
 
-	/** Va écrire:
+	/**
+	 * Va écrire:
 	 * Pour le CSV normal : les valeurs moyennes et écartType pour les attributs activés
 	 * Pour le CSV détaillé : écartType et moyenne pour chaque attribut
-	 *
 	 */
-	public void writeLastRunOnCSV(File rep,int networkId,List<NetworkProperties> ListOfproperties ,int activator){
-		NetworkProperties netMean = new NetworkProperties(); netMean.createStub();
-		NetworkProperties netSD = new NetworkProperties(); netSD.createStub();
+	public void writeLastRunOnCSV(File rep, int networkId, List<NetworkProperties> ListOfproperties, int activator) {
+		NetworkProperties netMean = new NetworkProperties();
+		netMean.createStub();
+		NetworkProperties netSD = new NetworkProperties();
+		netSD.createStub();
 		Result result = resultById.get(networkId);
 		List<Double> scores = result.getScores();
 		Double[] scoreMeanAndSd;
@@ -298,14 +160,14 @@ public class ResultSet {
 		scoreMeanAndSd = Toolz.getDeviationAndMean(scores);
 		// TODO [WayPoint]- Calcul du score moyenne x ecart type mais pas pris en compte pour le vrai score...
 		toWriteSimple += ";" + scoreMeanAndSd[0] + ";" + scoreMeanAndSd[1] + ";"
-				+ ((scoreMeanAndSd[0]*scoreMeanAndSd[0]) / (scoreMeanAndSd[0] - scoreMeanAndSd[1]) );
+				+ ((scoreMeanAndSd[0] * scoreMeanAndSd[0]) / (scoreMeanAndSd[0] - scoreMeanAndSd[1]));
 
 		toWriteDetailled += ";" + scoreMeanAndSd[0] + ";" + scoreMeanAndSd[1]
-				+ ((scoreMeanAndSd[0]*scoreMeanAndSd[0]) / (scoreMeanAndSd[0] - scoreMeanAndSd[1]) );
+				+ ((scoreMeanAndSd[0] * scoreMeanAndSd[0]) / (scoreMeanAndSd[0] - scoreMeanAndSd[1]));
 
 		// TODO [WayPoint]- Ecriture dans les deux csv, normal et détaillé.
-		writeNRead.writeSmallFile2(rep, "NetworkCSV", Arrays.asList(toWriteSimple)) ;
-		writeNRead.writeSmallFile2(rep, "NetworkDetailsCSV", Arrays.asList(toWriteDetailled)) ;
+		writeNRead.writeSmallFile2(rep, "NetworkCSV", Arrays.asList(toWriteSimple));
+		writeNRead.writeSmallFile2(rep, "NetworkDetailsCSV", Arrays.asList(toWriteDetailled));
 	}
 
 	// EndRegion
@@ -314,21 +176,23 @@ public class ResultSet {
 
 	// REGION SCORE ETC
 
-	/** Va calculer la moyenne et l'écart type de la série de nework properties en parametre
+	/**
+	 * Va calculer la moyenne et l'écart type de la série de nework properties en parametre
 	 * Dans le cas du fichier détaillé, tous les champs ont besoin d'etre calculer.
 	 * Pour l'autre seulement les champs activé
+	 *
 	 * @param networksToRead IN
 	 * @param activationCode IN
-	 * @param netMean passage par "référence" IN/OUT
-	 * @param netSD IN/OUT
+	 * @param netMean        passage par "référence" IN/OUT
+	 * @param netSD          IN/OUT
 	 * @return
 	 */
-	private void updateMeanAndSD(List<NetworkProperties> networksToRead, int activationCode, NetworkProperties netMean, NetworkProperties netSD){
+	private void updateMeanAndSD(List<NetworkProperties> networksToRead, int activationCode, NetworkProperties netMean, NetworkProperties netSD) {
 		netMean.createStub();
 		netSD.createStub();
 
 		NetworkAttribType attribut;
-		ArrayList<Double> netPropValues  = new ArrayList<Double>();
+		ArrayList<Double> netPropValues = new ArrayList<Double>();
 
 		// On regarde sur tous les attributs de réseau ceux qui ont été activé
 		// pour le calcul de distance entre deux réseaux
@@ -337,13 +201,12 @@ public class ResultSet {
 		for (int i = 0; i < Configurator.NetworkAttribType.values().length; i++) {
 			attribut = NetworkAttribType.values()[i];
 			// Si l'attribut est actif
-			if(Configurator.isAttribActived(activationCode, attribut))
-			{
+			if (Configurator.isAttribActived(activationCode, attribut)) {
 				netPropValues.clear();
 				// On regarde tous les réseaux en param
 				for (NetworkProperties netProp : networksToRead)
 					// Ajout de ces valeurs dans une liste
-					netPropValues.add((Double)netProp.getValue(attribut));
+					netPropValues.add((Double) netProp.getValue(attribut));
 
 				// calcul des moyennes et écart type sur les valeurs données dans la liste
 				Double[] avgNSd = Toolz.getDeviationAndMean(netPropValues);
@@ -354,7 +217,7 @@ public class ResultSet {
 			}
 		}
 	}
-
+}
 	// TODO a refaire.
 	/** Va les mettres sous forme string:config du réseau arraydouble : valeur des attributs
 	 * ordonnée
@@ -505,7 +368,114 @@ public class ResultSet {
 //		return tranche * indexConcerne;
 //	}
 
+// TODO a refaire éventuellement.
+/** Parcourt tout les réseaux de la liste, et choisi ceux qui ont des valeurs
+ * extremes ( min ou max) dans au moins l'une des propriétés regardé.
+ * Va ensuite afficher le résultat.
+ *
+ */
+
+	/*public void displayPolar(){
+		int activationCode = 23;
+		// choix de ceux qui ont une valeur min/max dans un domaine
+		Hashtable<Integer, Integer> scoreMax = new Hashtable<>();
+		Hashtable<Integer, Integer> scoreMin = new Hashtable<>();
+		ArrayList<Integer> interestingNetwork = new ArrayList<>();
+
+		int rangParameter = -1;
+		int bitConcerne;
+		double maxValue , minValue , currentValue;
+		NetworkProperties netProp;
+
+		// Initialisation des meilleurs score
+		for (Integer id : parameterSetById.keySet()) {
+			scoreMax.put(id, 0);
+			scoreMin.put(id, 0);
+		}
+
+		// pour chaque type d'attribut
+		for (NetworkAttribType attributTypeLooked : NetworkAttribType.values()) {
+			if(!Configurator.isAttribActived(activationCode, attributTypeLooked))
+				continue;
+
+			maxValue = 0;
+			minValue = Double.MAX_VALUE;
+			rangParameter++;
+			// Association d'un rang a une puissance de 2 dans le int de max et min score.
+			bitConcerne = (int) Math.pow(2, rangParameter);
+
+			// pour chaque réseau.
+			for (Integer id : parameterSetById.keySet()) {
+
+				// propriété du réseau étudié.
+				netProp = networkPropertiesById.get(id).get(0);
+				currentValue = Double.parseDouble(""+netProp.getValue(attributTypeLooked));
+
+				// si on trouve un meilleur score que le score précédent
+				if(currentValue > maxValue) {
+					if(debugMode)
+						System.out.println("Meileur score battu, ancien "+maxValue +" nouveau " + currentValue);
+					// on efface le bit d'activation de meilleur score pour ce param de tous les UUID
+					for (Integer concerne : scoreMax.keySet()) {
+						scoreMax.put(concerne, (scoreMax.get(concerne) | bitConcerne) ^ bitConcerne);
+					}
+					// On place la nouvelle meilleur valeur
+					scoreMax.put(id, scoreMax.get(id) | bitConcerne);
+					maxValue = currentValue;
+				}
+
+				// Si le score est égal a la meilleure valeur, on ajoute cet id au meilleur valeur
+				else if(currentValue == maxValue ){
+					// On ajoute une nouvelle meilleur valeur
+					scoreMax.put(id, scoreMax.get(id) | bitConcerne);
+					if(debugMode)
+						System.out.println("Score egal au meilleur score courant "+ maxValue);
+				}
+
+				// Si le score trouvé est inférieur a la plus petite des valeur min
+				if(currentValue < minValue){
+					if(debugMode)
+						System.out.println("min score battu, ancien "+ minValue +" nouveau " + currentValue);
+					for(Integer concerne : scoreMin.keySet()){
+						scoreMin.put(concerne, (scoreMin.get(concerne) | bitConcerne) ^ bitConcerne);
+					}
+					scoreMin.put(id, scoreMin.get(id) | bitConcerne);
+					minValue = currentValue;
+
+					// si le socre trouvé est égal a la meilleur valeur inférieur
+				}else if(currentValue == minValue){
+					if(debugMode)
+						System.out.println(" EGALITE DE MIN ");
+					scoreMin.put(id, scoreMin.get(id) | bitConcerne);
+				}
+			}
+		}
+
+		// Initialisation des meilleurs score
+		for (Integer id : parameterSetById.keySet()) {
+			if(debugMode){
+				System.out.println("UUID: " + id);
+				System.out.println("Score " + scoreById.get(id));
+				System.out.println("MAX " + scoreMax.get(id));
+				System.out.println("MIN " + scoreMin.get(id));
+				System.out.println("elements " + getConfigAsStringForId(id));
+			}
 
 
-	// EndRegion
-}
+			// Eventuellement rarifier la selection pour avoir moins de réseau qui ressorte.
+			// genre savoir si on veut un min ou un max sur certaines propriétés ou encore
+			// sélectionner les réseaux qui sont les meilleurs sur deux attrib ou qui sont meilleurs
+			// de loin sur cette propriété. ( plus dur )
+			if(scoreMax.get(id) != 0 || scoreMin.get(id) != 0)
+				interestingNetwork.add(id);
+		}
+
+		for (Integer networkId : parameterSetById.keySet()) {
+			System.out.println("_____________________________________");
+			System.out.println(networkPropertiesById.get(networkId).get(0).toString() + " ◊score: "+scoreById.get(networkId));
+		}
+
+		processData(interestingNetwork, 23);
+	}
+
+	// EndRegion */

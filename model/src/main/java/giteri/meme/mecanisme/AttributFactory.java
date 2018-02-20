@@ -9,17 +9,9 @@ import giteri.meme.entite.EntiteHandler;
  *
  */
 public class AttributFactory {
-	// Region singleton Stuff
 	private static AttributFactory instance = null;
 	public AttributFactory(){
-
 	}
-//	public static AttributFactory getInstance(){
-//		if(instance == null)
-//			instance = new AttributFactory();
-//		return instance;
-//	}
-	// EndRegion
 
 	/** Renvoi l'attribut concerné
 	 *
@@ -70,7 +62,7 @@ public class AttributFactory {
 
 	/** Attribut de nom degré, de type comparable Integer
 	 *
-	 * @param <T> Integer
+	 * @param <> Integer
 	 */
 	public class Degree implements IAttribut<Integer>{
 

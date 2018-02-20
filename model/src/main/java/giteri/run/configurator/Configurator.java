@@ -71,7 +71,7 @@ public final class Configurator {
 	public static boolean debugOpenMole = false;
 
 	// Configuration Modèle
-	public static final boolean lotOfNodes = true;
+	public static final boolean lotOfNodes = false;
 	public final static boolean autoRedoActionIfNoAction = false;
 	public final static int nbNode = lotOfNodes? 1000 : 100;
 	public static int refreshInfoRate = 500;

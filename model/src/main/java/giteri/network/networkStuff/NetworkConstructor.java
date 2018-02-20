@@ -26,8 +26,6 @@ public class NetworkConstructor extends ThreadHandler {
 
 
 	DrawerInterface drawer;
-//	StatAndPlotInterface computer;
-
 	final Network networkInstance;
 	INetworkRepresentations networkRepresentation;
 	NetworkProperties networkInstanceProperties;
@@ -47,9 +45,6 @@ public class NetworkConstructor extends ThreadHandler {
 	public NetworkConstructor() {
 		if(Configurator.DisplayLogdebugInstantiation)
 			System.out.println("Network Constructor Initialisation");
-
-//		this.drawer = worker.getDrawer();
-//		this.computer = worker.getCalculator();
 
 		networkInstance = new Network();
 		generateNodes();
@@ -98,18 +93,6 @@ public class NetworkConstructor extends ThreadHandler {
 		}
 		else
 			suspend();
-
-		// ICI
-		// Fonction de mise a jour des propriétés du réseau
-		// this.computeNetworkProperties()
-		// Avoir un object synchronized a lire et écrire
-		// this.suspend();
-
-//		cmp++;
-//		if(cmp % Configurator.refreshInfoRate == 0){
-//			displayNetworkInfo();
-//			cmp = 0;
-//		}
 	}
 
 	/** Renvoi, après avoir fait le lien entre entités et noeud du réseau,

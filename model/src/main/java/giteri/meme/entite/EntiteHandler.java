@@ -1170,29 +1170,6 @@ public class EntiteHandler extends ThreadHandler {
 		return false;
 	}
 
-//	/**
-//	 * Si un lien existe entre one et two, renvoi true.
-//	 *
-//	 * @return
-//	 */
-//	@SuppressWarnings("unused")
-//	private boolean isEntiteLinked(int first, int second, boolean directed) {
-//		Node one = entites.get(first).getNode();
-//		Node two = entites.get(second).getNode();
-//		boolean returnValue = false;
-//
-//		if (one.getConnectedNodes().contains(second))
-//			return true;
-//		if (!directed)
-//			if (two.getConnectedNodes().contains(first))
-//				return true;
-//
-//		if (first == second)
-//			return true;
-//
-//		return returnValue;
-//	}
-
 	/**
 	 * Si un lien existe entre one et two, renvoi true.
 	 * @return
@@ -1312,20 +1289,6 @@ public class EntiteHandler extends ThreadHandler {
 
 		return memes;
 	}
-//	/** Applique directement depuis une hash d'index // comportements les
-//	 * behavior au nodes spécifiées par la key.
-//	 *
-//	 * @param affectation
-//	 */
-//	public void giveMemeToEntite(Hashtable<Integer, ArrayList<Meme>> affectation) {
-//		for (Integer index : affectation.keySet()) {
-//			if (entites.size() > index)
-//				for (Meme memeToAdd : affectation.get(index)) {
-//					eventMemeChanged(entites.get(index), entites.get(index).addMeme(memeToAdd, true),
-//							Configurator.MemeActivityPossibility.AjoutMeme.toString());
-//				}
-//		}
-//	}
 
 	/** Selection d'une action, en excluant la derniere choisi si il s'agit d'un
 	 * ajout ou d'un retrait, et mis a jour de la dernier action faite.

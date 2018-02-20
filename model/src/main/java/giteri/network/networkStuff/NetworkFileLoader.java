@@ -18,6 +18,7 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.jfree.chart.ChartUtilities;
 
+
 import giteri.tool.other.WriteNRead;
 import giteri.run.configurator.Configurator;
 import giteri.meme.entite.EntiteHandler;

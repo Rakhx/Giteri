@@ -14,15 +14,13 @@ public class Network {
 	private ArrayList<Node> nodes;
 	private ArrayList<Edge> edges;
 	private Integer updateId;
-//	public Object lockNodeAndEdge;
-	
+
 	// EndRegion
 
 	// Constructeur
 	public Network(){
 		nodes = new ArrayList<Node>();
 		edges = new ArrayList<Edge>();
-//		lockNodeAndEdge = new Object();
 		updateId = -1;
 	}
 
@@ -31,7 +29,6 @@ public class Network {
 	 */
 	public synchronized void resetStat(){
 		edges.clear();
-//		updateId = -1;
 	}
 	
 	// Region Public methods

@@ -16,8 +16,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -77,12 +79,11 @@ import giteri.meme.event.IBehaviorTransmissionListener;
 @SuppressWarnings("unused")
 public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransmissionListener, IView {
 
-	// Region properties
 
+	//<editor-fold desc="Properties">
 
 	// worker Factory
 	NetworkConstructor networkConstructor;
-
 
 	// action , attribut, aggrgator factory
 	MemeFactory memeFactory;
@@ -185,20 +186,14 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	// Séries de donnée pour l'affichage des graphiques
 	XYSeries seriesDegreeDistribution;
 	XYSeries seriesDensity;
-
 	XYSeries seriesDensityOverProba;
-
 	ArrayList<XYSeries> seriesAppliances ;
 	XYSeriesCollection datasetDensityOverProba ;
-//	XYSeries seriesAppliance1;
-//	XYSeries seriesAppliance2;
-//	XYSeries seriesAppliance3;
 
 	// Chart de l'IHM
 	private JFreeChart chart;
 	private JFreeChart chartDensity;
 	private JFreeChart chartDensityOverProba;
-
 	int compteurSerieDensity = 0;
 
 	// Liste des memes disponibles dans le programme / meme sélectionné pour le
@@ -209,13 +204,16 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	// à voir avec le reste
 	private ModelController modelController;
 	int compteurAction;
+
+	private DecimalFormatSymbols otherSymbols;
+
 	private DecimalFormat decimal;
 	private NetworkProperties netProp;
 
 	private static int rmv = 1;
 	private static int add = 1;
+	//</editor-fold>
 
-	// EndRegion
 
 	public IHM(ModelController modelParam,
 			   NetworkConstructor networkConstructor,
@@ -254,7 +252,8 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		this.setSelectedMeme(existingMeme);
 		compteurAction = 0;
 		densityMaxValue = 0.0;
-		decimal = new DecimalFormat();
+		otherSymbols = new DecimalFormatSymbols(Locale.getDefault());
+		decimal = new DecimalFormat("",otherSymbols);
 		decimal.setMaximumFractionDigits(4); // arrondi à 2 chiffres apres la
 		// virgules
 		decimal.setMinimumFractionDigits(3);
@@ -268,7 +267,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		Init();
 	}
 
-	// Region de fonction public, diverses
+	// region de fonction public, diverses
 
 	/**
 	 * Réinitilise l'interface aux valeurs de base, entre les steps de
@@ -408,12 +407,11 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		return this.chartDensityOverProba;
 	}
 
-	// EndRegion
+	// endregion
 
 	// EndRegion
 
-	// Region Concernant la création d'éléments d'interface
-
+	//<editor-fold desc="Création des éléments de IHM">
 	/**
 	 * Initialisation des champs et de la fenetre openGL
 	 *
@@ -1457,8 +1455,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		jpPaneTwo.setEnabled(jpPaneTwo.isEnabled());
 		btReset.setEnabled(btReset.isEnabled());
 	}
-
-	// EndRegion
+	//</editor-fold>
 
 	// Region concernant la mise a jour des informations de l'interface
 

@@ -16,13 +16,7 @@ public class ActionFactory{
 	// Region singleton Stuff
 	private EntiteHandler entiteHandler;
 
-	public ActionFactory(){
-
-	}
-
-//	public ActionFactory(EntiteHandler eh){
-//		entiteHandler = eh;
-//	}
+	public ActionFactory(){ }
 
 	public void setEntiteHandler(EntiteHandler eh){
 		entiteHandler = eh;
@@ -324,19 +318,7 @@ public class ActionFactory{
 		 *
 		 */
 		public String applyAction(Entite asker, Set<Entite> cibles) {
-//			String actionDone = asker.getIndex() + " a refresh les liens vers: ";
-//			ArrayList<Boolean> resultat = asker.refreshLinks(cibles);
-//			int count = 0;
-//			for (Boolean bool : resultat) {
-//				if(bool)
-//				{
-//					actionDone += "la cible " + cibles.get(count) + ";";
-//					count++;
-//				}
-//			}
-//
-//			//System.out.println("applied refresh " + count);
-//			return actionDone;
+
 			return "NOPE not implement";
 		}
 
@@ -361,37 +343,7 @@ public class ActionFactory{
 	}
 
 	private class ActionPurifyLinks  extends ActionBase implements IAction {
-		//
-//		@Override
-//		public String applyAction(Entite asker, ArrayList<Entite> cibles) {
-//			String actionDone = "";
-//
-//			if(Toolz.rollDice(.2)){
-//				Entite target;
-//				ArrayList<Entite> connectedNodeSeveralConnection = new ArrayList<Entite>();
-//
-//				for (Entite entite : cibles)
-//				{
-//					connectedNodeSeveralConnection.clear();
-//					if(entite.getDegree() > 1){
-//						for (Integer indexEventuality : entite.getConnectedNodesIndex()) {
-//	//						if(cibles.get(indexEventuality).getDegree() > 1){
-//							if(EntiteHandler.getInstance().getEntityCorresponding(indexEventuality).getDegree() > 1){
-//	//							connectedNodeSeveralConnection.add(cibles.get(indexEventuality));
-//								connectedNodeSeveralConnection.add(EntiteHandler.getInstance().getEntityCorresponding(indexEventuality));
-//							}
-//						}
-//
-//						if(connectedNodeSeveralConnection.size() > 1){
-//							target = connectedNodeSeveralConnection.get(Toolz.getRandomNumber(connectedNodeSeveralConnection.size()));
-//							applier.removeLink(entite, target);
-//							actionDone += this.toString() + " " + entite.getIndex() + " => " + target.getIndex();
-//						}
-//					}
-//				}
-//			}
-//			return actionDone;
-//		}
+
 		public ActionPurifyLinks(EntiteHandler eh){
 			super(eh);
 		}
@@ -407,9 +359,7 @@ public class ActionFactory{
 					connectedNodeSeveralConnection.clear();
 					if(entite.getDegree() > 1){
 						for (Integer indexEventuality : entite.getConnectedNodesIndex()) {
-							//						if(cibles.get(indexEventuality).getDegree() > 1){
 							if(applier.getEntityCorresponding(indexEventuality).getDegree() > 1){
-								//							connectedNodeSeveralConnection.add(cibles.get(indexEventuality));
 								connectedNodeSeveralConnection.add(applier.getEntityCorresponding(indexEventuality));
 							}
 						}

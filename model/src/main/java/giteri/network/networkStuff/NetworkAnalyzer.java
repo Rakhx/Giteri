@@ -38,17 +38,6 @@ public class NetworkAnalyzer extends StatAndPlotGeneric {
 		super(entiteHandler, memeFactory, networkConstructor, wnr, nfl,wf);
 	}
 
-//	/** Fourni l'unique instance de la classe.
-//	 *
-//	 */
-//	public static NetworkAnalyzer getInstance()
-//	{
-//		if( INSTANCE == null)
-//			INSTANCE = new NetworkAnalyzer();
-//
-//		return INSTANCE;
-//	}
-
 	// EndRegion
 
 	// Region Public methods
