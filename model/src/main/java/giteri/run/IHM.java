@@ -252,7 +252,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		this.setSelectedMeme(existingMeme);
 		compteurAction = 0;
 		densityMaxValue = 0.0;
-		otherSymbols = new DecimalFormatSymbols(Locale.getDefault());
+		otherSymbols = new DecimalFormatSymbols(Locale.US);
 		decimal = new DecimalFormat("",otherSymbols);
 		decimal.setMaximumFractionDigits(4); // arrondi à 2 chiffres apres la
 		// virgules
