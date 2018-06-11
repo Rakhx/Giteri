@@ -30,7 +30,7 @@ import static giteri.run.configurator.Configurator.debugOpenMole;
 /** Classe d'initialisation des objets nécessaires à l'utilisation du framework
  * Commun à ttes les classes.
  */
-public class Initializer {
+public class InitializerV2 {
     public static Double initialize(Configurator.EnumLauncher launcher, File fileInput, ArrayList<Double> probaBehavior) {
 
         // A instancier dans les if. a lancer dans tous les cas a la fin?

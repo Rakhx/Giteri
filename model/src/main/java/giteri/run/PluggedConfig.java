@@ -9,6 +9,23 @@ import java.util.List;
  */
 public class PluggedConfig implements Serializable {
 
+    //region prop
+
+
+    public int lbla;
+    //endregion
+
+
+
+    public void mainFunction(){
+
+
+
+    }
+
+
+
+
     // Choix des actions disponibles et de leur probas
     // Fonction avec
     public void selectActions(int code, List<Double> probas){

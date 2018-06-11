@@ -30,10 +30,16 @@ import giteri.tool.other.WriteNRead;
 
 public final class Main {
 
+	/** Lorsque l'appli est lancée depuis l'IDE.
+	 *
+	 * @param args
+	 */
 	public static void main(String[] args)  {
 		Initializer.initialize(Configurator.EnumLauncher.ihm, null, null);
 	}
 } 
+
+//region osef
 
 /** Fermeture de fenetre.
  *  
@@ -63,3 +69,5 @@ class JSlideListener implements ChangeListener
 	    }		
 	}
 }
+
+//endregion

@@ -158,7 +158,6 @@ public interface IModelParameter<T> {
 	/** CLASSE ABSTRAITE qui définit T comme un double. Défini un champs step pour connaitre la
 	 * vitesse de progression de minvalue a maxvalue
 	 *
-	 *
 	 */
 	public abstract class AbstractDoubleParameter extends AbstractModelParameter<Double>{
 		Double step;
