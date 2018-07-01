@@ -5,7 +5,7 @@ import giteri.run.configurator.Configurator;
 import giteri.meme.entite.EntiteHandler;
 
 /**
- * Attribut factory
+ * Attribut factory. Classe d'attibrut d'un noeud.
  *
  */
 public class AttributFactory {

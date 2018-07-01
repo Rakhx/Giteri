@@ -18,6 +18,9 @@ public class MemeFactory {
 	// Singleton
 	private static MemeFactory INSTANCE = null;
 
+	// Liste de meme qui existe. Pas nécessairement utilisé.
+	private ArrayList<Meme> memeExisting;
+
 	// Liste des memes disponibles sur la map
 	private ArrayList<Meme> memeAvailable;
 
@@ -39,7 +42,7 @@ public class MemeFactory {
 		memeAvailable = new ArrayList<Meme>();
 		memeAvailableFitting = new ArrayList<Meme>();
 		kvMemeIndexColor = new Hashtable<Meme, Integer>();
-		Init();
+		//Init();
 		actionFactory = actionFac;
 		agregatorFactory = agregatorFac;
 		attributFactory = attributFac;
@@ -54,7 +57,7 @@ public class MemeFactory {
 
 	// EndRegion
 
-	/** Permet de créer un meme et de l'ajouter a la liste des memes dispos sur la map.
+	/** Permet de créer un meme et de l'ajouter à la liste des memes dispos sur la map.
 	 *
 	 * @param name
 	 * @param actionAsked
@@ -101,6 +104,14 @@ public class MemeFactory {
 		return toReturn;
 	}
 
+	/** Va définir les memes disponibles sur la simu courante.
+	 *
+	 */
+	public void setMemeAvailableForSimulation(){
+
+	}
+
+
 	/** Permet de retourner l'ensemble des memes disponibles pour la map
 	 *
 	 * @return l'ensemble des memes qui ont été généré par la factory.
@@ -138,11 +149,11 @@ public class MemeFactory {
 		String resultat = "";
 		if(forFitting)
 			for (Meme meme : memeAvailableFitting) {
-				resultat += ":" + meme.toFourCharString() + "%" + meme.probaOfPropagation;
+				resultat += ":" + meme.toFourCharString() + "%" + meme.getProbaOfPropagation();
 			}
 		else
 			for (Meme meme : memeAvailable) {
-				resultat += ":" + meme.toFourCharString() + "%" + meme.probaOfPropagation;
+				resultat += ":" + meme.toFourCharString() + "%" + meme.getProbaOfPropagation();
 			}
 
 		return resultat;

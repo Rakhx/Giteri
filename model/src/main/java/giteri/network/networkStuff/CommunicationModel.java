@@ -152,6 +152,7 @@ public class CommunicationModel implements IModel {
 		path.add(screen);
 		wf.getDrawer().screenshotDisplay(path);
 		path.remove(screen);
+
 	}
 
 	/** Lorsqu'on fait du step by step pour le fitting.
@@ -227,6 +228,7 @@ public class CommunicationModel implements IModel {
 		eh.OneStep();
 //		nc.OneStep();
 	}
+
 
 	// EndRegion
 

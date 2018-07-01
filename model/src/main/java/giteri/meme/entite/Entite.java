@@ -12,13 +12,14 @@ import giteri.meme.mecanisme.ActionFactory.IAction;
 import giteri.network.network.Node;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.ActionType;
+import giteri.tool.objects.ObjectRef;
 
 /** Entitée conteneur des memes.
  *
  */
 public class Entite implements Comparable<Entite>{
 
-	// Region Properties
+	//region Properties
 
 	EntiteHandler eh;
 
@@ -36,7 +37,7 @@ public class Entite implements Comparable<Entite>{
 	// défini sur quels memes l'entité fourni le réseau
 	Set<IAction> breederOn;
 
-	// EndRegion
+	//endregion
 
 	/** Constructeur d'entite.
 	 *
@@ -48,7 +49,7 @@ public class Entite implements Comparable<Entite>{
 //		connectedTimeNodes = new Hashtable<Entite, Integer>();
 		connectedNodes = new HashSet<>();
 		breederOn = new HashSet<>();
-		probaLearning = Configurator.getProbaLearning(Configurator.probaEntiteLearning * - 1);
+		//probaLearning = Configurator.getProbaLearning(Configurator.probaEntiteLearning * - 1);
 		eh = ent;
 	}
 
@@ -58,11 +59,15 @@ public class Entite implements Comparable<Entite>{
 	@SuppressWarnings("unchecked")
 	public void defineRulesProbaLimited(){
 		double roll;
-		ArrayList<Meme> myMemeCloned = (ArrayList<Meme>) getMyMemes().clone();
-		intervalOfSelection.clear();
+//		ArrayList<Meme> myMemeCloned = new ArrayList<>(getMyMemes());
+//		intervalOfSelection.clear();
+//		for (Meme meme : myMemeCloned) {
+//			roll = 1.0 / myMemeCloned.size();
+//			intervalOfSelection.put(meme, roll);
+//		}
 
-		for (Meme meme : myMemeCloned) {
-			roll = 1.0 / myMemeCloned.size();
+		for (Meme meme : getMyMemes()) {
+			roll = 1.0 / getMyMemes().size();
 			intervalOfSelection.put(meme, roll);
 		}
 	}
@@ -73,21 +78,75 @@ public class Entite implements Comparable<Entite>{
 	 * @Return le meme qui a été remplacé s'il existe,
 	 */
 	public Boolean receiveMeme(Meme subMeme){
-		boolean ok;
-		// Concernant l'usage de la proba propre au meme
-		try {
-			if(subMeme.probaOfPropagation == 0){
-			}
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
-		}
+//		// Concernant l'usage de la proba propre au meme
+//		try {
+//			if(subMeme.probaOfPropagation == 0){
+//			}
+//		} catch (Exception e) {
+//			System.err.println(e.getMessage());
+//		}
 		// (!A || B) && (!A || C) <=> !A && !A || !A && C || !A && B || B && C
-		ok = !Configurator.useMemePropagationProba || Toolz.rollDice(subMeme.probaOfPropagation);
+		boolean ok = !Configurator.useMemePropagationProba || Toolz.rollDice(subMeme.getProbaOfPropagation());
 		ok = ok && (!Configurator.useEntitePropagationProba || Toolz.rollDice(this.probaLearning));
-		if(ok)
-			return addOrReplaceSlotVersion(subMeme);
+		if(ok) {
+			return addOrReplaceFast(subMeme);
+		}
 		return false;
 	}
+
+	/** ajoute un meme ou remplace un meme déja existant,
+	 * avec une notion de slot pour meme d'ajout et meme de retrait.
+	 *
+	 * @param memeToAdd
+	 * @return true si le meme a bien été remplacé.
+	 */
+	public boolean addOrReplaceFast(Meme memeToAdd){
+		boolean okToBeAdded = true;
+		boolean needToBeReplaced = false;
+		boolean addedOrReplaced = false;
+		Meme memeReplaced = null;
+
+		// On parcourt les meme existant et regarde si un meme de la meme catégorie existe
+		for (Meme possededMeme : getMyMemes())
+			if(memeToAdd.getAction().toString() == possededMeme.getAction().toString())
+			{
+				// si oui, il faudra que la configuration l'autorise pour remplacer l'ancien meme.
+				memeReplaced = possededMeme;
+				needToBeReplaced = true;
+				break;
+			}
+
+		// Si il faut remplacer un meme pour pouvoir ajouter le meme courant,
+		// et que la configuration l'accepte, on supprime l'ancien meme.
+		if(needToBeReplaced && Configurator.memeCanBeReplaceByCategory)
+		{
+			// Un meme devrait etre remplacé, et la configuration l'autorise, masi on vérifie
+			// que l'entité n'est pas un breeder de ce comportement
+			if(Configurator.fixedSlotForBreeder && !breederOn.isEmpty()){
+				for (IAction iAction : breederOn) {
+					// Dans le cas ou il s'agit d'une action de breeder, donc à ne pas remplacer
+					if(memeReplaced.getAction().toString() == iAction.toString()){
+						return false;
+					} } }
+			synchronized(myMemes){
+				myMemes.remove(memeReplaced);
+			}
+			eh.eventMemeChanged(this, memeReplaced, Configurator.MemeActivityPossibility.RetraitMeme.toString());
+			okToBeAdded = true;
+		}
+
+		// Dans le cas ou on ajoute effectivement le nouveau meme,
+		// soit apres remplacement soit parceque ca a été directement possible.
+		if(okToBeAdded)
+		{
+			addedOrReplaced = true;
+			addMeme(memeToAdd);
+			myMemes.sort(null);
+		}
+
+		return addedOrReplaced;
+	}
+
 
 	/** ajoute un meme ou remplace un meme déja existant,
 	 * avec une notion de slot pour meme d'ajout et meme de retrait.
@@ -99,7 +158,6 @@ public class Entite implements Comparable<Entite>{
 		boolean okToBeAdded = true;
 		boolean addedOrReplaced = false;
 		Meme memeToReplace = null ;
-
 
 		// On parcourt les meme existant et regarde si un meme de la meme catégorie existe
 		for (Meme possededMeme : getMyMemes())
@@ -120,7 +178,7 @@ public class Entite implements Comparable<Entite>{
 			// que l'entité n'est pas un breeder de ce comportement
 			if(Configurator.fixedSlotForBreeder && !breederOn.isEmpty()){
 				for (IAction iAction : breederOn) {
-					// Dans le cas ou il s'agit d'une action de breeder, donc a ne pas remplacer
+					// Dans le cas ou il s'agit d'une action de breeder, donc à ne pas remplacer
 					if(memeToReplace.getAction().toString() == iAction.toString()){
 						return false;
 					}
@@ -339,7 +397,6 @@ public class Entite implements Comparable<Entite>{
 		defineRulesProbaLimited();
 		return e;
 	}
-
 
 	public Meme addMeme(Meme e){
 		synchronized(myMemes){

@@ -18,8 +18,7 @@ public class Meme implements Serializable, Comparable<Meme>{
 	IAction action;
 	ArrayList<IAttribut> attributs;
 	Hashtable<String, Hashtable<Integer, IAgregator>> KVAttributLAgregator;
-
-	public double probaOfPropagation;
+	private double probaOfPropagation;
 	String name;
 
 	/** Constructeur avec une bardée de paramètre.
@@ -131,5 +130,17 @@ public class Meme implements Serializable, Comparable<Meme>{
 		this.KVAttributLAgregator = target.KVAttributLAgregator;
 		this.probaOfPropagation = target.probaOfPropagation;
 		this.name = target.name;
+	}
+
+
+	public double getProbaOfPropagation() {
+		return probaOfPropagation;
+	}
+
+	public void setProbaOfPropagation(double probaOfPropagation) {
+		if(probaOfPropagation >= 0 && probaOfPropagation <= 1 )
+			this.probaOfPropagation = probaOfPropagation;
+		else
+			this.probaOfPropagation = 0;
 	}
 }

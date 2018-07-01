@@ -1,6 +1,8 @@
 package giteri.run;
 
 
+import giteri.run.configurator.Configurator;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -10,6 +12,14 @@ import java.util.List;
 public class PluggedConfig implements Serializable {
 
     //region prop
+
+    // Concernant la facon dont les memes se propagent
+
+    // Définit si le meme appliqué se propage ou si on choisit un meme au hasard possédé par le porteur
+    boolean randomMemePassed;
+
+
+
 
 
     public int lbla;
@@ -36,7 +46,10 @@ public class PluggedConfig implements Serializable {
 
     // choix sur les termes de propagations
     public void selectPropagation(){
-        // A voir avec le fichier Configurator
+
+//        Configurator.usePropagationSecondGeneration
+
+
 
     }
 

@@ -39,8 +39,9 @@ public class EntiteHandler extends ThreadHandler {
 
 	// les entités du réseau
 	protected Set<Entite> entites;
+
 	// Entite possedant des actions
-	private Set<Entite> entitesActive;
+	private ArrayList<Entite> entitesActive;
 
 	private Hashtable<String, String> memeTranslationReadable;
 
@@ -61,7 +62,7 @@ public class EntiteHandler extends ThreadHandler {
 
 	// endregion
 
-	/** Constructeur sans param. Crée les memes de la map
+	/** Constructeur sans param.
 	 *
 	 */
 	public EntiteHandler(NetworkConstructor networkC, MemeFactory memeF, WorkerFactory workF) {
@@ -74,7 +75,7 @@ public class EntiteHandler extends ThreadHandler {
 		workerFactory = workF;
 
 		entites = new HashSet<>();
-		entitesActive = new HashSet<>(); //new ArrayList<Entite>();
+		entitesActive = new ArrayList<>(); //new ArrayList<Entite>();
 		entityListeners = new ArrayList<IActionApplyListener>();
 		memeListeners = new ArrayList<IBehaviorTransmissionListener>();
 		memeTranslationReadable = new Hashtable<String, String>();
@@ -585,26 +586,26 @@ public class EntiteHandler extends ThreadHandler {
 			Meme memeAction;
 
 			// Choix d'une entitée au hasard
-			Entite movingOne = SelectActingEntite();
+			Entite entiteActing = selectActingEntiteV2();
 			if(Configurator.debugEntiteHandler)
-				System.out.println("[EH.runEntite]- entite choisie " + movingOne.getIndex());
+				System.out.println("[EH.runEntite]- entite choisie " + entiteActing.getIndex());
 
-			if (movingOne == null) {
+			if (entiteActing == null) {
 				if(Configurator.debugEntiteHandler) System.err.println("[EH.runEntite()]- Aucune entité sélectionnée");
 				return ("Nope pas d'entite prete");
 			}
 
 			// CHOIX DE L'ACTION POUR CETTE ENTITE
-			memeAction = actionSelectionRulesVersion(movingOne);
+			memeAction = actionSelectionRulesVersion(entiteActing);
 			if(Configurator.debugEntiteHandler)
 				System.out.println("[EH.runEntite]- action choisie " + memeAction.toFourCharString());
 
 			// APPLICATION DE L'ACTION
-			rez = doAction(movingOne, memeAction);
+			rez = doAction(entiteActing, memeAction);
 			if(Configurator.debugEntiteHandler)
 				System.out.println("[EH.runEntite]- resultat de l'action" + rez);
 
-
+			// Concernant affichage et debugage
 			if (Configurator.displayLogRatioTryAddOverTryRmv) {
 				if (memeAction != null)
 					if (memeAction.action.getActionType() == ActionType.AJOUTLIEN)
@@ -627,6 +628,16 @@ public class EntiteHandler extends ThreadHandler {
 		return rez;
 	}
 
+	/** Choix aléatoire d'une entité qui va faire une action.
+	 * Prise parmis la liste des entités possédant des actions.
+	 *
+	 * @return
+	 */
+	private Entite selectActingEntiteV2(){
+		return entitesActive.size() == 0? null :
+				entitesActive.get(Toolz.getRandomNumber(entitesActive.size()));
+	}
+
 	/** Selection de l'entité qui va agir
 	 *
 	 * @return
@@ -645,7 +656,6 @@ public class EntiteHandler extends ThreadHandler {
 		}
 
 		return null;
-
 	}
 
 	/** Selection d'une action pour l'entité en action rules version
@@ -657,6 +667,80 @@ public class EntiteHandler extends ThreadHandler {
 		return movingOne.chooseAction();
 	}
 
+	/** Application de l'action de l'entité
+	 *
+	 * @param movingOne
+	 * @param memeAction
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	private String doActionFast(Entite movingOne, Meme memeAction) {
+		String actionDone = "";
+		String memeApply = "";
+		Set<Entite> cibles ;
+		Set<Integer> ciblesIndex = new HashSet<>();
+		IAgregator currentFilter = null;
+
+		// Execution d'un meme de l'entite.
+		if (memeAction != null) {
+			cibles = new HashSet<>(entites);
+			cibles.remove(movingOne);
+
+			// Pour chaque attribut sur lesquels on applique des filtres
+			for (IAttribut<Integer> attribut : memeAction.getAttributs()) {
+
+				// Pour chaque filtre appliqué a un attribut
+				for (int order = 0; order < memeAction.getAgregators(attribut.toString()).size(); order++) {
+					currentFilter = memeAction.getAgregators(attribut.toString()).get(order);
+					currentFilter.applyAggregator(movingOne, cibles, attribut);
+				}
+			}
+
+			// Le dernier filtre appliqué est tjrs un random() unitaire
+			if (cibles.size() == 1) {
+				actionDone += memeAction.getAction().applyAction(movingOne, cibles);
+
+				// PROPAGATION du meme
+				//if (Configurator.usePropagation)
+				for (Entite entite : cibles)
+				{
+					// Transmission de l'un de behavior possédé par l'acting.
+					if (Configurator.usePropagationSecondGeneration)
+					{
+						Meme selectedMeme = movingOne.chooseAction();
+						if(selectedMeme == null){
+							if(Configurator.debugEntiteHandler) System.out.println("Meme joué par " + movingOne.toString() + " disparu");
+						}
+						memeApply = selectedMeme.toFourCharString();
+						if (entite.receiveMeme(selectedMeme))
+							eventMemeChanged(entite, selectedMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
+					}
+					else
+						// ou transmission du behavior appliqué
+						if (entite.receiveMeme(memeAction))
+							eventMemeChanged(entite, memeAction,Configurator.MemeActivityPossibility.AjoutMeme.toString());
+				}
+
+				// evenement d'application d'une action
+				// 2- A revoir niveau timing
+				eventActionDone(movingOne, memeAction, actionDone);
+
+			} else {
+				if (cibles.size() > 1) System.err.println("Plusieurs cibles pour une action, pas normal");
+
+				actionDone = "Nope, Entite " + movingOne.getIndex()
+						+ " Aucune(ou trop de) cible pour l'action" + memeAction.toFourCharString();
+				eventActionDone(movingOne, null, "NOTARGET " + actionDone);
+			}
+		} else {
+			actionDone = "Nope, Entite " + movingOne.getIndex() + " Liste d'action vide ou aucune action sélectionnée";
+			eventActionDone(movingOne, null, "NOACTION");}
+
+		if (Configurator.displayLogMemeApplication)
+			System.out.println(memeApply + " " + actionDone);
+
+		return actionDone;
+	}
 
 	/** Application de l'action de l'entité
 	 *
@@ -674,7 +758,7 @@ public class EntiteHandler extends ThreadHandler {
 
 		// Execution d'un meme de l'entite.
 		if (memeAction != null) {
-			cibles = (HashSet<Entite>) (HashSet<Entite>) ((HashSet<Entite>) entites).clone();
+			cibles = (HashSet<Entite>) ((HashSet<Entite>) entites).clone();
 			cibles.remove(movingOne);
 
 			// Pour chaque attribut sur lesquels on applique des filtres
@@ -709,14 +793,16 @@ public class EntiteHandler extends ThreadHandler {
 					for (Entite entite : cibles)
 					{
 						// Transmission de l'un de behavior possédé par l'acting.
-						if (Configurator.usePropagationSecondGeneration) {
+						if (Configurator.usePropagationSecondGeneration)
+						{
 							Meme selectedMeme = movingOne.chooseAction();
 							if(selectedMeme == null){
 								if(Configurator.debugEntiteHandler) System.out.println("Meme joué par " + movingOne.toString() + " disparu");
 							}
 							memeApply = selectedMeme.toFourCharString();
 							if (entite.receiveMeme(selectedMeme))
-								eventMemeChanged(entite, selectedMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());}
+								eventMemeChanged(entite, selectedMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
+						}
 						else
 							// ou transmission du behavior appliqué
 						if (entite.receiveMeme(memeAction))
@@ -863,40 +949,36 @@ public class EntiteHandler extends ThreadHandler {
 		int i = 0;
 		Hashtable<Integer, ArrayList<Meme>> behaviors = new Hashtable<Integer, ArrayList<Meme>>();
 		Hashtable<String, Integer> nameKVindex = new Hashtable<String, Integer>();
-		Meme toAdd;
 		Entite entiteReceptrice;
 		ArrayList<Double> scParamSet = new ArrayList<Double>(Arrays.asList(0.788335449538696,0.373092466173732,0.292052580578804,0.438882845642738,0.109153677952613));
 		ArrayList<Double> swParamSet3 = new ArrayList<Double>(Arrays.asList(0.907489970963927,0.363546615459677,0.458976194767827,0.247873953220028,0.984710568248182));
-		ArrayList<Double> currentParamSet = swParamSet3 ;
-
+		ArrayList<Double> currentParamSet = swParamSet3;
 		Iterator<Entite> entitees = entites.iterator();
-		Entite actual;
-
 
 		for (Meme meme : memeFactory.getMemeAvailable(true)) {
 			entiteReceptrice = entitees.next();
 			if(meme.getName().compareTo("Add∞") == 0){
-				meme.probaOfPropagation = currentParamSet.get(i);
+				meme.setProbaOfPropagation(currentParamSet.get(i));
 				entiteReceptrice.addMeme(meme, true);
 				eventMemeChanged(entiteReceptrice, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			}
 			if(meme.getName().compareTo("AddØ-Hop") == 0){
-				meme.probaOfPropagation = currentParamSet.get(i);
+				meme.setProbaOfPropagation(currentParamSet.get(i));
 				entiteReceptrice.addMeme(meme, true);
 				eventMemeChanged(entiteReceptrice, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			}
 			if(meme.getName().compareTo("Rmv-") == 0){
-				meme.probaOfPropagation = currentParamSet.get(i);
+				meme.setProbaOfPropagation(currentParamSet.get(i));
 				entiteReceptrice.addMeme(meme, true);
 				eventMemeChanged(entiteReceptrice, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			}
 			if(meme.getName().compareTo("Rmv+") == 0){
-				meme.probaOfPropagation = currentParamSet.get(i);
+				meme.setProbaOfPropagation(currentParamSet.get(i));
 				entiteReceptrice.addMeme(meme, true);
 				eventMemeChanged(entiteReceptrice, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			}
 			if(meme.getName().compareTo("RmvØ-2hop") == 0){
-				meme.probaOfPropagation = currentParamSet.get(i);
+				meme.setProbaOfPropagation(currentParamSet.get(i));
 				entiteReceptrice.addMeme(meme, true);
 				eventMemeChanged(entiteReceptrice, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			}
@@ -973,7 +1055,7 @@ public class EntiteHandler extends ThreadHandler {
 		}
 	}
 
-	// TODO REFACTORING Mieux positionner l'appel a cette fonction? Plutot que dans l'instanciation d'EH? Paramétriser
+	// TODO REFACTORING Mieux positionner l'appel à cette fonction? Plutot que dans l'instanciation d'EH? Paramétriser
 	// Ca pour en faire un truc joli depuis un main qui l'appel ( Jar etc )
 	/**
 	 * Génère les memes disponibles sur la map, qui seront associés ou non aux

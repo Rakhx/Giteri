@@ -35,7 +35,7 @@ public final class Main {
 	 * @param args
 	 */
 	public static void main(String[] args)  {
-		Initializer.initialize(Configurator.EnumLauncher.ihm, null, null);
+		InitializerV2.initialize(Configurator.EnumLauncher.ihm, null, null);
 	}
 } 
 

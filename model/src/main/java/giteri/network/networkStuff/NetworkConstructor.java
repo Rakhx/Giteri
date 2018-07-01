@@ -18,18 +18,17 @@ import giteri.run.ThreadHandler;
 import giteri.run.configurator.Configurator;
 
 /** Prend en entrée un fichier texte, ou génére aléatoirement un réseau.
- * Va instancier des Node & Edge 
+ * Va instancier des Node & Edge
+ * Mécanisme qui ne met pas à jour systématiquement la représentation du réseau a chaque action des entités.
+ * Le fera si une demande de calcul ou d'affichage est faite.
  */
 public class NetworkConstructor extends ThreadHandler {
 
 	// Region Properties
-
-
 	DrawerInterface drawer;
 	final Network networkInstance;
 	INetworkRepresentations networkRepresentation;
 	NetworkProperties networkInstanceProperties;
-
 
 
 	boolean onceOneStep = true;

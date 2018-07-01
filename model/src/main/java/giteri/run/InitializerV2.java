@@ -29,12 +29,17 @@ import static giteri.run.configurator.Configurator.debugOpenMole;
 
 /** Classe d'initialisation des objets nécessaires à l'utilisation du framework
  * Commun à ttes les classes.
+ * idée :
+ *                                                          -> IHM ( Set des meme utilisés, des probas =)
+ * Lancement de l'appli => initializer ( Meme existant )    -> JAR ( lecture des memes et probas )
+ *
  */
 public class InitializerV2 {
     public static Double initialize(Configurator.EnumLauncher launcher, File fileInput, ArrayList<Double> probaBehavior) {
 
         // A instancier dans les if. a lancer dans tous les cas a la fin?
         Runnable willBeRun;
+        boolean ihmLauncher = launcher == Configurator.EnumLauncher.ihm;
 
         if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.jarOpenMole){
 //            Configurator.methodOfGeneration = Configurator.MemeDistributionType.FollowingFitting;
@@ -63,47 +68,27 @@ public class InitializerV2 {
         ActionFactory actionFactory = new ActionFactory() ;
         MemeFactory memeFactory = new MemeFactory(actionFactory, agregatorFactory, attributFactory);
 
-        WorkerFactory workerFactory = null ;
-        WorkerFactoryJarVersion workerFactoryJar = null;
-
-        if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.testProvider
-                || launcher == Configurator.EnumLauncher.jarOpenMole){
-            workerFactoryJar = new WorkerFactoryJarVersion();
-        }else if(launcher == Configurator.EnumLauncher.ihm ){
-            workerFactory = new WorkerFactory();
-        }
+        WorkerFactory workerFactory = new WorkerFactory();
 
         NetworkConstructor networkConstructor = new NetworkConstructor();
-        EntiteHandler entiteHandler  = null;
-
-        if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.testProvider
-                || launcher == Configurator.EnumLauncher.jarOpenMole){
-            entiteHandler = new EntiteHandler(networkConstructor, memeFactory, workerFactoryJar);
-        }else if(launcher == Configurator.EnumLauncher.ihm ){
-            entiteHandler = new EntiteHandler(networkConstructor, memeFactory, workerFactory);
-        }
+        EntiteHandler entiteHandler = new EntiteHandler(networkConstructor, memeFactory, workerFactory);
 
         NetworkFileLoader networkFileLoader = new NetworkFileLoader(memeFactory, writeNRead);
         DrawerGraphStream drawerGraphStream = null;
         StatAndPlotJarVersion stat = null;
 
-        if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.testProvider
-                || launcher == Configurator.EnumLauncher.jarOpenMole){
-             stat = new StatAndPlotJarVersion(entiteHandler, memeFactory, networkConstructor,
-                     writeNRead, networkFileLoader, workerFactoryJar);
-        }else if(launcher == Configurator.EnumLauncher.ihm){
-            drawerGraphStream =  new DrawerGraphStream(entiteHandler, memeFactory,
-                    networkConstructor, writeNRead, networkFileLoader, workerFactory);
+        if(!ihmLauncher) {
+             stat = new StatAndPlotJarVersion(entiteHandler, memeFactory, networkConstructor, writeNRead, networkFileLoader, workerFactory);
+        }else{
+            drawerGraphStream =  new DrawerGraphStream(entiteHandler, memeFactory, networkConstructor, writeNRead, networkFileLoader, workerFactory);
         }
-
         // Communication model
         CommunicationModel communicationModel = null;
 
-        if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.testProvider
-                || launcher == Configurator.EnumLauncher.jarOpenMole) {
-            communicationModel = new CommunicationModel(entiteHandler, networkConstructor, networkFileLoader, workerFactoryJar, stat);
+        if(!ihmLauncher) {
+            communicationModel = new CommunicationModel(entiteHandler, networkConstructor, networkFileLoader, workerFactory, stat);
             stat.setCommunicationModel(communicationModel);
-        }else if (launcher == Configurator.EnumLauncher.ihm) {
+        }else {
             communicationModel = new CommunicationModel(entiteHandler, networkConstructor, networkFileLoader, workerFactory, drawerGraphStream);
             drawerGraphStream.setCommunicationModel(communicationModel);
         }
@@ -112,11 +97,10 @@ public class InitializerV2 {
         actionFactory.setEntiteHandler(entiteHandler);
         agregatorFactory.setEntiteHandler(entiteHandler);
 
-        if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.testProvider
-                || launcher == Configurator.EnumLauncher.jarOpenMole)  {
-            workerFactoryJar.setNecessary(stat, new DrawerStub());
+        if(!ihmLauncher)  {
+            workerFactory.setNecessary(stat, new DrawerStub());
             networkConstructor.setDrawer(new DrawerStub());
-        }else if (launcher == Configurator.EnumLauncher.ihm) {
+        }else {
             workerFactory.setNecessary(drawerGraphStream, drawerGraphStream);
             networkConstructor.setDrawer(drawerGraphStream);
         }
@@ -133,8 +117,8 @@ public class InitializerV2 {
             vControl.setView((Interfaces.IView)fenetre);
             entiteHandler.initialisation();
 
-            entiteHandler.addMemeListener(workerFactoryJar.getDrawer());
-            entiteHandler.addEntityListener(workerFactoryJar.getCalculator());
+            entiteHandler.addMemeListener(workerFactory.getDrawer());
+            entiteHandler.addEntityListener(workerFactory.getCalculator());
 
             Interfaces.IReadNetwork nl = mControl.getReader();
             try {

@@ -52,7 +52,7 @@ public class JarVersion {
 		run(inputFile, probaBehavior.get(0),probaBehavior.get(1),probaBehavior.get(2),probaBehavior.get(3),probaBehavior.get(4));
     }
 
-    /** Run lancé depuis openMole, ou depuis le main.
+    /** Run lancé depuis openMole, ou depuis le main@JarVersion.
      *
      * @param fileInput
      * @param param1

@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import giteri.tool.math.Toolz;
 
 public final class Configurator {
+
+	public static boolean fastMode;
+
+
 	// La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
 	// depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent
 	// cette configuration initiale

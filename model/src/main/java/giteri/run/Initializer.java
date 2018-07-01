@@ -151,6 +151,7 @@ public class Initializer {
             entiteHandler.start();
 
             return stat.fitNetwork(0);
+
         }else if (launcher == Configurator.EnumLauncher.ihm) {
             entiteHandler.initialisation();
 
@@ -180,7 +181,6 @@ public class Initializer {
                 e1.printStackTrace();
             }
 
-
             fenetre.setVisible(true);
             entiteHandler.setIHMController(vControl);
 
@@ -207,6 +207,9 @@ public class Initializer {
 
             return 0.;
         }
+
+        // region testProvider
+
         else if(launcher == Configurator.EnumLauncher.testProvider){
             entiteHandler.initialisation();
 
@@ -233,6 +236,8 @@ public class Initializer {
 
             return 0.;
         }
+
+        // endregion
 
         return 0.;
     }
