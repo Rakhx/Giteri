@@ -588,7 +588,7 @@ public interface IModelParameter<T> {
 		public void apply() {
 			ArrayList<Meme> memeo = new ArrayList<>();
 			for (Meme meme : value.keySet()) {
-				meme.probaOfPropagation = value.get(meme).value;
+				meme.setProbaOfPropagation( value.get(meme).value);
 				memeo.add(meme);
 			}
 			if(Configurator.doNotApplyMemeAvailability) {
