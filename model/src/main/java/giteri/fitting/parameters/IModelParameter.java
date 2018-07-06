@@ -160,6 +160,7 @@ public interface IModelParameter<T> {
 	 *
 	 */
 	public abstract class AbstractDoubleParameter extends AbstractModelParameter<Double>{
+
 		Double step;
 		// détermine l'arrondi fait lors de l'ajout de step a la valeur courante.
 		// Problème de précision autrement ( 0.400000001 au lieu de 0.4 )
@@ -598,7 +599,6 @@ public interface IModelParameter<T> {
 
 		/** Va choisir un meme aléatoirement et lui donner une valeur de propagation
 		 * aléatoire.
-		 *
 		 */
 		public void gotoRandom(){
 			Meme meme = new ArrayList<Meme>(value.keySet()).get(Toolz.getRandomNumber(value.keySet().size()));

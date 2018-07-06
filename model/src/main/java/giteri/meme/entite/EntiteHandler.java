@@ -572,7 +572,7 @@ public class EntiteHandler extends ThreadHandler {
 
 	// endregion
 
-	// Region PRIVATE
+	//region PRIVATE
 
 	// region Action
 
@@ -1100,18 +1100,19 @@ public class EntiteHandler extends ThreadHandler {
 		agregators.put(0, theMost);
 		agregators.put(1, notLinked);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add∞", .4, add, attributs, KVAttributAgregator, true);
+		memeFactory.registerMemeAction("Add∞", 1, add, attributs, KVAttributAgregator, true ,true);
 
 		agregators.clear();
 		agregators.put(0, hopAWay);
 		agregators.put(1, notLinked);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("AddØ-Hop", .4, add, attributs,KVAttributAgregator, true);
+		memeFactory.registerMemeAction("AddØ-Hop", 1, add, attributs,KVAttributAgregator, true ,true);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, random);
-//		addRandom = memeFactory.registerMemeAction("AddØ",0.,add, attributs, KVAttributAgregator, true);
+//		addRandom =
+		memeFactory.registerMemeAction("AddØ",.1, add, attributs, KVAttributAgregator, true, true);
 
 		agregators.clear();
 		agregators.put(0, linked);
@@ -1122,18 +1123,18 @@ public class EntiteHandler extends ThreadHandler {
 		agregators.put(0, linked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv-", .4, remove, attributs, KVAttributAgregator, true);
+		memeFactory.registerMemeAction("Rmv-", .1, remove, attributs, KVAttributAgregator, true ,true);
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, mineInf);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv+", .4, remove, attributs, KVAttributAgregator, true);
+		memeFactory.registerMemeAction("Rmv+", .1, remove, attributs, KVAttributAgregator, true ,true);
 
 		agregators.clear();
 		agregators.put(0, hopAWay);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("RmvØ-2hop", .4, remove, attributs, KVAttributAgregator, true);
+		memeFactory.registerMemeAction("RmvØ-2hop", .2, remove, attributs, KVAttributAgregator,true ,true);
 
 		agregators.clear();
 		// memeFactory.getMemeAction("Puri",0,puri, attributs,

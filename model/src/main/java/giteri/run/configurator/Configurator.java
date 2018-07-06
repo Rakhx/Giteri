@@ -256,7 +256,8 @@ public final class Configurator {
 		COPIERANDOMMEME,
 		EVAPORATION,
 		REFRESH,
-		PURIFY
+		PURIFY,
+		ANYTHING
 	}
 
 	/** degree
@@ -264,6 +265,12 @@ public final class Configurator {
 	 */
 	public enum AttributType {
 		DEGREE
+	}
+
+	public enum MemeList {
+		EXISTING,
+		ONMAP,
+		FITTING
 	}
 
 	@SuppressWarnings("unused")
