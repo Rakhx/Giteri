@@ -59,7 +59,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public int nbRepetitionByConfig;
 
 	// Nombre d'action réalisé par les entités avant une collecte de données
-	public int nbActionByStep = 500;
+	public int nbActionByStep = Configurator.nbNode * 5; //500;
 	public int boucleExterneSize = 30;
 
 	// EndRegion
@@ -158,7 +158,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		kvOverallNumberOfActionDone = new Hashtable<>();
 		cfqMemeAppliancePropOnFitting = new CircularFifoQueue<>(nbEltCircularQFitting);
 		cfqMemeApplianceNumberOnFitting = new CircularFifoQueue<>(nbEltCircularQFitting);
-		memesAvailables = memeFactory.getMemeAvailable(false);
+		memesAvailables = memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING);
+				//memeFactory.getMemeAvailable(false);
 		currentNetProperties.createStub();
 	}
 
@@ -230,7 +231,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		resultNetwork.addInitialConfigurationToResult(numeroRun, explorator.getModelParameterSet());
 	}
 
-	/** Nouveau run, donc reset du network et pas de chg sur la config. courante du modèle.
+	/** Nouvelle répétition d'une configuration donnée.
+	 *
 	 *
 	 */
 	public void newTurn(){
@@ -495,20 +497,21 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 * @return
 	 */
 	public boolean continuFittingSimpleVersion(){
-		boolean debug = Configurator.debugFittingClass && !Configurator.jarMode;
-		boolean fastDebug = Configurator.debugFittingClassFast && !Configurator.jarMode;
+		//boolean debug = Configurator.debugFittingClass && !Configurator.jarMode;
+		//boolean fastDebug = Configurator.debugFittingClassFast && !Configurator.jarMode;
+		// boolean canStillApplyAction;
+		//String resume = "";
+		//double scoreEcartDensite = 100;
 		boolean oneMoreTurn = true;
-		boolean canStillApplyAction;
-		ObjectRef<String> message = new ObjectRef<String>("");
-		String resume = "";
-		double scoreEcartDensite = 100;
+		ObjectRef<String> message = new ObjectRef<>("");
 
-		oneMoreTurn = readingActionCanContinue(message);
-
-		nbCallContinuOnThisConfig++;
 		if(nbCallContinuOnThisConfig % nbActionThreshRising == 0)
 			riseThresholdValue(nbCallContinuOnThisConfig);
 
+		// On vérifie s'il est tjrs possible de faire des actions.
+		oneMoreTurn = readingActionCanContinue(message);
+
+		nbCallContinuOnThisConfig++;
 		if(nbCallContinuOnThisConfig / nbActionThreshRising > 4)
 			oneMoreTurn &= false;
 

@@ -216,7 +216,7 @@ public class Initializer {
             Hashtable<Meme, IModelParameter.GenericBooleanParameter> memeDispo = new Hashtable<Meme,IModelParameter.GenericBooleanParameter>();
             Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<Integer, IModelParameter<?>>();
 
-            for (Meme meme : memeFactory.getMemeAvailable(true)) {
+            for (Meme meme : memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING)) {
                 memeDispo.put(meme, new IModelParameter.GenericBooleanParameter());
             }
 
@@ -225,7 +225,9 @@ public class Initializer {
 //            providers.put(1,memeProvider);
 
 
-            IModelParameter.MemeDiffusionProba memeDiffu = new IModelParameter.MemeDiffusionProba(memeFactory.getMemeAvailable(true), new IModelParameter.GenericDoubleParameter(.0,.0,.2,.1));
+            IModelParameter.MemeDiffusionProba memeDiffu =
+                    new IModelParameter.MemeDiffusionProba(memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING),
+                            new IModelParameter.GenericDoubleParameter(.0,.0,.2,.1));
             memeDiffu.setEntiteHandler(entiteHandler);
             providers.put(0,memeDiffu);
 

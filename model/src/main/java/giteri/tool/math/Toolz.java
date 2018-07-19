@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.*;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
@@ -19,7 +20,7 @@ public class Toolz {
 	static Long lastSetSeed = new Random().nextLong();
 	static Random rand = new Random(lastSetSeed); 
 	static final boolean meLikeDebug = false;
-	
+	DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.getDefault());
 	final static Charset ENCODING = StandardCharsets.UTF_8;
 	
 	public static void setSeed(long seed){
@@ -474,8 +475,10 @@ public class Toolz {
 	 * @return
 	 */
 	public static double getNumberCutToPrecision(Double input, int precision){
-		
-		DecimalFormat decimal = new DecimalFormat();
+		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.getDefault());
+		otherSymbols.setDecimalSeparator('.');
+		// otherSymbols.setGroupingSeparator('.');
+		DecimalFormat decimal = new DecimalFormat("", otherSymbols);
 		decimal.setMaximumFractionDigits(precision); // arrondi à 2 chiffres apres la virgules
 		decimal.setMinimumFractionDigits(0);
 		try{

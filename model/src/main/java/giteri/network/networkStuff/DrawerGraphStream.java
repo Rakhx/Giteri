@@ -214,6 +214,8 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 			fs.writeAll(graph, writeNRead.createAndGetDirFromString(rep).getAbsolutePath());
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (Exception e2){
+			e2.printStackTrace();
 		}
 	}
 
@@ -273,7 +275,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 		String attribut = "";
 //		int index = -1;
 		Integer officialIndex;
-		int nbMemeSolo = memeFactory.getMemeAvailable(false).size();
+		int nbMemeSolo = memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING).size();
 		nbMemeSolo--;
 		int aAppliquer;
 

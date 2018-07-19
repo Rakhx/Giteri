@@ -81,11 +81,12 @@ public interface IModelParameter<T> {
 	 *
 	 * @param <T>
 	 */
-	public abstract class AbstractModelParameter<T> implements IModelParameter<T>{
+	 abstract class AbstractModelParameter<T> implements IModelParameter<T>{
 		T value;
 		T minValue;
 		T maxValue;
 		EntiteHandler entiteHandler;
+		boolean hasChanged = true;
 
 		public void setEntiteHandler(EntiteHandler eh){
 			entiteHandler = eh;
@@ -136,7 +137,7 @@ public interface IModelParameter<T> {
 		}
 
 		public void setValue(boolean valeur){
-			value = valeur? true : false;
+			value = valeur;
 		}
 
 		public List<String> getPossibleValue(){
@@ -226,7 +227,7 @@ public interface IModelParameter<T> {
 	 *
 	 * @param <P>
 	 */
-	public abstract class AbstractMapParameter<P extends AbstractModelParameter<?>> extends AbstractModelParameter<Hashtable<Meme, P>>{
+	 abstract class AbstractMapParameter<P extends AbstractModelParameter<?>> extends AbstractModelParameter<Hashtable<Meme, P>>{
 		public void gotoMinValue(){
 			for (Meme meme : value.keySet()) {
 				value.get(meme).gotoMinValue();
@@ -343,15 +344,13 @@ public interface IModelParameter<T> {
 
 			return result;
 		}
-
 	}
 
-	/** CLASSE de boolean générique, utilisé pour etre utilisé dans la map<Meme, P>. Donc pas d'apply en tant que tel.
+	/** CLASSE de boolean générique, utilisé dans la map<Meme, P>. Donc pas d'apply en tant que tel.
 	 *
 	 * @author Felix
-	 *
 	 */
-	public class GenericBooleanParameter extends AbstractBooleanParameter{
+	 class GenericBooleanParameter extends AbstractBooleanParameter{
 
 		public GenericBooleanParameter(){}
 
@@ -363,13 +362,11 @@ public interface IModelParameter<T> {
 		public void apply() {
 			// Rien, normal.
 		}
-
 	}
 
 	/** CLASSE de double générique, utilisé dans la map<Meme, P>. pas d'apply définit.
 	 *
 	 * @author Felix
-	 *
 	 */
 	public class GenericDoubleParameter extends AbstractDoubleParameter {
 		public GenericDoubleParameter(){}
@@ -385,7 +382,6 @@ public interface IModelParameter<T> {
 			this.step = step;
 			if(step < 1)
 				precision = (int)Math.log10(((double)1) / step) + 1;
-
 		}
 
 		@Override
@@ -401,11 +397,11 @@ public interface IModelParameter<T> {
 
 	/** CLASSE qui permet de définir si un meme est présent sur la map ou non au début de la
 	 * simulation. Ne prends pas de set<Meme> mais juste un meme et l'applique successivement
-	 * a la liste de node disponible.
+	 * à la liste de node disponible.
 	 *
 	 *
 	 */
-	public class MemeAvailability extends AbstractMapParameter<GenericBooleanParameter> {
+	 class MemeAvailability extends AbstractMapParameter<GenericBooleanParameter> {
 		private List<Meme> activatedMeme = new ArrayList<>();
 		private List<IMemeAvailableListener> memeAvailableListeners = new ArrayList<>();
 
@@ -421,7 +417,6 @@ public interface IModelParameter<T> {
 			}
 		}
 
-
 		/** Constructeur prenant un ensemble de meme; booleanParameter.
 		 * Permet d'associer une valeur précise pour le boolean du meme.
 		 * /!\ valeur sera perdu en cas d'exploration exhaustive ou random.
@@ -436,6 +431,7 @@ public interface IModelParameter<T> {
 		 *
 		 */
 		public boolean gotoNext() {
+			hasChanged = true;
 			ArrayList<Meme> memes = new ArrayList<Meme>();
 			memes.addAll(value.keySet());
 			memes.sort(null); // TODO [Opti 1.0]- Peut etre inutile a sort, puisque le constructeur le fait déjà
@@ -455,6 +451,7 @@ public interface IModelParameter<T> {
 		 */
 		public void gotoRandom(){
 			System.err.println("Pas implémenté");
+			hasChanged = true;
 		}
 
 		/** Donne aux entités les memes actifs.
@@ -462,15 +459,15 @@ public interface IModelParameter<T> {
 		 *
 		 */
 		public void apply() {
-			activatedMeme.clear();
-			for (Meme meme : value.keySet()) {
-				if(value.get(meme).getValue())
-					activatedMeme.add(meme);
-			}
+			if(hasChanged) {
+				activatedMeme.clear();
+				for (Meme meme : value.keySet()) {
+					if (value.get(meme).getValue())
+						activatedMeme.add(meme);
+				}
 
-			// TODO [Refactoring 4.0]- Ne devrait pas avoir a utiliser ce boolean
-			if(!Configurator.doNotApplyMemeAvailability) {
 				this.memesAvailablesChange(activatedMeme, "New list of active memes on map");
+				hasChanged = false;
 			}
 		}
 
@@ -583,7 +580,7 @@ public interface IModelParameter<T> {
 			return false;
 		}
 
-		/** Apply aux memes sa probabilité de propagation.
+		/** Apply aux memes leurs probabilités de propagation.
 		 *
 		 */
 		public void apply() {
@@ -592,16 +589,15 @@ public interface IModelParameter<T> {
 				meme.setProbaOfPropagation( value.get(meme).value);
 				memeo.add(meme);
 			}
-			if(Configurator.doNotApplyMemeAvailability) {
-				entiteHandler.giveMemeToEntiteXFirst(memeo);
-			}
+
+			entiteHandler.giveMemeToEntiteXFirst(memeo);
 		}
 
 		/** Va choisir un meme aléatoirement et lui donner une valeur de propagation
 		 * aléatoire.
 		 */
 		public void gotoRandom(){
-			Meme meme = new ArrayList<Meme>(value.keySet()).get(Toolz.getRandomNumber(value.keySet().size()));
+			Meme meme = new ArrayList<>(value.keySet()).get(Toolz.getRandomNumber(value.keySet().size()));
 			value.get(meme).gotoRandom();
 		}
 

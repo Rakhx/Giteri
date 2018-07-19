@@ -39,11 +39,12 @@ public class InitializerV2 {
 
         // A instancier dans les if. a lancer dans tous les cas a la fin?
         Runnable willBeRun;
-        boolean ihmLauncher = launcher == Configurator.EnumLauncher.ihm;
+        boolean ihmLauncher = launcher == Configurator.EnumLauncher.ihm ;
 
         if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.jarOpenMole){
 //            Configurator.methodOfGeneration = Configurator.MemeDistributionType.FollowingFitting;
-        }else if(launcher == Configurator.EnumLauncher.ihm){
+        }
+        else if(launcher == Configurator.EnumLauncher.ihm){
             Configurator.methodOfGeneration = Configurator.MemeDistributionType.SingleBasic;
             Configurator.displayPlotWhileSimulation = true;
             Configurator.withGraphicalDisplay = true;
@@ -52,7 +53,8 @@ public class InitializerV2 {
             Configurator.writeNetworkResultOnFitting = true;
             Configurator.explorator = Configurator.EnumExplorationMethod.exhaustive;
 //            Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
-        }else if(launcher == Configurator.EnumLauncher.testProvider){
+        }
+        else if(launcher == Configurator.EnumLauncher.testProvider){
             Configurator.methodOfGeneration = Configurator.MemeDistributionType.SingleBasic;
             Configurator.displayPlotWhileSimulation = false;
             Configurator.withGraphicalDisplay = false;
@@ -67,12 +69,9 @@ public class InitializerV2 {
         AgregatorFactory agregatorFactory = new AgregatorFactory();
         ActionFactory actionFactory = new ActionFactory() ;
         MemeFactory memeFactory = new MemeFactory(actionFactory, agregatorFactory, attributFactory);
-
         WorkerFactory workerFactory = new WorkerFactory();
-
         NetworkConstructor networkConstructor = new NetworkConstructor();
         EntiteHandler entiteHandler = new EntiteHandler(networkConstructor, memeFactory, workerFactory);
-
         NetworkFileLoader networkFileLoader = new NetworkFileLoader(memeFactory, writeNRead);
         DrawerGraphStream drawerGraphStream = null;
         StatAndPlotJarVersion stat = null;
@@ -82,6 +81,7 @@ public class InitializerV2 {
         }else{
             drawerGraphStream =  new DrawerGraphStream(entiteHandler, memeFactory, networkConstructor, writeNRead, networkFileLoader, workerFactory);
         }
+
         // Communication model
         CommunicationModel communicationModel = null;
 
@@ -135,6 +135,7 @@ public class InitializerV2 {
             entiteHandler.start();
 
             return stat.fitNetwork(0);
+
         }else if (launcher == Configurator.EnumLauncher.ihm) {
             entiteHandler.initialisation();
 
@@ -163,7 +164,6 @@ public class InitializerV2 {
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
-
 
             fenetre.setVisible(true);
             entiteHandler.setIHMController(vControl);
@@ -194,19 +194,19 @@ public class InitializerV2 {
         else if(launcher == Configurator.EnumLauncher.testProvider){
             entiteHandler.initialisation();
 
-            Hashtable<Meme, IModelParameter.GenericBooleanParameter> memeDispo = new Hashtable<Meme,IModelParameter.GenericBooleanParameter>();
-            Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<Integer, IModelParameter<?>>();
+            Hashtable<Meme, IModelParameter.GenericBooleanParameter> memeDispo = new Hashtable<>();
+            Hashtable<Integer, IModelParameter<?>> providers = new Hashtable<>();
 
-            for (Meme meme : memeFactory.getMemeAvailable(true)) {
+            for (Meme meme : memeFactory.getMemes(Configurator.MemeList.FITTING, Configurator.ActionType.ANYTHING)) {
                 memeDispo.put(meme, new IModelParameter.GenericBooleanParameter());
             }
 
             IModelParameter.MemeAvailability memeProvider = new IModelParameter.MemeAvailability(memeDispo);
             memeProvider.setEntiteHandler(entiteHandler);
-//            providers.put(1,memeProvider);
+            providers.put(1,memeProvider);
 
-
-            IModelParameter.MemeDiffusionProba memeDiffu = new IModelParameter.MemeDiffusionProba(memeFactory.getMemeAvailable(true), new IModelParameter.GenericDoubleParameter(.0,.0,.2,.1));
+            IModelParameter.MemeDiffusionProba memeDiffu = new IModelParameter.MemeDiffusionProba(memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING),
+                    new IModelParameter.GenericDoubleParameter(.2,.2,.6,.2));
             memeDiffu.setEntiteHandler(entiteHandler);
             providers.put(0,memeDiffu);
 

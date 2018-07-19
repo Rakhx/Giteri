@@ -196,11 +196,11 @@ public class MemeFactory {
 	 *
 	 * @return l'ensemble des memes qui ont été généré par la factory.
 	 */
-	public ArrayList<Meme> getMemeAvailable(boolean forFitting) {
-		if(forFitting)
-			return memeFitting;
-		return memeExisting;
-	}
+//	public ArrayList<Meme> getMemeAvailable(boolean forFitting) {
+//		if(forFitting)
+//			return memeFitting;
+//		return memeExisting;
+//	}
 
 	/** Retourne les memes disponibles qui font un certain type d'action
 	 * en paramètre.

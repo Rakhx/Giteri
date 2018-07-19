@@ -40,14 +40,14 @@ public class StatAndPlotJarVersion extends NetworkAnalyzer {
 		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<Integer, IModelParameter<?>>();
 		Hashtable<Meme, GenericDoubleParameter> kvMemeValue = new Hashtable<Meme, IModelParameter.GenericDoubleParameter>();
 
-		for (Meme meme : memeFactory.getMemeAvailable(true))
+		for (Meme meme :memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING))
 			memeDispo.put(meme, new GenericBooleanParameter());
 
 		MemeAvailability memeProvider = new MemeAvailability(memeDispo);
 		providers.put(1,memeProvider);
 		memeProvider.setEntiteHandler(entiteHandler);
 
-		for (Meme meme : memeFactory.getMemeAvailable(true)){
+		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING)){
 			value = probaVoulu.get(i++);
 			kvMemeValue.put(meme, new GenericDoubleParameter(value,value, value,1.));
 		}

@@ -94,8 +94,10 @@ public class AgregatorFactory {
 		 */
 		@SuppressWarnings("unchecked")
 		protected void getNotLinked(Entite asker, Set<Entite> entites){
-			this.getLinked(asker, entites);
-			entites.removeAll(entites);
+			Set<Entite> entitesLinked = new HashSet<>();
+			this.getLinked(asker, entitesLinked);
+			entites.removeAll(entitesLinked);
+//			entites.removeAll(this.getLinked(asker, entites));
 		}
 	}
 

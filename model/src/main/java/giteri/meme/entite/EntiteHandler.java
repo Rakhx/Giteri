@@ -42,7 +42,6 @@ public class EntiteHandler extends ThreadHandler {
 
 	// Entite possedant des actions
 	private ArrayList<Entite> entitesActive;
-
 	private Hashtable<String, String> memeTranslationReadable;
 
 	// Listener pour les évènements issu de l'obtention de meme ou application
@@ -453,7 +452,7 @@ public class EntiteHandler extends ThreadHandler {
 		}
 		if (setAsked == FittingBehavior.onlySimple || setAsked == FittingBehavior.simpleAndComplex) {
 			int lastIndex = memes.size();
-			for (Meme meme : memeFactory.getMemeAvailable(false))
+			for (Meme meme : memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING))
 				Toolz.addElementInHashArray(memes, ++lastIndex, meme);
 		}
 
@@ -839,12 +838,11 @@ public class EntiteHandler extends ThreadHandler {
 	 * x = nb de meme la map. Nombre d'agent avec comportement = x
 	 */
 	private void giveMemeToEntiteOnlyBasis() {
-		int i = 0;
-		ArrayList<Entite> entiteContente = new ArrayList<Entite>();
+		ArrayList<Entite> entiteContente = new ArrayList<>();
 		Iterator<Entite> entitees = entites.iterator();
 		Entite actual;
 
-		for (Meme meme : memeFactory.getMemeAvailable(true)) {
+		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING)) {
 			actual = entitees.next();
 			actual.addMeme(meme, true);
 			eventMemeChanged(actual, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
@@ -871,18 +869,13 @@ public class EntiteHandler extends ThreadHandler {
 	 *
 	 */
 	private void giveMemeBasicAllNodes() {
-		int nbMeme = memeFactory.getMemeAvailable(false).size();
+		int nbMeme = memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING).size();
 		int partSize = entites.size() / nbMeme;
 		int lastIndex = 0;
 		int part = 0;
 		Iterator<Entite> entitees = entites.iterator();
 		Entite actual;
-
-
-
-
-
-		for (Meme meme : memeFactory.getMemeAvailable(false)) {
+		for (Meme meme :memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING)) {
 			part++;
 			actual = entitees.next();
 			for (int i = lastIndex; i < partSize * part; i++)
@@ -955,7 +948,7 @@ public class EntiteHandler extends ThreadHandler {
 		ArrayList<Double> currentParamSet = swParamSet3;
 		Iterator<Entite> entitees = entites.iterator();
 
-		for (Meme meme : memeFactory.getMemeAvailable(true)) {
+		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING)) {
 			entiteReceptrice = entitees.next();
 			if(meme.getName().compareTo("Add∞") == 0){
 				meme.setProbaOfPropagation(currentParamSet.get(i));
@@ -1088,13 +1081,13 @@ public class EntiteHandler extends ThreadHandler {
 		agregators.put(0, notLinked);
 		agregators.put(1, mineInf);
 		agregators.put(2, random);
-//		memeFactory.registerMemeAction("Add+", .4, add, attributs,KVAttributAgregator, true);
+		//memeFactory.registerMemeAction("Add+", .8, add, attributs,KVAttributAgregator, true ,true);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-//		memeFactory.registerMemeAction("Add-",.4,add, attributs,KVAttributAgregator, true);
+		//memeFactory.registerMemeAction("Add-",.8,add, attributs,KVAttributAgregator, true ,true);
 
 		agregators.clear();
 		agregators.put(0, theMost);
@@ -1106,41 +1099,42 @@ public class EntiteHandler extends ThreadHandler {
 		agregators.put(0, hopAWay);
 		agregators.put(1, notLinked);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("AddØ-Hop", 1, add, attributs,KVAttributAgregator, true ,true);
+		//memeFactory.registerMemeAction("AddØ-Hop", 1, add, attributs,KVAttributAgregator, true ,true);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, random);
 //		addRandom =
-		memeFactory.registerMemeAction("AddØ",.1, add, attributs, KVAttributAgregator, true, true);
+		memeFactory.registerMemeAction("AddØ",.8, add, attributs, KVAttributAgregator, false, false);
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, random);
-//		removeRandom = memeFactory.registerMemeAction("RmvØ",.4,remove, attributs,  KVAttributAgregator, false);
+		//removeRandom =
+		// memeFactory.registerMemeAction("RmvØ",.4,remove, attributs,  KVAttributAgregator, true, true);
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv-", .1, remove, attributs, KVAttributAgregator, true ,true);
+		memeFactory.registerMemeAction("Rmv-", .8, remove, attributs, KVAttributAgregator, true ,true);
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, mineInf);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv+", .1, remove, attributs, KVAttributAgregator, true ,true);
+		memeFactory.registerMemeAction("Rmv+", .8, remove, attributs, KVAttributAgregator, true ,true);
 
 		agregators.clear();
 		agregators.put(0, hopAWay);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("RmvØ-2hop", .2, remove, attributs, KVAttributAgregator,true ,true);
+		//memeFactory.registerMemeAction("RmvØ-2hop", .2, remove, attributs, KVAttributAgregator,true ,true);
 
 		agregators.clear();
 		// memeFactory.getMemeAction("Puri",0,puri, attributs,
 		// KVAttributAgregator, true);
 
-		for (Meme memeDispo : memeFactory.getMemeAvailable(false)) {
+		for (Meme memeDispo : memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING)) {
 			memeTranslationReadable.put(memeDispo.toFourCharString(),memeDispo.getName());
 		}
 

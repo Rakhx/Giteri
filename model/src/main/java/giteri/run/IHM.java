@@ -235,7 +235,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		this.drawerGraphStream= drawerGraphStream ;
 		this.writeNRead = wnr;
 
-		existingMeme = memeFactory.getMemeAvailable(false);
+		existingMeme = memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING);
 		lastHundredActionDone = new CircularFifoQueue<String>(
 				sizeOfCircularQueue);
 		nbActivationByMemes = new Hashtable<String, Integer>();
