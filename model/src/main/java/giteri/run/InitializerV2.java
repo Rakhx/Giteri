@@ -76,14 +76,20 @@ public class InitializerV2 {
         EntiteHandler entiteHandler = new EntiteHandler(networkConstructor, memeFactory, workerFactory);
         NetworkFileLoader networkFileLoader = new NetworkFileLoader(memeFactory, writeNRead);
         DrawerGraphStream drawerGraphStream = null;
-        StatAndPlotJarVersion stat = null;
+       // StatAndPlotJarVersion stat = null;
+       // StatAndPlotWithoutIHM without = null;
+        StatAndPlotGeneric stat = null;
 
 
-        if(ihmLauncher && Configurator.withGraphicalDisplay){
-            drawerGraphStream =  new DrawerGraphStream(entiteHandler, memeFactory, networkConstructor, writeNRead, networkFileLoader, workerFactory);
-        } else {
-            stat = new StatAndPlotJarVersion(entiteHandler, memeFactory, networkConstructor, writeNRead, networkFileLoader, workerFactory);
+        if(ihmLauncher ){
+            if(Configurator.withGraphicalDisplay)
+                drawerGraphStream =  new DrawerGraphStream(entiteHandler, memeFactory, networkConstructor, writeNRead, networkFileLoader, workerFactory);
+            else
+                stat = new StatAndPlotWithoutIHM(entiteHandler, memeFactory, networkConstructor, writeNRead, networkFileLoader, workerFactory);
         }
+        else
+            stat = new StatAndPlotJarVersion(entiteHandler, memeFactory, networkConstructor, writeNRead, networkFileLoader, workerFactory);
+
 
         // Communication model
         CommunicationModel communicationModel = null;
@@ -100,7 +106,7 @@ public class InitializerV2 {
         actionFactory.setEntiteHandler(entiteHandler);
         agregatorFactory.setEntiteHandler(entiteHandler);
 
-        if(ihmLauncher && Configurator.withGraphicalDisplay){
+        if(ihmLauncher && withGraphicalDisplay ){
             workerFactory.setNecessary(drawerGraphStream, drawerGraphStream);
             networkConstructor.setDrawer(drawerGraphStream);
         }else {
@@ -164,6 +170,7 @@ public class InitializerV2 {
 
             vControl.setView(fenetre);
 
+            if(!Configurator.withGraphicalDisplay)
             stat.probaVoulu = new ArrayList<Double>(Arrays.asList(0.,0.,0.,0.,0.,0.,0.));
 
             // Le graph associé lors de l'affichage avec graphstream

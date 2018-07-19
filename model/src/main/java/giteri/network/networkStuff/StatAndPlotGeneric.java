@@ -50,7 +50,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 	boolean debugBeforeSkip = true;
 	boolean debug = Configurator.debugStatAndPlot;
-	private ArrayList<Double> probaVoulu;
+	public ArrayList<Double> probaVoulu;
 
 	/** Constructeur de cet élément de base.
 	 * Ne peut etre appelé directement, classe abstract
