@@ -25,7 +25,7 @@ public final class Configurator {
 	// affiche dans la console "param en cours"
 	public static boolean displayFittingProviderApplied = true;
 	// pas de passage au run suivant, il faut appuyer sur next
-	public static boolean manuelNextStep = false;
+	public static boolean manuelNextStep = true;
 	// mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	public static boolean autoPauseIfNexted = false;
 

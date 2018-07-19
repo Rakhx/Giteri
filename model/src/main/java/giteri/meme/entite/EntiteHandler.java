@@ -177,8 +177,13 @@ public class EntiteHandler extends ThreadHandler {
 		Entite acting;
 		String resultat;
 
+		List<Meme> myMemes ;
+
 		for (Entite entite : entites) {
-			for (Meme action : entite.getMyMemes()) {
+			// copie la liste pour éviter des deadlocks avec la fonction redefineProba
+			// si on arrive a forcer une action et cette action se transmettre.
+			myMemes = entite.getMyMemes();
+			for (Meme action : myMemes) {
 				resultat = doAction(entite, action);
 				if (!resultat.contains("Nope") && !resultat.contains("NOACTION")) {
 					actionDone = true;

@@ -117,28 +117,24 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 * @param fitting
 	 */
 	protected void initializeConfigForStability(FittingClass fitting){
-		Hashtable<Meme, GenericBooleanParameter> memeDispo = new Hashtable<Meme,GenericBooleanParameter>();
-		ArrayList<Meme> memeOnMap = new ArrayList<Meme>();
-		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<Integer, IModelParameter<?>>();
+		Hashtable<Meme, GenericBooleanParameter> memeDispo = new Hashtable<>();
+		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
 
-
-		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING)) {
+		// Rempli la liste des memes que l'on veut pour lancer le fitting.
+		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING))
 			memeDispo.put(meme, new GenericBooleanParameter());
 
-		}
 
-		// classe truqué pour tjrs renvoyer tous les behaviors. Trop chiant a refaire en l'enlevant et pas forcement
-		// pertinent.
 		MemeAvailability memeProvider = new MemeAvailability(memeDispo);
 		memeProvider.setEntiteHandler(entiteHandler);
-
 		providers.put(1,memeProvider);
-		// entiteHandler.giveMemeToEntiteXFirst(memeFactory.getMemeAvailable(true));
 
 		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING),
-				new GenericDoubleParameter(.2,.2,.2,.2));
+				new GenericDoubleParameter(.2,.2,.4,.2));
 		memeDiffu.setEntiteHandler(entiteHandler);
 		providers.put(0,memeDiffu);
+
+		memeProvider.addMemeListListener(memeDiffu);
 
 		if(Configurator.explorator == EnumExplorationMethod.oneShot){
 			ArrayList<Double> InOrderOfParameter = new ArrayList<Double>(Arrays.asList(1.,0.365018173274458,0.089130672733655,0.484877681454417,1.));
@@ -187,13 +183,13 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			// On fait nbRunByConfig mesures par configuration pour étudier la variance des résultats REPETITION++
 			for (int i = 0; i < config.nbRepetitionByConfig; i++)
 			{
-				config.newTurn();
+				config.newRepetition();
 				do
 				{
 					config.com.view.displayMessageOnFitPanel("Work In Progress");
 
 					// TODO a voir pour rendre le truc un peu plus flexible sur la circular queue
-					// qui prend boucleExterneSize en taille mais qui n'est reset que dans newTurn().
+					// qui prend boucleExterneSize en taille mais qui n'est reset que dans newRepetition().
 
 					// On répète x fois
 					for (int x = 0; x < config.boucleExterneSize; x++)
@@ -233,7 +229,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 					communicationModel.resume();
 				}
 
-				config.endTurn();
+				config.endRepetition();
 			}
 
 			config.endRun();

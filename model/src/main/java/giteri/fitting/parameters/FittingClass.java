@@ -59,7 +59,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public int nbRepetitionByConfig;
 
 	// Nombre d'action réalisé par les entités avant une collecte de données
-	public int nbActionByStep = Configurator.nbNode * 5; //500;
+	public int nbActionByStep = Configurator.nbNode * 10; //500;
 	public int boucleExterneSize = 30;
 
 	// EndRegion
@@ -71,8 +71,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public String numeroRunAsString = "-1";
 
 	// numéro de répétition dans le run
-	public int numeroTurn = -1;
-	public String numeroTurnAsString = "-1";
+	public int numeroRepetition = -1;
+	public String numeroRepetitionAsString = "-1";
 
 	// Compteur du nombre de relevé fait pour un meme run
 	public int turnCount = 0;
@@ -100,10 +100,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 	private double threshSeDensity, threshSeCoeff, threshSeAppliance;
 	private double threshHeDensity, threshHeAppliance;
-//	private double threshHeCoeff;
 
 	// every nbActionThreshrising rise threshold of risingPourcentage
-
 	private double risingPourcentage = .4;
 	private int nbActionThreshRising = 7;
 
@@ -159,7 +157,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		cfqMemeAppliancePropOnFitting = new CircularFifoQueue<>(nbEltCircularQFitting);
 		cfqMemeApplianceNumberOnFitting = new CircularFifoQueue<>(nbEltCircularQFitting);
 		memesAvailables = memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING);
-				//memeFactory.getMemeAvailable(false);
 		currentNetProperties.createStub();
 	}
 
@@ -219,13 +216,14 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 */
 	public void newRun(){
 		numeroRun++;
-		numeroTurn = 0;
+		numeroRepetition = 0;
 		networksSameTurn.clear();
 
 		numeroRunAsString = "Run#" + numeroRun;
+		// Repetition de l'affichage
 		if(debug){
-			System.out.println(numeroRunAsString + " applications des parametres: ");
-			System.out.println(explorator.toString());
+			//System.out.println(numeroRunAsString + " applications des parametres: ");
+			//System.out.println(explorator.toString());
 		}
 		repertoires.add(numeroRunAsString);
 		resultNetwork.addInitialConfigurationToResult(numeroRun, explorator.getModelParameterSet());
@@ -235,10 +233,10 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 *
 	 *
 	 */
-	public void newTurn(){
+	public void newRepetition(){
 		resetSeuilValue();
-		numeroTurnAsString = "Repetition#" + ++numeroTurn;
-		repertoires.add(numeroTurnAsString);
+		numeroRepetitionAsString = "Repetition#" + ++numeroRepetition;
+		repertoires.add(numeroRepetitionAsString);
 		com.suspend();
 		synchronized(workerFactory.waitingForReset)
 		{
@@ -250,12 +248,12 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 		explorator.apply();
 		// & (3) Application de ces paramètres
-		if(Configurator.displayFittingProviderApplied && numeroTurn == 1 && !Configurator.jarMode) {
+		if(Configurator.displayFittingProviderApplied && numeroRepetition == 1 && !Configurator.jarMode) {
 			System.out.println(numeroRunAsString + " applications des parametres: ");
 			System.out.println(explorator.toString());
 		}
 
-		if(debug) System.out.println(numeroRunAsString + " at " + numeroTurnAsString);
+		if(debug) System.out.println(numeroRunAsString + " at " + numeroRepetitionAsString);
 		entiteHandler.resetProba();
 		turnCount = 0;
 		cqLastXActionDone.clear();
@@ -272,7 +270,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 * Enregistre les valeurs, sauvegarde et snapshot.
 	 *
 	 */
-	public void endTurn(){
+	public void endRepetition(){
 		turnCount = 0;
 		// STEP: Concernant la continuité du fitting sur meme config.
 		nbCallContinuOnThisConfig = 0;
@@ -300,7 +298,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		if(Configurator.writeNetworkResultOnFitting)
 			com.takeSnapshot(currentSeed, Optional.ofNullable(repertoires));
 
-		repertoires.remove(numeroTurnAsString);
+		repertoires.remove(numeroRepetitionAsString);
 
 		if(Configurator.writeNetworkResultOnFitting)
 			// Va écrire les résultats détaillés dans le CSV correspondant
