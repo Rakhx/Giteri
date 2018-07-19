@@ -39,7 +39,7 @@ public class Node {
 		displayDetailledInfo ="";
 	}
 
-	// Region Getter Setter
+	//region Getter Setter
 	
 	public void addConnectedNode(Node toAdd){
 		synchronized(lockOnConnectedNodes){
@@ -78,6 +78,6 @@ public class Node {
 		this.displayInfo = displayInfo;
 	}
 	
-	// EndRegion
+	//endregion
 
 }	

@@ -31,7 +31,7 @@ public class CommunicationModel implements IModel {
 	public VueController view;
 	public WorkerFactory wf;
 
-	// Region SINGLETON
+	//region SINGLETON
 
 	/** Constructeur sans paramètre.
 	 *
@@ -49,7 +49,7 @@ public class CommunicationModel implements IModel {
 
 	}
 
-	// EndRegion
+	//endregion
 
 	public void setCalculator(StatAndPlotInterface stat){
 		this.calculator = stat;
@@ -63,7 +63,7 @@ public class CommunicationModel implements IModel {
 		view = vue;
 	}
 
-	// Region getting data
+	//region getting data
 
 	/** Obtenir la liste des behaviors disponibles
 	 *
@@ -107,9 +107,9 @@ public class CommunicationModel implements IModel {
 		return nl;
 	}
 
-	// EndRegion
+	//endregion
 
-	// Region asking updates & lancement processus
+	//region asking updates & lancement processus
 
 	/**
 	 *
@@ -163,9 +163,9 @@ public class CommunicationModel implements IModel {
 	}
 
 //	public void
-	// EndRegion
+	//endregion
 
-	// Region Generation Graphe
+	//region Generation Graphe
 
 	/**
 	 *
@@ -198,9 +198,9 @@ public class CommunicationModel implements IModel {
 		eh.purgeLink();
 	}
 
-	// EndRegion
+	//endregion
 
-	// Region thread stuff
+	//region thread stuff
 
 	/** Reset tout les éléments nécessaires pour relancer une simulation
 	 * du réseau ou de fitting ou autre.
@@ -230,9 +230,9 @@ public class CommunicationModel implements IModel {
 	}
 
 
-	// EndRegion
+	//endregion
 
-	// Region private method
+	//region private method
 
-	// EndRegion
+	//endregion
 }

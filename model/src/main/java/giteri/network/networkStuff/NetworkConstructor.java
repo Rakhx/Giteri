@@ -24,7 +24,7 @@ import giteri.run.configurator.Configurator;
  */
 public class NetworkConstructor extends ThreadHandler {
 
-	// Region Properties
+	//region Properties
 	DrawerInterface drawer;
 	final Network networkInstance;
 	INetworkRepresentations networkRepresentation;
@@ -36,7 +36,7 @@ public class NetworkConstructor extends ThreadHandler {
 	int cmp = 0;
 	int activator;
 
-	// EndRegion
+	//endregion
 
 	/** Constructeur sans paramètre.
 	 *
@@ -59,7 +59,7 @@ public class NetworkConstructor extends ThreadHandler {
 	public void setDrawer(DrawerInterface drawer){
 		this.drawer = drawer;
 	}
-	// Region public methods
+	//region public methods
 
 	/** Toutes les x secondes, lancement du thread. Si 1er lancement, création d'un réseau
 	 * random. Affichage du réseau, et modification au fur et a mesure du temps qui passe.
@@ -149,7 +149,7 @@ public class NetworkConstructor extends ThreadHandler {
 		return networkInstanceProperties;
 	}
 
-	// Region Network modifications
+	//region Network modifications
 
 	/** Méthode qui génère un réseau d'un certains type.
 	 * Va générer les liens, mais les noeuds doivent déjà etre présent.
@@ -382,11 +382,11 @@ public class NetworkConstructor extends ThreadHandler {
 		return networkInstance.getUpdateId() == networkInstanceProperties.getNetworkInstance();
 	}
 
-	// EndRegion
+	//endregion
 
-	// EndRegion
+	//endregion
 
-	// Region Private
+	//region Private
 
 	/** Création des nodes pour le réseau.
 	 *
@@ -397,6 +397,6 @@ public class NetworkConstructor extends ThreadHandler {
 		}
 	}
 
-	// EndRegion
+	//endregion
 
 }

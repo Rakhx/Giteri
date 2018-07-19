@@ -247,7 +247,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		return config.endSimu();
 	}
 
-	// EndRegion
+	//endregion
 
 	/** avg;dispersion
 	 *
@@ -470,7 +470,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		}
 	}
 
-	// Region GARBAGE
+	//region GARBAGE
 
 	/** lancement de thread pour la fonction de stabilité d'un réseau.
 	 *
@@ -479,7 +479,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 	}
 
-	// EndRegion
+	//endregion
 
-	// EndRegion
+	//endregion
 }

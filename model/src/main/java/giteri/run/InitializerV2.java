@@ -23,9 +23,11 @@ import org.graphstream.ui.view.Viewer;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 
 import static giteri.run.configurator.Configurator.debugOpenMole;
+import static giteri.run.configurator.Configurator.withGraphicalDisplay;
 
 /** Classe d'initialisation des objets nécessaires à l'utilisation du framework
  * Commun à ttes les classes.
@@ -39,7 +41,7 @@ public class InitializerV2 {
 
         // A instancier dans les if. a lancer dans tous les cas a la fin?
         Runnable willBeRun;
-        boolean ihmLauncher = launcher == Configurator.EnumLauncher.ihm ;
+        boolean ihmLauncher = (launcher == Configurator.EnumLauncher.ihm) ;
 
         if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.jarOpenMole){
 //            Configurator.methodOfGeneration = Configurator.MemeDistributionType.FollowingFitting;
@@ -47,7 +49,7 @@ public class InitializerV2 {
         else if(launcher == Configurator.EnumLauncher.ihm){
             Configurator.methodOfGeneration = Configurator.MemeDistributionType.SingleBasic;
             Configurator.displayPlotWhileSimulation = true;
-            Configurator.withGraphicalDisplay = true;
+            Configurator.withGraphicalDisplay = false;
             Configurator.jarMode = false;
             Configurator.systemPaused = true;
             Configurator.writeNetworkResultOnFitting = true;
@@ -76,41 +78,42 @@ public class InitializerV2 {
         DrawerGraphStream drawerGraphStream = null;
         StatAndPlotJarVersion stat = null;
 
-        if(!ihmLauncher) {
-             stat = new StatAndPlotJarVersion(entiteHandler, memeFactory, networkConstructor, writeNRead, networkFileLoader, workerFactory);
-        }else{
+
+        if(ihmLauncher && Configurator.withGraphicalDisplay){
             drawerGraphStream =  new DrawerGraphStream(entiteHandler, memeFactory, networkConstructor, writeNRead, networkFileLoader, workerFactory);
+        } else {
+            stat = new StatAndPlotJarVersion(entiteHandler, memeFactory, networkConstructor, writeNRead, networkFileLoader, workerFactory);
         }
 
         // Communication model
         CommunicationModel communicationModel = null;
 
-        if(!ihmLauncher) {
-            communicationModel = new CommunicationModel(entiteHandler, networkConstructor, networkFileLoader, workerFactory, stat);
-            stat.setCommunicationModel(communicationModel);
-        }else {
+        if(ihmLauncher && Configurator.withGraphicalDisplay){
             communicationModel = new CommunicationModel(entiteHandler, networkConstructor, networkFileLoader, workerFactory, drawerGraphStream);
             drawerGraphStream.setCommunicationModel(communicationModel);
+        }else {
+            communicationModel = new CommunicationModel(entiteHandler, networkConstructor, networkFileLoader, workerFactory, stat);
+            stat.setCommunicationModel(communicationModel);
         }
 
         networkFileLoader.setCommunicationModel(communicationModel);
         actionFactory.setEntiteHandler(entiteHandler);
         agregatorFactory.setEntiteHandler(entiteHandler);
 
-        if(!ihmLauncher)  {
-            workerFactory.setNecessary(stat, new DrawerStub());
-            networkConstructor.setDrawer(new DrawerStub());
-        }else {
+        if(ihmLauncher && Configurator.withGraphicalDisplay){
             workerFactory.setNecessary(drawerGraphStream, drawerGraphStream);
             networkConstructor.setDrawer(drawerGraphStream);
+        }else {
+            workerFactory.setNecessary(stat, new DrawerStub());
+            networkConstructor.setDrawer(new DrawerStub());
         }
 
         // Controller
         Controller c = new Controller();
         Controller.VueController vControl = c.new VueController();
         Controller.ModelController mControl = c.new ModelController(vControl, communicationModel);
-
-        if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.jarOpenMole)  {
+        // Crée une fenetre stub
+        if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.jarOpenMole) {
             // La fenetre en elle meme Controller de Model donné a l'IHM
             IHMStub fenetre = new IHMStub();
 
@@ -138,9 +141,10 @@ public class InitializerV2 {
 
         }else if (launcher == Configurator.EnumLauncher.ihm) {
             entiteHandler.initialisation();
-
+            IHM fenetre;
             // La fenetre en elle meme Controller de Model donné a l'IHM
-            IHM fenetre = new IHM(mControl,
+            if(withGraphicalDisplay)
+                fenetre = new IHM(mControl,
                     networkConstructor,
                     memeFactory,
                     workerFactory,
@@ -148,8 +152,19 @@ public class InitializerV2 {
                     actionFactory,
                     drawerGraphStream,
                     writeNRead);
+            else
+                fenetre = new IHM(mControl,
+                        networkConstructor,
+                        memeFactory,
+                        workerFactory,
+                        entiteHandler,
+                        actionFactory,
+                        new DrawerStub(),
+                        writeNRead);
 
-            vControl.setView((Interfaces.IView) fenetre);
+            vControl.setView(fenetre);
+
+            stat.probaVoulu = new ArrayList<Double>(Arrays.asList(0.,0.,0.,0.,0.,0.,0.));
 
             // Le graph associé lors de l'affichage avec graphstream
             if (Configurator.withGraphicalDisplay) {

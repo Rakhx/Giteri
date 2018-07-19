@@ -37,7 +37,7 @@ public class Meme implements Serializable, Comparable<Meme>{
 		probaOfPropagation = probaOfTransmission;
 	}
 	
-	// Region Getter/Setter/toString
+	//region Getter/Setter/toString
 	
 	public String toString(){
 		return getMemeName(0);
@@ -71,7 +71,7 @@ public class Meme implements Serializable, Comparable<Meme>{
 		return this.attributs;
 	}
 
-	// EndRegion
+	//endregion
 	
 	/** mode 0 : the shortest
 	 *  mode 1 : 

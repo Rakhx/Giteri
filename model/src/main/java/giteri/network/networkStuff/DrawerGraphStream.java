@@ -70,7 +70,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 		defineGraphAttributes(graph);
 	}
 
-	// Region Interface MemeListener
+	//region Interface MemeListener
 
 	/** Lorsqu'un meme est ajouté ou retiré d'une entité
 	 *
@@ -106,9 +106,9 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 		// Réseau et affichage de ce dernier.
 	}
 
-	// EndRegion
+	//endregion
 
-	// Region Interface DrawerInterface
+	//region Interface DrawerInterface
 
 	/** Dessin d'un graphe initial, va aussi regarder les memes possédé par les
 	 * noeuds pour l'initialisation des couleurs.
@@ -252,9 +252,9 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 		graph.removeEdge(from, to);
 	}
 
-	// EndRegion interface DrawerInterface
+	//endregion interface DrawerInterface
 
-	// Region Fonction propre à ce moteur graphique
+	//region Fonction propre à ce moteur graphique
 
 	/** va associer une classe au node en fonction des memes qu'il contient
 	 *
@@ -362,9 +362,9 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 		colorPieAsString.put(17, "rgb(253,102,102)");
 		colorPieAsColor. put(17, new Color(253,102,102));
 	}
-	// EndRegion
+	//endregion
 
-	// Region fonction pour obtenir des mesures sur le graph
+	//region fonction pour obtenir des mesures sur le graph
 	/** obtient la densité du graph au moment de l'appel 
 	 * de la fonction
 	 */
@@ -426,5 +426,5 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 		return  total / nbValue;
 	}
 
-	// EndRegion
+	//endregion
 }

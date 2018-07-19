@@ -13,7 +13,7 @@ import giteri.meme.entite.Meme;
  */
 public class ActionFactory{
 
-	// Region singleton Stuff
+	//region singleton Stuff
 	private EntiteHandler entiteHandler;
 
 	public ActionFactory(){ }
@@ -21,7 +21,7 @@ public class ActionFactory{
 	public void setEntiteHandler(EntiteHandler eh){
 		entiteHandler = eh;
 	}
-	// EndRegion
+	//endregion
 
 	/** Distributeur d'action.
 	 *

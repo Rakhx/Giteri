@@ -208,7 +208,7 @@ public class Initializer {
             return 0.;
         }
 
-        // region testProvider
+        //region testProvider
 
         else if(launcher == Configurator.EnumLauncher.testProvider){
             entiteHandler.initialisation();
@@ -239,7 +239,7 @@ public class Initializer {
             return 0.;
         }
 
-        // endregion
+        //endregion
 
         return 0.;
     }

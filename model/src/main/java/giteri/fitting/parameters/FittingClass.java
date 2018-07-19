@@ -40,7 +40,7 @@ import giteri.meme.event.IBehaviorTransmissionListener;
  */
 public class FittingClass implements IBehaviorTransmissionListener, IActionApplyListener {
 
-	// Region Variables
+	//region Variables
 
 	private EntiteHandler entiteHandler;
 	private MemeFactory memeFactory;
@@ -53,7 +53,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public CommunicationModel com ;
 	public IExplorationMethod explorator;
 
-	// Region CONFIGURATION INITIALE
+	//region CONFIGURATION INITIALE
 
 	// Nombre de fois ou on lance un run pour une meme config.
 	public int nbRepetitionByConfig;
@@ -62,9 +62,9 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public int nbActionByStep = Configurator.nbNode * 10; //500;
 	public int boucleExterneSize = 30;
 
-	// EndRegion
+	//endregion
 
-	// Region VARIABLES DE FONCTIONNEMENT
+	//region VARIABLES DE FONCTIONNEMENT
 
 	// numero du run en cours
 	public int numeroRun = -1;
@@ -105,9 +105,9 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	private double risingPourcentage = .4;
 	private int nbActionThreshRising = 7;
 
-	// EndRegion
+	//endregion
 
-	// Region RESULTATS DE SIMULATION
+	//region RESULTATS DE SIMULATION
 
 	// relevés des différentes densité pour une meme configuration
 	public ArrayList<NetworkProperties> networksSameTurn = new ArrayList<NetworkProperties>();
@@ -119,29 +119,11 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public double currentNetworkScore;
 	ArrayList<String> repertoires ;
 
-
 	ResultSet resultNetwork;
 
+	//endregion
 
-	// EndRegion
-
-	// EndRegion
-
-	/**	Constructeur.
-	 *
-	 */
-	public FittingClass(WriteNRead wnr, CommunicationModel com, MemeFactory memeF,
-						NetworkFileLoader nfl, WorkerFactory wf, EntiteHandler eh, NetworkConstructor nc){
-		resultNetwork = new ResultSet(wnr);
-		this.com = com;
-		this.memeFactory = memeF;
-		this.writeNRead = wnr;
-		this.networkFileLoader = nfl;
-		this.workerFactory = wf;
-		this.entiteHandler = eh;
-		this.networkConstructor = nc;
-		setDefaultValue();
-	}
+	//endregion
 
 	/** Mise en place des valeurs par défault pour les variables d'utilisation
 	 *
@@ -160,7 +142,23 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		currentNetProperties.createStub();
 	}
 
-	// Region Fitting running
+	/**	Constructeur.
+	 *
+	 */
+	public FittingClass(WriteNRead wnr, CommunicationModel com, MemeFactory memeF,
+						NetworkFileLoader nfl, WorkerFactory wf, EntiteHandler eh, NetworkConstructor nc){
+		resultNetwork = new ResultSet(wnr);
+		this.com = com;
+		this.memeFactory = memeF;
+		this.writeNRead = wnr;
+		this.networkFileLoader = nfl;
+		this.workerFactory = wf;
+		this.entiteHandler = eh;
+		this.networkConstructor = nc;
+		setDefaultValue();
+	}
+
+	//region Fitting running
 
 	/** Initialisation des variables nécessaire a un fitting.
 	 * Ecriture dans les fichiers, ouverture des répertoires.
@@ -361,9 +359,9 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		kvLastActionDone.clear();
 	}
 
-	// EndRegion
+	//endregion
 
-	// Region Fitting hardstuff
+	//region Fitting hardstuff
 
 	/** Version utilisée pour savoir s'il faut continuer a faire du fitting ou si on a
 	 * attend une stabilité.
@@ -423,7 +421,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 		//endregion
 
-		// Region STEP Utilisation des scores
+		//region STEP Utilisation des scores
 		if(canStillApplyAction)
 		{
 			// Density
@@ -452,9 +450,9 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 					heAppliance = true;}
 		}
 
-		// EndRegion
+		//endregion
 
-		// Region STEP Return
+		//region STEP Return
 
 		// HARDEND
 		if(!canStillApplyAction)
@@ -485,7 +483,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			if(!stepByStep) oneMoreTurn = false;
 			if(fastDebug) System.out.println("Somme des scores inférieur a somme des SE");}
 		if(debug && !oneMoreTurn)  System.out.println( resume );
-		// EndRegion
+		//endregion
 
 		return oneMoreTurn;
 	}
@@ -771,7 +769,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		return score;
 	}
 
-	// EndRegion
+	//endregion
 
 	/** Methode la plus simple pour trouver la distance entre deux réseaux.
 	 *
@@ -892,7 +890,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		if(debug) System.out.println("Rise des threshold");
 	}
 
-	// Region Ensemble de méthode pour compter le nombre d'action réalisée dans le network.
+	//region Ensemble de méthode pour compter le nombre d'action réalisée dans le network.
 
 	/** Implemente ces handler d'entités pour pouvoir compter le nombre
 	 * d'actions réalisées afin d'etre en mesure de connaitre la progression du network.
@@ -940,7 +938,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		}
 	}
 
-	// EndRegion
+	//endregion
 
 }
 	

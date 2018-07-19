@@ -24,12 +24,12 @@ import giteri.network.network.INetworkRepresentations;
  */
 public class WriteNRead {
 
-	// Region Singleton
+	//region Singleton
 	public WriteNRead(){
 
 	}
 
-	// EndRegion
+	//endregion
 
 	final static File defaultPath = new File("DefaultPath");
 	final static Charset ENCODING = StandardCharsets.UTF_8;

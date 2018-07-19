@@ -1,5 +1,6 @@
 package giteri.run.interfaces;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Optional;
@@ -53,7 +54,7 @@ public class Interfaces {
 		
 		public void applyTargetColor(Network net, Integer actingEntite ,Set<Integer> nodeToDesignAsTarget);
 		public void resetGoodColor(Network net);
-		
+		public Color getColorAsColor(int i);
 		
 		public void addEdge(int from, int to);
 		public void addNode(int from);

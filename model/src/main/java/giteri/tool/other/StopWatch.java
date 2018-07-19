@@ -7,7 +7,7 @@ package giteri.tool.other;
  */
 public class StopWatch
 { 
-	// Region Properties
+	//region Properties
     
 	@SuppressWarnings("unused")
 	private String name;   
@@ -15,7 +15,7 @@ public class StopWatch
     private long startTime;
     private boolean isRunning;
     
-    // EndRegion
+    //endregion
     
     /** Création d'un timer, mise a zéro.
      * 

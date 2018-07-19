@@ -30,7 +30,7 @@ import giteri.meme.event.IBehaviorTransmissionListener;
  */
 public class EntiteHandler extends ThreadHandler {
 
-	// region properties
+	//region properties
 
 	private VueController ihmController;
 	private NetworkConstructor networkConstruct;
@@ -59,7 +59,7 @@ public class EntiteHandler extends ThreadHandler {
 	private ActionType lastAction = ActionType.RETRAITLIEN;
 	private int nbActionBySecond;
 
-	// endregion
+	//endregion
 
 	/** Constructeur sans param.
 	 *
@@ -74,10 +74,10 @@ public class EntiteHandler extends ThreadHandler {
 		workerFactory = workF;
 
 		entites = new HashSet<>();
-		entitesActive = new ArrayList<>(); //new ArrayList<Entite>();
-		entityListeners = new ArrayList<IActionApplyListener>();
-		memeListeners = new ArrayList<IBehaviorTransmissionListener>();
-		memeTranslationReadable = new Hashtable<String, String>();
+		entitesActive = new ArrayList<>();
+		entityListeners = new ArrayList<>();
+		memeListeners = new ArrayList<>();
+		memeTranslationReadable = new Hashtable<>();
 
 		if (Configurator.DisplayLogdebugInstantiation)
 			System.out.println("EntiteHandler constructor Closing");
@@ -89,7 +89,7 @@ public class EntiteHandler extends ThreadHandler {
 		giveMemeToEntite(Configurator.methodOfGeneration);
 	}
 
-	// region Thread
+	//region Thread
 
 	/** Les joies des constructeurs nécessitant l'un et l'autre
 	 *
@@ -145,9 +145,9 @@ public class EntiteHandler extends ThreadHandler {
 		}
 	}
 
-	// endregion
+	//endregion
 
-	// region Entité
+	//region Entité
 
 	/**
 	 * Méthode de génération de network. A placer dans le NC? Va générer les
@@ -304,9 +304,9 @@ public class EntiteHandler extends ThreadHandler {
 		}
 	}
 
-	// endregion
+	//endregion
 
-	// region Event
+	//region Event
 
 	/** Pour lancer les évènements de type meme transmis
 	 * crée un evenement pour la mise a jour de l'interface Il s'agit d'un
@@ -322,8 +322,10 @@ public class EntiteHandler extends ThreadHandler {
 		BehavTransmEvent myEvent = new BehavTransmEvent(this, entiteConcernee, ajoutOrR, message);
 
 		// On prévient les entites qui listen
-		for (IBehaviorTransmissionListener memeListener : memeListeners) {
-			memeListener.handlerBehavTransm(myEvent);
+		synchronized (memeListeners) {
+			for (IBehaviorTransmissionListener memeListener : memeListeners) {
+				memeListener.handlerBehavTransm(myEvent);
+			}
 		}
 	}
 
@@ -339,9 +341,10 @@ public class EntiteHandler extends ThreadHandler {
 		ActionApplyEvent myEvent = new ActionApplyEvent(this, entiteConcernee, memeRealisee, message);
 
 		// ON PREVIENT LES ENTITES QUI LISTEN
+		synchronized (entityListeners) {
 		for (IActionApplyListener entityListener : entityListeners) {
 			entityListener.handlerActionApply(myEvent);
-		}
+		}}
 	}
 
 	/** Ajout d'un listener a la liste des listeners a prévenir en cas d'event de
@@ -350,8 +353,11 @@ public class EntiteHandler extends ThreadHandler {
 	 * @param myListener
 	 */
 	public void addEntityListener(IActionApplyListener myListener) {
-		if (!entityListeners.contains(myListener)) {
-			entityListeners.add(myListener);
+		synchronized (entityListeners) {
+
+			if (!entityListeners.contains(myListener)) {
+				entityListeners.add(myListener);
+			}
 		}
 	}
 
@@ -360,8 +366,10 @@ public class EntiteHandler extends ThreadHandler {
 	 * @param myListener
 	 */
 	public void removeEntityListener(IActionApplyListener myListener) {
-		if (entityListeners.contains(myListener)) {
-			entityListeners.remove(myListener);
+		synchronized (entityListeners) {
+			if (entityListeners.contains(myListener)) {
+				entityListeners.remove(myListener);
+			}
 		}
 	}
 
@@ -371,8 +379,10 @@ public class EntiteHandler extends ThreadHandler {
 	 * @param myListener
 	 */
 	public void addMemeListener(IBehaviorTransmissionListener myListener) {
-		if (!memeListeners.contains(myListener)) {
-			memeListeners.add(myListener);
+		synchronized (memeListeners) {
+			if (!memeListeners.contains(myListener)) {
+				memeListeners.add(myListener);
+			}
 		}
 	}
 
@@ -381,14 +391,16 @@ public class EntiteHandler extends ThreadHandler {
 	 * @param myListener
 	 */
 	public void removeMemeListener(IBehaviorTransmissionListener myListener) {
-		if (memeListeners.contains(myListener)) {
-			memeListeners.remove(myListener);
+		synchronized (memeListeners) {
+			if (memeListeners.contains(myListener)) {
+				memeListeners.remove(myListener);
+			}
 		}
 	}
 
-	// endregion
+	//endregion
 
-	// region Meme
+	//region Meme
 
 	/** Distribut les memes aux entités suivant certain mode.
 	 *
@@ -574,11 +586,11 @@ public class EntiteHandler extends ThreadHandler {
 		return resultat;
 	}
 
-	// endregion
+	//endregion
 
 	//region PRIVATE
 
-	// region Action
+	//region Action
 
 	/** va lancer l'action d'une entitée
 	 *
@@ -834,9 +846,9 @@ public class EntiteHandler extends ThreadHandler {
 		return actionDone;
 	}
 
-	// endregion
+	//endregion
 
-	// region Meme
+	//region Meme
 
 	/** Donne des memes aux entités. Ici chaque meme est donnée une fois pour une
 	 * entité dans le réseau.
@@ -1210,7 +1222,7 @@ public class EntiteHandler extends ThreadHandler {
 		}
 	}
 
-	// endregion
+	//endregion
 
 	/**
 	 * Utilisé pour mettre a jour l'affichage du nombre d'action par seconde
@@ -1288,7 +1300,7 @@ public class EntiteHandler extends ThreadHandler {
 	}
 
 
-	// Region getter//Setter
+	//region getter//Setter
 
 	/**
 	 * Renvoi, pour affichage, en condensé index, obj et meme. ttes entités
@@ -1306,7 +1318,7 @@ public class EntiteHandler extends ThreadHandler {
 		return resultat;
 	}
 
-	// EndRegion
+	//endregion
 
 	public class memeComparatorAscending implements Comparator<Meme> {
 		@Override
@@ -1325,10 +1337,9 @@ public class EntiteHandler extends ThreadHandler {
 
 	}
 
-	// EndRegion
+	//endregion
 
-
-	// region deprecated
+	//region deprecated
 
 	/** Va retirer au noeud un edge aléatoirement si plus d'un noeud
 	 *
@@ -1388,4 +1399,6 @@ public class EntiteHandler extends ThreadHandler {
 
 		return selected;
 	}
+
+	//endregion
 }

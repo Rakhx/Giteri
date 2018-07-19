@@ -105,7 +105,7 @@ public class Controller {
 			com.setViewController(vueC);
 		}
 
-		// Region Demande d'informations
+		//region Demande d'informations
 
 		public String getDDInfos(){
 			return model.getDDInfos();
@@ -127,9 +127,9 @@ public class Controller {
 			model.takeSnapshot(Toolz.getLastSeed(), simulationPath);
 		}
 
-		// EndRegion
+		//endregion
 
-		// Region calcul pour la mise à jour d'éléments de l'interface
+		//region calcul pour la mise à jour d'éléments de l'interface
 
 		public void stabilityResearch(){
 			model.stabilityResearch();
@@ -159,9 +159,9 @@ public class Controller {
 			Configurator.semiStepProgression = !Configurator.semiStepProgression;
 		}
 
-		// EndRegion
+		//endregion
 
-		// Region generation de graphe.
+		//region generation de graphe.
 
 		/**
 		 *
@@ -212,9 +212,9 @@ public class Controller {
 			model.purgeLinks();
 		}
 
-		// EndRegion
+		//endregion
 
-		// Region thread and co
+		//region thread and co
 
 		public void suspend(){
 			model.suspend();
@@ -228,6 +228,6 @@ public class Controller {
 			model.oneStep();
 		}
 
-		// EndRegion
+		//endregion
 	}
 }

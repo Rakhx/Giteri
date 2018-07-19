@@ -25,7 +25,7 @@ public final class Configurator {
 	// affiche dans la console "param en cours"
 	public static boolean displayFittingProviderApplied = true;
 	// pas de passage au run suivant, il faut appuyer sur next
-	public static boolean manuelNextStep = true;
+	public static boolean manuelNextStep = false;
 	// mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	public static boolean autoPauseIfNexted = false;
 
@@ -80,9 +80,9 @@ public final class Configurator {
 
 	// Configuration Modèle
 	public static final boolean lotOfNodes = false;
-	public final static boolean autoRedoActionIfNoAction = false;
-	public final static int nbNode = lotOfNodes? 1000 : 100;
+	public final static int nbNode = lotOfNodes ? 1000 : 200;
 	public static int refreshInfoRate = 500;
+	public final static boolean autoRedoActionIfNoAction = false;
 
 	// Affichage
 	public static boolean displayPlotWhileSimulation = !jarMode;
@@ -90,7 +90,7 @@ public final class Configurator {
 	
 	// Config Temporaire
 
-	// Region ancien boolean, osef, etc
+	//region ancien boolean, osef, etc
 	public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-d_HH'h'mm'm'ss's'");
 	public static File defaultPathForReadingNetwork = new File("C:\\Users\\John\\IdeaProjects\\Giteri\\model\\default.txt");
 	public static Integer baseSleepTimeMulti = 0;
@@ -107,7 +107,7 @@ public final class Configurator {
 
 //	public static long randomSeed;
 
-	// EndRegion
+	//endregion
 
 	public enum EnumLauncher
 	{
@@ -117,7 +117,7 @@ public final class Configurator {
 		testProvider
 	}
 
-	// Region Concernant Meme and co
+	//region Concernant Meme and co
 
 	/** Exhaustive..
 	 *
@@ -312,6 +312,6 @@ public final class Configurator {
 		return dateFormat;
 	}
 
-	// EndRegion
+	//endregion
 }
 

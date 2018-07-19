@@ -15,7 +15,7 @@ import giteri.meme.entite.Meme;
  */
 public class MemeFactory {
 
-	// region Properties
+	//region Properties
 
 	// Singleton
 	private static MemeFactory INSTANCE = null;
@@ -37,9 +37,9 @@ public class MemeFactory {
 	private AgregatorFactory agregatorFactory;
 	private AttributFactory attributFactory;
 
-	// endregion
+	//endregion
 
-	// Region SINGLETON Constructor & Co
+	//region SINGLETON Constructor & Co
 	public MemeFactory(ActionFactory actionFac, AgregatorFactory agregatorFac, AttributFactory attributFac ){
 		memeExisting = new ArrayList<Meme>();
 		memeFitting = new ArrayList<Meme>();

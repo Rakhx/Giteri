@@ -16,7 +16,7 @@ import giteri.run.configurator.Configurator;
  */
 public class NetworkProperties implements Cloneable{
 	
-	// Region properties ! les propriétés publics sont utilisées génériquement !
+	//region properties ! les propriétés publics sont utilisées génériquement !
 	
 	public String name;
 	public double density;
@@ -29,7 +29,7 @@ public class NetworkProperties implements Cloneable{
 	private Hashtable<Integer, Double> furDurchschnitt;
 	private int activator;
 	private Integer networkInstance;
-	// EndRegion
+	//endregion
 	
 	/**
 	 * 
@@ -113,7 +113,7 @@ public class NetworkProperties implements Cloneable{
 		return result;
 	}
 	
-	// Region getter / setter
+	//region getter / setter
 	
 	public Object getValue(Configurator.NetworkAttribType type){
 		switch (type) {
@@ -366,5 +366,5 @@ public class NetworkProperties implements Cloneable{
 //		values += ""+ entete + " ; " +density+" ; "+ddAvg +" ; "+ ddInterQrt + " ; " + avgClust;
 		return values;
 	}
-	// EndRegion
+	//endregion
 }

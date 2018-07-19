@@ -9,13 +9,13 @@ import java.util.Collections;
  */
 public class Network {
 	
-	// Region Properties
+	//region Properties
 	
 	private ArrayList<Node> nodes;
 	private ArrayList<Edge> edges;
 	private Integer updateId;
 
-	// EndRegion
+	//endregion
 
 	// Constructeur
 	public Network(){
@@ -31,7 +31,7 @@ public class Network {
 		edges.clear();
 	}
 	
-	// Region Public methods
+	//region Public methods
 	
 	/** Méthode pour ajouter un edge 
 	 * 
@@ -206,9 +206,9 @@ public class Network {
 			edge.setMyColor(color);
 	}
 	
-	// EndRegion
+	//endregion
 
-	// Region Private Methode
+	//region Private Methode
 	
 	/** Ajoute un node a la liste des nodes,
 	 * si il n'existe pas de node possédant cet index.
@@ -313,5 +313,5 @@ public class Network {
 		this.removeEdge(edgeee);
 	}
 
-	// EndRegion
+	//endregion
 }

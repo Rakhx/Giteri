@@ -4,6 +4,7 @@ import giteri.meme.mecanisme.ActionFactory;
 import giteri.network.networkStuff.NetworkConstructor;
 import giteri.network.networkStuff.WorkerFactory;
 import giteri.run.configurator.Configurator;
+import giteri.run.interfaces.Interfaces;
 import giteri.run.interfaces.Interfaces.IReadNetwork;
 import giteri.run.interfaces.Interfaces.ISetValues;
 import giteri.run.interfaces.Interfaces.IView;
@@ -98,7 +99,9 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	ActionFactory actionFactory ;
 
 	// entitehandler, memefactory, ntworkconstructor
-	DrawerGraphStream drawerGraphStream;
+	//DrawerGraphStream drawerGraphStream;
+	Interfaces.DrawerInterface drawerGraphStream;
+
 
 	WriteNRead writeNRead;
 
@@ -221,7 +224,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 			   WorkerFactory workerFactory,
 			   EntiteHandler entiteHandler,
 			   ActionFactory actionFactory ,
-			   DrawerGraphStream drawerGraphStream,
+			   Interfaces.DrawerInterface drawerGraphStream,
 			   WriteNRead wnr) {
 
 		super("-");
@@ -267,7 +270,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		Init();
 	}
 
-	// region de fonction public, diverses
+	//region de fonction public, diverses
 
 	/**
 	 * Réinitilise l'interface aux valeurs de base, entre les steps de
@@ -371,7 +374,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		// RETRAIT
 	}
 
-	// Region INTERFACE IVIEW
+	//region INTERFACE IVIEW
 
 	/**
 	 * affiche le nombre d'action par seconde.
@@ -407,9 +410,9 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		return this.chartDensityOverProba;
 	}
 
-	// endregion
+	//endregion
 
-	// EndRegion
+	//endregion
 
 	//<editor-fold desc="Création des éléments de IHM">
 	/**
@@ -972,7 +975,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		Class<?> c = new NetworkProperties().getClass();
 		for (int i = 0; i < c.getFields().length; i++) {
-			// Region reflection
+			//region reflection
 			JLabel pair;
 			String properties;
 			Object value = new Object();
@@ -994,7 +997,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 			} catch (IllegalArgumentException e1) {
 				e1.printStackTrace();
 			}
-			// EndRegion
+			//endregion
 
 			try {
 				pair = new JLabel(properties + ": "
@@ -1457,7 +1460,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	}
 	//</editor-fold>
 
-	// Region concernant la mise a jour des informations de l'interface
+	//region concernant la mise a jour des informations de l'interface
 
 	/** Plot dans la série "Density Over Proba". DEPRECATED.
 	 *
@@ -1624,9 +1627,9 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		}
 	}
 
-	// EndRegion
+	//endregion
 
-	// Region Autres CLASSE
+	//region Autres CLASSE
 	/** Action de faire avancer step par step.
 	 *
 	 */
@@ -1673,6 +1676,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		return x;
 	}
 
-	// EndRegion
+	//endregion
 
 }

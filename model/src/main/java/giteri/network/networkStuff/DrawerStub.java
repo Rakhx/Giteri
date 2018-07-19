@@ -1,5 +1,6 @@
 package giteri.network.networkStuff;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -60,4 +61,7 @@ public class DrawerStub implements DrawerInterface{
 	public void resetGoodColor(Network net) {
 	}
 
+	public Color getColorAsColor(int i){
+		return new Color(0,0,0);
+	}
 }

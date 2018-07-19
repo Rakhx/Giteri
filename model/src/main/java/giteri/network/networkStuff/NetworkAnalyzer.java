@@ -15,7 +15,7 @@ import giteri.tool.other.WriteNRead;
  */
 public class NetworkAnalyzer extends StatAndPlotGeneric {
 
-	// Region Properties 
+	//region Properties
 
 
 
@@ -24,9 +24,9 @@ public class NetworkAnalyzer extends StatAndPlotGeneric {
 	// Attribut propre a la classe
 	private int module = 0;
 
-	// EndRegion
+	//endregion
 
-	// Region Constructor
+	//region Constructor
 
 	private static NetworkAnalyzer INSTANCE = null;
 
@@ -38,11 +38,11 @@ public class NetworkAnalyzer extends StatAndPlotGeneric {
 		super(entiteHandler, memeFactory, networkConstructor, wnr, nfl,wf);
 	}
 
-	// EndRegion
+	//endregion
 
-	// Region Public methods
+	//region Public methods
 
-	// Region StatAndPlotInterface
+	//region StatAndPlotInterface
 
 	/** lors d'un changement de type ajout ou retrait de lien
 	 *
@@ -59,8 +59,8 @@ public class NetworkAnalyzer extends StatAndPlotGeneric {
 		return 0;
 	}
 
-	// EndRegion
+	//endregion
 
-	// EndRegion
+	//endregion
 
 }

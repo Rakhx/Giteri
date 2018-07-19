@@ -293,7 +293,7 @@ public class Entite implements Comparable<Entite>{
 		return succes;
 	}
 
-	// Region Getter/Setter
+	//region Getter/Setter
 
 	/**
 	 *
@@ -426,6 +426,6 @@ public class Entite implements Comparable<Entite>{
 		return Integer.compare(this.index, o.index);
 	}
 
-	// EndRegion
+	//endregion
 
 }

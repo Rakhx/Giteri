@@ -56,7 +56,7 @@ public class ResultSet {
 //		networkPropertiesById = new Hashtable<>();
 	}
 
-	// Region Public Method
+	//region Public Method
 
 	/**
 	 * Renvoi les scores en fonction des ID en fonction des distributions
@@ -170,11 +170,11 @@ public class ResultSet {
 		writeNRead.writeSmallFile2(rep, "NetworkDetailsCSV", Arrays.asList(toWriteDetailled));
 	}
 
-	// EndRegion
+	//endregion
 
-	// Region private
+	//region private
 
-	// REGION SCORE ETC
+	//region SCORE ETC
 
 	/**
 	 * Va calculer la moyenne et l'écart type de la série de nework properties en parametre
@@ -275,7 +275,7 @@ public class ResultSet {
 //		displayShit(dataFormat, activationCode);
 //	}
 
-	// REGION DISPLAY ETC
+	//region DISPLAY ETC
 
 //	/**  Affiche les données sélectionnées,
 //	 *
@@ -478,4 +478,4 @@ public class ResultSet {
 		processData(interestingNetwork, 23);
 	}
 
-	// EndRegion */
+	//endregion */

@@ -5,7 +5,7 @@ public class StopWatchFactory {
 
 	TreeNode<StopWatch> watches;
 	
-	// Region singleton
+	//region singleton
 	
 	static private StopWatchFactory INSTANCE= null;
 	private StopWatchFactory(){
@@ -18,7 +18,7 @@ public class StopWatchFactory {
 		return INSTANCE;
 	}
 	
-	// EndRegion
+	//endregion
 	
 	/** Va afficher sur l'interface les temps d'execution des différentes
      * watch.

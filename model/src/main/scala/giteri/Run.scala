@@ -14,7 +14,7 @@ import giteri.tool.other.WriteNRead
 
 object Run {
 
-  def run(network: File, one: Double, two: Double, three: Double, four: Double, five : Double, seed: Long):Double ={ // Region Param
+  def run(network: File, one: Double, two: Double, three: Double, four: Double, five : Double, seed: Long):Double ={ //region Param
     val rand = new java.util.Random(seed)
     JarVersion.run(network, one, two, three, four, five)
     // val s = io.Source.fromFile(network).getLines()
