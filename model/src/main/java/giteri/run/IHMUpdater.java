@@ -9,7 +9,6 @@ public class IHMUpdater extends ThreadHandler{
 	Thread t;
 	@Override
 	public void doRun() {
-		// TODO ICI
 		// Method d'update d'IHM
 		// puis wait sur le NC
 		

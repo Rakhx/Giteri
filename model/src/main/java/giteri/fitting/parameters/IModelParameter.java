@@ -2,13 +2,9 @@ package giteri.fitting.parameters;
 
 import java.util.*;
 
-import giteri.meme.entite.Entite;
-import giteri.meme.event.ActionApplyEvent;
-import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.IMemeAvailableListener;
 import giteri.meme.event.MemeAvailableEvent;
 import giteri.tool.math.Toolz;
-import giteri.run.configurator.Configurator;
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
 
@@ -590,7 +586,7 @@ public interface IModelParameter<T> {
 				memeo.add(meme);
 			}
 
-			entiteHandler.giveMemeToEntiteXFirst(memeo);
+			entiteHandler.giveXMemeFromListToEntite(memeo);
 		}
 
 		/** Va choisir un meme aléatoirement et lui donner une valeur de propagation

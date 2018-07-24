@@ -66,8 +66,8 @@ public class MemeFactory {
 		// L'action qui compose le meme
 		ActionFactory.IAction action = actionFactory.getAction(actionAsked);
 		@SuppressWarnings("rawtypes")
-		ArrayList<AttributFactory.IAttribut> attribs = new ArrayList<AttributFactory.IAttribut>();
-		Hashtable<String, Hashtable<Integer ,AgregatorFactory.IAgregator>> KVAttribAgreg = new Hashtable<String, Hashtable<Integer ,AgregatorFactory.IAgregator>>();
+		ArrayList<AttributFactory.IAttribut> attribs = new ArrayList<>();
+		Hashtable<String, Hashtable<Integer ,AgregatorFactory.IAgregator>> KVAttribAgreg = new Hashtable<>();
 
 		AttributFactory.IAttribut<?> attribut;
 		Hashtable<Integer ,AgregatorFactory.IAgregator> listAgregator;
@@ -103,21 +103,6 @@ public class MemeFactory {
 		kvMemeIndexColor.put(toReturn, ++lastIndexUsed);
 
 		return toReturn;
-	}
-
-	/** Va définir les memes disponibles sur la simu courante.
-	 *
-	 */
-	public void setMemeAvailableForSimulation(){
-	ArrayList<Meme> hihi = (ArrayList<Meme>) blabla(true);
-	}
-
-
-	public ArrayList<?> blabla(boolean po){
-		if(po)
-			return new ArrayList<String>();
-		else
-			return new ArrayList<Meme>();
 	}
 
 	/** pas opti mais plus rapide. ( espérons ).
@@ -189,18 +174,6 @@ public class MemeFactory {
 
 		return resultat;
 	}
-
-
-
-	/** Permet de retourner l'ensemble des memes disponibles pour la map
-	 *
-	 * @return l'ensemble des memes qui ont été généré par la factory.
-	 */
-//	public ArrayList<Meme> getMemeAvailable(boolean forFitting) {
-//		if(forFitting)
-//			return memeFitting;
-//		return memeExisting;
-//	}
 
 	/** Retourne les memes disponibles qui font un certain type d'action
 	 * en paramètre.

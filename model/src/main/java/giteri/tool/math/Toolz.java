@@ -178,6 +178,40 @@ public class Toolz {
 		
 		return toUnsort;
 	}
+
+
+	/** Shuffle les corespondances key et value d'une hashMap.
+	 *
+	 * @param toShuffle
+	 * @param totalRandom Défini l'aspect déterministe de l'opération.
+	 * @param <A> type des keys
+	 * @param <B> type des values
+	 * @return une hashmap pour laquelle les associations key value ont été mélangées.
+	 */
+	public static <A extends Object,B extends Object> Hashtable<A,B> shuffleHashmap(Map<A,B> toShuffle, boolean totalRandom){
+		Hashtable<A,B> unSorted = new Hashtable<A,B>();
+		Set<A> keys = toShuffle.keySet();
+		Collection<B> values = toShuffle.values();
+		ArrayList<B> valuesConversion = new ArrayList<>(values);
+		Random myRand = new Random(0);
+
+		if(totalRandom){
+			valuesConversion = unsortArray(valuesConversion);
+		}else {
+			for (int i = 0; i < valuesConversion.size() * 5; i++) {
+				valuesConversion.add(valuesConversion.remove(myRand.nextInt(valuesConversion.size())));
+			}
+		}
+
+		int i = 0;
+		for (A key: keys) {
+			unSorted.put(key, valuesConversion.get(i));
+			i++;
+		}
+
+
+		return unSorted;
+	}
 	
 	/** Ajoute, dans une hashtable(key, arraylist<value>) une valeur, que la key existe
 	 * déjà ou non. 

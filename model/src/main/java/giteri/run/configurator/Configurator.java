@@ -16,7 +16,7 @@ public final class Configurator {
 	public static boolean jarMode = true;
 	public static boolean systemPaused = false;
 	public static boolean writeNetworkResultOnFitting = false;
-	public static MemeDistributionType methodOfGeneration = MemeDistributionType.FollowingFitting;
+	public static MemeDistributionType methodOfGeneration ;//= MemeDistributionType.FollowingFitting;
 
 	// FITTING
 
@@ -27,7 +27,7 @@ public final class Configurator {
 	// pas de passage au run suivant, il faut appuyer sur next
 	public static boolean manuelNextStep = false;
 	// mise en pause automatique avant un changement de run. Il faut appuyer sur next
-	public static boolean autoPauseIfNexted = false;
+	public static boolean autoPauseIfNexted = true;
 
 	// PROPAGATION DE MEME
 
@@ -39,7 +39,7 @@ public final class Configurator {
 	public static boolean fixedSlotForBreeder = true;
 	// Donne des random add et rmv a tt le monde pour (?) gagner du temps
 	// A tester les résultats
-	public static boolean initializeDefaultBehavior = false;
+	public static boolean initializeDefaultBehavior = true;
 	public static int activationCodeForScore = 55;
 	public static int activationCodeAllAttribExceptDD = 247;
 	public static int activationCodeAllAttrib = 255;
@@ -79,8 +79,8 @@ public final class Configurator {
 	public static boolean debugOpenMole = false;
 
 	// Configuration Modèle
-	public static final boolean lotOfNodes = false;
-	public final static int nbNode = lotOfNodes ? 1000 : 200;
+	public static final boolean lotOfNodes = true;
+	public final static int nbNode = lotOfNodes ? 1000 : 100;
 	public static int refreshInfoRate = 500;
 	public final static boolean autoRedoActionIfNoAction = false;
 
@@ -138,8 +138,7 @@ public final class Configurator {
 		SingleCombinaison,
 		AllCombinaison,
 		AllSingle,
-		specificDistrib,
-		FollowingFitting
+		specificDistrib
 	}
 
 	public enum MemeActivityPossibility{

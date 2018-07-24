@@ -13,7 +13,7 @@ import giteri.meme.entite.Meme;
  */
 public class ActionFactory{
 
-	//region singleton Stuff
+	//region  constructeur
 	private EntiteHandler entiteHandler;
 
 	public ActionFactory(){ }
@@ -58,17 +58,15 @@ public class ActionFactory{
 		 * @param cibles la cible l'action de l'entite
 		 * @return String = action réalisée, vide sinon
 		 */
-		public abstract String applyAction(Entite asker, Set<Entite> cibles);
+		String applyAction(Entite asker, Set<Entite> cibles);
 
-		public ActionType getActionType();
+		ActionType getActionType();
 
-		public String getFourCharName();
-
+		String getFourCharName();
 
 		/** Intance d'entite handler pour faire les actions.
 		 *
 		 */
-
 
 	}
 

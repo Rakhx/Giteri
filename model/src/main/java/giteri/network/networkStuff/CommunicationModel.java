@@ -146,7 +146,7 @@ public class CommunicationModel implements IModel {
 	 */
 	public void takeSnapshot(long seed, Optional<ArrayList<String>> simulationPath){
 		String screen = "Screenshot.png";
-		ArrayList<String> path = simulationPath.orElse(new ArrayList<String>
+		ArrayList<String> path = simulationPath.orElse(new ArrayList<>
 				(Arrays.asList("defaultRep",""+Configurator.getDateFormat().format(new Date()))));
 		nl.takeSnapshot(path, seed);
 		path.add(screen);
@@ -228,11 +228,6 @@ public class CommunicationModel implements IModel {
 		eh.OneStep();
 //		nc.OneStep();
 	}
-
-
-	//endregion
-
-	//region private method
 
 	//endregion
 }

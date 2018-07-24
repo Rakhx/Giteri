@@ -66,6 +66,7 @@ public class Entite implements Comparable<Entite>{
 //			intervalOfSelection.put(meme, roll);
 //		}
 
+		intervalOfSelection.clear();
 		for (Meme meme : getMyMemes()) {
 			roll = 1.0 / getMyMemes().size();
 			intervalOfSelection.put(meme, roll);

@@ -4,14 +4,14 @@ import giteri.run.interfaces.Interfaces.DrawerInterface;
 
 import java.awt.Color;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Set;
+import java.util.*;
 
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.network.Edge;
 import giteri.network.network.Network;
 
+import giteri.tool.math.Toolz;
+import giteri.tool.objects.ObjectRef;
 import org.graphstream.algorithm.APSP;
 import org.graphstream.algorithm.APSP.APSPInfo;
 import org.graphstream.algorithm.Toolkit;
@@ -42,8 +42,8 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 		super(entiteHandler, memeFactory, networkConstructor, wnr, nfl, wf);
 		if(Configurator.DisplayLogdebugInstantiation)
 			System.out.println("DrawerGraphStream Constructor");
-		colorPieAsString = new Hashtable<Integer, String>();
-		colorPieAsColor = new Hashtable<Integer, Color>();
+		colorPieAsString = new Hashtable<>();
+		colorPieAsColor = new Hashtable<>();
 		setColorPie();
 		fs = new FileSinkImages("pre", FileSinkImages.OutputType.PNG, FileSinkImages.Resolutions.HD1080,
 				FileSinkImages.OutputPolicy.NONE);
@@ -53,11 +53,13 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 
 	// Graphe associé
 	private Graph graph;
+	// x3
+	private int nbColorWanted = 3;
 	private Hashtable<Integer, String> colorPieAsString;
 	private Hashtable<Integer, Color> colorPieAsColor;
 
 	FileSinkImages fs;
-	private int nbAction = 0;
+
 
 	/** Permet de transmettre l'instance du graph.
 	 *
@@ -293,6 +295,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 			}
 		}
 
+		// utilisé pour le step by step
 		attribut += "node.TARGET {fill-color: "+ colorPieAsString.get(100)+";}";
 		attribut += "node.NONTARGET {fill-color: "+ colorPieAsString.get(101)+";}";
 
@@ -321,47 +324,39 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 		}
 	}
 
-	/**
+	/** TODO [WayPoint]- Initialisation des couleurs pour le graphe
 	 *
 	 */
 	private void setColorPie(){
-		colorPieAsString.put(0, "rgb(204,0,0)");
-		colorPieAsColor. put(0, new Color(204,0,0));
-		colorPieAsString.put(1, "rgb(255,153,0)");
-		colorPieAsColor. put(1, new Color(255,153,0));
-		colorPieAsString.put(2, "rgb(255,204,0)");
-		colorPieAsColor. put(2, new Color(255,204,0));
-		colorPieAsString.put(3, "rgb(255,102,102)");
-		colorPieAsColor. put(3, new Color(255,102,102));
-		colorPieAsString.put(4, "rgb(102,0,102)");
-		colorPieAsColor. put(4, new Color(102,0,102));
-		colorPieAsString.put(5, "rgb(102,0,255)");
-		colorPieAsColor. put(5, new Color(102,0,255));
-		colorPieAsString.put(6, "rgb(0,0,204)");
-		colorPieAsColor. put(6, new Color(0,0,204));
-		colorPieAsString.put(7, "rgb(51,204,255)");
-		colorPieAsColor. put(7, new Color(51,204,255));
-		colorPieAsString.put(8, "rgb(0,102,102)");
-		colorPieAsColor. put(8, new Color(0,102,102));
-		colorPieAsString.put(9, "rgb(51,102,0)");
-		colorPieAsColor. put(9, new Color(51,102,0));
-		colorPieAsString.put(10, "rgb(250,250,250)");
-		colorPieAsColor. put(10, new Color(0,0,0));
-		colorPieAsString.put(11, "rgb(250,250,250)");
-		colorPieAsColor. put(11, new Color(0,0,0));
-		colorPieAsString.put(12, "rgb(0,255,0)");
-		colorPieAsColor. put(12, new Color(0,255,0));
-		colorPieAsString.put(13, "rgb(102,51,0)");
-		colorPieAsColor. put(13, new Color(102,51,0));
-		colorPieAsString.put(14, "rgb(204,153,255)");
-		colorPieAsColor. put(14, new Color(204,153,255));
-		colorPieAsString.put(15, "rgb(153,204,204)");
-		colorPieAsColor. put(15, new Color(153,204,204));
-		colorPieAsString.put(16, "rgb(153,51,0)");
-		colorPieAsColor. put(16, new Color(153,51,0));
-		colorPieAsString.put(17, "rgb(253,102,102)");
-		colorPieAsColor. put(17, new Color(253,102,102));
+
+		int i= 0;
+		for (int r = 0; r <= 250; r += 250/nbColorWanted)
+			for (int g = 0; g <= 250; g += 250/nbColorWanted)
+				for (int b = 0; b <= 250; b += 250/nbColorWanted)
+				{
+					if(r + g + b == 0)
+						continue;
+					colorPieAsColor.put(i, new Color(r,g,b));
+					i++;
+				}
+
+		colorPieAsColor = Toolz.shuffleHashmap(colorPieAsColor, false);
+		for (Integer index: colorPieAsColor.keySet()) {
+			colorPieAsString.put(index, "rgb("
+					+ colorPieAsColor.get(index).getRed()+","
+					+ colorPieAsColor.get(index).getGreen()+","
+					+ colorPieAsColor.get(index).getBlue()+")");
+
+		}
+
+		if(Configurator.semiStepProgression){
+			colorPieAsString.put(100, "rgb(204,0,0)");
+			colorPieAsColor. put(100, new Color(204,0,0));
+			colorPieAsString.put(101, "rgb(0,0,0)");
+			colorPieAsColor. put(101, new Color(0,0,0));
+		}
 	}
+
 	//endregion
 
 	//region fonction pour obtenir des mesures sur le graph

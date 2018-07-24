@@ -150,8 +150,8 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		fitting.explorator = ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
 
-		if(!Configurator.jarMode)
-			Configurator.methodOfGeneration = Configurator.MemeDistributionType.FollowingFitting;
+//		if(!Configurator.jarMode)
+//			Configurator.methodOfGeneration = Configurator.MemeDistributionType.FollowingFitting;
 	}
 
 	/**

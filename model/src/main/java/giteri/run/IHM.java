@@ -1342,7 +1342,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		btFitting.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Configurator.methodOfGeneration = Configurator.MemeDistributionType.FollowingFitting;
+//				Configurator.methodOfGeneration = Configurator.MemeDistributionType.FollowingFitting;
 				toggleEnableInterface();
 				modelController.fittingNetworks();
 			}

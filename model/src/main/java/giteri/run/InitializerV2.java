@@ -49,7 +49,7 @@ public class InitializerV2 {
         else if(launcher == Configurator.EnumLauncher.ihm){
             Configurator.methodOfGeneration = Configurator.MemeDistributionType.SingleBasic;
             Configurator.displayPlotWhileSimulation = true;
-            Configurator.withGraphicalDisplay = false;
+            Configurator.withGraphicalDisplay = true;
             Configurator.jarMode = false;
             Configurator.systemPaused = true;
             Configurator.writeNetworkResultOnFitting = true;

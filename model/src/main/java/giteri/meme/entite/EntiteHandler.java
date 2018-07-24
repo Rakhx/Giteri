@@ -316,7 +316,8 @@ public class EntiteHandler extends ThreadHandler {
 
 		// On crée un événement rappelant l'état courant concernant les memes;
 		synchronized (entitesActive) {
-			entitesActive.add(entiteConcernee);
+			if(!entitesActive.contains(entiteConcernee))
+				entitesActive.add(entiteConcernee);
 		}
 
 		BehavTransmEvent myEvent = new BehavTransmEvent(this, entiteConcernee, ajoutOrR, message);
@@ -402,7 +403,9 @@ public class EntiteHandler extends ThreadHandler {
 
 	//region Meme
 
-	/** Distribut les memes aux entités suivant certain mode.
+	/** Distribut les memes aux entités suivant certains mode.
+	 * Utilisé pour les lancement manuels. l'apply du IModelParameter DiffuProba
+	 * fourni une liste et appelle giveXMemeFromListToEntite
 	 *
 	 * @param distrib
 	 */
@@ -416,9 +419,6 @@ public class EntiteHandler extends ThreadHandler {
 				break;
 			case AllCombinaison:
 				giveMemeToEntiteGeneric();
-				break;
-			case FollowingFitting:
-				giveMemeToEntiteFollowingFitting();
 				break;
 			case AllSingle:
 				giveMemeBasicAllNodes();
@@ -436,20 +436,22 @@ public class EntiteHandler extends ThreadHandler {
 	 *
 	 * @param memes
 	 */
-	public void giveMemeToEntiteXFirst(List<Meme> memes) {
-		int i = 0;
-		ArrayList<Entite> entiteContente = new ArrayList<Entite>();
+	public void giveXMemeFromListToEntite(List<Meme> memes) {
+		ArrayList<Entite> entiteContente = new ArrayList<>();
 		Iterator<Entite> entitees = entites.iterator();
 		Entite actual;
+		ArrayList<Entite> others = new ArrayList<>(entites);
 
 		for (Meme meme : memes) {
 			actual = entitees.next();
 			eventMemeChanged(actual,actual.addMeme(meme, true), Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			entiteContente.add(actual);
-
 		}
 
-		if(Configurator.initializeDefaultBehavior) giveFluideMeme(entiteContente);
+		if(Configurator.initializeDefaultBehavior) {
+			others.removeAll(entiteContente);
+			giveFluideMeme(others);
+		}
 	}
 
 	/** Obtention de la liste des memes disponibles sur la map, soit les simples,
@@ -516,9 +518,21 @@ public class EntiteHandler extends ThreadHandler {
 	 */
 	public String translateMemeCombinaisonReadable(String memeCombinaison) {
 		String compo = "";
-		for (String string : memeTranslationReadable.keySet())
-			if(memeCombinaison.contains(string))
-				compo += "." + memeTranslationReadable.get(string);
+		String[] combinaison = memeCombinaison.contains(".")? memeCombinaison.split("."):new String[]{memeCombinaison};
+		for (String oneName:
+			 memeTranslationReadable.keySet()) {
+			for (String combi:combinaison) {
+				if(combi.compareToIgnoreCase(oneName) == 0)
+					compo += "." + memeTranslationReadable.get(oneName);
+			}
+		}
+
+//		for (String string : memeTranslationReadable.keySet())
+//			if(memeCombinaison.contains(string)) {
+//			cpt++;
+//			compo += "." + memeTranslationReadable.get(string);
+//
+//			}
 		return compo;
 	}
 
@@ -527,11 +541,12 @@ public class EntiteHandler extends ThreadHandler {
 	 *
 	 */
 	public String checkPropertiesByMemePossession() {
-		Hashtable<String, ArrayList<Entite>> entiteByMemePossession = new Hashtable<String, ArrayList<Entite>>();
+		Hashtable<String, ArrayList<Entite>> entiteByMemePossession = new Hashtable<>();
 		@SuppressWarnings("unchecked")
-		HashSet<Entite> toExamine = (HashSet<Entite>) ((HashSet<Entite>) entites).clone();
-		ArrayList<Integer> SelfDegrees = new ArrayList<Integer>();
-		ArrayList<Integer> othersDegrees = new ArrayList<Integer>();
+		HashSet<Entite> toExamine = new HashSet<>(entites);
+//				(HashSet<Entite>) ((HashSet<Entite>) entites).clone();
+		ArrayList<Integer> SelfDegrees = new ArrayList<>();
+		ArrayList<Integer> othersDegrees = new ArrayList<>();
 		String memes = "";
 		Entite nodeConnected;
 		String resultat = "";
@@ -544,8 +559,7 @@ public class EntiteHandler extends ThreadHandler {
 				if (memes == "")
 					memes = "AUCUN";
 
-				Toolz.addElementInHashArray(entiteByMemePossession, memes,
-						entite);
+				Toolz.addElementInHashArray(entiteByMemePossession, memes, entite);
 			}
 		} catch (ConcurrentModificationException e) {
 			System.err.println(e.getStackTrace());
@@ -723,11 +737,15 @@ public class EntiteHandler extends ThreadHandler {
 					// Transmission de l'un de behavior possédé par l'acting.
 					if (Configurator.usePropagationSecondGeneration)
 					{
+						// Selectionne un meme en fonction de sa proba de propagation
 						Meme selectedMeme = movingOne.chooseAction();
 						if(selectedMeme == null){
+							Double error = 1.;
+							error = error / 0;
 							if(Configurator.debugEntiteHandler) System.out.println("Meme joué par " + movingOne.toString() + " disparu");
 						}
-						memeApply = selectedMeme.toFourCharString();
+
+//						memeApply = selectedMeme.toFourCharString();
 						if (entite.receiveMeme(selectedMeme))
 							eventMemeChanged(entite, selectedMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
 					}
@@ -856,17 +874,23 @@ public class EntiteHandler extends ThreadHandler {
 	 */
 	private void giveMemeToEntiteOnlyBasis() {
 		ArrayList<Entite> entiteContente = new ArrayList<>();
+		ArrayList<Entite> others = new ArrayList<>(entites);
+
 		Iterator<Entite> entitees = entites.iterator();
 		Entite actual;
 
-		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING)) {
+		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING)) {
 			actual = entitees.next();
 			actual.addMeme(meme, true);
 			eventMemeChanged(actual, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			entiteContente.add(actual);
 		}
 
-		if(Configurator.initializeDefaultBehavior) giveFluideMeme(entiteContente);
+		if(Configurator.initializeDefaultBehavior){
+			others.removeAll(entiteContente);
+			giveFluideMeme(others);
+		}
+
 	}
 
 	/** Donne les combinaisons de meme existantes sur la map à tous les agents, un par un.
@@ -945,13 +969,6 @@ public class EntiteHandler extends ThreadHandler {
 		}
 	}
 
-	/** Vide car les memes dispo sur la map devraient etre gérés par un IModelParameter
-	 *
-	 */
-	private void giveMemeToEntiteFollowingFitting() {
-
-	}
-
 	/**
 	 *
 	 */
@@ -965,7 +982,7 @@ public class EntiteHandler extends ThreadHandler {
 		ArrayList<Double> currentParamSet = swParamSet3;
 		Iterator<Entite> entitees = entites.iterator();
 
-		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING)) {
+		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.EXISTING,Configurator.ActionType.ANYTHING)) {
 			entiteReceptrice = entitees.next();
 			if(meme.getName().compareTo("Add∞") == 0){
 				meme.setProbaOfPropagation(currentParamSet.get(i));
@@ -1000,14 +1017,16 @@ public class EntiteHandler extends ThreadHandler {
 	// TODO REFACTORING Prendre les memes a appliquer a tous en parametre plutot qu'avoir des variables statics
 	/** Dote les entités qui n'ont pas encore d'action des actions Add et remove de base.
 	 *
-	 * @param entiteAlreadyDone
+	 * @param entitesToBeApplied
 	 */
-	private void giveFluideMeme(ArrayList<Entite> entiteAlreadyDone){
-		for (Entite entite : entites) {
-			if(!entiteAlreadyDone.contains(entite)){
-				if(addRandom != null)eventMemeChanged(entite, entite.addMeme(addRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
-				if(removeRandom != null)eventMemeChanged(entite, entite.addMeme(removeRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
-			}
+	private void giveFluideMeme(ArrayList<Entite> entitesToBeApplied){
+
+
+		for (Entite entite : entitesToBeApplied) {
+				if(addRandom != null)
+					eventMemeChanged(entite, entite.addMeme(addRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
+				if(removeRandom != null)
+					eventMemeChanged(entite, entite.addMeme(removeRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
 		}
 	}
 
@@ -1107,8 +1126,8 @@ public class EntiteHandler extends ThreadHandler {
 		//memeFactory.registerMemeAction("Add-",.8,add, attributs,KVAttributAgregator, true ,true);
 
 		agregators.clear();
-		agregators.put(0, theMost);
-		agregators.put(1, notLinked);
+		agregators.put(0, notLinked);
+		agregators.put(1, theMost);
 		agregators.put(2, random);
 		memeFactory.registerMemeAction("Add∞", 1, add, attributs, KVAttributAgregator, true ,true);
 
@@ -1121,26 +1140,32 @@ public class EntiteHandler extends ThreadHandler {
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, random);
-//		addRandom =
-		memeFactory.registerMemeAction("AddØ",.8, add, attributs, KVAttributAgregator, false, false);
+		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, add, attributs, KVAttributAgregator, false, false);
+
+		agregators.clear();
+		agregators.put(0, notLinked);
+		agregators.put(1, random);
+		memeFactory.registerMemeAction("AddØ",0.1, add, attributs, KVAttributAgregator, false, false);
+
+
+
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, random);
-		//removeRandom =
-		// memeFactory.registerMemeAction("RmvØ",.4,remove, attributs,  KVAttributAgregator, true, true);
+		removeRandom = memeFactory.registerMemeAction("RmvØ",1, remove, attributs,  KVAttributAgregator, true, false);
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv-", .8, remove, attributs, KVAttributAgregator, true ,true);
+		memeFactory.registerMemeAction("Rmv-", .8, remove, attributs, KVAttributAgregator, false ,true);
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, mineInf);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv+", .8, remove, attributs, KVAttributAgregator, true ,true);
+		memeFactory.registerMemeAction("Rmv+", .8, remove, attributs, KVAttributAgregator, false ,true);
 
 		agregators.clear();
 		agregators.put(0, hopAWay);
@@ -1151,13 +1176,9 @@ public class EntiteHandler extends ThreadHandler {
 		// memeFactory.getMemeAction("Puri",0,puri, attributs,
 		// KVAttributAgregator, true);
 
-		for (Meme memeDispo : memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING)) {
+		for (Meme memeDispo : memeFactory.getMemes(Configurator.MemeList.EXISTING,Configurator.ActionType.ANYTHING)) {
 			memeTranslationReadable.put(memeDispo.toFourCharString(),memeDispo.getName());
 		}
-
-//		MemeFactory lol = memeFactory;
-//		lol.getClass();
-		// uhhum.
 
 	}
 
