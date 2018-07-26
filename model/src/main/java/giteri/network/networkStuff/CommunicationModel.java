@@ -17,6 +17,7 @@ import giteri.run.configurator.Configurator.NetworkAttribType;
 import giteri.run.controller.Controller.VueController;
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
+import jdk.nashorn.internal.runtime.regexp.joni.Config;
 
 /** Classe de représentation du modèle proposé via un controller
  * à l'IHM. 
@@ -115,7 +116,7 @@ public class CommunicationModel implements IModel {
 	 *
 	 */
 	public void stabilityResearch() {
-		this.calculator.fitNetwork(0);
+		this.calculator.fitNetwork();
 	}
 
 	/** Lancement du processus de fittage du réseau courant a celui
@@ -123,7 +124,7 @@ public class CommunicationModel implements IModel {
 	 *
 	 */
 	public void fittingNetworks(){
-		this.calculator.fitNetwork(1);
+		this.calculator.fitNetwork();
 	}
 
 	public void displayPolar(){
@@ -133,8 +134,12 @@ public class CommunicationModel implements IModel {
 	/** Plus de fonctionnalité
 	 *
 	 */
-	public void toggleStep(){
-		// Configurator.fittingStepByStep  = !Configurator.fittingStepByStep ;
+	public void fittingOnce(){
+		Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
+		Configurator.typeOfMemeUseForFitting = Configurator.MemeList.ONMAP;
+//		eh.giveMemeToEntite(Configurator.methodOfGeneration);
+
+		this.calculator.fitNetwork();
 	}
 
 	public void rdmConfig(){

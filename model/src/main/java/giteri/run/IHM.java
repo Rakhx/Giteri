@@ -49,7 +49,6 @@ import javax.swing.text.DefaultFormatter;
 import giteri.tool.math.Toolz;
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.network.NetworkProperties;
-import giteri.network.networkStuff.DrawerGraphStream;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.jfree.chart.ChartFactory;
@@ -146,7 +145,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	public JButton btFitting;
 	public JButton btPolar;
 	public JButton btNextStep;
-	public JButton btToggleStep;
+	public JButton bFittingOneStep;
 	public JButton btRandomConfig;
 	public JButton btSemiAutomaticStep;
 
@@ -644,7 +643,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		btFitting = new JButton("Fitting");
 		btPolar = new JButton("Polar");
 		btNextStep = new JButton("Next Step");
-		btToggleStep = new JButton("Rien");
+		bFittingOneStep = new JButton("FittingOnce");
 		btRandomConfig = new JButton("Find Stability");
 		btSemiAutomaticStep= new JButton("ToggleSemiautoAction");
 
@@ -678,7 +677,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 								.addComponent(btNextStep,
 										GroupLayout.DEFAULT_SIZE,
 										hauteurComponent, hauteurComponent)
-								.addComponent(btToggleStep,
+								.addComponent(bFittingOneStep,
 										GroupLayout.DEFAULT_SIZE,
 										hauteurComponent, hauteurComponent)
 								.addComponent(btRandomConfig,
@@ -731,7 +730,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 								.addComponent(btNextStep,
 										GroupLayout.DEFAULT_SIZE,
 										hauteurComponent, hauteurComponent)
-								.addComponent(btToggleStep,
+								.addComponent(bFittingOneStep,
 										GroupLayout.DEFAULT_SIZE,
 										hauteurComponent, hauteurComponent)
 								.addComponent(btRandomConfig,
@@ -1360,7 +1359,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 			}
 		});
 
-		btToggleStep.addActionListener(e -> modelController.toggleStep());
+		bFittingOneStep.addActionListener(e -> modelController.fittingOnce());
 
 		btRandomConfig.addActionListener(e -> modelController.rdmConfig());
 

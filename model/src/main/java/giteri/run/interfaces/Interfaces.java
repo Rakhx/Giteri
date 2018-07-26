@@ -71,7 +71,7 @@ public class Interfaces {
 		
 		public void updateNetworkProperties(TinyNetwork net, NetworkProperties netProp, int activationCode);
 		public double getAPL();
-		public Double fitNetwork(int activator);
+		public Double fitNetwork();
 //		public void searchStability();
 		public void fitNextStep();
 		public void testStability();
@@ -104,7 +104,7 @@ public class Interfaces {
 		void fittingNetworks();
 		void displayPolar();
 		void fittingNextStep();
-		void toggleStep();
+		void fittingOnce();
 		void rdmConfig();
 		void takeSnapshot(long seed, Optional<ArrayList<String>> simulationPath);
 		

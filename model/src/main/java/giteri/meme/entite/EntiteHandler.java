@@ -448,6 +448,8 @@ public class EntiteHandler extends ThreadHandler {
 			entiteContente.add(actual);
 		}
 
+		// On file des memes d'ajout et retrait random aux entités qui n'ont pas eu de comportement de base a l'initialisation
+		// TODO a deplacer avnt l'appel de cette fonction pour que tout les giveMeme puisse faire de la fluidité?
 		if(Configurator.initializeDefaultBehavior) {
 			others.removeAll(entiteContente);
 			giveFluideMeme(others);
@@ -518,7 +520,7 @@ public class EntiteHandler extends ThreadHandler {
 	 */
 	public String translateMemeCombinaisonReadable(String memeCombinaison) {
 		String compo = "";
-		String[] combinaison = memeCombinaison.contains(".")? memeCombinaison.split("."):new String[]{memeCombinaison};
+		String[] combinaison = memeCombinaison.contains(".")? memeCombinaison.split("\\."):new String[]{memeCombinaison};
 		for (String oneName:
 			 memeTranslationReadable.keySet()) {
 			for (String combi:combinaison) {
@@ -527,12 +529,6 @@ public class EntiteHandler extends ThreadHandler {
 			}
 		}
 
-//		for (String string : memeTranslationReadable.keySet())
-//			if(memeCombinaison.contains(string)) {
-//			cpt++;
-//			compo += "." + memeTranslationReadable.get(string);
-//
-//			}
 		return compo;
 	}
 
@@ -544,7 +540,6 @@ public class EntiteHandler extends ThreadHandler {
 		Hashtable<String, ArrayList<Entite>> entiteByMemePossession = new Hashtable<>();
 		@SuppressWarnings("unchecked")
 		HashSet<Entite> toExamine = new HashSet<>(entites);
-//				(HashSet<Entite>) ((HashSet<Entite>) entites).clone();
 		ArrayList<Integer> SelfDegrees = new ArrayList<>();
 		ArrayList<Integer> othersDegrees = new ArrayList<>();
 		String memes = "";
@@ -579,8 +574,7 @@ public class EntiteHandler extends ThreadHandler {
 					if (nodeConnected != null)
 						othersDegrees.add(nodeConnected.getDegree());
 					else
-						System.err
-								.println("Ne DEVRAIT PAS ETRE POSSIBLE EH CHECKPROPERTIESBY...");
+						System.err.println("Ne DEVRAIT PAS ETRE POSSIBLE EH CHECKPROPERTIESBY...");
 				}
 			}
 
@@ -630,7 +624,7 @@ public class EntiteHandler extends ThreadHandler {
 			if(Configurator.debugEntiteHandler)
 				System.out.println("[EH.runEntite]- action choisie " + memeAction.toFourCharString());
 
-			// APPLICATION DE L'ACTION
+			// APPLICATION ET PROPAGATION DE L'ACTION
 			rez = doAction(entiteActing, memeAction);
 			if(Configurator.debugEntiteHandler)
 				System.out.println("[EH.runEntite]- resultat de l'action" + rez);
@@ -783,7 +777,7 @@ public class EntiteHandler extends ThreadHandler {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private String doAction(Entite movingOne, Meme memeAction) {
+	private String  doAction(Entite movingOne, Meme memeAction) {
 		String actionDone = "";
 		String memeApply = "";
 		Set<Entite> cibles ;
@@ -792,7 +786,7 @@ public class EntiteHandler extends ThreadHandler {
 
 		// Execution d'un meme de l'entite.
 		if (memeAction != null) {
-			cibles = (HashSet<Entite>) ((HashSet<Entite>) entites).clone();
+			cibles = new HashSet<>(entites);
 			cibles.remove(movingOne);
 
 			// Pour chaque attribut sur lesquels on applique des filtres
@@ -897,7 +891,7 @@ public class EntiteHandler extends ThreadHandler {
 	 *
 	 */
 	private void giveMemeToEntiteGeneric() {
-		Hashtable<Integer, ArrayList<Meme>> composition ;//= new Hashtable<Integer, ArrayList<Meme>>();
+		Hashtable<Integer, ArrayList<Meme>> composition;
 		composition = getMemeCombinaisonAvailable();
 
 		for (Entite entite : entites)

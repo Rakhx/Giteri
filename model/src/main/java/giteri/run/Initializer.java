@@ -150,7 +150,7 @@ public class Initializer {
             networkConstructor.start();
             entiteHandler.start();
 
-            return stat.fitNetwork(0);
+            return stat.fitNetwork();
 
         }else if (launcher == Configurator.EnumLauncher.ihm) {
             entiteHandler.initialisation();

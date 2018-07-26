@@ -128,7 +128,9 @@ public class Entite implements Comparable<Entite>{
 					// Dans le cas ou il s'agit d'une action de breeder, donc à ne pas remplacer
 					if(memeReplaced.getAction().toString() == iAction.toString()){
 						return false;
-					} } }
+					}
+				}
+			}
 			synchronized(myMemes){
 				myMemes.remove(memeReplaced);
 			}

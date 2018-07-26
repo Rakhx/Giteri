@@ -15,19 +15,20 @@ public final class Configurator {
 	public static boolean withGraphicalDisplay = false;
 	public static boolean jarMode = true;
 	public static boolean systemPaused = false;
-	public static boolean writeNetworkResultOnFitting = false;
-	public static MemeDistributionType methodOfGeneration ;//= MemeDistributionType.FollowingFitting;
+	public static boolean writeNetworkResultOnFitting = true;
+	public static MemeDistributionType methodOfGeneration = MemeDistributionType.Nothing;
 
 	// FITTING
 
 	public static EnumExplorationMethod explorator = EnumExplorationMethod.exhaustive;
 	public static FittingBehavior memeCombinaisonOnMap = FittingBehavior.simpleAndComplex;
+	public static MemeList typeOfMemeUseForFitting = MemeList.FITTING;
 	// affiche dans la console "param en cours"
 	public static boolean displayFittingProviderApplied = true;
 	// pas de passage au run suivant, il faut appuyer sur next
 	public static boolean manuelNextStep = false;
 	// mise en pause automatique avant un changement de run. Il faut appuyer sur next
-	public static boolean autoPauseIfNexted = true;
+	public static boolean autoPauseIfNexted = false;
 
 	// PROPAGATION DE MEME
 
@@ -79,7 +80,7 @@ public final class Configurator {
 	public static boolean debugOpenMole = false;
 
 	// Configuration Modèle
-	public static final boolean lotOfNodes = true;
+	public static final boolean lotOfNodes = false;
 	public final static int nbNode = lotOfNodes ? 1000 : 100;
 	public static int refreshInfoRate = 500;
 	public final static boolean autoRedoActionIfNoAction = false;
@@ -138,7 +139,8 @@ public final class Configurator {
 		SingleCombinaison,
 		AllCombinaison,
 		AllSingle,
-		specificDistrib
+		specificDistrib,
+		Nothing
 	}
 
 	public enum MemeActivityPossibility{
@@ -162,7 +164,8 @@ public final class Configurator {
 	public static ArrayList<String> getConfig(){
 		ArrayList<String> elements = new ArrayList<String>();
 		elements.add("Nombre de noeuds: "+ nbNode);
-		elements.add("Proba d'évaporation: "+ probaRetraitLien);
+		elements.add("Méthode de propagation" + (usePropagationSecondGeneration ?
+				"Transmet l'un des meme portée":"Transmission direct du meme joué"));
 		return elements;
 	}
 

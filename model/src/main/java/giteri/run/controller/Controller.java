@@ -147,8 +147,8 @@ public class Controller {
 			model.fittingNextStep();
 		}
 
-		public void toggleStep(){
-			//model.toggleStep();
+		public void fittingOnce(){
+			model.fittingOnce();
 		}
 
 		public void rdmConfig(){

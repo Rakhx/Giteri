@@ -22,9 +22,6 @@ import java.util.Hashtable;
 
 public class StatAndPlotJarVersion extends NetworkAnalyzer {
 
-	//public ArrayList<Double> probaVoulu = new ArrayList<>();
-//	boolean debug = Configurator.overallDebug;
-
 	/** Constructeur sans paramètre.
 	 *
 	 */
@@ -36,18 +33,18 @@ public class StatAndPlotJarVersion extends NetworkAnalyzer {
 	protected void initializeConfigForStability(FittingClass fitting){
 		int i = 0;
 		double value;
-		Hashtable<Meme, GenericBooleanParameter> memeDispo = new Hashtable<Meme,GenericBooleanParameter>();
-		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<Integer, IModelParameter<?>>();
-		Hashtable<Meme, GenericDoubleParameter> kvMemeValue = new Hashtable<Meme, IModelParameter.GenericDoubleParameter>();
+		Hashtable<Meme, GenericBooleanParameter> memeDispo = new Hashtable<>();
+		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
+		Hashtable<Meme, GenericDoubleParameter> kvMemeValue = new Hashtable<>();
 
-		for (Meme meme :memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING))
+		for (Meme meme :memeFactory.getMemes(Configurator.typeOfMemeUseForFitting,Configurator.ActionType.ANYTHING))
 			memeDispo.put(meme, new GenericBooleanParameter());
 
 		MemeAvailability memeProvider = new MemeAvailability(memeDispo);
 		providers.put(1,memeProvider);
 		memeProvider.setEntiteHandler(entiteHandler);
 
-		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING)){
+		for (Meme meme : memeFactory.getMemes(Configurator.typeOfMemeUseForFitting,Configurator.ActionType.ANYTHING)){
 			value = probaVoulu.get(i++);
 			kvMemeValue.put(meme, new GenericDoubleParameter(value,value, value,1.));
 		}

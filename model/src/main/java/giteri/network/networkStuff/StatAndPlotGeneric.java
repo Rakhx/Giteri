@@ -72,7 +72,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	/** Lancement de thread qui va comparer un réseau lu et le réseau en cours.
 	 *
 	 */
-	public Double fitNetwork(int activator){
+	public Double fitNetwork(){
 		if(!Configurator.jarMode){
 			(new Thread(){
 				public void run() {
@@ -83,7 +83,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		}else{
 			return fittingLauncher();
 		}
-			
 	}
 
 	/** PREMIERE FONCTION APPELEE DANS LA LONGUE SERIE DES FITTING SEARCHING
@@ -124,7 +123,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING))
 			memeDispo.put(meme, new GenericBooleanParameter());
 
-
 		MemeAvailability memeProvider = new MemeAvailability(memeDispo);
 		memeProvider.setEntiteHandler(entiteHandler);
 		providers.put(1,memeProvider);
@@ -137,9 +135,9 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		memeProvider.addMemeListListener(memeDiffu);
 
 		if(Configurator.explorator == EnumExplorationMethod.oneShot){
-			ArrayList<Double> InOrderOfParameter = new ArrayList<Double>(Arrays.asList(1.,0.365018173274458,0.089130672733655,0.484877681454417,1.));
+			ArrayList<Double> InOrderOfParameter = new ArrayList<>(Arrays.asList(1.,0.365018173274458,0.089130672733655,0.484877681454417,1.));
 
-			ArrayList<Double> probaVoulu = new ArrayList<Double>();
+			ArrayList<Double> probaVoulu = new ArrayList<>();
 			probaVoulu.add(InOrderOfParameter.get(3));
 			probaVoulu.add(InOrderOfParameter.get(0));
 			probaVoulu.add(InOrderOfParameter.get(1));

@@ -198,16 +198,11 @@ public class MemeFactory {
 	/** Retourne la liste des memes dispos en string.
 	 *
 	 */
-	public String getMemeAvailableAsString(boolean forFitting){
+	public String getMemeAvailableAsString(Configurator.MemeList usage){
 		String resultat = "";
-		if(forFitting)
-			for (Meme meme : memeFitting) {
-				resultat += ":" + meme.toFourCharString() + "%" + meme.getProbaOfPropagation();
-			}
-		else
-			for (Meme meme : memeExisting) {
-				resultat += ":" + meme.toFourCharString() + "%" + meme.getProbaOfPropagation();
-			}
+		for (Meme meme : getMemes(usage, ActionType.ANYTHING)) {
+			resultat += ":" + meme.toFourCharString() + "-ProbaPropagation:" + meme.getProbaOfPropagation();
+		}
 
 		return resultat;
 	}

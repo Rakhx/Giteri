@@ -17,58 +17,58 @@ public interface IModelParameter<T> {
 	 *
 	 * @return Une donnée de type T
 	 */
-	public T getValue();
+	 T getValue();
 	/** Applique la nouvelle valeur au systeme. doit avoir acces au 
 	 * entités ec etc
 	 *
 	 */
-	public void apply();
+	 void apply();
 	/** Va a la donnée suivante. Si int, i++
 	 *
 	 * @return true si la valeur existe
 	 */
-	public boolean gotoNext();
+	 boolean gotoNext();
 	/** Va à une valeur random de la plage disponible.
 	 *
 	 */
-	public void gotoRandom();
+	 void gotoRandom();
 	/** Retourne a la valeur minimum de la donnée. Pour explorer tt les
 	 * valeurs lors que plusieurs paramètres sont couplés.
 	 *
 	 */
-	public void gotoMinValue();
+	 void gotoMinValue();
 	/** La donnée sous forme string pour affichage. La rendre explicite en 
 	 * précisant de quelle donnée il s'agit.
 	 *
 	 * @return
 	 */
-	public String valueString();
+	 String valueString();
 	/**
 	 *
 	 * @return
 	 */
-	public String nameString();
+	 String nameString();
 	/** Obtient une liste de string définissant les valeurs possibles.
 	 * Doit etre réutilisable dans setPossibleValue
 	 *
 	 * @return
 	 */
-	public List<String> getPossibleValue();
+	 List<String> getPossibleValue();
 	/** Obtient la valeur actuelle qui pourra etre remise par le setPossibleValue
 	 *
 	 * @return
 	 */
-	public String getActualValue();
+	 String getActualValue();
 	/** Permet de partir d'un string et
 	 *
 	 * @param ref
 	 */
-	public void setPossibleValue(String ref);
+	 void setPossibleValue(String ref);
 	/**
 	 *
 	 * @param eh
 	 */
-	public void setEntiteHandler(EntiteHandler eh);
+	 void setEntiteHandler(EntiteHandler eh);
 
 	/** CLASSE ABSTRAITE qui implémente une partie de l'interface, définissant
 	 * la valeur T contenu, sa valeur min et sa valeur max.
@@ -531,7 +531,7 @@ public interface IModelParameter<T> {
 		 *
 		 */
 		public MemeDiffusionProba(){
-			value = new Hashtable<Meme, GenericDoubleParameter>();
+			value = new Hashtable<>();
 		}
 
 		/** Prend un hashmap de meme associé a un doubleParameter

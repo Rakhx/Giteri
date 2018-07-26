@@ -105,11 +105,11 @@ public class NetworkFileLoader implements IReadNetwork {
 		File repertoires = writeNRead.createAndGetDirFromString(reps);
 
 		// Enregistrement des settings dans un fichier texte
-		ArrayList<String> toWrite = new ArrayList<String>(Configurator.getConfig());
-		toWrite.add("screenshot n°: " + nombreScreen++);
+		ArrayList<String> toWrite = new ArrayList<>(Configurator.getConfig());
+		toWrite.add("screenshot n°: " + ++nombreScreen);
 		toWrite.add("seed n°: " + seed);
 		toWrite.add("Density: " + communicationModel.getDensity());
-		toWrite.add("Proportion: "+ memeFactory.getMemeAvailableAsString(false));
+		toWrite.add("Meme on map et propagation: "+ memeFactory.getMemeAvailableAsString(Configurator.MemeList.ONMAP));
 		toWrite.add("Meme possession: "+ communicationModel.eh.checkPropertiesByMemePossession());
 		toWrite.add("DD stuff: "+ communicationModel.getDDInfos());
 
