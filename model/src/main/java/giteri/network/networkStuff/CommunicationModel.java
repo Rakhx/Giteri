@@ -32,8 +32,7 @@ public class CommunicationModel implements IModel {
 	public VueController view;
 	public WorkerFactory wf;
 
-	//region SINGLETON
-
+	//region constructeur
 	/** Constructeur sans paramètre.
 	 *
 	 */
@@ -49,20 +48,10 @@ public class CommunicationModel implements IModel {
 		this.nl = ln;
 
 	}
-
-	//endregion
-
-	public void setCalculator(StatAndPlotInterface stat){
-		this.calculator = stat;
-	}
-
-
-	/** Constructeur.
-	 *
-	 */
 	public void setViewController(VueController vue){
 		view = vue;
 	}
+	//endregion
 
 	//region getting data
 
@@ -167,7 +156,6 @@ public class CommunicationModel implements IModel {
 		calculator.fitNextStep();
 	}
 
-//	public void
 	//endregion
 
 	//region Generation Graphe

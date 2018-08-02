@@ -66,6 +66,10 @@ public final class Configurator {
 	public static boolean DisplayLogdebugInstantiation = false;
 	public static boolean DisplayLogGetAvailableMeme = false;
 
+	// I/O
+	// Défini si on écrit les détails des actions dans un fichier texte.
+	public static boolean writeHeavyDetails = true;
+
 	// affichage de debug
 	// Affiche le fait de vouloir passer au step suivant
 	public static boolean debugStatAndPlot = true;

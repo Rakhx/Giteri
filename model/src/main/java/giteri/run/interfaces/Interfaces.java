@@ -21,6 +21,7 @@ import giteri.meme.event.IBehaviorTransmissionListener;
 /** Ensemble des interfaces utilisées dans le programme.
  * 
  *
+ *
  */
 public class Interfaces {
 	
@@ -88,7 +89,7 @@ public class Interfaces {
 		void toggleEnableInterface();
 		void toggleWkProgress(String message);
 		void addValueToDensityOverProbaSerie(double x, double y);
-		public void addValueToApplianceSerie(double time,Hashtable<Integer, Double>  value);
+		void addValueToApplianceSerie(double time,Hashtable<Integer, Double>  value);
 		JFreeChart getDDChart();
 		JFreeChart getDensityChart();
 		JFreeChart getDensityOverProbaChart();
@@ -167,7 +168,4 @@ public class Interfaces {
 		public ArrayList<String> getNetworkEdges();
 	}
 
-	public interface ILauncherCompanion {
-		Runnable provideRunable();
-	}
 }

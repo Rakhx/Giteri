@@ -33,7 +33,7 @@ public class NetworkFileLoader implements IReadNetwork {
 	CommunicationModel communicationModel;
 	MemeFactory memeFactory;
 	WriteNRead writeNRead;
-	Hashtable<Integer, ArrayList<Integer>> nodesAndLinks = new Hashtable<Integer, ArrayList<Integer>>();
+	Hashtable<Integer, ArrayList<Integer>> nodesAndLinks = new Hashtable<>();
 	boolean changed = true;
 	private TinyNetwork net;
 	int nombreScreen = 0;
