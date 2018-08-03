@@ -1,6 +1,6 @@
 package giteri.run.jarVersion;
 
-import giteri.run.Initializer;
+import giteri.run.InitializerV2;
 import giteri.run.configurator.Configurator;
 
 import java.io.File;
@@ -65,7 +65,7 @@ public class JarVersion {
     public static Double run(File fileInput, double param1, double param2, double param3, double param4, double param5) {
         ArrayList<Double> probaBehavior = new ArrayList<Double>();
         probaBehavior.addAll(Arrays.asList(param1,param2,param3,param4,param5));
-        return Initializer.initialize(launcher, fileInput, probaBehavior);
+        return InitializerV2.initialize(launcher, fileInput, probaBehavior);
     }
 
 }

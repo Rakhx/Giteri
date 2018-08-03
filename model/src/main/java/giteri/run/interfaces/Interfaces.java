@@ -40,7 +40,7 @@ public class Interfaces {
 		void whatToDoWithOneLine(String line, String separator);
 		void init();
 		NetworkProperties getNetworkProperties();
-		Graph getGraphFromdataRead();
+		Graph getGraphFromDataRead();
 	}
 	
 	/** Interface des classes qui s'occupe de rendre le giteri.network.
@@ -162,7 +162,7 @@ public class Interfaces {
 		public void resetRepresentation();
 		/** Obtient la liste des edges du giteri.network sous la forme
 		 * IndexNode espace IndexNode, classé en ordre croissant. 
-		 * 
+		 *  TODO Si volonté de faire apparaitre les noeuds seuls, modifier l'implémentation de cette fonction.
 		 * @return
 		 */
 		public ArrayList<String> getNetworkEdges();

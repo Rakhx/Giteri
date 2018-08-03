@@ -1,7 +1,7 @@
 package giteri.test;
 
 import giteri.fitting.algo.IExplorationMethod;
-import giteri.run.Initializer;
+import giteri.run.InitializerV2;
 import giteri.run.configurator.Configurator;
 
 /** Classe de test pour vérifier les providers.
@@ -9,7 +9,7 @@ import giteri.run.configurator.Configurator;
  */
 public class TestProvider {
     public static void main(String[] args)  {
-        Initializer.initialize(Configurator.EnumLauncher.testProvider, null, null);
+        InitializerV2.initialize(Configurator.EnumLauncher.testProvider, null, null);
     }
 
     public static class Companion {

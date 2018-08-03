@@ -179,9 +179,9 @@ public interface INetworkRepresentations extends INetworkRepresentation{
 		
 		@Override
 		public synchronized ArrayList<String> getNetworkEdges(){
-			ArrayList<String> edges = new ArrayList<String>();
-			ArrayList<Integer> nodesIndex = new ArrayList<Integer>();
-			ArrayList<Integer> nodeLinks  = new ArrayList<Integer>();
+			ArrayList<String> edges = new ArrayList<>();
+			ArrayList<Integer> nodesIndex = new ArrayList<>();
+			ArrayList<Integer> nodeLinks  = new ArrayList<>();
 			nodesIndex.addAll(nodesAndConnections.keySet());
 			nodesIndex.sort(null);
 			

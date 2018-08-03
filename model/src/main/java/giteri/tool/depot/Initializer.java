@@ -1,4 +1,4 @@
-package giteri.run;
+package giteri.tool.depot;
 
 import giteri.fitting.algo.IExplorationMethod;
 import giteri.fitting.parameters.IModelParameter;
@@ -9,6 +9,8 @@ import giteri.meme.mecanisme.AgregatorFactory;
 import giteri.meme.mecanisme.AttributFactory;
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.networkStuff.*;
+import giteri.run.IHM;
+import giteri.run.IHMStub;
 import giteri.run.configurator.Configurator;
 import giteri.run.controller.Controller;
 import giteri.run.interfaces.Interfaces;
