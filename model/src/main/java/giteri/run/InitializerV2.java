@@ -86,7 +86,7 @@ public class InitializerV2 {
         DrawerGraphStream drawerGraphStream = null;
         StatAndPlotGeneric stat = null;
        // Interfaces.IView displaysMng = new DisplaysMng();
-        DisplaysMng displaysMng = new DisplaysMng();
+     //   DisplaysMng displaysMng = new DisplaysMng();
 
         if(ihmLauncher)
         {
@@ -130,11 +130,11 @@ public class InitializerV2 {
 
             // La fenetre en elle meme Controller de Model donné a l'IHM
             IHMStub fenetre = new IHMStub();
-            displaysMng.addView(fenetre);
+            vControl.addView(fenetre);
 
             // TODO ICICICICICICI EN COURS ICICICCICI
            // vControl.setView(fenetre);
-            vControl.setView(displaysMng);
+           // vControl.setView(displaysMng);
 
 
             entiteHandler.initialisation();
@@ -183,10 +183,10 @@ public class InitializerV2 {
                         writeNRead);
 
             // le gestionnaire de multiple vue possible.
-            displaysMng.addView(fenetre);
-            vControl.setView(displaysMng);
+            vControl.addView(fenetre);
+           // vControl.setView(displaysMng);
             if(Configurator.writeHeavyDetails)
-                displaysMng.addView(new FileView(true));
+                vControl.addView(new FileView(true));
 
             // TODO ICICICICICCICI
             //

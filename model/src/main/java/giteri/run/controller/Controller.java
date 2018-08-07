@@ -1,13 +1,12 @@
 package giteri.run.controller;
 
 import giteri.run.configurator.Configurator;
+import giteri.run.interfaces.Interfaces;
 import giteri.run.interfaces.Interfaces.IModel;
 import giteri.run.interfaces.Interfaces.IReadNetwork;
 import giteri.run.interfaces.Interfaces.IView;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Optional;
+import java.util.*;
 
 import giteri.tool.math.Toolz;
 import giteri.network.network.NetworkProperties;
@@ -26,22 +25,29 @@ public class Controller {
 	 *
 	 */
 	public class VueController{
-		IView view;
-
+		//IView view;
+		Set<IView> vues;
 		public VueController(){
-
+			vues = new HashSet<>();
 		}
 
-		public void setView(IView viewParam){
-			view = viewParam;
+		/** Ajout d'une vue a la liste.
+		 *
+		 * @param toAdd
+		 */
+		public void addView(Interfaces.IView toAdd){
+			vues.add(toAdd);
 		}
-
 		public void resetIHM(){
-			view.resetIHM();
+			for (Interfaces.IView vue:  vues) {
+				vue.resetIHM();
+			}
 		}
 
 		public void resetPlotDensity(){
-			view.resetDensityOverProbaChart();
+			for (Interfaces.IView vue:  vues) {
+				vue.resetDensityOverProbaChart();
+			}
 		}
 
 		/** Ajoute une valeur dans la chart de density over proba.
@@ -49,8 +55,11 @@ public class Controller {
 		 * @param x
 		 * @param y
 		 */
-		public void addDensityOverProbaValue(double x, double y){
-			view.addValueToDensityOverProbaSerie(x, y);
+		public void addDensityOverProbaValue(double x, double y)
+		{
+			for (Interfaces.IView vue:  vues) {
+				vue.addValueToDensityOverProbaSerie(x,y);
+			}
 		}
 
 		/** ajoute une série de valeur pour le time T
@@ -59,7 +68,9 @@ public class Controller {
 		 * @param values
 		 */
 		public void addValueToApplianceSerie(double time, Hashtable<Integer, Double>  values){
-			view.addValueToApplianceSerie( time, values);
+			for (Interfaces.IView vue:  vues) {
+				vue.addValueToApplianceSerie(time, values);
+			}
 		}
 
 
@@ -68,7 +79,9 @@ public class Controller {
 		 * @param message
 		 */
 		public void setDisplayNbAction(String message){
-			view.setDisplayNbAction(message);
+			for (Interfaces.IView vue:  vues) {
+				vue.setDisplayNbAction(message);
+			}
 		}
 
 		/** Permet d'afficher un nouveau message ou de toggle le 
@@ -76,17 +89,32 @@ public class Controller {
 		 * @param message
 		 */
 		public void displayMessageOnFitPanel(String message){
-			view.toggleWkProgress(message);
+			for (Interfaces.IView vue:  vues) {
+				vue.toggleWkProgress(message);
+			}
 		}
 
 		public JFreeChart getDDChart(){
-			return view.getDDChart();
+			for (Interfaces.IView vue:  vues) {
+				if(vue.getDDChart() != null)
+					return vue.getDDChart();
+			}
+			return null;
 		}
+
 		public JFreeChart getDensityChart(){
-			return view.getDensityChart();
+			for (Interfaces.IView vue:  vues) {
+				if(vue.getDensityChart() != null)
+					return vue.getDensityChart();
+			}
+			return null;
 		}
 		public JFreeChart getDensityOverProbaChart(){
-			return view.getDensityOverProbaChart();
+			for (Interfaces.IView vue:  vues) {
+				if(vue.getDensityOverProbaChart() != null)
+					return vue.getDensityOverProbaChart();
+			}
+			return null;
 		}
 	}
 
