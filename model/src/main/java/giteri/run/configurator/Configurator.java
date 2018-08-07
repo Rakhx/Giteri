@@ -9,6 +9,7 @@ import giteri.tool.math.Toolz;
 
 public final class Configurator {
 
+	// VALEURS DONNEES A TITRE INDICATIF, set définitif dans l'initializer
 	// La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
 	// depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent
 	// cette configuration initiale
@@ -69,6 +70,7 @@ public final class Configurator {
 	// I/O
 	// Défini si on écrit les détails des actions dans un fichier texte.
 	public static boolean writeHeavyDetails = true;
+	public static String repByDefault = "defaultRep";
 
 	// affichage de debug
 	// Affiche le fait de vouloir passer au step suivant
@@ -97,7 +99,7 @@ public final class Configurator {
 
 	//region ancien boolean, osef, etc
 	public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-d_HH'h'mm'm'ss's'");
-	public static File defaultPathForReadingNetwork = new File("C:\\Users\\John\\IdeaProjects\\Giteri\\model\\default.txt");
+	public static File defaultPathForReadingNetwork = new File("model\\default.txt");
 	public static Integer baseSleepTimeMulti = 0;
 	private static Integer threadSleepMultiplicateur = baseSleepTimeMulti;
 

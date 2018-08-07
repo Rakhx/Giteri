@@ -21,7 +21,6 @@ import org.jfree.chart.ChartUtilities;
 
 import giteri.tool.other.WriteNRead;
 import giteri.run.configurator.Configurator;
-import giteri.meme.entite.EntiteHandler;
 
 /** classe pour loader un network depuis des lignes données en paramètres
  * Défini ce qu'il faut faire lors de la lecture d'une ligne d'un fichier.
@@ -91,7 +90,7 @@ public class NetworkFileLoader implements IReadNetwork {
 		communicationModel.calculator.updateNetworkProperties(net, netProp, Configurator.activationCodeAllAttrib);
 
 		// TODO Ici se passait le calcul lié au APL
-//		Graph graph = getGraphFromdataRead();
+//		Graph graph = getGraphFromDataRead();
 //		netProp.computeAPL(graph);
 
 		return netProp;
@@ -113,7 +112,7 @@ public class NetworkFileLoader implements IReadNetwork {
 		toWrite.add("Meme possession: "+ communicationModel.eh.checkPropertiesByMemePossession());
 		toWrite.add("DD stuff: "+ communicationModel.getDDInfos());
 
-		writeNRead.writeSmallFile2(repertoires, "config", toWrite);
+		writeNRead.writeSmallFile(repertoires, "config", toWrite);
 
 		// Enregistrement du réseau dans un fichier texte.
 		try {
@@ -157,7 +156,7 @@ public class NetworkFileLoader implements IReadNetwork {
 	}
 
 
-	public Graph getGraphFromdataRead(){
+	public Graph getGraphFromDataRead(){
 		JFrame popo = new JFrame("Lu");
 		popo.setVisible(true);
 		Graph graph = new SingleGraph("Lu");

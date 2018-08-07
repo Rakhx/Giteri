@@ -141,7 +141,7 @@ public class CommunicationModel implements IModel {
 	public void takeSnapshot(long seed, Optional<ArrayList<String>> simulationPath){
 		String screen = "Screenshot.png";
 		ArrayList<String> path = simulationPath.orElse(new ArrayList<>
-				(Arrays.asList("defaultRep",""+Configurator.getDateFormat().format(new Date()))));
+				(Arrays.asList(Configurator.repByDefault,""+Configurator.getDateFormat().format(new Date()))));
 		nl.takeSnapshot(path, seed);
 		path.add(screen);
 		wf.getDrawer().screenshotDisplay(path);

@@ -49,7 +49,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	private WorkerFactory workerFactory;
 	private NetworkConstructor networkConstructor;
 
-	public boolean debug = Configurator.debugFittingClass;
+	private boolean debug = Configurator.debugFittingClass;
 	public CommunicationModel com ;
 	public IExplorationMethod explorator;
 
@@ -189,7 +189,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			toWriteNormalCSV += currentNetProperties.getCsvHeader(Configurator.activationCodeForScore);
 			toWriteNormalCSV += ";moyenne des scores";
 			toWriteNormalCSV += ";Variance des scores";
-			writeNRead.writeSmallFile2(repOfTheSearch, "NetworkCSV", Collections.singletonList(toWriteNormalCSV));
+			writeNRead.writeSmallFile(repOfTheSearch, "NetworkCSV", Collections.singletonList(toWriteNormalCSV));
 
 			// STEP: DETAILLED
 			toWriteDetailCSV.append(header);
@@ -203,7 +203,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 			toWriteDetailCSV.append(";moyenne des scores");
 			toWriteDetailCSV.append(";Variance des scores");
-			writeNRead.writeSmallFile2(repOfTheSearch, "NetworkDetailsCSV", Collections.singletonList(toWriteDetailCSV.toString()));
+			writeNRead.writeSmallFile(repOfTheSearch, "NetworkDetailsCSV", Collections.singletonList(toWriteDetailCSV.toString()));
 
 			// Donner aux entités les memes originaux?
 		}

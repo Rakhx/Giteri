@@ -11,9 +11,10 @@ import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.networkStuff.*;
 import giteri.run.configurator.Configurator;
 import giteri.run.controller.Controller;
+import giteri.run.displaysStuff.DisplaysMng;
+import giteri.run.displaysStuff.FileView;
 import giteri.run.interfaces.Interfaces;
 import giteri.run.jarVersion.StatAndPlotJarVersion;
-import giteri.run.jarVersion.WorkerFactoryJarVersion;
 import giteri.test.TestProvider;
 import giteri.tool.other.WriteNRead;
 import org.graphstream.graph.Graph;
@@ -39,12 +40,18 @@ import static giteri.run.configurator.Configurator.withGraphicalDisplay;
 public class InitializerV2 {
     public static Double initialize(Configurator.EnumLauncher launcher, File fileInput, ArrayList<Double> probaBehavior) {
 
-        // A instancier dans les if. a lancer dans tous les cas a la fin?
+        // A instancier dans les if. à lancer dans tous les cas a la fin?
         Runnable willBeRun;
         boolean ihmLauncher = (launcher == Configurator.EnumLauncher.ihm) ;
 
         if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.jarOpenMole){
-//            Configurator.methodOfGeneration = Configurator.MemeDistributionType.FollowingFitting;
+            // La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
+	        // depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent cette configuration initiale
+            Configurator.methodOfGeneration = Configurator.MemeDistributionType.Nothing;
+            Configurator.withGraphicalDisplay = false;
+            Configurator.jarMode = true;
+            Configurator.systemPaused = false;
+            Configurator.writeNetworkResultOnFitting = true;
 
         }
         else if(launcher == Configurator.EnumLauncher.ihm){
@@ -78,8 +85,11 @@ public class InitializerV2 {
         NetworkFileLoader networkFileLoader = new NetworkFileLoader(memeFactory, writeNRead);
         DrawerGraphStream drawerGraphStream = null;
         StatAndPlotGeneric stat = null;
+       // Interfaces.IView displaysMng = new DisplaysMng();
+        DisplaysMng displaysMng = new DisplaysMng();
 
-        if(ihmLauncher ){
+        if(ihmLauncher)
+        {
             if(Configurator.withGraphicalDisplay)
                 drawerGraphStream =  new DrawerGraphStream(entiteHandler, memeFactory, networkConstructor, writeNRead, networkFileLoader, workerFactory);
             else
@@ -117,16 +127,23 @@ public class InitializerV2 {
         Controller.ModelController mControl = c.new ModelController(vControl, communicationModel);
         // Crée une fenetre stub
         if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.jarOpenMole) {
+
             // La fenetre en elle meme Controller de Model donné a l'IHM
             IHMStub fenetre = new IHMStub();
+            displaysMng.addView(fenetre);
 
-            vControl.setView(fenetre);
+            // TODO ICICICICICICI EN COURS ICICICCICI
+           // vControl.setView(fenetre);
+            vControl.setView(displaysMng);
+
+
             entiteHandler.initialisation();
 
             entiteHandler.addMemeListener(workerFactory.getDrawer());
             entiteHandler.addEntityListener(workerFactory.getCalculator());
 
             Interfaces.IReadNetwork nl = mControl.getReader();
+            // Pour pouvoir lancer direct le fitting.
             try {
                 writeNRead.readAndCreateNetwork(fileInput, nl," ","#");
             } catch (IOException e1) {
@@ -165,8 +182,14 @@ public class InitializerV2 {
                         new DrawerStub(),
                         writeNRead);
 
-            vControl.setView(fenetre);
+            // le gestionnaire de multiple vue possible.
+            displaysMng.addView(fenetre);
+            vControl.setView(displaysMng);
+            if(Configurator.writeHeavyDetails)
+                displaysMng.addView(new FileView(true));
 
+            // TODO ICICICICICCICI
+            //
             if(!Configurator.withGraphicalDisplay)
                 stat.probaVoulu = new ArrayList<>(Arrays.asList(0.,0.,0.,0.,0.,0.,0.));
 
@@ -178,6 +201,7 @@ public class InitializerV2 {
             }
 
             Interfaces.IReadNetwork nl = mControl.getReader();
+            // Permet d'éviter d'avoir besoin de cliquer sur analyse avant de fitté
             try {
                 writeNRead.readAndCreateNetwork("" + Configurator.defaultPathForReadingNetwork, nl, " ", "#");
             } catch (IOException e1) {

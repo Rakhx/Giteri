@@ -1,25 +1,15 @@
 package giteri.fitting.algo;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.io.File;
 import java.util.*;
-
-import javax.swing.JFrame;
 
 import giteri.fitting.parameters.IModelParameter;
 import giteri.tool.math.Toolz;
 import giteri.network.network.NetworkProperties;
 
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.PolarChartPanel;
-import org.jfree.chart.plot.PolarPlot;
-import org.jfree.chart.renderer.DefaultPolarItemRenderer;
 import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 
 import giteri.tool.other.WriteNRead;
 import giteri.run.configurator.Configurator;
@@ -119,7 +109,7 @@ public class ResultSet {
 		toWrite += ";" + result.getLastScore();
 		toWrite += ";" + -1;
 
-		writeNRead.writeSmallFile2(rep, "NetworkDetailsCSV", Arrays.asList(toWrite));
+		writeNRead.writeSmallFile(rep, "NetworkDetailsCSV", Arrays.asList(toWrite));
 	}
 
 	/**
@@ -166,8 +156,8 @@ public class ResultSet {
 				+ ((scoreMeanAndSd[0] * scoreMeanAndSd[0]) / (scoreMeanAndSd[0] - scoreMeanAndSd[1]));
 
 		// TODO [WayPoint]- Ecriture dans les deux csv, normal et détaillé.
-		writeNRead.writeSmallFile2(rep, "NetworkCSV", Arrays.asList(toWriteSimple));
-		writeNRead.writeSmallFile2(rep, "NetworkDetailsCSV", Arrays.asList(toWriteDetailled));
+		writeNRead.writeSmallFile(rep, "NetworkCSV", Arrays.asList(toWriteSimple));
+		writeNRead.writeSmallFile(rep, "NetworkDetailsCSV", Arrays.asList(toWriteDetailled));
 	}
 
 	//endregion
