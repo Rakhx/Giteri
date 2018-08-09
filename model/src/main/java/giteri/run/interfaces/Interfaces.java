@@ -83,6 +83,7 @@ public class Interfaces {
 	 *
 	 */
 	public interface IView {
+		void displayInfo(String type, String info);
 		void setDisplayNbAction(String message);
 		void resetIHM();
 		void resetDensityOverProbaChart();

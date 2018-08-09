@@ -9,6 +9,11 @@ import org.jfree.chart.JFreeChart;
 public class IHMStub implements IView {
 
 	@Override
+	public void displayInfo(String type, String info) {
+
+	}
+
+	@Override
 	public void setDisplayNbAction(String message) {
 		
 	}

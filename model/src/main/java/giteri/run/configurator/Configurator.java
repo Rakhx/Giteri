@@ -56,12 +56,12 @@ public final class Configurator {
 	// Affichage log
 	public static boolean DisplayLogBehaviorColors = false;
 
-	public static boolean displayLogMemeApplication = false;
-	public static boolean displayLogAvgDegreeByMeme = false;
+	public static boolean displayLogMemeApplication = true;
+	public static boolean displayLogAvgDegreeByMeme = true;
 	public static boolean displayLogMemeTransmission = false;
 
 	public static boolean displayLogRatioLogFailOverFail = false;
-	public static boolean displayLogRatioLogFailOverSuccess= false;
+	public static boolean displayLogRatioLogFailOverSuccess = false;
 	public static boolean displayLogRatioTryAddOverTryRmv = false;
 
 	public static boolean DisplayLogdebugInstantiation = false;
@@ -69,8 +69,12 @@ public final class Configurator {
 
 	// I/O
 	// Défini si on écrit les détails des actions dans un fichier texte.
-	public static boolean writeHeavyDetails = true;
+	//public static boolean writeHeavyDetails = true;
 	public static String repByDefault = "defaultRep";
+	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
+	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
+	public static int activationCodeForView = 1;
+
 
 	// affichage de debug
 	// Affiche le fait de vouloir passer au step suivant

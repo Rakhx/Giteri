@@ -10,7 +10,6 @@ import giteri.network.network.Network;
 import giteri.network.network.Node;
 import giteri.network.networkStuff.NetworkConstructor;
 import giteri.network.networkStuff.WorkerFactory;
-import giteri.tool.other.StopWatchFactory;
 import giteri.run.ThreadHandler;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.ActionType;
@@ -32,7 +31,7 @@ public class EntiteHandler extends ThreadHandler {
 
 	//region properties
 
-	private VueController ihmController;
+	private VueController vueController;
 	private NetworkConstructor networkConstruct;
 	private MemeFactory memeFactory;
 	private WorkerFactory workerFactory;
@@ -96,7 +95,7 @@ public class EntiteHandler extends ThreadHandler {
 	 * @param control
 	 */
 	public void setIHMController(VueController control) {
-		ihmController = control;
+		vueController = control;
 	}
 
 	/** Obtenir un thread a partir de la classe
@@ -135,14 +134,16 @@ public class EntiteHandler extends ThreadHandler {
 
 		if(!Configurator.jarMode){
 			checkAPM();
-			if (Configurator.displayLogAvgDegreeByMeme) {
-				cptModulo++;
-				if (cptModulo % (Configurator.refreshInfoRate * 25) == 0) {
-					cptModulo = 0;
-					System.out.println(checkPropertiesByMemePossession());
-				}
+		}
+		if (Configurator.displayLogAvgDegreeByMeme) {
+			cptModulo++;
+			if (cptModulo % (Configurator.refreshInfoRate * 25) == 0) {
+				cptModulo = 0;
+				vueController.displayInfo("AvgDgrByMeme", checkPropertiesByMemePossession());
+				//System.out.println(checkPropertiesByMemePossession());
 			}
 		}
+
 	}
 
 	//endregion
@@ -195,7 +196,7 @@ public class EntiteHandler extends ThreadHandler {
 		return actionDone;
 	}
 
-	// TODO REFACTORING A voir pour le positionnement de l'appel a cette fonction.
+	// TODO REFACTORING A voir pour le positionnement de l'appel à cette fonction.
 	/** Rappelle pour chaque entité la fonction qui définit les probabilités de
 	 * choix des règles
 	 */
@@ -636,6 +637,7 @@ public class EntiteHandler extends ThreadHandler {
 						cptActionAddTried++;
 					else if (memeAction.action.getActionType() == ActionType.RETRAITLIEN)
 						cptActionRmvTried++;
+
 				System.out.println("Tried Add/rmv " + (double) cptActionAddTried / cptActionRmvTried);
 			}
 
@@ -852,8 +854,10 @@ public class EntiteHandler extends ThreadHandler {
 			actionDone = "Nope, Entite " + movingOne.getIndex() + " Liste d'action vide ou aucune action sélectionnée";
 			eventActionDone(movingOne, null, "NOACTION");}
 
-		if (Configurator.displayLogMemeApplication)
-			System.out.println(memeApply + " " + actionDone);
+		if (Configurator.displayLogMemeApplication) {
+			vueController.displayInfo("memeApplication", memeApply + " " + actionDone);
+			// System.out.println(memeApply + " " + actionDone);
+		}
 
 		return actionDone;
 	}
@@ -884,7 +888,6 @@ public class EntiteHandler extends ThreadHandler {
 			others.removeAll(entiteContente);
 			giveFluideMeme(others);
 		}
-
 	}
 
 	/** Donne les combinaisons de meme existantes sur la map à tous les agents, un par un.
@@ -948,8 +951,6 @@ public class EntiteHandler extends ThreadHandler {
 		ArrayList<Meme> memez = new ArrayList<Meme>();
 		indexOfMemesCombinaisonRecursion = -1;
 		recursive(memesByCategory, memez, keyz, composition, -1);
-
-
 		Iterator<Entite> entitees = entites.iterator();
 		Entite actual;
 
@@ -968,14 +969,11 @@ public class EntiteHandler extends ThreadHandler {
 	 */
 	private void giveMemeToEntiteSpecific() {
 		int i = 0;
-		Hashtable<Integer, ArrayList<Meme>> behaviors = new Hashtable<Integer, ArrayList<Meme>>();
-		Hashtable<String, Integer> nameKVindex = new Hashtable<String, Integer>();
 		Entite entiteReceptrice;
-		ArrayList<Double> scParamSet = new ArrayList<Double>(Arrays.asList(0.788335449538696,0.373092466173732,0.292052580578804,0.438882845642738,0.109153677952613));
-		ArrayList<Double> swParamSet3 = new ArrayList<Double>(Arrays.asList(0.907489970963927,0.363546615459677,0.458976194767827,0.247873953220028,0.984710568248182));
+		ArrayList<Double> scParamSet = new ArrayList<>(Arrays.asList(0.788335449538696,0.373092466173732,0.292052580578804,0.438882845642738,0.109153677952613));
+		ArrayList<Double> swParamSet3 = new ArrayList<>(Arrays.asList(0.907489970963927,0.363546615459677,0.458976194767827,0.247873953220028,0.984710568248182));
 		ArrayList<Double> currentParamSet = swParamSet3;
 		Iterator<Entite> entitees = entites.iterator();
-
 		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.EXISTING,Configurator.ActionType.ANYTHING)) {
 			entiteReceptrice = entitees.next();
 			if(meme.getName().compareTo("Add∞") == 0){
@@ -1003,7 +1001,6 @@ public class EntiteHandler extends ThreadHandler {
 				entiteReceptrice.addMeme(meme, true);
 				eventMemeChanged(entiteReceptrice, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			}
-
 			i++;
 		}
 	}
@@ -1014,8 +1011,6 @@ public class EntiteHandler extends ThreadHandler {
 	 * @param entitesToBeApplied
 	 */
 	private void giveFluideMeme(ArrayList<Entite> entitesToBeApplied){
-
-
 		for (Entite entite : entitesToBeApplied) {
 				if(addRandom != null)
 					eventMemeChanged(entite, entite.addMeme(addRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
@@ -1052,20 +1047,24 @@ public class EntiteHandler extends ThreadHandler {
 		}
 	}
 
-	/**
+	/** Utilisé pour l'application des filtres step by step.
 	 *
 	 */
 	private void giveEntiteTargetedColor(Integer actingEntite, Set<Integer> targeted) {
 		networkConstruct.changeColorClass(actingEntite,targeted);
 	}
 
-	/**
+	/** Utilisé pour l'application des filtres step by step.
 	 *
 	 */
 	private void giveEntiteBaseColor() {
 		networkConstruct.resetColorClass();
 	}
 
+	/** utilisé lors du reset des réseaux.
+	 *
+	 * @param network
+	 */
 	public void synchronizeNodeConnectionWithEntiteConnection(Network network) {
 		Entite concerne;
 
@@ -1185,9 +1184,9 @@ public class EntiteHandler extends ThreadHandler {
 	 *         meme.
 	 */
 	private Hashtable<Integer, ArrayList<Meme>> getMemeCombinaisonAvailable() {
-		Hashtable<ActionType, ArrayList<Meme>> memesByCategory = new Hashtable<ActionType, ArrayList<Meme>>();
+		Hashtable<ActionType, ArrayList<Meme>> memesByCategory = new Hashtable<>();
 		ArrayList<Meme> memeOfOneCategory;
-		ArrayList<ActionType> key = new ArrayList<ActionType>();
+		ArrayList<ActionType> key = new ArrayList<>();
 
 		for (ActionType action : Configurator.ActionType.values()) {
 			if (action == ActionType.AJOUTLIEN || action == ActionType.RETRAITLIEN) {
@@ -1203,8 +1202,8 @@ public class EntiteHandler extends ThreadHandler {
 		for (int i = 0; i < key.size(); i++)
 			keyz[i] = key.get(i);
 
-		Hashtable<Integer, ArrayList<Meme>> composition = new Hashtable<Integer, ArrayList<Meme>>();
-		ArrayList<Meme> memez = new ArrayList<Meme>();
+		Hashtable<Integer, ArrayList<Meme>> composition = new Hashtable<>();
+		ArrayList<Meme> memez = new ArrayList<>();
 		indexOfMemesCombinaisonRecursion = -1;
 		recursive(memesByCategory, memez, keyz, composition, -1);
 
@@ -1248,7 +1247,7 @@ public class EntiteHandler extends ThreadHandler {
 		long elapsed = System.nanoTime() - atmLastTime;
 		if (elapsed >= Math.pow(10, 9)) {
 			// mise a jour de l'affichage du nombre d'action par seconde.
-			ihmController.setDisplayNbAction(nbActionBySecond + " action/Sec");
+			vueController.setDisplayNbAction(nbActionBySecond + " action/Sec");
 			// remise a zero du compteur
 			nbActionBySecond = 0;
 			atmLastTime = System.nanoTime();
@@ -1300,21 +1299,6 @@ public class EntiteHandler extends ThreadHandler {
 		return returnValue;
 	}
 
-
-	private void checkConsistency(){
-		ArrayList<Meme> myMemes;
-		for (Entite entite: entites) {
-			myMemes = entite.getMyMemes();
-			if(myMemes.size() > 2)
-				System.out.println("TROP DE COMPORTEMENT");
-			if(myMemes.size() == 2 && myMemes.get(0).equals(myMemes.get(1)))
-			System.out.println("Scandale deux fois le meme");
-
-		}
-
-	}
-
-
 	//region getter//Setter
 
 	/**
@@ -1335,6 +1319,21 @@ public class EntiteHandler extends ThreadHandler {
 
 	//endregion
 
+	//endregion
+
+	//region deprecated
+
+	private void checkConsistency(){
+		ArrayList<Meme> myMemes;
+		for (Entite entite: entites) {
+			myMemes = entite.getMyMemes();
+			if(myMemes.size() > 2)
+				System.out.println("TROP DE COMPORTEMENT");
+			if(myMemes.size() == 2 && myMemes.get(0).equals(myMemes.get(1)))
+				System.out.println("Scandale deux fois le meme");
+		}
+	}
+
 	public class memeComparatorAscending implements Comparator<Meme> {
 		@Override
 		public int compare(Meme arg0, Meme arg1) {
@@ -1351,10 +1350,6 @@ public class EntiteHandler extends ThreadHandler {
 		}
 
 	}
-
-	//endregion
-
-	//region deprecated
 
 	/** Va retirer au noeud un edge aléatoirement si plus d'un noeud
 	 *

@@ -25,7 +25,6 @@ public class Controller {
 	 *
 	 */
 	public class VueController{
-		//IView view;
 		Set<IView> vues;
 		public VueController(){
 			vues = new HashSet<>();
@@ -38,6 +37,16 @@ public class Controller {
 		public void addView(Interfaces.IView toAdd){
 			vues.add(toAdd);
 		}
+
+
+		//region iview part
+
+		public void displayInfo(String type, String info) {
+			for (Interfaces.IView vue:  vues) {
+				vue.displayInfo(type,info);
+			}
+		}
+
 		public void resetIHM(){
 			for (Interfaces.IView vue:  vues) {
 				vue.resetIHM();
@@ -72,7 +81,6 @@ public class Controller {
 				vue.addValueToApplianceSerie(time, values);
 			}
 		}
-
 
 		/** Affiche le nombre d'action par seconde
 		 *
@@ -116,6 +124,8 @@ public class Controller {
 			}
 			return null;
 		}
+
+		// endregion
 	}
 
 	/** Classe qui permet l'appel de fonction depusi l'extérieur

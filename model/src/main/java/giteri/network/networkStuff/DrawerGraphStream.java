@@ -85,6 +85,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 			Node noeud = graph.getNode(""+e.entite.getIndex());
 			setNodeClass(noeud, e.entite.getGraphStreamClass());
 			if(Configurator.displayLogMemeTransmission)
+
 				System.out.println(noeud+" "+e.meme.getName());
 		}
 	}

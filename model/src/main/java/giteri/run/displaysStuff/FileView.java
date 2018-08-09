@@ -65,6 +65,12 @@ public class FileView implements Interfaces.IView {
     // region implémentation d'interface
 
     @Override
+    public void displayInfo(String type, String info) {
+
+        addLine(type, Arrays.asList(oneFilePerSubject?"":type + separator + info));
+    }
+
+    @Override
     public void setDisplayNbAction(String message) {
         addLine("nbline", new ArrayList<>(Arrays.asList(message, "" + cpt++)));
     }

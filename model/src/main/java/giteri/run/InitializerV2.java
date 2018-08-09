@@ -11,7 +11,7 @@ import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.networkStuff.*;
 import giteri.run.configurator.Configurator;
 import giteri.run.controller.Controller;
-import giteri.run.displaysStuff.DisplaysMng;
+import giteri.run.displaysStuff.ConsoleView;
 import giteri.run.displaysStuff.FileView;
 import giteri.run.interfaces.Interfaces;
 import giteri.run.jarVersion.StatAndPlotJarVersion;
@@ -185,8 +185,10 @@ public class InitializerV2 {
             // le gestionnaire de multiple vue possible.
             vControl.addView(fenetre);
            // vControl.setView(displaysMng);
-            if(Configurator.writeHeavyDetails)
-                vControl.addView(new FileView(true));
+            if((Configurator.activationCodeForView & 4) == 4)
+                vControl.addView(new FileView(false));
+            if((Configurator.activationCodeForView & 2) == 2)
+                vControl.addView(new ConsoleView());
 
             // TODO ICICICICICCICI
             //

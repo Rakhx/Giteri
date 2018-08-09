@@ -375,6 +375,11 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 	//region INTERFACE IVIEW
 
+	@Override
+	public void displayInfo(String type, String info) {
+
+	}
+
 	/**
 	 * affiche le nombre d'action par seconde.
 	 *
