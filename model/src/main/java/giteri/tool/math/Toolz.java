@@ -255,7 +255,7 @@ public class Toolz {
 	 * @param value
 	 * @return true si la key existait déjé, false sinon.
 	 */
-	public static <T1 extends Object> Integer addCountToElementInHashArray(Hashtable<T1,Integer> table,T1 key, Integer value){
+	public static <T1 extends Object> Integer addCountToElementInHashArray(Map<T1,Integer> table,T1 key, Integer value){
 		Integer newValue;
 		if(table.containsKey(key)){
 			 newValue = table.get(key) + value;
@@ -276,7 +276,7 @@ public class Toolz {
 	 * @param value
 	 * @return true si la key existait déjé, false sinon.
 	 */
-	public static <T1 extends Object> Integer removeCountToElementInHashArray(Hashtable<T1,Integer> table,T1 key, Integer value){
+	public static <T1 extends Object> Integer removeCountToElementInHashArray(Map<T1,Integer> table,T1 key, Integer value){
 		Integer newValue;
 		if(table.containsKey(key)){
 			 newValue = table.get(key) - value;

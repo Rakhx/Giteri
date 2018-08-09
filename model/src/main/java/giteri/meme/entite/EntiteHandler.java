@@ -1,8 +1,9 @@
 package giteri.meme.entite;
 
-import java.util.*;
-
-import giteri.tool.math.Toolz;
+import giteri.meme.event.ActionApplyEvent;
+import giteri.meme.event.BehavTransmEvent;
+import giteri.meme.event.IActionApplyListener;
+import giteri.meme.event.IBehaviorTransmissionListener;
 import giteri.meme.mecanisme.AgregatorFactory.IAgregator;
 import giteri.meme.mecanisme.AttributFactory.IAttribut;
 import giteri.meme.mecanisme.MemeFactory;
@@ -12,16 +13,12 @@ import giteri.network.networkStuff.NetworkConstructor;
 import giteri.network.networkStuff.WorkerFactory;
 import giteri.run.ThreadHandler;
 import giteri.run.configurator.Configurator;
-import giteri.run.configurator.Configurator.ActionType;
-import giteri.run.configurator.Configurator.AgregatorType;
-import giteri.run.configurator.Configurator.AttributType;
-import giteri.run.configurator.Configurator.FittingBehavior;
-import giteri.run.configurator.Configurator.MemeDistributionType;
+import giteri.run.configurator.Configurator.*;
 import giteri.run.controller.Controller.VueController;
-import giteri.meme.event.ActionApplyEvent;
-import giteri.meme.event.IActionApplyListener;
-import giteri.meme.event.BehavTransmEvent;
-import giteri.meme.event.IBehaviorTransmissionListener;
+import giteri.tool.math.Toolz;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
+
+import java.util.*;
 
 /**
  * Classe qui gère les entités du réseau.
@@ -29,7 +26,7 @@ import giteri.meme.event.IBehaviorTransmissionListener;
  */
 public class EntiteHandler extends ThreadHandler {
 
-	//region properties
+	//region properties & constructeur
 
 	private VueController vueController;
 	private NetworkConstructor networkConstruct;
@@ -38,10 +35,18 @@ public class EntiteHandler extends ThreadHandler {
 
 	// les entités du réseau
 	protected Set<Entite> entites;
-
 	// Entite possedant des actions
 	private ArrayList<Entite> entitesActive;
 	private Hashtable<String, String> memeTranslationReadable;
+
+	// Liste des memes applied sur les X derniers actions et depuis le début de la simu
+	// Nombre de fois ou le meme a été appelé
+	public Map<Meme, Integer> nbActivationByMemes;
+	// Nombre de fois ou le meme a été appelé sur les 20 dernieres actions
+	public Map<Meme, Integer> countOfLastMemeActivation;
+	// Sur les 100 dernières actions, quel meme a été appelé
+	public CircularFifoQueue<Meme> lastHundredActionDone;
+	public int sizeOfCircularQueue = 100;
 
 	// Listener pour les évènements issu de l'obtention de meme ou application
 	// de ce dernier.
@@ -54,11 +59,9 @@ public class EntiteHandler extends ThreadHandler {
 	private static int indexOfMemesCombinaisonRecursion;
 	private long atmLastTime;
 	private int cptModulo;
-	private int cptActionAddTried = 1, cptActionRmvTried = 1;
+	private int cptActionAddTried = 1, cptActionRmvTried = 1,cptActionAddFail = 1, cptActionRmvFail = 1;
 	private ActionType lastAction = ActionType.RETRAITLIEN;
 	private int nbActionBySecond;
-
-	//endregion
 
 	/** Constructeur sans param.
 	 *
@@ -78,6 +81,11 @@ public class EntiteHandler extends ThreadHandler {
 		memeListeners = new ArrayList<>();
 		memeTranslationReadable = new Hashtable<>();
 
+		nbActivationByMemes = new Hashtable<>();
+		countOfLastMemeActivation = new Hashtable<>();
+		lastHundredActionDone = new CircularFifoQueue<>(sizeOfCircularQueue);
+
+
 		if (Configurator.DisplayLogdebugInstantiation)
 			System.out.println("EntiteHandler constructor Closing");
 	}
@@ -87,6 +95,8 @@ public class EntiteHandler extends ThreadHandler {
 		bindNodeWithEntite(networkConstruct.getNetwork());
 		giveMemeToEntite(Configurator.methodOfGeneration);
 	}
+
+	//endregion
 
 	//region Thread
 
@@ -138,9 +148,7 @@ public class EntiteHandler extends ThreadHandler {
 		if (Configurator.displayLogAvgDegreeByMeme) {
 			cptModulo++;
 			if (cptModulo % (Configurator.refreshInfoRate * 25) == 0) {
-				cptModulo = 0;
 				vueController.displayInfo("AvgDgrByMeme", checkPropertiesByMemePossession());
-				//System.out.println(checkPropertiesByMemePossession());
 			}
 		}
 
@@ -297,6 +305,16 @@ public class EntiteHandler extends ThreadHandler {
 			entite.resetStat();
 		}
 
+		cptModulo = 0;
+		cptActionAddTried = 1;
+		cptActionRmvTried = 1;
+		cptActionAddFail = 1;
+		cptActionRmvFail = 1;
+
+		nbActivationByMemes.clear();
+		countOfLastMemeActivation.clear();
+		lastHundredActionDone.clear();
+
 		entitesActive.clear();
 		// TODO POTENTIAL ERROR Il ne semble pas qu'il soit nécessaire de tout reset puis le TRUE reset
 		// vient de l'appel dans le fitting qui réapply lui meme les IModelMachin.
@@ -331,7 +349,7 @@ public class EntiteHandler extends ThreadHandler {
 		}
 	}
 
-	/** Pour lancer les évènements de type action réalisée.
+	/** Pour lancer les évènements de type action réalisée. Application d'un meme // d'une action
 	 *
 	 * @param entiteConcernee
 	 * @param memeRealisee
@@ -610,7 +628,7 @@ public class EntiteHandler extends ThreadHandler {
 		synchronized (workerFactory.waitingForReset) {
 			Meme memeAction;
 
-			// Choix d'une entitée au hasard
+			// CHOIX D'UNE ENTITÉE AU HASARD
 			Entite entiteActing = selectActingEntiteV2();
 			if(Configurator.debugEntiteHandler)
 				System.out.println("[EH.runEntite]- entite choisie " + entiteActing.getIndex());
@@ -637,10 +655,15 @@ public class EntiteHandler extends ThreadHandler {
 						cptActionAddTried++;
 					else if (memeAction.action.getActionType() == ActionType.RETRAITLIEN)
 						cptActionRmvTried++;
-
 				System.out.println("Tried Add/rmv " + (double) cptActionAddTried / cptActionRmvTried);
 			}
 
+			// Si on veut afficher les X dernieres actions entreprises & action depuis le début
+			if (Configurator.displayMemePosessionDuringSimulation) {
+				updateActionCount(memeAction, entiteActing.getIndex(), rez );
+			}
+
+			// Dans le cas ou on veut les filtres en semi step, remis a zero des couleurs.
 			if (Configurator.semiStepProgression)
 			{
 				giveEntiteBaseColor();
@@ -779,7 +802,7 @@ public class EntiteHandler extends ThreadHandler {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private String  doAction(Entite movingOne, Meme memeAction) {
+	private String doAction(Entite movingOne, Meme memeAction) {
 		String actionDone = "";
 		String memeApply = "";
 		Set<Entite> cibles ;
@@ -860,6 +883,54 @@ public class EntiteHandler extends ThreadHandler {
 		}
 
 		return actionDone;
+	}
+
+	/** Mise a jour de la liste des X derniers meme applied ainsi que la liste
+	 * des memes applied depuis le début du run.
+	 * Appelé a chaque action réalisée.
+	 * @param memeApply
+	 */
+	private void updateActionCount(Meme memeApply, int entiteIndex, String message){
+
+		if (memeApply != null) {
+			Meme elementRemoveOfCircular = null;
+			Toolz.addCountToElementInHashArray(nbActivationByMemes, memeApply, 1);
+
+			// partie last twenty
+			if(lastHundredActionDone.size() == lastHundredActionDone.maxSize())
+			{
+				elementRemoveOfCircular = lastHundredActionDone.poll();
+				Toolz.removeCountToElementInHashArray(countOfLastMemeActivation, elementRemoveOfCircular, 1);
+			}
+
+			lastHundredActionDone.add(memeApply);
+			Toolz.addCountToElementInHashArray(countOfLastMemeActivation, memeApply, 1);
+		}
+
+		// Dans le cas ou il n'y a pas de meme apply, c'est a dire que l'action d'application du meme a échouée.
+		else if (Configurator.displayLogRatioLogFailOverFail ||Configurator.displayLogRatioLogFailOverSuccess )
+		{
+			System.out.println("Aucune action réalisé par l'entité " + entiteIndex + " :: message " + message);
+			if (message.contains("RMLK"))
+				cptActionRmvFail++;
+			else if (message.contains("ADLK"))
+				cptActionAddFail++;
+
+			if(Configurator.displayLogRatioLogFailOverFail)
+				System.out.println("ratio fail (rmvFail/addFail): " + (double) cptActionRmvFail / cptActionAddFail);
+			if(Configurator.displayLogRatioLogFailOverSuccess){
+				int nbWin = 0;
+				for (Integer winTimes : nbActivationByMemes.values())
+					nbWin += winTimes;
+				System.out.println("Ratio Fail / sucess: " + (double) (cptActionRmvFail + cptActionAddFail) / nbWin);
+			}
+		}
+
+		// Compteur de tour
+		if (cptModulo % Configurator.refreshInfoRate == 0) {
+				updateInformationDisplay();
+			}
+
 	}
 
 	//endregion
@@ -1238,6 +1309,8 @@ public class EntiteHandler extends ThreadHandler {
 
 	//endregion
 
+	//region divers
+
 	/**
 	 * Utilisé pour mettre a jour l'affichage du nombre d'action par seconde
 	 * réalisée.
@@ -1298,6 +1371,8 @@ public class EntiteHandler extends ThreadHandler {
 
 		return returnValue;
 	}
+
+	//endregion
 
 	//region getter//Setter
 

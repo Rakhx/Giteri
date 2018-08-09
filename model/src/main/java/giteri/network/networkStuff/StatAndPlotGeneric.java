@@ -193,6 +193,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 					for (int x = 0; x < config.boucleExterneSize; x++)
 					{
 						do{
+							// TODO [Refactoring 6] - Peut etre lu depuis l'EH
 							nbActionPassee  = getNbAction();
 						}while(nbActionPassee <= config.nbActionByStep);
 

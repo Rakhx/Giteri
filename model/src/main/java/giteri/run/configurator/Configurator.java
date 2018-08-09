@@ -56,8 +56,8 @@ public final class Configurator {
 	// Affichage log
 	public static boolean DisplayLogBehaviorColors = false;
 
-	public static boolean displayLogMemeApplication = true;
-	public static boolean displayLogAvgDegreeByMeme = true;
+	public static boolean displayLogMemeApplication = false;
+	public static boolean displayLogAvgDegreeByMeme = false;
 	public static boolean displayLogMemeTransmission = false;
 
 	public static boolean displayLogRatioLogFailOverFail = false;

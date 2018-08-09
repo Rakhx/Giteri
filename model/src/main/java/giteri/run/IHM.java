@@ -323,7 +323,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 				Toolz.addCountToElementInHashArray(nbActivationByMemes, e.memeApply.toString(), 1);
 
 				// partie last twenty
-//				countOfLastMemeActivation.clear();
 				if(lastHundredActionDone.size() == lastHundredActionDone.maxSize())
 				{
 					elementRemoveOfCircular = lastHundredActionDone.poll();
@@ -333,8 +332,8 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 				lastHundredActionDone.add(e.memeApply.toString());
 				Toolz.addCountToElementInHashArray(countOfLastMemeActivation, e.memeApply.toString(), 1);
 			}
-			// Dans le cas ou il n'y a pas de meme apply, c'est a dire que l'action
-			// d'application du meme a échouer.
+
+			// Dans le cas ou il n'y a pas de meme apply, c'est a dire que l'action d'application du meme a échouée.
 			else if (Configurator.displayLogRatioLogFailOverFail ||Configurator.displayLogRatioLogFailOverSuccess )
 			{
 				System.out.println("Aucune action réalisé par l'entité " + e.entite.getIndex() + " :: message " + e.message);
@@ -1630,6 +1629,8 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 			}
 		}
 	}
+
+	//endregion
 
 	//endregion
 
