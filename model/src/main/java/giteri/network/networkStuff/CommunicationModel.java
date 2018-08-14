@@ -125,7 +125,7 @@ public class CommunicationModel implements IModel {
 	 */
 	public void fittingOnce(){
 		Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
-		Configurator.typeOfMemeUseForFitting = Configurator.MemeList.ONMAP;
+		Configurator.typeOfMemeUseForFitting = Configurator.MemeList.FITTING;
 //		eh.giveMemeToEntite(Configurator.methodOfGeneration);
 
 		this.calculator.fitNetwork();

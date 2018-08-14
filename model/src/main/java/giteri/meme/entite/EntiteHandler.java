@@ -145,10 +145,16 @@ public class EntiteHandler extends ThreadHandler {
 		if(!Configurator.jarMode){
 			checkAPM();
 		}
-		if (Configurator.displayLogAvgDegreeByMeme) {
-			cptModulo++;
-			if (cptModulo % (Configurator.refreshInfoRate * 25) == 0) {
-				vueController.displayInfo("AvgDgrByMeme", checkPropertiesByMemePossession());
+		cptModulo++;
+		if (cptModulo % (Configurator.refreshInfoRate * 25) == 0) {
+
+			if (Configurator.displayMemePosessionDuringSimulation) {
+				vueController.displayMemeUsage(cptModulo, nbActivationByMemes,countOfLastMemeActivation,lastHundredActionDone);
+			}
+
+
+			if (Configurator.displayLogAvgDegreeByMeme) {
+				vueController.displayInfo("AvgDgrByMeme", Arrays.asList(checkPropertiesByMemePossession()));
 			}
 		}
 
@@ -319,7 +325,7 @@ public class EntiteHandler extends ThreadHandler {
 		// TODO POTENTIAL ERROR Il ne semble pas qu'il soit nécessaire de tout reset puis le TRUE reset
 		// vient de l'appel dans le fitting qui réapply lui meme les IModelMachin.
 		if (complete){
-			giveMemeToEntite(Configurator.methodOfGeneration);
+			//giveMemeToEntite(Configurator.methodOfGeneration);
 		}
 	}
 
@@ -878,7 +884,7 @@ public class EntiteHandler extends ThreadHandler {
 			eventActionDone(movingOne, null, "NOACTION");}
 
 		if (Configurator.displayLogMemeApplication) {
-			vueController.displayInfo("memeApplication", memeApply + " " + actionDone);
+			vueController.displayInfo("memeApplication", Arrays.asList("MemeApplied- " + memeApply,"ActionDone- " +  actionDone));
 			// System.out.println(memeApply + " " + actionDone);
 		}
 
@@ -892,7 +898,8 @@ public class EntiteHandler extends ThreadHandler {
 	 */
 	private void updateActionCount(Meme memeApply, int entiteIndex, String message){
 
-		if (memeApply != null) {
+		if (memeApply != null)
+		{
 			Meme elementRemoveOfCircular = null;
 			Toolz.addCountToElementInHashArray(nbActivationByMemes, memeApply, 1);
 
@@ -908,30 +915,28 @@ public class EntiteHandler extends ThreadHandler {
 		}
 
 		// Dans le cas ou il n'y a pas de meme apply, c'est a dire que l'action d'application du meme a échouée.
-		else if (Configurator.displayLogRatioLogFailOverFail ||Configurator.displayLogRatioLogFailOverSuccess )
+		else if (Configurator.displayLogRatioLogFailOverFail || Configurator.displayLogRatioLogFailOverSuccess )
 		{
-			System.out.println("Aucune action réalisé par l'entité " + entiteIndex + " :: message " + message);
-			if (message.contains("RMLK"))
-				cptActionRmvFail++;
-			else if (message.contains("ADLK"))
-				cptActionAddFail++;
+			int nbWin = 0;
+			if(Configurator.displayLogRatioLogFailOverSuccess)
+					for (Integer winTimes : nbActivationByMemes.values())
+						nbWin += winTimes;
 
 			if(Configurator.displayLogRatioLogFailOverFail)
-				System.out.println("ratio fail (rmvFail/addFail): " + (double) cptActionRmvFail / cptActionAddFail);
-			if(Configurator.displayLogRatioLogFailOverSuccess){
-				int nbWin = 0;
-				for (Integer winTimes : nbActivationByMemes.values())
-					nbWin += winTimes;
-				System.out.println("Ratio Fail / sucess: " + (double) (cptActionRmvFail + cptActionAddFail) / nbWin);
-			}
+				if (message.contains("RMLK"))
+					cptActionRmvFail++;
+				else if (message.contains("ADLK"))
+					cptActionAddFail++;
+
+			vueController.displayInfo("Action-Echec", Arrays.asList(
+					"Iteration- "+ cptModulo,
+					"Ratio Rmv/Add -" + (Configurator.displayLogRatioLogFailOverFail? ((double) cptActionRmvFail / cptActionAddFail) : " NC"),
+					"Ratio Fail/success -" + (Configurator.displayLogRatioLogFailOverSuccess ? ((double) (cptActionRmvFail + cptActionAddFail) / nbWin) : "NC"),
+					"Aucune action réalisée par l'entité- " + entiteIndex,
+					"Message- " + message));
 		}
-
-		// Compteur de tour
-		if (cptModulo % Configurator.refreshInfoRate == 0) {
-				updateInformationDisplay();
-			}
-
 	}
+
 
 	//endregion
 

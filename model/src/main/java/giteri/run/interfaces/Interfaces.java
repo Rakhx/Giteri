@@ -1,10 +1,8 @@
 package giteri.run.interfaces;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.List;
 
 import giteri.network.network.Network;
 import giteri.network.network.NetworkProperties;
@@ -83,7 +81,14 @@ public class Interfaces {
 	 *
 	 */
 	public interface IView {
-		void displayInfo(String type, String info);
+		/** Affichage d'une information.
+		 *
+		 * @param type Le
+		 * @param info
+		 */
+		void displayInfo(String type, List<String> info);
+
+		void displayXLastAction(int nbAction, Map<String, Integer> nbActivByMeme, Map<String,Integer> nbLastActivByMeme, List<String> lastXMemeApplied);
 		void setDisplayNbAction(String message);
 		void resetIHM();
 		void resetDensityOverProbaChart();

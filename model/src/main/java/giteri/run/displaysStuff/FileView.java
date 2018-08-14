@@ -7,6 +7,7 @@ import org.jfree.chart.JFreeChart;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /** Implémentation pour écrire dans les fichiers textes.
  * ? utilisation d'un buffer?
@@ -65,9 +66,26 @@ public class FileView implements Interfaces.IView {
     // region implémentation d'interface
 
     @Override
-    public void displayInfo(String type, String info) {
+    public void displayInfo(String type, List<String> info) {
+        if (!oneFilePerSubject)
+            info.add(0, type);
+        addLine(type, info);
+    }
 
-        addLine(type, Arrays.asList(oneFilePerSubject?"":type + separator + info));
+    public void displayXLastAction(int nbAction, Map<String, Integer> nbActivByMeme, Map<String,Integer> nbLastActivByMeme, List<String> lastXMemeApplied){
+       List<String> nbActiv = new ArrayList<>(Arrays.asList(""+nbAction));
+       List<String> nbActiv2;
+       nbActivByMeme.entrySet().stream().forEach(k -> nbActiv.add("meme "+k.getKey()+" - "+ k.getValue().toString()));
+       addLine("MemeActif", nbActiv);
+       nbActiv.clear();
+       nbActiv.add(""+nbAction);
+       nbLastActivByMeme.entrySet().stream().forEach(k -> nbActiv.add("meme "+k.getKey()+" - "+ k.getValue().toString()));
+       addLine("LastMemeActif", nbActiv);
+       nbActiv2 = lastXMemeApplied.stream().collect(
+                Collectors.groupingBy(String::toString, Collectors.counting())).
+                entrySet().stream().map(Object::toString).collect(Collectors.toList());
+       nbActiv2.add(0,""+ nbAction);
+       addLine("LastMXMemeApplied",nbActiv2 );
     }
 
     @Override

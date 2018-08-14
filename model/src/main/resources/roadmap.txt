@@ -1,0 +1,10 @@
+En cours
+	- Meilleur indicateurs de l'évolution des memes Etc. but : expliquer les dynamiques sur le réseau.
+		- Taux de réussite d'application des memes
+		- s
+		
+	- traduit par : regarder les méthodes qui mettent a jour les données sur l'interface OU dans la console,
+	et les faire passer par l'interface D'IVIEW. 
+		- Eventuellemnt IVIEW console, avec refactoring sur le class name
+
+		

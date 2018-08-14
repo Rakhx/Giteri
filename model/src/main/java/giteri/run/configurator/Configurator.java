@@ -23,6 +23,8 @@ public final class Configurator {
 
 	public static EnumExplorationMethod explorator = EnumExplorationMethod.exhaustive;
 	public static FittingBehavior memeCombinaisonOnMap = FittingBehavior.simpleAndComplex;
+
+	// TODO [Refact 6]- pour cohérence avec les méthodes, supprimé ce boolean et avoir la stabilitySearch pour le jar qui utilise direct les ftting
 	public static MemeList typeOfMemeUseForFitting = MemeList.FITTING;
 	// affiche dans la console "param en cours"
 	public static boolean displayFittingProviderApplied = true;
@@ -73,7 +75,7 @@ public final class Configurator {
 	public static String repByDefault = "defaultRep";
 	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
-	public static int activationCodeForView = 1;
+	public static int activationCodeForView = 3;
 
 
 	// affichage de debug
@@ -97,7 +99,7 @@ public final class Configurator {
 
 	// Affichage
 	public static boolean displayPlotWhileSimulation = !jarMode;
-	public static boolean displayMemePosessionDuringSimulation = true;
+	public static boolean displayMemePosessionDuringSimulation = false;
 	
 	// Config Temporaire
 

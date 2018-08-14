@@ -18,10 +18,7 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
@@ -178,11 +175,11 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	// Correspondance entre un meme et les memes le possédant
 	public Hashtable<String, ArrayList<Integer>> nodesHavingXoxoMemes;
 	// Nombre de fois ou le meme a été appelé
-	public Hashtable<String, Integer> nbActivationByMemes;
+	public Map<String, Integer> nbActivationByMemes;
 	// Nombre de fois ou le meme a été appelé sur les 20 dernieres actions
-	public Hashtable<String, Integer> countOfLastMemeActivation;
+	public Map<String, Integer> countOfLastMemeActivation;
 	// Sur les 100 dernières actions, quel meme a été appelé
-	public CircularFifoQueue<String> lastHundredActionDone;
+	public List<String> lastHundredActionDone;
 	public int sizeOfCircularQueue = 100;
 
 	// Séries de donnée pour l'affichage des graphiques
@@ -238,8 +235,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		this.writeNRead = wnr;
 
 		existingMeme = memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING);
-		lastHundredActionDone = new CircularFifoQueue<String>(
-				sizeOfCircularQueue);
+		lastHundredActionDone = new ArrayList<>(sizeOfCircularQueue);
 		nbActivationByMemes = new Hashtable<String, Integer>();
 		countOfLastMemeActivation = new Hashtable<String, Integer>();
 		nodesHavingXoxoMemes = new Hashtable<String, ArrayList<Integer>>();
@@ -315,7 +311,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	 *
 	 */
 	public void handlerActionApply(ActionApplyEvent e) {
-
+/*
 		if(Configurator.displayMemePosessionDuringSimulation){
 			// MISE A JOUR DES DONNEES
 			if (e.memeApply != null) {
@@ -357,7 +353,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 				compteurAction = 0;
 				updateInformationDisplay();
 			}
-		}
+		}*/
 	}
 
 	/** On change au niveau des memes possédées par les entités.
@@ -375,8 +371,17 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	//region INTERFACE IVIEW
 
 	@Override
-	public void displayInfo(String type, String info) {
+	public void displayInfo(String type, List<String> info) {
 
+	}
+
+	public void displayXLastAction(int nbAction, Map<String, Integer> nbActivByMeme, Map<String,Integer> nbLastActivByMeme, List<String> lastXMemeApplied){
+
+		lastHundredActionDone = lastXMemeApplied;
+		nbActivationByMemes = nbActivByMeme;
+		countOfLastMemeActivation = nbLastActivByMeme;
+
+		updateInformationDisplay();
 	}
 
 	/**
@@ -1570,7 +1575,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 						nbActivationByMemesLabel.get(meme.toString()).setText(memeRef + ":" + nbAppel );
 						nbActivationByMemesLabel.get(meme.toString()).setForeground(associatedColor);
 						totalAppel += nbAppel;
-						nbAppelInLast100 = countOfLastMemeActivation.contains(meme.toString()) ? countOfLastMemeActivation
+						nbAppelInLast100 = countOfLastMemeActivation.containsKey(meme.toString()) ? countOfLastMemeActivation
 								.get(meme.toString()) : 0;
 
 						// Partie last 100 compte du nombre

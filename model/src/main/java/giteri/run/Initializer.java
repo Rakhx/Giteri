@@ -37,7 +37,7 @@ import static giteri.run.configurator.Configurator.withGraphicalDisplay;
  * Lancement de l'appli => initializer ( Meme existant )    -> JAR ( lecture des memes et probas )
  *
  */
-public class InitializerV2 {
+public class Initializer {
     public static Double initialize(Configurator.EnumLauncher launcher, File fileInput, ArrayList<Double> probaBehavior) {
 
         // A instancier dans les if. à lancer dans tous les cas a la fin?
@@ -52,8 +52,8 @@ public class InitializerV2 {
             Configurator.jarMode = true;
             Configurator.systemPaused = false;
             Configurator.writeNetworkResultOnFitting = true;
-
         }
+
         else if(launcher == Configurator.EnumLauncher.ihm){
             Configurator.methodOfGeneration = Configurator.MemeDistributionType.SingleBasic;
             Configurator.displayPlotWhileSimulation = true;
@@ -64,6 +64,7 @@ public class InitializerV2 {
             Configurator.explorator = Configurator.EnumExplorationMethod.exhaustive;
 //            Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
         }
+
         else if(launcher == Configurator.EnumLauncher.testProvider){
             Configurator.methodOfGeneration = Configurator.MemeDistributionType.SingleBasic;
             Configurator.displayPlotWhileSimulation = false;
@@ -190,8 +191,6 @@ public class InitializerV2 {
             if((Configurator.activationCodeForView & 2) == 2)
                 vControl.addView(new ConsoleView());
 
-            // TODO ICICICICICCICI
-            //
             if(!Configurator.withGraphicalDisplay)
                 stat.probaVoulu = new ArrayList<>(Arrays.asList(0.,0.,0.,0.,0.,0.,0.));
 

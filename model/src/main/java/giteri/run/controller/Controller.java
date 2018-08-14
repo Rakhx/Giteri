@@ -1,5 +1,6 @@
 package giteri.run.controller;
 
+import giteri.meme.entite.Meme;
 import giteri.run.configurator.Configurator;
 import giteri.run.interfaces.Interfaces;
 import giteri.run.interfaces.Interfaces.IModel;
@@ -12,6 +13,7 @@ import giteri.tool.math.Toolz;
 import giteri.network.network.NetworkProperties;
 import giteri.network.networkStuff.CommunicationModel;
 
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.jfree.chart.JFreeChart;
 
 /** Controller de la vue, dans le sens vue -> model, ainsi que dans 
@@ -41,9 +43,9 @@ public class Controller {
 
 		//region iview part
 
-		public void displayInfo(String type, String info) {
+		public void displayInfo(String type, List<String> info) {
 			for (Interfaces.IView vue:  vues) {
-				vue.displayInfo(type,info);
+				vue.displayInfo(type, info);
 			}
 		}
 
@@ -57,6 +59,31 @@ public class Controller {
 			for (Interfaces.IView vue:  vues) {
 				vue.resetDensityOverProbaChart();
 			}
+		}
+
+
+		/** Demande aux vues d'afficher les informations relatives a l'application des memes.
+		 *
+		 * @param nbActivationByMemes Le nombre d'activation de meme depuis le début de la simulation
+		 * @param countOfLastMemeActivation ?
+		 * @param lastHundredActionDone une fenetre glissante des 100 dernier meme appliqué
+		 */
+		public void displayMemeUsage(int nbAction, Map<Meme, Integer> nbActivationByMemes, Map<Meme, Integer> countOfLastMemeActivation, CircularFifoQueue<Meme> lastHundredActionDone ){
+			Map<String, Integer> nbActiByMeme = new Hashtable<>();
+			Map<String, Integer> nbLastActivByMeme = new Hashtable<>();
+			List<String> lastHundred = new ArrayList<>();
+
+			nbActivationByMemes.entrySet().stream().
+					forEach(kv -> nbActiByMeme.put(kv.getKey().toFourCharString(),kv.getValue()));
+			countOfLastMemeActivation.entrySet().stream().
+					forEach(kv -> nbLastActivByMeme.put(kv.getKey().toFourCharString(),kv.getValue()));
+			lastHundredActionDone.stream().
+					forEach(l -> lastHundred.add(l.toFourCharString()));
+
+			for (Interfaces.IView vue:  vues) {
+				vue.displayXLastAction(nbAction, nbActiByMeme,  nbLastActivByMeme, lastHundred);
+			}
+
 		}
 
 		/** Ajoute une valeur dans la chart de density over proba.

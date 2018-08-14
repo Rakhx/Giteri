@@ -3,13 +3,18 @@ package giteri.run;
 import giteri.run.interfaces.Interfaces.IView;
 
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 import org.jfree.chart.JFreeChart;
 
 public class IHMStub implements IView {
 
 	@Override
-	public void displayInfo(String type, String info) {
+	public void displayInfo(String type, List<String> info) {
+
+	}
+	public void displayXLastAction(int nbAction,Map<String, Integer> nbActivByMeme, Map<String,Integer> nbLastActivByMeme, List<String> lastXMemeApplied){
 
 	}
 

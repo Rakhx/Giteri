@@ -59,7 +59,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public int nbRepetitionByConfig;
 
 	// Nombre d'action réalisé par les entités avant une collecte de données
-	public int nbActionByStep = Configurator.nbNode * 10; //500;
+	public int nbActionByStep = Configurator.nbNode * 10;
 	public int boucleExterneSize = 30;
 
 	//endregion
@@ -165,7 +165,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 *
 	 */
 	public void init(){
-
+		Configurator.methodOfGeneration = Configurator.MemeDistributionType.Nothing;
 		targetNetProperties = networkFileLoader.getNetworkProperties();
 
 		// ECRITURE

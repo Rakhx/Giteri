@@ -2,12 +2,31 @@ package giteri.test;
 
 import giteri.tool.math.Toolz;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class RandomTest {
     public static void main(String[] args)  {
 
+        // STREAM
+        List<String> list = new ArrayList<>(Arrays.asList("bla","bla","troiseimebla", "hihi", "hihi", "hihi", "hihi"));
+        String resultat;
+        resultat = list.stream().reduce("", (String::concat));
+        System.out.println(resultat);
+        list.stream().reduce((a,b)->  a.compareTo(b) > 0 ? a : b)
+                .ifPresent(System.out::println);
+
+        List<String> quantity =
+        list.stream().collect(
+                Collectors.groupingBy(String::toString,
+                Collectors.counting())
+        ).entrySet().stream().map(Object::toString).collect(Collectors.toList());
+
+        System.out.println(quantity);
+
+
+
+        // BITWISE
         bitwiseAdd(10,10);
         add(10,18);
 
