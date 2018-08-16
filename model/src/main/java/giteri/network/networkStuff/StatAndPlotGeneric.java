@@ -1,11 +1,9 @@
 package giteri.network.networkStuff;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import giteri.run.interfaces.Interfaces.StatAndPlotInterface;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Optional;
+import java.util.*;
 
 import giteri.tool.math.Toolz;
 import giteri.tool.other.WriteNRead;
@@ -25,6 +23,8 @@ import giteri.run.configurator.Configurator.EnumExplorationMethod;
 import giteri.run.configurator.Configurator.NetworkAttribType;
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
+
+import javax.swing.text.html.Option;
 
 /** Classe commune à tous les statAndPlot
  *
@@ -84,6 +84,23 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			return fittingLauncher();
 		}
 	}
+	/** Lancement de thread qui va comparer un réseau lu et le réseau en cours.
+	 *
+	 */
+	public Double fitNetworkV2(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
+							   Optional<List<Boolean>> memeActivation, Optional<List<Double>> memeProba) {
+		if (typeOfLaunch == Configurator.EnumLauncher.jarC || typeOfLaunch == Configurator.EnumLauncher.jarOpenMole) {
+			(new Thread() {
+				public void run() {
+
+					fittingLauncherVersionClean(typeOfLaunch, typeOfExplo, memeActivation, memeProba);
+				}
+			}).start();
+			return 0.;
+		} else {
+			return fittingLauncherVersionClean(typeOfLaunch, typeOfExplo, Optional.empty(), Optional.empty());
+		}
+	}
 
 	/** PREMIERE FONCTION APPELEE DANS LA LONGUE SERIE DES FITTING SEARCHING
 	 *
@@ -96,6 +113,48 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		// ajout de la fitting classe au listener
 		entiteHandler.addEntityListener(configuration);
+
+		// initialise les config de simulation genre répartition des comportments etc
+		initializeConfigForStability(configuration);
+
+		// Lancement d'une simulation
+		resultat = factorisation(configuration);
+
+		// retrait de la fitting classe des listener
+		entiteHandler.removeEntityListener(configuration);
+
+		return resultat;
+	}
+
+	/** Refact. Fonction commune à tous les appels, premiere de la série.
+	 *
+	 */
+	public double fittingLauncherVersionClean(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
+											  Optional<List<Boolean>> memeActivation, Optional<List<Double>> memeProba) {
+		double resultat;
+
+		// Classe de configuration qui contient tout ce qu'il faut pour faire une simu
+		FittingClass configuration = new FittingClass(writeNRead, communicationModel,
+				memeFactory, networkFileLoader, workerFactory, entiteHandler, networkConstructor);
+
+		// ajout de la fitting classe au listener
+		entiteHandler.addEntityListener(configuration);
+
+
+
+
+
+		// Si appelle toutifruiti, explo full ou random, depuis IHM
+		// Besoin de cycler sur les config de IModel, etc etc.
+
+
+		// Si appelle oneSot, depuis IHM ou depuis JAR
+
+
+
+
+
+
 
 		// initialise les config de simulation genre répartition des comportments etc
 		initializeConfigForStability(configuration);
@@ -166,9 +225,42 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		}
 	}
 
+
+	/** lorsque le programme est appelé depuis java
+	 *
+	 * @return
+	 */
+	private double callFromJava(){
+		// Tout le trala des explorateurs qui enchaine les IModelParameter
+
+
+	}
+
+	/** lorsque le fitting est appelé depuis un jar
+	 *
+	 * @return
+	 */
+	private double callFromJar(List<Boolean> activation, List<Double> proba){
+		// appelle sec avec un seul jeu de parametre, aux probas fixés
+	}
+
+
+	/** Prend en parametre une configuration, fait X run sur la configuration, écrit dans les fichiers, et renvoi un score.
+	 *
+	 * @param config
+	 * @return
+	 */
+	private double doFitting(FittingClass config){
+
+
+	}
+
+
+
 	/** Classe factorisée pour les traitements de fitting ou searching.
 	 *
 	 * @param config
+	 * @return le score de la config testé
 	 */
 	private double factorisation(FittingClass config){
 		config.init();
@@ -193,7 +285,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 					for (int x = 0; x < config.boucleExterneSize; x++)
 					{
 						do{
-							// TODO [Refactoring 6] - Peut etre lu depuis l'EH
 							nbActionPassee  = getNbAction();
 						}while(nbActionPassee <= config.nbActionByStep);
 

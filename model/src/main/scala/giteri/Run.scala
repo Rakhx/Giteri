@@ -5,9 +5,9 @@ import java.util
 
 import giteri.meme.entite.EntiteHandler
 import giteri.network.networkStuff.NetworkConstructor
-import giteri.run.IHMStub
 import giteri.run.configurator.Configurator
 import giteri.run.controller.Controller
+import giteri.run.displaysStuff.IHMStub
 import giteri.run.interfaces.Interfaces
 import giteri.run.jarVersion.{JarVersion, StatAndPlotJarVersion, WorkerFactoryJarVersion}
 import giteri.tool.other.WriteNRead

@@ -1,4 +1,4 @@
-package giteri.run;
+package giteri.run.displaysStuff;
 
 import giteri.meme.mecanisme.ActionFactory;
 import giteri.network.networkStuff.NetworkConstructor;
@@ -41,6 +41,8 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.text.DefaultFormatter;
 
 import giteri.tool.math.Toolz;
@@ -1687,5 +1689,21 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	}
 
 	//endregion
+	/** Vitesse des tics de la simulation.
+	 *
+	 *
+	 */
+	class JSlideListener implements ChangeListener
+	{
+		@Override
+		public void stateChanged(ChangeEvent e){
+			JSlider source = (JSlider)e.getSource();
+			if (!source.getValueIsAdjusting()) {
+				source.setToolTipText("Value "+(int)(source.getValue()));
+				int fps = (int)source.getValue();
+				Configurator.setThreadSpeed(fps);
 
+			}
+		}
+	}
 }

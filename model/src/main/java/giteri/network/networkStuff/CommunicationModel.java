@@ -106,6 +106,7 @@ public class CommunicationModel implements IModel {
 	 */
 	public void stabilityResearch() {
 		this.calculator.fitNetwork();
+
 	}
 
 	/** Lancement du processus de fittage du réseau courant a celui
@@ -114,6 +115,8 @@ public class CommunicationModel implements IModel {
 	 */
 	public void fittingNetworks(){
 		this.calculator.fitNetwork();
+
+		this.calculator.fitNetworkV2();
 	}
 
 	public void displayPolar(){
@@ -129,6 +132,9 @@ public class CommunicationModel implements IModel {
 //		eh.giveMemeToEntite(Configurator.methodOfGeneration);
 
 		this.calculator.fitNetwork();
+
+		// oneshot ihm
+		this.calculator.fitNetworkV2();
 	}
 
 	public void rdmConfig(){

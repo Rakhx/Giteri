@@ -1,6 +1,6 @@
 package giteri.run.jarVersion;
 
-import giteri.run.Initializer;
+import giteri.run.configurator.Initializer;
 import giteri.run.configurator.Configurator;
 
 import java.io.File;

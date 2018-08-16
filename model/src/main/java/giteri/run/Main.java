@@ -1,10 +1,8 @@
 package giteri.run;
 
 import giteri.run.configurator.Configurator;
+import giteri.run.configurator.Initializer;
 
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -32,22 +30,6 @@ class FrameListener extends WindowAdapter
   }
 }
 
-/** Vitesse des tics de la simulation.
- * 
- *
- */
-class JSlideListener implements ChangeListener
-{
-	@Override
-	public void stateChanged(ChangeEvent e){
-		JSlider source = (JSlider)e.getSource();
-	    if (!source.getValueIsAdjusting()) {
-	    	source.setToolTipText("Value "+(int)(source.getValue()));
-	        int fps = (int)source.getValue();
-	        Configurator.setThreadSpeed(fps);
 
-	    }		
-	}
-}
 
 //endregion

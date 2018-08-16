@@ -3,7 +3,6 @@ package giteri.meme.mecanisme;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import giteri.run.IHM;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.ActionType;
 import giteri.run.configurator.Configurator.AgregatorType;

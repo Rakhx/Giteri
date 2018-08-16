@@ -1,4 +1,4 @@
-package giteri.run;
+package giteri.run.displaysStuff;
 
 import giteri.run.interfaces.Interfaces.IView;
 

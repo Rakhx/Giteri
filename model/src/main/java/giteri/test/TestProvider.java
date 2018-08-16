@@ -1,7 +1,7 @@
 package giteri.test;
 
 import giteri.fitting.algo.IExplorationMethod;
-import giteri.run.Initializer;
+import giteri.run.configurator.Initializer;
 import giteri.run.configurator.Configurator;
 
 /** Classe de test pour vérifier les providers.

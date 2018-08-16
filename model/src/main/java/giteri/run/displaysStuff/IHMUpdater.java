@@ -1,10 +1,12 @@
-package giteri.run;
+package giteri.run.displaysStuff;
+
+import giteri.run.ThreadHandler;
 
 /** Le faire handle les events
  * 
  *
  */
-public class IHMUpdater extends ThreadHandler{
+public class IHMUpdater extends ThreadHandler {
 
 	Thread t;
 	@Override

@@ -1,4 +1,4 @@
-package giteri.run;
+package giteri.run.configurator;
 
 import giteri.fitting.algo.IExplorationMethod;
 import giteri.fitting.parameters.IModelParameter;
@@ -13,6 +13,8 @@ import giteri.run.configurator.Configurator;
 import giteri.run.controller.Controller;
 import giteri.run.displaysStuff.ConsoleView;
 import giteri.run.displaysStuff.FileView;
+import giteri.run.displaysStuff.IHM;
+import giteri.run.displaysStuff.IHMStub;
 import giteri.run.interfaces.Interfaces;
 import giteri.run.jarVersion.StatAndPlotJarVersion;
 import giteri.test.TestProvider;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.List;
 
 import static giteri.run.configurator.Configurator.debugOpenMole;
 import static giteri.run.configurator.Configurator.withGraphicalDisplay;
@@ -132,12 +135,6 @@ public class Initializer {
             // La fenetre en elle meme Controller de Model donné a l'IHM
             IHMStub fenetre = new IHMStub();
             vControl.addView(fenetre);
-
-            // TODO ICICICICICICI EN COURS ICICICCICI
-           // vControl.setView(fenetre);
-           // vControl.setView(displaysMng);
-
-
             entiteHandler.initialisation();
 
             entiteHandler.addMemeListener(workerFactory.getDrawer());
@@ -158,6 +155,9 @@ public class Initializer {
             networkConstructor.start();
             entiteHandler.start();
 
+            List<Boolean> activ; List<Double> proba;
+
+            //
             return stat.fitNetwork();
 
         }else if (launcher == Configurator.EnumLauncher.ihm) {
