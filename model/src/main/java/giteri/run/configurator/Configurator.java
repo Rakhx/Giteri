@@ -140,7 +140,8 @@ public final class Configurator {
 		exhaustive,
 		random,
 		genetique,
-		oneShot
+		oneShot,
+		specific
 	}
 
 	/** Basic Combinaison..

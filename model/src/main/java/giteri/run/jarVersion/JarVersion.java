@@ -26,30 +26,34 @@ public class JarVersion {
 	 */
 	public static void main(String[] args) {
 		//region Param
-		ArrayList<Double> probaBehavior = new ArrayList<Double>();
-		String filePath ;
+		ArrayList<Double> memeProba = new ArrayList<>();
+		ArrayList<Boolean> memeActi = new ArrayList<>();
+		String filePath;
 		File inputFile;
 		boolean debug = false;
-
 		launcher = Configurator.EnumLauncher.jarC;
-
-		// STEP: Récupérer les probas et du filepath
-		if(args.length != 6){
-			System.err.println("Pas le bon nombre de paramètres");
-			return;
-		}
 
 		filePath = args[0];
         inputFile = new File(filePath);
         if(debug)System.out.print("Fichier d'input: " + (inputFile.exists()? "exist" : "does not exist"));
 
-		for (int i = 1; i < args.length; i++) {
-			probaBehavior.add(Double.parseDouble(args[i]));
+
+		for (int i = 1; i <= args.length/2; i++) {
+			memeActi.add(Boolean.parseBoolean(""+args[i]));
 		}
 
-		if(debug) System.out.println("Proba Recup "+ probaBehavior);
+		for (int i = args.length/2 + 1; i < args.length; i++) {
+			memeProba.add(Double.parseDouble(args[i]));
+		}
 
-		run(inputFile, probaBehavior.get(0),probaBehavior.get(1),probaBehavior.get(2),probaBehavior.get(3),probaBehavior.get(4));
+		if(debug) System.out.println("Actication recup " + memeActi);
+		if(debug) System.out.println("Proba Recup "+ memeProba);
+
+		run(inputFile,
+				memeActi.get(0),memeActi.get(1),memeActi.get(2),memeActi.get(3),memeActi.get(4),
+				memeActi.get(5),memeActi.get(6),memeActi.get(7),memeActi.get(8),
+				memeProba.get(0),memeProba.get(1),memeProba.get(2),memeProba.get(3),memeProba.get(4),
+				memeProba.get(5),memeProba.get(6),memeProba.get(7),memeProba.get(8));
     }
 
     /** Run lancé depuis openMole, ou depuis le main@JarVersion.
@@ -62,10 +66,17 @@ public class JarVersion {
      * @param param5
      * @return
      */
-    public static Double run(File fileInput, double param1, double param2, double param3, double param4, double param5) {
+    public static Double run(File fileInput,
+							 boolean acti1,boolean acti2,boolean acti3,boolean acti4,boolean acti5,
+							 boolean acti6,boolean acti7,boolean acti8,boolean acti9,
+							 double param1, double param2, double param3, double param4, double param5,
+							 double param6, double param7, double param8, double param9
+	) {
         ArrayList<Double> probaBehavior = new ArrayList<Double>();
-        probaBehavior.addAll(Arrays.asList(param1,param2,param3,param4,param5));
-        return Initializer.initialize(launcher, fileInput, probaBehavior);
+        ArrayList<Boolean> memeAtivation = new ArrayList<>();
+        memeAtivation.addAll(Arrays.asList(acti1,acti2,acti3,acti4,acti5, acti6, acti7, acti8, acti9));
+        probaBehavior.addAll(Arrays.asList(param1,param2,param3,param4,param5, param6, param7, param8, param9));
+        return Initializer.initialize(launcher, fileInput, memeAtivation ,probaBehavior);
     }
 
 }

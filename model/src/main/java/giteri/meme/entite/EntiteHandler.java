@@ -1186,13 +1186,13 @@ public class EntiteHandler extends ThreadHandler {
 		agregators.put(0, notLinked);
 		agregators.put(1, mineInf);
 		agregators.put(2, random);
-		//memeFactory.registerMemeAction("Add+", .8, add, attributs,KVAttributAgregator, true ,true);
+		memeFactory.registerMemeAction("Add+", .5, add, attributs,KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		//memeFactory.registerMemeAction("Add-",.8,add, attributs,KVAttributAgregator, true ,true);
+		memeFactory.registerMemeAction("Add-",.8,add, attributs,KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
@@ -1204,20 +1204,17 @@ public class EntiteHandler extends ThreadHandler {
 		agregators.put(0, hopAWay);
 		agregators.put(1, notLinked);
 		agregators.put(2, random);
-		//memeFactory.registerMemeAction("AddØ-Hop", 1, add, attributs,KVAttributAgregator, true ,true);
+		memeFactory.registerMemeAction("AddØ-Hop", 1, add, attributs,KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, random);
-		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, add, attributs, KVAttributAgregator, false, false);
+		//addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, add, attributs, KVAttributAgregator, false, false);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, random);
 		memeFactory.registerMemeAction("AddØ",0.1, add, attributs, KVAttributAgregator, false, false);
-
-
-
 
 		agregators.clear();
 		agregators.put(0, linked);
@@ -1228,7 +1225,7 @@ public class EntiteHandler extends ThreadHandler {
 		agregators.put(0, linked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv-", .8, remove, attributs, KVAttributAgregator, false ,true);
+		memeFactory.registerMemeAction("Rmv-", .8, remove, attributs, KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		agregators.put(0, linked);
@@ -1239,7 +1236,7 @@ public class EntiteHandler extends ThreadHandler {
 		agregators.clear();
 		agregators.put(0, hopAWay);
 		agregators.put(1, random);
-		//memeFactory.registerMemeAction("RmvØ-2hop", .2, remove, attributs, KVAttributAgregator,true ,true);
+		memeFactory.registerMemeAction("RmvØ-2hop", .2, remove, attributs, KVAttributAgregator,false ,false);
 
 		agregators.clear();
 		// memeFactory.getMemeAction("Puri",0,puri, attributs,
@@ -1302,8 +1299,7 @@ public class EntiteHandler extends ThreadHandler {
 			for (Meme meme : memesByCategory.get(actions[indexAction])) {
 				ArrayList<Meme> copy = (ArrayList<Meme>) memes.clone();
 				copy.add(meme);
-				recursive(memesByCategory, copy, actions, selection,
-						indexAction);
+				recursive(memesByCategory, copy, actions, selection, indexAction);
 			}
 		} else {
 			indexOfMemesCombinaisonRecursion++;

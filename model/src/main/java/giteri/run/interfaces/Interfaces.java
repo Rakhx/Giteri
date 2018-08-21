@@ -70,7 +70,8 @@ public class Interfaces {
 		
 		public void updateNetworkProperties(TinyNetwork net, NetworkProperties netProp, int activationCode);
 		public double getAPL();
-		public Double fitNetwork();
+		public Double fitNetwork(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
+								 Optional<List<Boolean>> memeActivation, Optional<List<Double>> memeProba);
 //		public void searchStability();
 		public void fitNextStep();
 		public void testStability();

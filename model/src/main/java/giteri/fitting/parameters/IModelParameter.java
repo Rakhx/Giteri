@@ -368,7 +368,8 @@ public interface IModelParameter<T> {
 		public GenericDoubleParameter(){}
 
 		public GenericDoubleParameter(Double valeur){
-			value = valeur;
+			value = maxValue = minValue = valeur;
+			step = Double.MAX_VALUE;
 		}
 
 		public GenericDoubleParameter(Double valeur, Double min, Double max, Double step){

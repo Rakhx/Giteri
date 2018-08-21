@@ -6,7 +6,7 @@ import giteri.tool.math.Toolz;
 import java.util.*;
 
 /** Classe contenant les résultats d'une configuration particulière -
- * Mais contenant chacun des TURN sur cette config.
+ * Mais contenant chacun des REPETITIONS sur cette config.
  *
  */
 public class Result {

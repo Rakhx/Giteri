@@ -1,34 +1,38 @@
 package giteri.test;
 
-import giteri.tool.math.Toolz;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class RandomTest {
     public static void main(String[] args)  {
 
+        // OPTIONAL
+        Optional<Double> opt = Optional.of(new Double(3.));
+        changeRef(opt);
+        System.out.println(opt);
+
         // STREAM
-        List<String> list = new ArrayList<>(Arrays.asList("bla","bla","troiseimebla", "hihi", "hihi", "hihi", "hihi"));
-        String resultat;
-        resultat = list.stream().reduce("", (String::concat));
-        System.out.println(resultat);
-        list.stream().reduce((a,b)->  a.compareTo(b) > 0 ? a : b)
-                .ifPresent(System.out::println);
-
-        List<String> quantity =
-        list.stream().collect(
-                Collectors.groupingBy(String::toString,
-                Collectors.counting())
-        ).entrySet().stream().map(Object::toString).collect(Collectors.toList());
-
-        System.out.println(quantity);
+        // - Transformation de list etc
+//        List<String> list = new ArrayList<>(Arrays.asList("bla","bla","troiseimebla", "hihi", "hihi", "hihi", "hihi"));
+//        String resultat;
+//        resultat = list.stream().reduce("", (String::concat));
+//        System.out.println(resultat);
+//        list.stream().reduce((a,b)->  a.compareTo(b) > 0 ? a : b)
+//                .ifPresent(System.out::println);
+//
+//        List<String> quantity =
+//        list.stream().collect(
+//                Collectors.groupingBy(String::toString,
+//                Collectors.counting())
+//        ).entrySet().stream().map(Object::toString).collect(Collectors.toList());
+//
+//        System.out.println(quantity);
 
 
 
         // BITWISE
-        bitwiseAdd(10,10);
-        add(10,18);
+//        bitwiseAdd(10,10);
+//        add(10,18);
 
 
           // TEST DU SHUFFLE DE MAP DETERMINISTE ET NON
@@ -45,6 +49,12 @@ public class RandomTest {
 
 
     }
+
+    static void changeRef(Optional<Double> changera){
+//        changera.
+        changera = Optional.of(new Double(5.1));
+    }
+
     static int add(int x, int y)
 
     {

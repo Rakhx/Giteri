@@ -1,11 +1,13 @@
 package giteri.network.networkStuff;
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
+import giteri.fitting.algo.IExplorationMethod;
 import giteri.run.interfaces.Interfaces.StatAndPlotInterface;
 
 import java.util.*;
 
 import giteri.tool.math.Toolz;
+import giteri.tool.objects.ObjectRef;
 import giteri.tool.other.WriteNRead;
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.network.NetworkProperties;
@@ -50,12 +52,12 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 	boolean debugBeforeSkip = true;
 	boolean debug = Configurator.debugStatAndPlot;
-	public ArrayList<Double> probaVoulu;
+//	public ArrayList<Double> probaVoulu;
 
 	/** Constructeur de cet élément de base.
 	 * Ne peut etre appelé directement, classe abstract
 	 */
-	protected StatAndPlotGeneric( EntiteHandler entiteHandler, MemeFactory memeFactory, NetworkConstructor networkConstructor,
+	protected StatAndPlotGeneric(EntiteHandler entiteHandler, MemeFactory memeFactory, NetworkConstructor networkConstructor,
 								  WriteNRead wnr, NetworkFileLoader nfl, WorkerFactory wf){
 		this.entiteHandler = entiteHandler;
 		this.memeFactory = memeFactory;
@@ -72,24 +74,24 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	/** Lancement de thread qui va comparer un réseau lu et le réseau en cours.
 	 *
 	 */
-	public Double fitNetwork(){
-		if(!Configurator.jarMode){
-			(new Thread(){
-				public void run() {
-					 fittingLauncher();
-				}
-			}).start();
-		return 0.;
-		}else{
-			return fittingLauncher();
-		}
-	}
+//	public Double fitNetwork(){
+//		if(!Configurator.jarMode){
+//			(new Thread(){
+//				public void run() {
+//					 fittingLauncher();
+//				}
+//			}).start();
+//		return 0.;
+//		}else{
+//			return fittingLauncher();
+//		}
+//	}
 	/** Lancement de thread qui va comparer un réseau lu et le réseau en cours.
 	 *
 	 */
-	public Double fitNetworkV2(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
+	public Double fitNetwork(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
 							   Optional<List<Boolean>> memeActivation, Optional<List<Double>> memeProba) {
-		if (typeOfLaunch == Configurator.EnumLauncher.jarC || typeOfLaunch == Configurator.EnumLauncher.jarOpenMole) {
+		if (!(typeOfLaunch == Configurator.EnumLauncher.jarC || typeOfLaunch == Configurator.EnumLauncher.jarOpenMole)) {
 			(new Thread() {
 				public void run() {
 
@@ -105,59 +107,70 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	/** PREMIERE FONCTION APPELEE DANS LA LONGUE SERIE DES FITTING SEARCHING
 	 *
 	 */
-	public double fittingLauncher(){
-		double resultat;
-		// Classe de configuration qui contient tout ce qu'il faut pour faire une simu
-		FittingClass configuration = new FittingClass(writeNRead,communicationModel,
-				memeFactory, networkFileLoader, workerFactory, entiteHandler, networkConstructor);
-
-		// ajout de la fitting classe au listener
-		entiteHandler.addEntityListener(configuration);
-
-		// initialise les config de simulation genre répartition des comportments etc
-		initializeConfigForStability(configuration);
-
-		// Lancement d'une simulation
-		resultat = factorisation(configuration);
-
-		// retrait de la fitting classe des listener
-		entiteHandler.removeEntityListener(configuration);
-
-		return resultat;
-	}
+//	public double fittingLauncher(){
+//		double resultat;
+//		// Classe de configuration qui contient tout ce qu'il faut pour faire une simu
+//		FittingClass configuration = new FittingClass(writeNRead,communicationModel,
+//				memeFactory, networkFileLoader, workerFactory, entiteHandler, networkConstructor);
+//
+//		// ajout de la fitting classe au listener
+//		entiteHandler.addEntityListener(configuration);
+//
+//		// initialise les config de simulation genre répartition des comportments etc
+//		initializeConfigForStability(configuration);
+//
+//		// Lancement d'une simulation
+//		resultat = factorisation(configuration);
+//
+//		// retrait de la fitting classe des listener
+//		entiteHandler.removeEntityListener(configuration);
+//
+//		return resultat;
+//	}
 
 	/** Refact. Fonction commune à tous les appels, premiere de la série.
 	 *
 	 */
 	public double fittingLauncherVersionClean(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
-											  Optional<List<Boolean>> memeActivation, Optional<List<Double>> memeProba) {
+											  Optional<List<Boolean>> memeActivationOpt, Optional<List<Double>> memeProbaOpt) {
 		double resultat;
 
+		List<Boolean> memeActivation = memeActivationOpt.orElse(new ArrayList<>());
+		List<Double> memeProba = memeProbaOpt.orElse(new ArrayList<>());
+
+
+		// Qui définira pour la classe de fitting l'espace de recherche
+		IExplorationMethod explorator = null;
+		NetworkProperties networkTarget = null;
+		FittingClass configuration = null;
+
+
+		// Dans le cas ou on veut un one shot de l'IHM il faut remplir les listes
+//		if(typeOfExplo == EnumExplorationMethod.oneShot && typeOfLaunch == Configurator.EnumLauncher.ihm)
+		if(typeOfExplo == EnumExplorationMethod.oneShot && !memeActivationOpt.isPresent())
+			fitListEMManuel(memeActivation, memeProba);
+
+		// Si appelle toutifruiti, explo full ou random, depuis IHM Besoin de cycler sur les config de IModel, etc etc.
+		if(typeOfExplo == EnumExplorationMethod.exhaustive)
+			explorator = callFromJava();
+
+		// Si appelle oneSot, depuis IHM ou depuis JAR
+		else if(typeOfExplo == EnumExplorationMethod.oneShot)
+			explorator = callFromJar(memeActivation, memeProba);
+
+		//
+		else if (typeOfExplo == EnumExplorationMethod.specific)
+			explorator = callSpecificParam();
+
 		// Classe de configuration qui contient tout ce qu'il faut pour faire une simu
-		FittingClass configuration = new FittingClass(writeNRead, communicationModel,
-				memeFactory, networkFileLoader, workerFactory, entiteHandler, networkConstructor);
+		configuration = new FittingClass(writeNRead, communicationModel,
+				memeFactory, networkFileLoader, workerFactory, entiteHandler, networkConstructor, explorator);
 
 		// ajout de la fitting classe au listener
 		entiteHandler.addEntityListener(configuration);
 
-
-
-
-
-		// Si appelle toutifruiti, explo full ou random, depuis IHM
-		// Besoin de cycler sur les config de IModel, etc etc.
-
-
-		// Si appelle oneSot, depuis IHM ou depuis JAR
-
-
-
-
-
-
-
 		// initialise les config de simulation genre répartition des comportments etc
-		initializeConfigForStability(configuration);
+		// initializeConfigForStability(configuration);
 
 		// Lancement d'une simulation
 		resultat = factorisation(configuration);
@@ -175,6 +188,46 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 * @param fitting
 	 */
 	protected void initializeConfigForStability(FittingClass fitting){
+//		Hashtable<Meme, GenericBooleanParameter> memeDispo = new Hashtable<>();
+//		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
+//
+//		// Rempli la liste des memes que l'on veut pour lancer le fitting.
+//		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING))
+//			memeDispo.put(meme, new GenericBooleanParameter());
+//
+//		MemeAvailability memeProvider = new MemeAvailability(memeDispo);
+//		memeProvider.setEntiteHandler(entiteHandler);
+//		providers.put(1,memeProvider);
+//
+//		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING),
+//				new GenericDoubleParameter(.2,.2,.4,.2));
+//		memeDiffu.setEntiteHandler(entiteHandler);
+//		providers.put(0,memeDiffu);
+//
+//		memeProvider.addMemeListListener(memeDiffu);
+//
+//		if(Configurator.explorator == EnumExplorationMethod.oneShot){
+//			ArrayList<Double> InOrderOfParameter = new ArrayList<>(Arrays.asList(1.,0.365018173274458,0.089130672733655,0.484877681454417,1.));
+//
+//			ArrayList<Double> probaVoulu = new ArrayList<>();
+//			probaVoulu.add(InOrderOfParameter.get(3));
+//			probaVoulu.add(InOrderOfParameter.get(0));
+//			probaVoulu.add(InOrderOfParameter.get(1));
+//			probaVoulu.add(InOrderOfParameter.get(4));
+//			probaVoulu.add(InOrderOfParameter.get(2));
+//			setPreciseValue(probaVoulu, memeDiffu);
+//		}
+//
+//		fitting.explorator = ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
+	}
+
+	/** lorsque le programme est appelé depuis java - et que l'on souhaite utiliser les modelParameter pour cycler.
+	 *
+	 *
+	 * @return
+	 */
+	private IExplorationMethod callFromJava(){
+		// Tout le trala des explorateurs qui enchaine les IModelParameter
 		Hashtable<Meme, GenericBooleanParameter> memeDispo = new Hashtable<>();
 		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
 
@@ -193,68 +246,100 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		memeProvider.addMemeListListener(memeDiffu);
 
-		if(Configurator.explorator == EnumExplorationMethod.oneShot){
-			ArrayList<Double> InOrderOfParameter = new ArrayList<>(Arrays.asList(1.,0.365018173274458,0.089130672733655,0.484877681454417,1.));
 
-			ArrayList<Double> probaVoulu = new ArrayList<>();
-			probaVoulu.add(InOrderOfParameter.get(3));
-			probaVoulu.add(InOrderOfParameter.get(0));
-			probaVoulu.add(InOrderOfParameter.get(1));
-			probaVoulu.add(InOrderOfParameter.get(4));
-			probaVoulu.add(InOrderOfParameter.get(2));
-			setPreciseValue(probaVoulu, memeDiffu);
-		}
+		return ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
 
-		fitting.explorator = ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
 
-//		if(!Configurator.jarMode)
-//			Configurator.methodOfGeneration = Configurator.MemeDistributionType.FollowingFitting;
 	}
 
-	/**
-	 *
-	 * @param probaVoulu
-	 * @param memeDiffu
-	 */
-	private void setPreciseValue(ArrayList<Double> probaVoulu, MemeDiffusionProba memeDiffu){
-		Double value;
-		int i = 0;
-		for (Meme meme :memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING)){
-			value = probaVoulu.get(i++);
-			memeDiffu.getValue().put(meme, new GenericDoubleParameter(value,value, value,.1));
-		}
-	}
-
-
-	/** lorsque le programme est appelé depuis java
+	/** lorsque le fitting est appelé depuis un jar, ou depuis l'IHM mais qu'on veut faire un oneshot.
 	 *
 	 * @return
 	 */
-	private double callFromJava(){
-		// Tout le trala des explorateurs qui enchaine les IModelParameter
-
-
-	}
-
-	/** lorsque le fitting est appelé depuis un jar
-	 *
-	 * @return
-	 */
-	private double callFromJar(List<Boolean> activation, List<Double> proba){
+	private IExplorationMethod callFromJar(List<Boolean> activation, List<Double> proba){
 		// appelle sec avec un seul jeu de parametre, aux probas fixés
+		Hashtable<Meme, GenericDoubleParameter> memeAndProba = new Hashtable<>();
+		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
+
+
+		// Parcourt la liste des memes
+		for (int i = 0; i < activation.size(); i++) {
+			memeAndProba.put(memeFactory.getMemeFromColorInteger(i), new GenericDoubleParameter(proba.get(i)));
+		}
+
+		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeAndProba);
+		memeDiffu.setEntiteHandler(entiteHandler);
+		providers.put(0,memeDiffu);
+
+		return ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
 	}
 
-
-	/** Prend en parametre une configuration, fait X run sur la configuration, écrit dans les fichiers, et renvoi un score.
+	/** Retourne
 	 *
-	 * @param config
 	 * @return
 	 */
-	private double doFitting(FittingClass config){
+	private IExplorationMethod callSpecificParam(){
+//		//
+//		Hashtable<Meme, GenericBooleanParameter> memeDispo = new Hashtable<>();
+//		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
+//
+//		// Rempli la liste des memes que l'on veut pour lancer le fitting.
+//		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING))
+//			memeDispo.put(meme, new GenericBooleanParameter());
+//
+//		MemeAvailability memeProvider = new MemeAvailability(memeDispo);
+//		memeProvider.setEntiteHandler(entiteHandler);
+//		providers.put(1,memeProvider);
+//
+//		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING),
+//				new GenericDoubleParameter(.2,.2,.4,.2));
+//		memeDiffu.setEntiteHandler(entiteHandler);
+//		providers.put(0,memeDiffu);
+//
+//		memeProvider.addMemeListListener(memeDiffu);
+//
+//		if(Configurator.explorator == EnumExplorationMethod.oneShot){
+//			ArrayList<Double> InOrderOfParameter = new ArrayList<>(Arrays.asList(1.,0.365018173274458,0.089130672733655,0.484877681454417,1.));
+//
+//			ArrayList<Double> probaVoulu = new ArrayList<>();
+//			probaVoulu.add(InOrderOfParameter.get(3));
+//			probaVoulu.add(InOrderOfParameter.get(0));
+//			probaVoulu.add(InOrderOfParameter.get(1));
+//			probaVoulu.add(InOrderOfParameter.get(4));
+//			probaVoulu.add(InOrderOfParameter.get(2));
+//			setPreciseValue(probaVoulu, memeDiffu);
+//		}
+//
+//		fitting.explorator = ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
 
+		return null;
 
 	}
 
+
+	/** prends les listes vides en entrée et les remplis pour les faire correspondre a une
+	 * entrée standard en appelle console.
+	 *  Pour faire un oneshot depuis IHM
+	 * @param activator
+	 * @param proba
+	 */
+	private void fitListEMManuel(List<Boolean> activator, List<Double> proba){
+		activator.clear(); proba.clear();
+
+		List<Meme> existingMeme = memeFactory.getMemes(Configurator.MemeList.EXISTING, Configurator.ActionType.ANYTHING);
+
+		for (int i = 0; i < existingMeme.size(); i++) {
+
+			if(existingMeme.get(i).toFourCharString().compareToIgnoreCase("ADD+") == 0 ){
+				activator.add(true); proba.add(0.2);
+			} else 	if(existingMeme.get(i).toFourCharString().compareToIgnoreCase("RMV-") == 0 ){
+				activator.add(true); proba.add(0.2);
+			}
+			else{
+				activator.add(false); proba.add(-1.);
+			}
+		}
+	}
 
 
 	/** Classe factorisée pour les traitements de fitting ou searching.

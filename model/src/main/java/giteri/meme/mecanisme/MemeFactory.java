@@ -2,6 +2,7 @@ package giteri.meme.mecanisme;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.ActionType;
@@ -17,8 +18,6 @@ public class MemeFactory {
 	//region Properties
 
 	// Singleton
-	private static MemeFactory INSTANCE = null;
-
 	// Liste de meme qui existe. Pas nécessairement utilisé.
 	private ArrayList<Meme> memeOnMap;
 
@@ -28,6 +27,7 @@ public class MemeFactory {
 	// Liste des memes dispo sur la map et qui seront utlisé pour le fitting
 	private ArrayList<Meme> memeFitting;
 
+	// association meme & index, pour coloration ET fitting
 	private Hashtable<Meme, Integer> kvMemeIndexColor;
 
 	private Integer lastIndexUsed = -1;
@@ -38,7 +38,7 @@ public class MemeFactory {
 
 	//endregion
 
-	//region SINGLETON Constructor & Co
+	//region  Constructor & Co
 	public MemeFactory(ActionFactory actionFac, AgregatorFactory agregatorFac, AttributFactory attributFac ){
 		memeExisting = new ArrayList<Meme>();
 		memeFitting = new ArrayList<Meme>();
@@ -94,11 +94,12 @@ public class MemeFactory {
 			}
 		}
 
+		memeExisting.add(toReturn);
 		if(addForFitting)
 			memeFitting.add(toReturn);
 		if(addForMap)
 			memeOnMap.add(toReturn);
-		memeExisting.add(toReturn);
+
 		kvMemeIndexColor.put(toReturn, ++lastIndexUsed);
 
 		return toReturn;
@@ -206,6 +207,23 @@ public class MemeFactory {
 		return resultat;
 	}
 
+	/** obtenir un meme depuis son fourcharname, sinon null.
+	 *
+	 * @param foursizeName
+	 * @return
+	 */
+	public Meme getMemeFromFourString(String foursizeName){
+		for (Meme meme: getMemes(Configurator.MemeList.EXISTING, ActionType.ANYTHING )) {
+			if(meme.toFourCharString() == foursizeName)
+				return meme;
+		}
+
+		return null;
+
+	}
+
+	//region index stuff
+
 	/** pour l'affichage. récupération apres association d'une couleur a un meme
 	 *
 	 * @param thismeme
@@ -228,7 +246,12 @@ public class MemeFactory {
 		return null;
 	}
 
-	public Meme getMemeFromInteger(int numero){
+	/**
+	 *
+	 * @param numero
+	 * @return
+	 */
+	public Meme getMemeFromColorInteger(int numero){
 		for (Meme meme : kvMemeIndexColor.keySet()) {
 			if(kvMemeIndexColor.get(meme) == numero)
 				return meme;
@@ -236,4 +259,5 @@ public class MemeFactory {
 		return null;
 	}
 
+	//endregion
 }

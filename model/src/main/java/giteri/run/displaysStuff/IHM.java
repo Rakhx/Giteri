@@ -49,7 +49,6 @@ import giteri.tool.math.Toolz;
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.network.NetworkProperties;
 
-import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -1441,7 +1440,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		// Pour chaque série qu'on veut ajouter
 		for (XYSeries serie : seriesAppliances) {
 			// on crée les série dans l'ordre a partir de 0 et regarde le meme associé a cet index dans MemeFactory
-			memeConcerne = memeFactory.getMemeFromInteger(numbSerie);
+			memeConcerne = memeFactory.getMemeFromColorInteger(numbSerie);
 			if(memeConcerne != null){
 				// label son petit nom
 				labelSerie = entiteHandler.translateMemeCombinaisonReadable(memeConcerne.toFourCharString());

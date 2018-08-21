@@ -17,8 +17,6 @@ public class NetworkAnalyzer extends StatAndPlotGeneric {
 
 	//region Properties
 
-
-
 	// Le réseau
 
 	// Attribut propre a la classe
@@ -27,8 +25,6 @@ public class NetworkAnalyzer extends StatAndPlotGeneric {
 	//endregion
 
 	//region Constructor
-
-	private static NetworkAnalyzer INSTANCE = null;
 
 	/** Constructeur sans paramètre.
 	 *

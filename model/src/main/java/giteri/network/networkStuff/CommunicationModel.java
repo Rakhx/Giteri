@@ -1,23 +1,17 @@
 package giteri.network.networkStuff;
 
-import giteri.run.interfaces.Interfaces.IModel;
-import giteri.run.interfaces.Interfaces.IReadNetwork;
-import giteri.run.interfaces.Interfaces.StatAndPlotInterface;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Optional;
-
+import giteri.meme.entite.EntiteHandler;
+import giteri.meme.entite.Meme;
 import giteri.network.network.NetworkProperties;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.FittingBehavior;
 import giteri.run.configurator.Configurator.NetworkAttribType;
 import giteri.run.controller.Controller.VueController;
-import giteri.meme.entite.EntiteHandler;
-import giteri.meme.entite.Meme;
-import jdk.nashorn.internal.runtime.regexp.joni.Config;
+import giteri.run.interfaces.Interfaces.IModel;
+import giteri.run.interfaces.Interfaces.IReadNetwork;
+import giteri.run.interfaces.Interfaces.StatAndPlotInterface;
+
+import java.util.*;
 
 /** Classe de représentation du modèle proposé via un controller
  * à l'IHM. 
@@ -105,7 +99,6 @@ public class CommunicationModel implements IModel {
 	 *
 	 */
 	public void stabilityResearch() {
-		this.calculator.fitNetwork();
 
 	}
 
@@ -114,9 +107,7 @@ public class CommunicationModel implements IModel {
 	 *
 	 */
 	public void fittingNetworks(){
-		this.calculator.fitNetwork();
-
-		this.calculator.fitNetworkV2();
+		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.exhaustive, Optional.empty(), Optional.empty());
 	}
 
 	public void displayPolar(){
@@ -129,16 +120,10 @@ public class CommunicationModel implements IModel {
 	public void fittingOnce(){
 		Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
 		Configurator.typeOfMemeUseForFitting = Configurator.MemeList.FITTING;
-//		eh.giveMemeToEntite(Configurator.methodOfGeneration);
-
-		this.calculator.fitNetwork();
-
-		// oneshot ihm
-		this.calculator.fitNetworkV2();
+		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.oneShot,Optional.empty(),Optional.empty());
 	}
 
 	public void rdmConfig(){
-//		calculator.testStability();
 	}
 
 	/** Sauvegarde des informations sur le réseau courant dans un dossier.
@@ -152,7 +137,6 @@ public class CommunicationModel implements IModel {
 		path.add(screen);
 		wf.getDrawer().screenshotDisplay(path);
 		path.remove(screen);
-
 	}
 
 	/** Lorsqu'on fait du step by step pour le fitting.

@@ -89,12 +89,12 @@ public class ResultSet {
 	 *
 	 * @param rep
 	 */
-	public void writelastTurnOnDetailCSV(File rep, int networkId, NetworkProperties properties) {
+	public void writelastTurnOnDetailCSV(File rep, NetworkProperties properties) {
 
-		Result result = resultById.get(networkId);
+		Result result = resultById.get(properties.getNetworkInstance());
 
 		String toWrite = "";
-		toWrite += networkId;
+		toWrite += properties.getNetworkInstance();
 		toWrite += ";" + result.getCurrentConfig();
 		toWrite += "; -";
 
@@ -182,7 +182,7 @@ public class ResultSet {
 		netSD.createStub();
 
 		NetworkAttribType attribut;
-		ArrayList<Double> netPropValues = new ArrayList<Double>();
+		ArrayList<Double> netPropValues = new ArrayList<>();
 
 		// On regarde sur tous les attributs de réseau ceux qui ont été activé
 		// pour le calcul de distance entre deux réseaux

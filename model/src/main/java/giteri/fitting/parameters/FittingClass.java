@@ -146,7 +146,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 *
 	 */
 	public FittingClass(WriteNRead wnr, CommunicationModel com, MemeFactory memeF,
-						NetworkFileLoader nfl, WorkerFactory wf, EntiteHandler eh, NetworkConstructor nc){
+						NetworkFileLoader nfl, WorkerFactory wf, EntiteHandler eh, NetworkConstructor nc, IExplorationMethod explorator){
 		resultNetwork = new ResultSet(wnr);
 		this.com = com;
 		this.memeFactory = memeF;
@@ -155,7 +155,23 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		this.workerFactory = wf;
 		this.entiteHandler = eh;
 		this.networkConstructor = nc;
+		this.explorator = explorator;
 		setDefaultValue();
+	}
+	/**	Constructeur.
+	 *
+	 */
+	public FittingClass(WriteNRead wnr, CommunicationModel com, MemeFactory memeF,
+						NetworkProperties np, WorkerFactory wf, EntiteHandler eh, NetworkConstructor nc, IExplorationMethod explorator ){
+//		resultNetwork = new ResultSet(wnr);
+//		this.com = com;
+//		this.memeFactory = memeF;
+//		this.writeNRead = wnr;
+//		this.networkFileLoader = nfl;
+//		this.workerFactory = wf;
+//		this.entiteHandler = eh;
+//		this.networkConstructor = nc;
+//		setDefaultValue();
 	}
 
 	//region Fitting running
@@ -279,6 +295,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		// passe par le tinyNetwork
 		currentNetProperties = networkConstructor.getNetworkProperties();
 
+		currentNetProperties.name = "Construit";
 		// TODO [WayPoint]- Score distance entre deux network
 		currentNetworkScore = getNetworksDistanceDumb(Configurator.activationCodeForScore, targetNetProperties, currentNetProperties);
 
@@ -292,7 +309,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			configAsString += model.valueString();
 		}
 
-		resultNetwork.addScore(numeroRun, currentNetworkScore, networkConstructor.getNetworkProperties().getCopyMe());
+		resultNetwork.addScore(numeroRun, currentNetworkScore, currentNetProperties);
 		if(Configurator.writeNetworkResultOnFitting)
 			com.takeSnapshot(currentSeed, Optional.ofNullable(repertoires));
 
@@ -300,7 +317,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 		if(Configurator.writeNetworkResultOnFitting)
 			// Va écrire les résultats détaillés dans le CSV correspondant
-			resultNetwork.writelastTurnOnDetailCSV(repOfTheSearch, numeroRun,networkConstructor.getNetworkProperties() );
+			resultNetwork.writelastTurnOnDetailCSV(repOfTheSearch/*, numeroRun*/, networkConstructor.getNetworkProperties() );
 	}
 
 	/** Fin du tour, enregistre les variances sur les résultats des différents run sur meme config,

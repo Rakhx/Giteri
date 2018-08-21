@@ -9,7 +9,6 @@ import giteri.meme.mecanisme.AgregatorFactory;
 import giteri.meme.mecanisme.AttributFactory;
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.networkStuff.*;
-import giteri.run.configurator.Configurator;
 import giteri.run.controller.Controller;
 import giteri.run.displaysStuff.ConsoleView;
 import giteri.run.displaysStuff.FileView;
@@ -25,12 +24,7 @@ import org.graphstream.ui.view.Viewer;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.List;
-
-import static giteri.run.configurator.Configurator.debugOpenMole;
+import java.util.*;
 import static giteri.run.configurator.Configurator.withGraphicalDisplay;
 
 /** Classe d'initialisation des objets nécessaires à l'utilisation du framework
@@ -41,7 +35,7 @@ import static giteri.run.configurator.Configurator.withGraphicalDisplay;
  *
  */
 public class Initializer {
-    public static Double initialize(Configurator.EnumLauncher launcher, File fileInput, ArrayList<Double> probaBehavior) {
+    public static Double initialize(Configurator.EnumLauncher launcher, File fileInput, ArrayList<Boolean> memeActication ,ArrayList<Double> memeProba) {
 
         // A instancier dans les if. à lancer dans tous les cas a la fin?
         Runnable willBeRun;
@@ -65,7 +59,6 @@ public class Initializer {
             Configurator.systemPaused = true;
             Configurator.writeNetworkResultOnFitting = true;
             Configurator.explorator = Configurator.EnumExplorationMethod.exhaustive;
-//            Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
         }
 
         else if(launcher == Configurator.EnumLauncher.testProvider){
@@ -89,8 +82,6 @@ public class Initializer {
         NetworkFileLoader networkFileLoader = new NetworkFileLoader(memeFactory, writeNRead);
         DrawerGraphStream drawerGraphStream = null;
         StatAndPlotGeneric stat = null;
-       // Interfaces.IView displaysMng = new DisplaysMng();
-     //   DisplaysMng displaysMng = new DisplaysMng();
 
         if(ihmLauncher)
         {
@@ -148,17 +139,15 @@ public class Initializer {
                 e1.printStackTrace();
             }
 
-            stat.probaVoulu = probaBehavior;
-            if(debugOpenMole) System.out.println("Proba donnée au launcher:" + probaBehavior);
             entiteHandler.suspend();
             networkConstructor.suspend();
             networkConstructor.start();
             entiteHandler.start();
 
-            List<Boolean> activ; List<Double> proba;
-
-            //
-            return stat.fitNetwork();
+            return stat.fitNetwork(Configurator.EnumLauncher.jarC,
+                    Configurator.EnumExplorationMethod.oneShot,
+                    Optional.of(memeActication),
+                    Optional.of(memeProba));
 
         }else if (launcher == Configurator.EnumLauncher.ihm) {
             entiteHandler.initialisation();
@@ -190,9 +179,6 @@ public class Initializer {
                 vControl.addView(new FileView(false));
             if((Configurator.activationCodeForView & 2) == 2)
                 vControl.addView(new ConsoleView());
-
-            if(!Configurator.withGraphicalDisplay)
-                stat.probaVoulu = new ArrayList<>(Arrays.asList(0.,0.,0.,0.,0.,0.,0.));
 
             // Le graph associé lors de l'affichage avec graphstream
             if (Configurator.withGraphicalDisplay) {
