@@ -17,6 +17,8 @@ import java.util.*;
  */
 public class MemeProperties{
 
+    //region properties & constructeur
+
     // Meme actif sur la map
     public List<Meme> memeOnMap;
 
@@ -47,6 +49,19 @@ public class MemeProperties{
         lastHundredActionDone.clear();
     }
 
+    //endregion
+
+    /** Appelée a chaque action effectuée
+     * mise a jour des listes de possession de meme et des dernier meme jouée,
+     * +
+     *  renvoi une list de string composée de ce qu'il faut output si on veut suivre l'évolution des ratio de fail etc.
+     *
+     * @param memeApply
+     * @param entiteIndex
+     * @param message
+     * @param cptModulo
+     * @return
+     */
     public List<String> updateActionCount(Meme memeApply, int entiteIndex, String message, int cptModulo){
         if (memeApply != null)
         {

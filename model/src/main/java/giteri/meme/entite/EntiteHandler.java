@@ -104,7 +104,7 @@ public class EntiteHandler extends ThreadHandler {
 	public void initialisation(){
 		generateMemeAvailableForMap();
 		bindNodeWithEntite(networkConstruct.getNetwork());
-		giveMemeToEntite(Configurator.methodOfGeneration);
+		//giveMemeToEntite(Configurator.methodOfGeneration);
 	}
 
 	public void updateMemeAvailableForProperties(){
@@ -1336,7 +1336,7 @@ public class EntiteHandler extends ThreadHandler {
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("AddØ",1, add, attributs, KVAttributAgregator, true, false);
+		memeFactory.registerMemeAction("AddØ",1, add, attributs, KVAttributAgregator, false, false);
 		agregators.put(2, random);
 		if(Configurator.initializeDefaultBehavior)
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, add, attributs, KVAttributAgregator, false, false);
@@ -1344,7 +1344,7 @@ public class EntiteHandler extends ThreadHandler {
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("RmvØ",1, remove, attributs,  KVAttributAgregator, true, false);
+		memeFactory.registerMemeAction("RmvØ",1, remove, attributs,  KVAttributAgregator, false, false);
 		agregators.put(2, random);
 		if(Configurator.initializeDefaultBehavior) {
 			removeRandom = memeFactory.registerMemeAction("RmvØ-neutral",0, remove, attributs,  KVAttributAgregator, false, false);

@@ -44,7 +44,7 @@ public class Entite implements Comparable<Entite>{
 	 */
 	public Entite(EntiteHandler ent){
 		associatedNode = null;
-		myMemes = new ArrayList<Meme>();
+		myMemes = new ArrayList<>();
 		intervalOfSelection = new Hashtable<Meme, Double>();
 //		connectedTimeNodes = new Hashtable<Entite, Integer>();
 		connectedNodes = new HashSet<>();

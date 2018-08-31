@@ -127,7 +127,6 @@ public class Initializer {
             IHMStub fenetre = new IHMStub();
             vControl.addView(fenetre);
             entiteHandler.initialisation();
-
             entiteHandler.addMemeListener(workerFactory.getDrawer());
             entiteHandler.addEntityListener(workerFactory.getCalculator());
 
@@ -138,6 +137,8 @@ public class Initializer {
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
+
+            entiteHandler.giveMemeToEntite(Configurator.methodOfGeneration);
 
             entiteHandler.suspend();
             networkConstructor.suspend();
@@ -208,6 +209,8 @@ public class Initializer {
             entiteHandler.addMemeListener(workerFactory.getDrawer());
             entiteHandler.addEntityListener(workerFactory.getCalculator());
 
+            entiteHandler.giveMemeToEntite(Configurator.methodOfGeneration);
+
             networkConstructor.start();
             if (!Configurator.isSystemPaused()) {
                 networkConstructor.start();
@@ -223,6 +226,7 @@ public class Initializer {
         }
         else if(launcher == Configurator.EnumLauncher.testProvider){
             entiteHandler.initialisation();
+            entiteHandler.giveMemeToEntite(Configurator.methodOfGeneration);
 
             Hashtable<Meme, IModelParameter.GenericBooleanParameter> memeDispo = new Hashtable<>();
             Hashtable<Integer, IModelParameter<?>> providers = new Hashtable<>();

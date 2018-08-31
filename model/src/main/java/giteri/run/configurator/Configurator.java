@@ -46,7 +46,10 @@ public final class Configurator {
 	// A tester les résultats
 
 	//fluidité
-	 public static boolean initializeDefaultBehavior = false;
+	public static boolean initializeDefaultBehavior = true;
+
+	public static boolean checkWhenFullPropagate = true;
+
 
 	public static int activationCodeForScore = 55;
 	public static int activationCodeAllAttribExceptDD = 247;
