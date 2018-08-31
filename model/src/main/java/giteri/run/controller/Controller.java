@@ -80,10 +80,9 @@ public class Controller {
 			lastHundredActionDone.stream().
 					forEach(l -> lastHundred.add(l.toFourCharString()));
 
-			for (Interfaces.IView vue:  vues) {
+			for (Interfaces.IView vue: vues) {
 				vue.displayXLastAction(nbAction, nbActiByMeme,  nbLastActivByMeme, lastHundred);
 			}
-
 		}
 
 		/** Ajoute une valeur dans la chart de density over proba.

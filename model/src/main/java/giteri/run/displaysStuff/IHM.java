@@ -77,7 +77,6 @@ import giteri.meme.event.IBehaviorTransmissionListener;
 @SuppressWarnings("unused")
 public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransmissionListener, IView {
 
-
 	//<editor-fold desc="Properties">
 
 	// worker Factory
@@ -213,7 +212,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	private static int rmv = 1;
 	private static int add = 1;
 	//</editor-fold>
-
 
 	public IHM(ModelController modelParam,
 			   NetworkConstructor networkConstructor,
@@ -376,6 +374,13 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 	}
 
+	/** Affichage des éléments concernants les memes qui sont joués sur la map
+	 *
+	 * @param nbAction
+	 * @param nbActivByMeme
+	 * @param nbLastActivByMeme
+	 * @param lastXMemeApplied
+	 */
 	public void displayXLastAction(int nbAction, Map<String, Integer> nbActivByMeme, Map<String,Integer> nbLastActivByMeme, List<String> lastXMemeApplied){
 
 		lastHundredActionDone = lastXMemeApplied;
@@ -1530,7 +1535,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 				int totalAppel = 0;
 				int nbAppel;
 				String memeRef = "";
-				boolean refreshDDArray = (compteurSerieDensity % 20 == 0);
+				boolean refreshDDArray = (compteurSerieDensity % 10 == 0);
 				// densité seul
 				int activator = 1;
 				Color associatedColor;

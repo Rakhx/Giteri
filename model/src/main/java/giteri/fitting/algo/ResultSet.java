@@ -15,70 +15,59 @@ import giteri.tool.other.WriteNRead;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.NetworkAttribType;
 /** Classe de résultat des réseaux pendant l'étape de fitting.
- * les réseaux sont identifiés par un GUID, et des map <Guid, parametre> // Score>
+ * les résultats sont identifiés par un numero de run, et une classe de Resultat contenant
+ * un Result pour chaque RUN. Un résult est donc une liste de score par répétition.
  * sont la pour associer réseau, paramètre et résultat suivant des métriques calculées
- * pendant l'étape de fitting. blabl
+ * pendant l'étape de fitting.
  */
-public class ResultSet {
+public class ResultSet extends Hashtable<Integer, Result> {
 
 	private WriteNRead writeNRead;
 
 	// Structure de donnée
-
-	// Identifiant et resultat d'une simulation
-	private Map<Integer, Result> resultById;
 
 	// Affichage stuff
 	XYDataset dataset;
 	JFreeChart chart;
 	ChartPanel chartPanel;
 	boolean debugMode = true;
-//	int lastNetworkId;
 
 	/**
 	 * Constructeur.
 	 */
 	public ResultSet(WriteNRead wnr) {
 		writeNRead = wnr;
-		resultById = new Hashtable<>();
-//		parameterSetById = new Hashtable<>();
-//		scoreById = new Hashtable<>();
-//		networkPropertiesById = new Hashtable<>();
 	}
 
 	//region Public Method
 
 	/**
-	 * Renvoi les scores en fonction des ID en fonction des distributions
+	 * Renvoi les scores en fonction du numéro de run en fonction des distributions
 	 */
 	public double displayResult() {
 		double res = 0;
 		if (Configurator.jarMode) {
-			for (Integer networkId : resultById.keySet())
-				res = resultById.get(networkId).getAvgScore();
+			for (Integer numeroRun : keySet())
+				res = get(numeroRun).getAvgScore();
 			System.out.println(res);
 		} else {
-			for (Integer networkId : resultById.keySet()) {
+			for (Integer numeroRun : keySet()) {
 				System.out.println("_____________________________________");
-				System.out.println("Configuration " + resultById.get(networkId).getCurrentConfig());
+				System.out.println("Configuration " + get(numeroRun).getCurrentConfig());
 			}
 		}
 		return res;
 	}
 
-	public void addInitialConfigurationToResult(int networkId, Collection<IModelParameter<?>> parameters) {
-		resultById.put(networkId, new Result(parameters));
-	}
-
-	/**
-	 * @param networkId
-	 * @param value
+	/** Ajoute un score pour le Result correspondant au numero de run courant.
+	 * @param numeroRun le numero de run courant du fitting
+	 * @param scoreNetwork Le score obtenu
+	 * @param properties Propriété du network courant. Densité etc etc
 	 */
-	public void addScore(int networkId, double value, NetworkProperties properties) {
-		Result result = resultById.get(networkId);
-		result.addScore(value);
+	public void addScore(int numeroRun, double scoreNetwork, NetworkProperties properties) {
+		Result result = get(numeroRun);
+		result.addScore(scoreNetwork);
 		result.addProperties(properties.toString());
-//		lastNetworkId = networkId;
 	}
 
 
@@ -89,14 +78,15 @@ public class ResultSet {
 	 *
 	 * @param rep
 	 */
-	public void writelastTurnOnDetailCSV(File rep, NetworkProperties properties) {
+	public void writelastRepDetailCSV(File rep, int numeroRun, NetworkProperties properties, IExplorationMethod explorator) {
 
-		Result result = resultById.get(properties.getNetworkInstance());
-
+		Result result = get(numeroRun);
 		String toWrite = "";
-		toWrite += properties.getNetworkInstance();
-		toWrite += ";" + result.getCurrentConfig();
-		toWrite += "; -";
+		toWrite += numeroRun;
+
+		for (IModelParameter<?> model : explorator.getModelParameterSet()){
+			toWrite += ";" + model.valueString();
+		}
 
 		// On prend le dernier élément de la liste
 		NetworkProperties lastProp = properties;
@@ -107,7 +97,8 @@ public class ResultSet {
 
 		// Concernant les scores
 		toWrite += ";" + result.getLastScore();
-		toWrite += ";" + -1;
+		// Rien pour les champs moyenne et SD des scores
+		toWrite += ";NA;NA" ;
 
 		writeNRead.writeSmallFile(rep, "NetworkDetailsCSV", Arrays.asList(toWrite));
 	}
@@ -117,26 +108,29 @@ public class ResultSet {
 	 * Pour le CSV normal : les valeurs moyennes et écartType pour les attributs activés
 	 * Pour le CSV détaillé : écartType et moyenne pour chaque attribut
 	 */
-	public void writeLastRunOnCSV(File rep, int networkId, List<NetworkProperties> ListOfproperties, int activator) {
+	public void writeLastRunOnCSV(File rep, int numeroRun, List<NetworkProperties> ListOfproperties, int activator) {
+
 		NetworkProperties netMean = new NetworkProperties();
-		netMean.createStub();
 		NetworkProperties netSD = new NetworkProperties();
+		netMean.createStub();
 		netSD.createStub();
-		Result result = resultById.get(networkId);
-		List<Double> scores = result.getScores();
+
 		Double[] scoreMeanAndSd;
 		String toWriteSimple = "", toWriteDetailled = "";
-		String parameter = result.getCurrentConfig();
 
+		Result result = get(numeroRun);
+		List<Double> scores = result.getScores();
+		List<String> parameter = result.getCurrentConfig();
+
+		// Mise à jour des valeurs de moyenne et d'écart type pour les réseaux
 		updateMeanAndSD(ListOfproperties, Configurator.activationCodeAllAttribExceptDD, netMean, netSD);
-		toWriteSimple += networkId;
-		toWriteDetailled += networkId;
+		toWriteSimple += numeroRun;
+		toWriteDetailled += numeroRun;
 
-		toWriteSimple += ";" + parameter;
-		toWriteDetailled += ";" + parameter;
-
-		toWriteSimple += "; -"; //+ parameter;
-		toWriteDetailled += "; -"; // + parameter;
+		for (String config: parameter ) {
+			toWriteSimple += ";" + config;
+			toWriteDetailled += ";" + config;
+		}
 
 		// STEP: Partie simple
 		// Moyenne et ecart type sur les valeurs activées, et sur le score
@@ -144,16 +138,19 @@ public class ResultSet {
 
 		// STEP: Partie detaillé
 		toWriteDetailled += netMean.getCSVFormatDoubleColonne(netSD, Configurator.activationCodeAllAttribExceptDD);
+		// Pour le champs moyenne qui n'a pas de sens sur le dernier run
+		toWriteDetailled += ";NA";
+
 
 		// STEP: Commun
 		// Dans tous les cas, ajouts du score et de son SD
-		scoreMeanAndSd = Toolz.getDeviationAndMean(scores);
+		scoreMeanAndSd = Toolz.getMeanAndSd(scores);
 		// TODO [WayPoint]- Calcul du score moyenne x ecart type mais pas pris en compte pour le vrai score...
-		toWriteSimple += ";" + scoreMeanAndSd[0] + ";" + scoreMeanAndSd[1] + ";"
-				+ ((scoreMeanAndSd[0] * scoreMeanAndSd[0]) / (scoreMeanAndSd[0] - scoreMeanAndSd[1]));
+		toWriteSimple += ";" + scoreMeanAndSd[0] + ";" + scoreMeanAndSd[1] ;
+				//+ ";" + ((scoreMeanAndSd[0] * scoreMeanAndSd[0]) / (scoreMeanAndSd[0] - scoreMeanAndSd[1]));
 
-		toWriteDetailled += ";" + scoreMeanAndSd[0] + ";" + scoreMeanAndSd[1]
-				+ ((scoreMeanAndSd[0] * scoreMeanAndSd[0]) / (scoreMeanAndSd[0] - scoreMeanAndSd[1]));
+		toWriteDetailled += ";" + scoreMeanAndSd[0] + ";" + scoreMeanAndSd[1];
+				//+ ";" + ((scoreMeanAndSd[0] * scoreMeanAndSd[0]) / (scoreMeanAndSd[0] - scoreMeanAndSd[1]));
 
 		// TODO [WayPoint]- Ecriture dans les deux csv, normal et détaillé.
 		writeNRead.writeSmallFile(rep, "NetworkCSV", Arrays.asList(toWriteSimple));
@@ -161,10 +158,6 @@ public class ResultSet {
 	}
 
 	//endregion
-
-	//region private
-
-	//region SCORE ETC
 
 	/**
 	 * Va calculer la moyenne et l'écart type de la série de nework properties en parametre
@@ -199,7 +192,7 @@ public class ResultSet {
 					netPropValues.add((Double) netProp.getValue(attribut));
 
 				// calcul des moyennes et écart type sur les valeurs données dans la liste
-				Double[] avgNSd = Toolz.getDeviationAndMean(netPropValues);
+				Double[] avgNSd = Toolz.getMeanAndSd(netPropValues);
 
 				// Ajout de ces valeurs dans les networkProperties contenant moyenne et écart type
 				netMean.setValue(attribut, avgNSd[0]);
@@ -208,6 +201,7 @@ public class ResultSet {
 		}
 	}
 }
+	//region a refaire
 	// TODO a refaire.
 	/** Va les mettres sous forme string:config du réseau arraydouble : valeur des attributs
 	 * ordonnée
@@ -237,8 +231,8 @@ public class ResultSet {
 //		// Recherche des meilleurs valeurs pour tous les attribs
 //		for (NetworkAttribType type : usedAttrib) {
 //			valeurMax = 0;
-//			for (Integer networkId : bestNetwork) {
-//				valeurCourante = Double.parseDouble(""+networkPropertiesById.get(networkId).get(0).getValue(type));
+//			for (Integer numeroRun : bestNetwork) {
+//				valeurCourante = Double.parseDouble(""+networkPropertiesById.get(numeroRun).get(0).getValue(type));
 //				if(valeurMax < valeurCourante)
 //					valeurMax = valeurCourante;
 //			}
@@ -247,17 +241,17 @@ public class ResultSet {
 //		}
 //
 //		// Création de valeur normalisée pour les valeurs de chacun de ces networks
-//		for (Integer networkId : bestNetwork) {
+//		for (Integer numeroRun : bestNetwork) {
 //
 //			// le nom du réseau par ses propriétés
-//			networkBlaze = parameterSetById.get(networkId);
+//			networkBlaze = parameterSetById.get(numeroRun);
 //			// sa liste de donnée normalisé, classé en hash par le type d'attribut du réseau
 //			Hashtable<NetworkAttribType, Double> formatValues = new Hashtable<NetworkAttribType, Double>();
 //			dataFormat.put(networkBlaze, formatValues);
 //
 //			// on rempli la structure de données normalisées
 //			for (NetworkAttribType type : usedAttrib) {
-//				valeurNormalisee = Double.parseDouble(""+networkPropertiesById.get(networkId).get(0).getValue(type)) / maxValues.get(type);
+//				valeurNormalisee = Double.parseDouble(""+networkPropertiesById.get(numeroRun).get(0).getValue(type)) / maxValues.get(type);
 //				formatValues.put(type, valeurNormalisee);
 //			}
 //		}
@@ -460,12 +454,14 @@ public class ResultSet {
 				interestingNetwork.add(id);
 		}
 
-		for (Integer networkId : parameterSetById.keySet()) {
+		for (Integer numeroRun : parameterSetById.keySet()) {
 			System.out.println("_____________________________________");
-			System.out.println(networkPropertiesById.get(networkId).get(0).toString() + " ◊score: "+scoreById.get(networkId));
+			System.out.println(networkPropertiesById.get(numeroRun).get(0).toString() + " ◊score: "+scoreById.get(numeroRun));
 		}
 
 		processData(interestingNetwork, 23);
 	}
+*/
+	//endregion
 
-	//endregion */
+//endregion

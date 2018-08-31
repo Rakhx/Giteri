@@ -364,22 +364,23 @@ public class Toolz {
 	}
 
 	/** calcul la déviation et la moyenne de la série de donnée en entrée, et donne ces valeurs en pseudo référence
-	 * aux variables avg et sd.   
+	 * aux variables 0 -> avg et 1 -> sd.
 	 * 
 	 * @param entry IN
 	 * @param avg OUT
 	 * @param sd OUT
 	 */
 	public static <T extends Number> Double[] getDeviation(Hashtable<Integer,T> entry, Double avg, double sd ){
-		return getDeviationAndMean(new ArrayList<T>(entry.values()));
+		return getMeanAndSd(new ArrayList<T>(entry.values()));
 	}
-	
-	/** 
-	 * 
+
+	/**
+	 *
 	 * @param entry
-	 * @return
+	 * @param <T>
+	 * @return Double[2] 0 -> avg : 1 -> sd
 	 */
-	public static <T extends Number> Double[] getDeviationAndMean(List<T> entry){
+	public static <T extends Number> Double[] getMeanAndSd(List<T> entry){
 		Double avg = 0., sd = 0.;
 		double sumFreq = 0;
 		for (T value : entry)

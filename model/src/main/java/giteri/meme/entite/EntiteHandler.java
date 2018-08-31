@@ -1,5 +1,7 @@
 package giteri.meme.entite;
 
+import giteri.fitting.algo.IExplorationMethod;
+import giteri.fitting.parameters.IModelParameter;
 import giteri.meme.event.ActionApplyEvent;
 import giteri.meme.event.BehavTransmEvent;
 import giteri.meme.event.IActionApplyListener;
@@ -18,6 +20,7 @@ import giteri.run.controller.Controller.VueController;
 import giteri.tool.math.Toolz;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -35,18 +38,29 @@ public class EntiteHandler extends ThreadHandler {
 
 	// les entités du réseau
 	protected Set<Entite> entites;
+
+	public ArrayList<Entite> getEntitesActive() {
+		return entitesActive;
+	}
+
 	// Entite possedant des actions
 	private ArrayList<Entite> entitesActive;
 	private Hashtable<String, String> memeTranslationReadable;
 
+	private List<Meme> memeFittingApplied;
+
+//	private Map<Integer, ArrayList<Meme>> memeCombinaisonFittingAvailable;
+
 	// Liste des memes applied sur les X derniers actions et depuis le début de la simu
 	// Nombre de fois ou le meme a été appelé
-	public Map<Meme, Integer> nbActivationByMemes;
+	//public Map<Meme, Integer> nbActivationByMemes;
 	// Nombre de fois ou le meme a été appelé sur les 20 dernieres actions
-	public Map<Meme, Integer> countOfLastMemeActivation;
+	//public Map<Meme, Integer> countOfLastMemeActivation;
 	// Sur les 100 dernières actions, quel meme a été appelé
-	public CircularFifoQueue<Meme> lastHundredActionDone;
-	public int sizeOfCircularQueue = 100;
+	//public CircularFifoQueue<Meme> lastHundredActionDone;
+	//public int sizeOfCircularQueue = 100;
+
+	public MemeProperties memeProperties;
 
 	// Listener pour les évènements issu de l'obtention de meme ou application
 	// de ce dernier.
@@ -81,10 +95,7 @@ public class EntiteHandler extends ThreadHandler {
 		memeListeners = new ArrayList<>();
 		memeTranslationReadable = new Hashtable<>();
 
-		nbActivationByMemes = new Hashtable<>();
-		countOfLastMemeActivation = new Hashtable<>();
-		lastHundredActionDone = new CircularFifoQueue<>(sizeOfCircularQueue);
-
+		memeProperties = new MemeProperties();
 
 		if (Configurator.DisplayLogdebugInstantiation)
 			System.out.println("EntiteHandler constructor Closing");
@@ -95,6 +106,20 @@ public class EntiteHandler extends ThreadHandler {
 		bindNodeWithEntite(networkConstruct.getNetwork());
 		giveMemeToEntite(Configurator.methodOfGeneration);
 	}
+
+	public void updateMemeAvailableForProperties(){
+		memeProperties.memeOnMap = this.memeFittingApplied;
+
+		//combinaison de meme présent sur le run, classé par type d'action
+		Hashtable<ActionType, ArrayList<Meme>> memesByCategory = new Hashtable<>();
+		for (Meme meme: this.memeFittingApplied)
+			Toolz.addElementInHashArray(memesByCategory,meme.getAction().getActionType(),meme);
+		//memeCombinaisonFittingAvailable = this.getMemeAvailable(FittingBehavior.simpleAndComplex,Optional.of(memesByCategory));
+
+		memeProperties.memeCombinaisonFittingAvailable =
+				this.getMemeAvailable(FittingBehavior.simpleAndComplex, Optional.of(memesByCategory));
+	}
+
 
 	//endregion
 
@@ -149,15 +174,16 @@ public class EntiteHandler extends ThreadHandler {
 		if (cptModulo % (Configurator.refreshInfoRate * 25) == 0) {
 
 			if (Configurator.displayMemePosessionDuringSimulation) {
-				vueController.displayMemeUsage(cptModulo, nbActivationByMemes,countOfLastMemeActivation,lastHundredActionDone);
+				vueController.displayMemeUsage(cptModulo,
+						memeProperties.getNbActivationByMemes(),
+						memeProperties.countOfLastMemeActivation,
+						memeProperties.lastHundredActionDone);
 			}
-
 
 			if (Configurator.displayLogAvgDegreeByMeme) {
 				vueController.displayInfo("AvgDgrByMeme", Arrays.asList(checkPropertiesByMemePossession()));
 			}
 		}
-
 	}
 
 	//endregion
@@ -317,10 +343,7 @@ public class EntiteHandler extends ThreadHandler {
 		cptActionAddFail = 1;
 		cptActionRmvFail = 1;
 
-		nbActivationByMemes.clear();
-		countOfLastMemeActivation.clear();
-		lastHundredActionDone.clear();
-
+		memeProperties.clear();
 		entitesActive.clear();
 		// TODO POTENTIAL ERROR Il ne semble pas qu'il soit nécessaire de tout reset puis le TRUE reset
 		// vient de l'appel dans le fitting qui réapply lui meme les IModelMachin.
@@ -424,13 +447,13 @@ public class EntiteHandler extends ThreadHandler {
 		}
 	}
 
+
 	//endregion
 
 	//region Meme
-
 	/** Distribut les memes aux entités suivant certains mode.
 	 * Utilisé pour les lancement manuels. l'apply du IModelParameter DiffuProba
-	 * fourni une liste et appelle giveXMemeFromListToEntite
+	 * fourni une liste et appelle giveMemeToEntiteFitting
 	 *
 	 * @param distrib
 	 */
@@ -458,18 +481,19 @@ public class EntiteHandler extends ThreadHandler {
 
 	/** Applique directement depuis une liste de meme au X premier agents pour les
 	 * recevoir. Si option de défault behavior, donne des memes fluides aux autres agent.
-	 *
+	 * Utilisé par l'apply du IModelParameter
 	 * @param memes
 	 */
-	public void giveXMemeFromListToEntite(List<Meme> memes) {
+	public void giveMemeToEntiteFitting(List<Meme> memes) {
 		ArrayList<Entite> entiteContente = new ArrayList<>();
 		Iterator<Entite> entitees = entites.iterator();
 		Entite actual;
 		ArrayList<Entite> others = new ArrayList<>(entites);
+		memeFittingApplied = memes;
 
 		for (Meme meme : memes) {
 			actual = entitees.next();
-			eventMemeChanged(actual,actual.addMeme(meme, true), Configurator.MemeActivityPossibility.AjoutMeme.toString());
+			eventMemeChanged(actual, actual.addMeme(meme, true), Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			entiteContente.add(actual);
 		}
 
@@ -490,11 +514,12 @@ public class EntiteHandler extends ThreadHandler {
 	 *            ou les deux.
 	 * @return
 	 */
-	public Hashtable<Integer, ArrayList<Meme>> getMemeAvailable(FittingBehavior setAsked) {
+	public Hashtable<Integer, ArrayList<Meme>> getMemeAvailable(FittingBehavior setAsked,
+																Optional<Hashtable<ActionType, ArrayList<Meme>>> memeByC) {
 
-		Hashtable<Integer, ArrayList<Meme>> memes = new Hashtable<Integer, ArrayList<Meme>>();
+		Hashtable<Integer, ArrayList<Meme>> memes = new Hashtable<>();
 		if (setAsked == FittingBehavior.onlyComplex || setAsked == FittingBehavior.simpleAndComplex) {
-			memes = getMemeCombinaisonAvailable();
+			memes = getMemeCombinaisonAvailable(memeByC);
 		}
 		if (setAsked == FittingBehavior.onlySimple || setAsked == FittingBehavior.simpleAndComplex) {
 			int lastIndex = memes.size();
@@ -504,7 +529,6 @@ public class EntiteHandler extends ThreadHandler {
 
 		return memes;
 	}
-
 	/** Renvoi la liste des memes dispo sur la map en liste de string.
 	 * Utilisé pour les couleurs sur le graphe
 	 *
@@ -513,7 +537,7 @@ public class EntiteHandler extends ThreadHandler {
 	 */
 	public ArrayList<String> getMemeAvailableAsString(FittingBehavior setAsked) {
 		ArrayList<String> memesAsString = new ArrayList<String>();
-		Hashtable<Integer, ArrayList<Meme>> memes = getMemeAvailable(setAsked);
+		Hashtable<Integer, ArrayList<Meme>> memes = getMemeAvailable(setAsked, Optional.empty());
 		ArrayList<String> classes = new ArrayList<String>();
 		String classe;
 
@@ -563,7 +587,7 @@ public class EntiteHandler extends ThreadHandler {
 	 */
 	public String checkPropertiesByMemePossession() {
 		Hashtable<String, ArrayList<Entite>> entiteByMemePossession = new Hashtable<>();
-		@SuppressWarnings("unchecked")
+		//@SuppressWarnings("unchecked")
 		HashSet<Entite> toExamine = new HashSet<>(entites);
 		ArrayList<Integer> SelfDegrees = new ArrayList<>();
 		ArrayList<Integer> othersDegrees = new ArrayList<>();
@@ -619,6 +643,105 @@ public class EntiteHandler extends ThreadHandler {
 		return resultat;
 	}
 
+	// ECRITURE CSV POUR FITTING
+
+	/**
+	 *
+	 * @param param
+	 * @param forRepetition si pour répetition, valeur de la répétition, sinon, celui des répétitions du runs
+	 * @return
+	 */
+//	public String getStringHeaderMemeDetail(List<IModelParameter<?>> param, boolean forRepetition){
+//		String header = "Run-Rep";
+//		for (IModelParameter<?> model :param)
+//			header += ";" + model.nameString();
+//
+//		// CALCUL DES INDICATEURS A ECRIRE
+//
+//		// La liste des memes courant devrait etre a jour, apply fait avant dans la fitting classe
+//		for (Meme meme:memeFittingApplied) {
+//			header += ";Meme[";
+//			header += meme.toFourCharString() +":";
+//			header += "]-nbEntiteOwning";
+//			if(forRepetition)
+//				header += ";SD";
+//			header += ";last X appli."; // Nombre / X + pourcentage
+//			if(forRepetition)
+//				header += ";SD";
+//		}
+//
+//		return header;
+//	}
+
+//	public String getStringHeaderCombinaison(List<IModelParameter<?>> param, boolean forRepetition){
+//		String header = "Run-Rep";
+//		for (IModelParameter<?> model :param)
+//			header += ";" + model.nameString();
+//
+//		// combinaison de meme présent sur le run, classé par type d'action
+//		Hashtable<ActionType, ArrayList<Meme>> memesByCategory = new Hashtable<>();
+//		for (Meme meme: this.memeFittingApplied)
+//			Toolz.addElementInHashArray(memesByCategory,meme.getAction().getActionType(),meme);
+//		memeCombinaisonFittingAvailable = this.getMemeAvailable(FittingBehavior.simpleAndComplex,Optional.of(memesByCategory));
+//
+//		// La liste des memes courant devrait etre a jour, apply fait avant dans la fitting classe
+//		for (Integer i:memeCombinaisonFittingAvailable.keySet()) {
+//			header += ";Meme[";
+//			for (Meme meme:memeCombinaisonFittingAvailable.get(i)) {
+//				header += meme.toFourCharString() +":";
+//			}
+//
+//			header += "]-nbEntiteOwning";
+//			if(forRepetition)
+//				header += ";SD";
+//			header += ";last X appli."; // Nombre / X + pourcentage
+//
+//		}
+//
+//		return header;
+//	}
+//
+//	public String getStringToWriteMemeDetails(File rep, int numeroRun, int numeroRep, IExplorationMethod explorator){
+//		String toWrite ="";
+//		toWrite += numeroRun + "-" + numeroRep;
+//
+//		// Config du fitting
+//		for (IModelParameter<?> model : explorator.getModelParameterSet())
+//			toWrite += ";" + model.valueString();
+//
+//		// detail sur les memes
+//		List<Meme> combinaisonLookedAt;
+//		int nbEntitesOwning;
+//		for (Integer i: memeCombinaisonFittingAvailable.keySet()){
+//			nbEntitesOwning = 0;
+//			combinaisonLookedAt = memeCombinaisonFittingAvailable.get(i);
+//			for (Entite entite: entitesActive) {
+//				if(entite.getMyMemes().containsAll(combinaisonLookedAt)){
+//					nbEntitesOwning++;
+//				}
+//			}
+//
+//			toWrite += ";Meme[";
+//			for (Meme meme:memeCombinaisonFittingAvailable.get(i)) {
+//				toWrite += meme.toFourCharString() +":";
+//			}
+//
+//			toWrite += "]-" + nbEntitesOwning;
+//		}
+//
+//		return toWrite;
+//	}
+//
+//	public String getStringToWriteMemeCombinaison(int numeroRun, int numeroRep,  IExplorationMethod explorator){
+//
+//	}
+//	// les entités du réseau
+//	protected Set<Entite> entites;
+//	// Entite possedant des actions
+//	private ArrayList<Entite> entitesActive;
+
+//	private Hashtable<String, String> memeTranslationReadable;
+
 	//endregion
 
 	//region PRIVATE
@@ -666,7 +789,11 @@ public class EntiteHandler extends ThreadHandler {
 
 			// Si on veut afficher les X dernieres actions entreprises & action depuis le début
 			if (Configurator.displayMemePosessionDuringSimulation) {
-				updateActionCount(memeAction, entiteActing.getIndex(), rez );
+				if (Configurator.displayLogRatioLogFailOverFail || Configurator.displayLogRatioLogFailOverSuccess )
+					vueController.displayInfo("Action-Echec",
+						memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez, cptModulo));
+				else
+					memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez, cptModulo);
 			}
 
 			// Dans le cas ou on veut les filtres en semi step, remis a zero des couleurs.
@@ -896,46 +1023,46 @@ public class EntiteHandler extends ThreadHandler {
 	 * Appelé a chaque action réalisée.
 	 * @param memeApply
 	 */
-	private void updateActionCount(Meme memeApply, int entiteIndex, String message){
-
-		if (memeApply != null)
-		{
-			Meme elementRemoveOfCircular = null;
-			Toolz.addCountToElementInHashArray(nbActivationByMemes, memeApply, 1);
-
-			// partie last twenty
-			if(lastHundredActionDone.size() == lastHundredActionDone.maxSize())
-			{
-				elementRemoveOfCircular = lastHundredActionDone.poll();
-				Toolz.removeCountToElementInHashArray(countOfLastMemeActivation, elementRemoveOfCircular, 1);
-			}
-
-			lastHundredActionDone.add(memeApply);
-			Toolz.addCountToElementInHashArray(countOfLastMemeActivation, memeApply, 1);
-		}
-
-		// Dans le cas ou il n'y a pas de meme apply, c'est a dire que l'action d'application du meme a échouée.
-		else if (Configurator.displayLogRatioLogFailOverFail || Configurator.displayLogRatioLogFailOverSuccess )
-		{
-			int nbWin = 0;
-			if(Configurator.displayLogRatioLogFailOverSuccess)
-					for (Integer winTimes : nbActivationByMemes.values())
-						nbWin += winTimes;
-
-			if(Configurator.displayLogRatioLogFailOverFail)
-				if (message.contains("RMLK"))
-					cptActionRmvFail++;
-				else if (message.contains("ADLK"))
-					cptActionAddFail++;
-
-			vueController.displayInfo("Action-Echec", Arrays.asList(
-					"Iteration- "+ cptModulo,
-					"Ratio Rmv/Add -" + (Configurator.displayLogRatioLogFailOverFail? ((double) cptActionRmvFail / cptActionAddFail) : " NC"),
-					"Ratio Fail/success -" + (Configurator.displayLogRatioLogFailOverSuccess ? ((double) (cptActionRmvFail + cptActionAddFail) / nbWin) : "NC"),
-					"Aucune action réalisée par l'entité- " + entiteIndex,
-					"Message- " + message));
-		}
-	}
+//	private void updateActionCount(Meme memeApply, int entiteIndex, String message){
+//
+//		if (memeApply != null)
+//		{
+//			Meme elementRemoveOfCircular = null;
+//			Toolz.addCountToElementInHashArray(nbActivationByMemes, memeApply, 1);
+//
+//			// partie last twenty
+//			if(lastHundredActionDone.size() == lastHundredActionDone.maxSize())
+//			{
+//				elementRemoveOfCircular = lastHundredActionDone.poll();
+//				Toolz.removeCountToElementInHashArray(countOfLastMemeActivation, elementRemoveOfCircular, 1);
+//			}
+//
+//			lastHundredActionDone.add(memeApply);
+//			Toolz.addCountToElementInHashArray(countOfLastMemeActivation, memeApply, 1);
+//		}
+//
+//		// Dans le cas ou il n'y a pas de meme apply, c'est a dire que l'action d'application du meme a échouée.
+//		else if (Configurator.displayLogRatioLogFailOverFail || Configurator.displayLogRatioLogFailOverSuccess )
+//		{
+//			int nbWin = 0;
+//			if(Configurator.displayLogRatioLogFailOverSuccess)
+//					for (Integer winTimes : nbActivationByMemes.values())
+//						nbWin += winTimes;
+//
+//			if(Configurator.displayLogRatioLogFailOverFail)
+//				if (message.contains("RMLK"))
+//					cptActionRmvFail++;
+//				else if (message.contains("ADLK"))
+//					cptActionAddFail++;
+//
+//			vueController.displayInfo("Action-Echec", Arrays.asList(
+//					"Iteration- "+ cptModulo,
+//					"Ratio Rmv/Add -" + (Configurator.displayLogRatioLogFailOverFail? ((double) cptActionRmvFail / cptActionAddFail) : " NC"),
+//					"Ratio Fail/success -" + (Configurator.displayLogRatioLogFailOverSuccess ? ((double) (cptActionRmvFail + cptActionAddFail) / nbWin) : "NC"),
+//					"Aucune action réalisée par l'entité- " + entiteIndex,
+//					"Message- " + message));
+//		}
+//	}
 
 
 	//endregion
@@ -971,7 +1098,7 @@ public class EntiteHandler extends ThreadHandler {
 	 */
 	private void giveMemeToEntiteGeneric() {
 		Hashtable<Integer, ArrayList<Meme>> composition;
-		composition = getMemeCombinaisonAvailable();
+		composition = getMemeCombinaisonAvailable(Optional.empty());
 
 		for (Entite entite : entites)
 			for (Meme meme : composition.get( entite.getIndex()%composition.keySet().size() ))
@@ -1163,9 +1290,9 @@ public class EntiteHandler extends ThreadHandler {
 	 */
 	private void generateMemeAvailableForMap() {
 
-		ArrayList<AttributType> attributs = new ArrayList<AttributType>();
-		Hashtable<AttributType, Hashtable<Integer, AgregatorType>> KVAttributAgregator = new Hashtable<AttributType, Hashtable<Integer, AgregatorType>>();
-		Hashtable<Integer, AgregatorType> agregators = new Hashtable<Integer, AgregatorType>();
+		ArrayList<AttributType> attributs = new ArrayList<>();
+		Hashtable<AttributType, Hashtable<Integer, AgregatorType>> KVAttributAgregator = new Hashtable<>();
+		Hashtable<Integer, AgregatorType> agregators = new Hashtable<>();
 
 		ActionType add = ActionType.AJOUTLIEN;
 		ActionType remove = ActionType.RETRAITLIEN;
@@ -1186,19 +1313,19 @@ public class EntiteHandler extends ThreadHandler {
 		agregators.put(0, notLinked);
 		agregators.put(1, mineInf);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add+", .5, add, attributs,KVAttributAgregator, false ,false);
+		memeFactory.registerMemeAction("Add+", 1, add, attributs,KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add-",.8,add, attributs,KVAttributAgregator, false ,false);
+		memeFactory.registerMemeAction("Add-",1,add, attributs,KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, theMost);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add∞", 1, add, attributs, KVAttributAgregator, true ,true);
+		memeFactory.registerMemeAction("Add∞", .01, add, attributs, KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		agregators.put(0, hopAWay);
@@ -1209,29 +1336,31 @@ public class EntiteHandler extends ThreadHandler {
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, random);
-		//addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, add, attributs, KVAttributAgregator, false, false);
-
-		agregators.clear();
-		agregators.put(0, notLinked);
-		agregators.put(1, random);
-		memeFactory.registerMemeAction("AddØ",0.1, add, attributs, KVAttributAgregator, false, false);
+		memeFactory.registerMemeAction("AddØ",1, add, attributs, KVAttributAgregator, true, false);
+		agregators.put(2, random);
+		if(Configurator.initializeDefaultBehavior)
+		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, add, attributs, KVAttributAgregator, false, false);
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, random);
-		removeRandom = memeFactory.registerMemeAction("RmvØ",1, remove, attributs,  KVAttributAgregator, true, false);
+		memeFactory.registerMemeAction("RmvØ",1, remove, attributs,  KVAttributAgregator, true, false);
+		agregators.put(2, random);
+		if(Configurator.initializeDefaultBehavior) {
+			removeRandom = memeFactory.registerMemeAction("RmvØ-neutral",0, remove, attributs,  KVAttributAgregator, false, false);
+		}
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv-", .8, remove, attributs, KVAttributAgregator, false ,false);
+		memeFactory.registerMemeAction("Rmv-", 1, remove, attributs, KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, mineInf);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv+", .8, remove, attributs, KVAttributAgregator, false ,true);
+		memeFactory.registerMemeAction("Rmv+", 1, remove, attributs, KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		agregators.put(0, hopAWay);
@@ -1256,17 +1385,27 @@ public class EntiteHandler extends ThreadHandler {
 	 * @return une hash Int ( qui n'a pas de signification ), combinaison de
 	 *         meme.
 	 */
-	private Hashtable<Integer, ArrayList<Meme>> getMemeCombinaisonAvailable() {
+	private Hashtable<Integer, ArrayList<Meme>> getMemeCombinaisonAvailable(
+			Optional<Hashtable<ActionType, ArrayList<Meme>>> memeByC) {
 		Hashtable<ActionType, ArrayList<Meme>> memesByCategory = new Hashtable<>();
 		ArrayList<Meme> memeOfOneCategory;
 		ArrayList<ActionType> key = new ArrayList<>();
 
-		for (ActionType action : Configurator.ActionType.values()) {
-			if (action == ActionType.AJOUTLIEN || action == ActionType.RETRAITLIEN) {
-				memeOfOneCategory = memeFactory.getMemeAvailable(action, false);
-				if (memeOfOneCategory.size() > 0) {
-					memesByCategory.put(action, memeOfOneCategory);
-					key.add(action);
+		if(memeByC.isPresent()) {
+			memesByCategory = memeByC.get();
+			for (ActionType actionT:
+				 memesByCategory.keySet()) {
+				key.add(actionT);
+			}
+		}
+		else {
+			for (ActionType action : Configurator.ActionType.values()) {
+				if (action == ActionType.AJOUTLIEN || action == ActionType.RETRAITLIEN) {
+					memeOfOneCategory = memeFactory.getMemeAvailable(action, false);
+					if (memeOfOneCategory.size() > 0) {
+						memesByCategory.put(action, memeOfOneCategory);
+						key.add(action);
+					}
 				}
 			}
 		}

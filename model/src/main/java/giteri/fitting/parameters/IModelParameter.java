@@ -587,7 +587,7 @@ public interface IModelParameter<T> {
 				memeo.add(meme);
 			}
 
-			entiteHandler.giveXMemeFromListToEntite(memeo);
+			entiteHandler.giveMemeToEntiteFitting(memeo);
 		}
 
 		/** Va choisir un meme aléatoirement et lui donner une valeur de propagation

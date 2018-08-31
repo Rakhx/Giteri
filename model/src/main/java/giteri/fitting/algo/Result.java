@@ -7,6 +7,7 @@ import java.util.*;
 
 /** Classe contenant les résultats d'une configuration particulière -
  * Mais contenant chacun des REPETITIONS sur cette config.
+ * <=> Une classe Result par RUN.
  *
  */
 public class Result {
@@ -20,22 +21,20 @@ public class Result {
     // Liste de properties as string pour les config
     List<String> propertiesAsString;
 
-    // TODO structure quelconque pour les bornes de fin de simulation
-    // huhum pas utilisé pour le moment
-   List<Double> nextStepScore;
-
-    Result(){
-        kvProviderValues = new Hashtable<String, String>();
+    /** Constructeur sans paramètre.
+     *
+     */
+    public Result(){
+        kvProviderValues = new Hashtable<>();
         score = new ArrayList<>();
         propertiesAsString = new ArrayList<>();
-        nextStepScore = new ArrayList<>();
     }
 
     /** Constructeur qui prend en param les providers contenant la configuration courante
      *
      * @param providers de la configuration courante.
      */
-    Result(Collection<IModelParameter<?>> providers){
+    public Result(Collection<IModelParameter<?>> providers){
         this();
         for (IModelParameter<?> provider : providers)
             kvProviderValues.put(provider.nameString(), provider.getActualValue());
@@ -64,10 +63,10 @@ public class Result {
      *
      * @return
      */
-    public String getCurrentConfig(){
-        String result="";
+    public List<String> getCurrentConfig(){
+        List<String> result= new ArrayList<>();
         for (String s : kvProviderValues.keySet())
-            result += "Provider: " + s + "Values :" + kvProviderValues.get(s);
+            result.add("Provider: " + s + "Values :" + kvProviderValues.get(s));
 
         return result;
     }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.text.DateFormat;
 import java.util.*;
 
+import giteri.fitting.algo.Result;
 import giteri.fitting.algo.ResultSet;
 import giteri.tool.math.Toolz;
 import giteri.meme.mecanisme.MemeFactory;
@@ -41,15 +42,13 @@ import giteri.meme.event.IBehaviorTransmissionListener;
 public class FittingClass implements IBehaviorTransmissionListener, IActionApplyListener {
 
 	//region Variables
-
+	private boolean debug = Configurator.debugFittingClass;
 	private EntiteHandler entiteHandler;
 	private MemeFactory memeFactory;
 	private NetworkFileLoader networkFileLoader;
 	private WriteNRead writeNRead;
 	private WorkerFactory workerFactory;
 	private NetworkConstructor networkConstructor;
-
-	private boolean debug = Configurator.debugFittingClass;
 	public CommunicationModel com ;
 	public IExplorationMethod explorator;
 
@@ -158,21 +157,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		this.explorator = explorator;
 		setDefaultValue();
 	}
-	/**	Constructeur.
-	 *
-	 */
-	public FittingClass(WriteNRead wnr, CommunicationModel com, MemeFactory memeF,
-						NetworkProperties np, WorkerFactory wf, EntiteHandler eh, NetworkConstructor nc, IExplorationMethod explorator ){
-//		resultNetwork = new ResultSet(wnr);
-//		this.com = com;
-//		this.memeFactory = memeF;
-//		this.writeNRead = wnr;
-//		this.networkFileLoader = nfl;
-//		this.workerFactory = wf;
-//		this.entiteHandler = eh;
-//		this.networkConstructor = nc;
-//		setDefaultValue();
-	}
 
 	//region Fitting running
 
@@ -184,6 +168,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		Configurator.methodOfGeneration = Configurator.MemeDistributionType.Nothing;
 		targetNetProperties = networkFileLoader.getNetworkProperties();
 
+
 		// ECRITURE
 		repertoires = new ArrayList<>(Arrays.asList("Stability"));
 		DateFormat dateFormat = Configurator.getDateFormat();
@@ -191,7 +176,9 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		repOfTheSearch = null;
 		String toWriteNormalCSV = "";
 		StringBuilder toWriteDetailCSV = new StringBuilder();
+		String toWriteMemeCSV = "";
 
+		// Creation des fichiers CSV avec entete
 		if(Configurator.writeNetworkResultOnFitting)
 		{
 			// STEP: HEADER
@@ -205,24 +192,24 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			toWriteNormalCSV += currentNetProperties.getCsvHeader(Configurator.activationCodeForScore);
 			toWriteNormalCSV += ";moyenne des scores";
 			toWriteNormalCSV += ";Variance des scores";
-			writeNRead.writeSmallFile(repOfTheSearch, "NetworkCSV", Collections.singletonList(toWriteNormalCSV));
+			writeNRead.writeSmallFile(repOfTheSearch, Configurator.fileNameCsvSimple,
+					Collections.singletonList(toWriteNormalCSV));
 
 			// STEP: DETAILLED
 			toWriteDetailCSV.append(header);
-			for (Configurator.NetworkAttribType attrib : Configurator.NetworkAttribType.values()) {
-				if(Configurator.isAttribActived(Configurator.activationCodeAllAttribExceptDD, attrib))
-				{
+			for (Configurator.NetworkAttribType attrib :
+					currentNetProperties.getActivatedAttrib(Configurator.activationCodeAllAttribExceptDD)) {
 					toWriteDetailCSV.append(";").append(attrib.toString());
 					toWriteDetailCSV.append(";" + "SD ").append(attrib.toString());
-				}
 			}
 
+			toWriteDetailCSV.append(";scores");
 			toWriteDetailCSV.append(";moyenne des scores");
 			toWriteDetailCSV.append(";Variance des scores");
-			writeNRead.writeSmallFile(repOfTheSearch, "NetworkDetailsCSV", Collections.singletonList(toWriteDetailCSV.toString()));
-
-			// Donner aux entités les memes originaux?
+			writeNRead.writeSmallFile(repOfTheSearch, Configurator.fileNameCsvDetail,
+					Collections.singletonList(toWriteDetailCSV.toString()));
 		}
+
 	}
 
 	/** Nouveau tour. C a d nouvelle série de Run dans une configuration du modèle donnée.
@@ -232,15 +219,10 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		numeroRun++;
 		numeroRepetition = 0;
 		networksSameTurn.clear();
-
 		numeroRunAsString = "Run#" + numeroRun;
-		// Repetition de l'affichage
-		if(debug){
-			//System.out.println(numeroRunAsString + " applications des parametres: ");
-			//System.out.println(explorator.toString());
-		}
 		repertoires.add(numeroRunAsString);
-		resultNetwork.addInitialConfigurationToResult(numeroRun, explorator.getModelParameterSet());
+
+		resultNetwork.put(numeroRun, new Result(explorator.getModelParameterSet()));
 	}
 
 	/** Nouvelle répétition d'une configuration donnée.
@@ -261,15 +243,27 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		Toolz.setSeed(currentSeed);
 
 		explorator.apply();
+		entiteHandler.updateMemeAvailableForProperties();
+
+
 		// & (3) Application de ces paramètres
 		if(Configurator.displayFittingProviderApplied && numeroRepetition == 1 && !Configurator.jarMode) {
 			System.out.println(numeroRunAsString + " applications des parametres: ");
 			System.out.println(explorator.toString());
+
+			// Creation du fichier de detail de meme, HEADER
+			if(Configurator.writeMemeResultOnFitting)
+				writeNRead.writeSmallFile(writeNRead.createAndGetDirFromString(repertoires), Configurator.fileNameMeme,
+						Collections.singletonList(
+						entiteHandler.memeProperties.getStringHeaderMemeDetail(explorator.getModelParameterSet(), true)));
 		}
 
 		if(debug) System.out.println(numeroRunAsString + " at " + numeroRepetitionAsString);
 		entiteHandler.resetProba();
+		// STEP: Concernant la continuité du fitting sur meme config.
 		turnCount = 0;
+		nbCallContinuOnThisConfig = 0;
+
 		cqLastXActionDone.clear();
 		cfqMemeAppliancePropOnFitting.clear();
 		cfqMemeApplianceNumberOnFitting.clear();
@@ -277,47 +271,50 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		cfqDensityValuesOnOneRun.clear();
 		kvOverallProportionActionDone.clear();
 		kvOverallNumberOfActionDone.clear();
+
+
 		com.resume();
 	}
 
-	/** Fin du run, une fois que le réseau a atteint un cycle//stabilité // chaos.
+	/** Fin du répétition, une fois que le réseau a atteint un cycle//stabilité // chaos.
 	 * Enregistre les valeurs, sauvegarde et snapshot.
 	 *
 	 */
 	public void endRepetition(){
-		turnCount = 0;
-		// STEP: Concernant la continuité du fitting sur meme config.
-		nbCallContinuOnThisConfig = 0;
-		resetSeuilValue();
 
 		// STEP: On prend les properties courantes pour calculer une distance avec le réseau cible
 		networkConstructor.updateAllNetworkProperties();
+
 		// passe par le tinyNetwork
 		currentNetProperties = networkConstructor.getNetworkProperties();
-
 		currentNetProperties.name = "Construit";
-		// TODO [WayPoint]- Score distance entre deux network
-		currentNetworkScore = getNetworksDistanceDumb(Configurator.activationCodeForScore, targetNetProperties, currentNetProperties);
-
-		// Sauvegarde des propriétés courantes du réseau TODO [refact2.0] quelque chose a voir par ici pour le score total
+		// Sauvegarde des propriétés courantes du réseau
+		// TODO [refact2.0] quelque chose a voir par ici pour le score total
 		// idée: distance entre les score des différents run exponentiel
 		networksSameTurn.add(currentNetProperties);
 
-		// STEP: Remplissage de la classe résultat
-		String configAsString = "";
-		for (IModelParameter<?> model : explorator.getModelParameterSet()){
-			configAsString += model.valueString();
-		}
+		// TODO [WayPoint]- Score distance entre deux network
+		currentNetworkScore = getNetworksDistanceDumb(Configurator.activationCodeForScore,
+				targetNetProperties, currentNetProperties);
 
+		// Ajout a la classe des resultSet un score et propriété d'un réseau
 		resultNetwork.addScore(numeroRun, currentNetworkScore, currentNetProperties);
+
 		if(Configurator.writeNetworkResultOnFitting)
 			com.takeSnapshot(currentSeed, Optional.ofNullable(repertoires));
 
 		repertoires.remove(numeroRepetitionAsString);
 
+		// Va écrire les résultats détaillés dans le CSV correspondant
 		if(Configurator.writeNetworkResultOnFitting)
-			// Va écrire les résultats détaillés dans le CSV correspondant
-			resultNetwork.writelastTurnOnDetailCSV(repOfTheSearch/*, numeroRun*/, networkConstructor.getNetworkProperties() );
+			resultNetwork.writelastRepDetailCSV(repOfTheSearch,
+					numeroRun, currentNetProperties, explorator);
+
+		if(Configurator.writeMemeResultOnFitting)
+			writeNRead.writeSmallFile(repOfTheSearch, Configurator.fileNameMeme, Arrays.asList(
+			entiteHandler.memeProperties.getStringToWriteMemeDetails(
+				entiteHandler.getEntitesActive(), numeroRun, numeroRepetition, explorator)));
+
 	}
 
 	/** Fin du tour, enregistre les variances sur les résultats des différents run sur meme config,
@@ -327,7 +324,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public void endRun(){
 		repertoires.remove(numeroRunAsString);
 		if(Configurator.writeNetworkResultOnFitting)
-			resultNetwork.writeLastRunOnCSV(repOfTheSearch, numeroRun, networksSameTurn,Configurator.activationCodeForScore);
+			resultNetwork.writeLastRunOnCSV(repOfTheSearch, numeroRun,
+					networksSameTurn, Configurator.activationCodeForScore);
 
 		// ici, ecrire: La chart de density sur les 4 runs, le fichier de config des runs?
 //		explorator.rememberNetwork(currentNetworkId);
@@ -793,7 +791,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 * @param activationCode
 	 * @param targetNetworkProperty
 	 */
-	public static double getNetworksDistanceDumb(int activationCode, NetworkProperties targetNetworkProperty, NetworkProperties currentNetworkProperty) {
+	public static double getNetworksDistanceDumb(int activationCode, NetworkProperties targetNetworkProperty,
+												 NetworkProperties currentNetworkProperty) {
 		// variation sur nombre le nombre de temps un lien dur, et sur le
 		// pourcentage d'evap necessité :augmenter le nombre de paramètre regardé.
 		double currentDistance = 0;

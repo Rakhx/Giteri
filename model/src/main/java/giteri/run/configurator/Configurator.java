@@ -17,6 +17,7 @@ public final class Configurator {
 	public static boolean jarMode = true;
 	public static boolean systemPaused = false;
 	public static boolean writeNetworkResultOnFitting = true;
+	public static boolean writeMemeResultOnFitting = writeNetworkResultOnFitting || true;
 	public static MemeDistributionType methodOfGeneration = MemeDistributionType.Nothing;
 
 	// FITTING
@@ -43,7 +44,10 @@ public final class Configurator {
 	public static boolean fixedSlotForBreeder = true;
 	// Donne des random add et rmv a tt le monde pour (?) gagner du temps
 	// A tester les résultats
-	public static boolean initializeDefaultBehavior = true;
+
+	//fluidité
+	 public static boolean initializeDefaultBehavior = false;
+
 	public static int activationCodeForScore = 55;
 	public static int activationCodeAllAttribExceptDD = 247;
 	public static int activationCodeAllAttrib = 255;
@@ -62,9 +66,10 @@ public final class Configurator {
 	public static boolean displayLogAvgDegreeByMeme = false;
 	public static boolean displayLogMemeTransmission = false;
 
-	public static boolean displayLogRatioLogFailOverFail = false;
-	public static boolean displayLogRatioLogFailOverSuccess = false;
-	public static boolean displayLogRatioTryAddOverTryRmv = false;
+	private static boolean faster = false;
+	public static boolean displayLogRatioLogFailOverFail = faster;
+	public static boolean displayLogRatioLogFailOverSuccess = faster;
+	public static boolean displayLogRatioTryAddOverTryRmv = faster;
 
 	public static boolean DisplayLogdebugInstantiation = false;
 	public static boolean DisplayLogGetAvailableMeme = false;
@@ -75,7 +80,11 @@ public final class Configurator {
 	public static String repByDefault = "defaultRep";
 	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
-	public static int activationCodeForView = 3;
+	public static int activationCodeForView = 1;
+
+	public static String fileNameCsvSimple = "NetworkCSV";
+	public static String fileNameCsvDetail = "NetworkDetailsCSV";
+	public static String fileNameMeme = "memeCSV";
 
 
 	// affichage de debug
@@ -99,7 +108,7 @@ public final class Configurator {
 
 	// Affichage
 	public static boolean displayPlotWhileSimulation = !jarMode;
-	public static boolean displayMemePosessionDuringSimulation = false;
+	public static boolean displayMemePosessionDuringSimulation = true;
 	
 	// Config Temporaire
 

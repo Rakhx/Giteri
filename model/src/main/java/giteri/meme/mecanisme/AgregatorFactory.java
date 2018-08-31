@@ -94,7 +94,7 @@ public class AgregatorFactory {
 		 */
 		@SuppressWarnings("unchecked")
 		protected void getNotLinked(Entite asker, Set<Entite> entites){
-			Set<Entite> entitesLinked = new HashSet<>();
+			Set<Entite> entitesLinked = new HashSet<>(entites);
 			this.getLinked(asker, entitesLinked);
 			entites.removeAll(entitesLinked);
 //			entites.removeAll(this.getLinked(asker, entites));
@@ -112,7 +112,7 @@ public class AgregatorFactory {
 		 */
 		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 
-		    ArrayList<Entite> resultat = new ArrayList<Entite>();
+		    ArrayList<Entite> resultat = new ArrayList<>();
 			Entite bestEntitee = null ;
 			boolean firstStep = true;
 
@@ -260,11 +260,14 @@ public class AgregatorFactory {
 	 *
 	 */
 	public class MineInf implements IAgregator{
+
+
 		@Override
 		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			ArrayList<Entite> resultat = new ArrayList<Entite>();
 			for (Entite entite : entites) {
-				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) == 1){
+				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) == 1)
+				{
 					resultat.add(entite);
 				}
 			}

@@ -158,7 +158,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		else if(typeOfExplo == EnumExplorationMethod.oneShot)
 			explorator = callFromJar(memeActivation, memeProba);
 
-		//
+		// NON FINI
 		else if (typeOfExplo == EnumExplorationMethod.specific)
 			explorator = callSpecificParam();
 
@@ -169,8 +169,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		// ajout de la fitting classe au listener
 		entiteHandler.addEntityListener(configuration);
 
-		// initialise les config de simulation genre répartition des comportments etc
-		// initializeConfigForStability(configuration);
 
 		// Lancement d'une simulation
 		resultat = factorisation(configuration);

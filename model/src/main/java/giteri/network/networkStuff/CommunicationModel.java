@@ -53,7 +53,7 @@ public class CommunicationModel implements IModel {
 	 *
 	 */
 	public Hashtable<Integer, ArrayList<Meme>>  getMemesAvailables(FittingBehavior setAsked){
-		return eh.getMemeAvailable(setAsked);
+		return eh.getMemeAvailable(setAsked, Optional.empty());
 	}
 
 	/** Obtenir la valeur de densité du graphe.
