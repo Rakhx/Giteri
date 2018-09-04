@@ -41,7 +41,7 @@ import giteri.meme.event.IBehaviorTransmissionListener;
  */
 public class FittingClass implements IBehaviorTransmissionListener, IActionApplyListener {
 
-	//region Variables
+	//region Variables diverses
 	private boolean debug = Configurator.debugFittingClass;
 	private EntiteHandler entiteHandler;
 	private MemeFactory memeFactory;
@@ -124,6 +124,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 	//endregion
 
+	//region constructeur et init
+
 	/** Mise en place des valeurs par défault pour les variables d'utilisation
 	 *
 	 */
@@ -158,7 +160,9 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		setDefaultValue();
 	}
 
-	//region Fitting running
+	//endregion
+
+	//region Fitting turn & run
 
 	/** Initialisation des variables nécessaire a un fitting.
 	 * Ecriture dans les fichiers, ouverture des répertoires.
@@ -242,9 +246,11 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		currentSeed = new Random().nextLong();
 		Toolz.setSeed(currentSeed);
 
+		// entiteHandler.generateNetwork(1);
+
+
 		explorator.apply();
 		entiteHandler.updateMemeAvailableForProperties();
-
 
 		// & (3) Application de ces paramètres
 		if(Configurator.displayFittingProviderApplied && numeroRepetition == 1 && !Configurator.jarMode) {
@@ -271,7 +277,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		cfqDensityValuesOnOneRun.clear();
 		kvOverallProportionActionDone.clear();
 		kvOverallNumberOfActionDone.clear();
-
 
 		com.resume();
 	}
@@ -340,47 +345,9 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		return res;
 	}
 
-	/** Ajout d'une densité à l'issu d'un relevé. C'est avec l'ensemble des densités
-	 * récoltés ici qu'on définit la stabilité d'un réseau ou non.
-	 *
-	 * @param density
-	 */
-	public void addDensity(double density){
-		cfqDensityValuesOnOneRun.add(density);
-	}
-
-	/** appelée régulièrement pour vérifier l'avancé de l'usage des memes sur la simulation.
-	 * cqLastXActionDone est mise a jour a chaque action effectivement appliquée. Size de
-	 * circularSize, 200
-	 */
-	public void computeMemeAppliance(){
-		int nbAction = 0;
-		synchronized(cqLastXActionDone){
-			for (Meme meme : cqLastXActionDone) {
-				Toolz.addCountToElementInHashArray(kvLastActionDone, meme, 1);
-				nbAction++;
-			}
-
-			// Si pas mise a zero, et que les 500 tentatives d'action dans la boucle principale
-			// echoue, le prochain relevé de proportion restera identique. TODO[Refact3.0] nouveau, à bien tester
-			cqLastXActionDone.clear();
-		}
-
-		for (Meme meme : kvLastActionDone.keySet()) {
-			kvOverallProportionActionDone.put(meme, (double)kvLastActionDone.get(meme) / nbAction);
-			kvOverallNumberOfActionDone.put(meme, kvLastActionDone.get(meme));
-		}
-
-		kvLastActionDone.clear();
-	}
-
-	//endregion
-
-	//region Fitting hardstuff
-
 	/** Version utilisée pour savoir s'il faut continuer a faire du fitting ou si on a
 	 * attend une stabilité.
-	 * // TODO [WayPoint]- Choix de continuité d'une simulation pour une config. 
+	 * // TODO [WayPoint]- Choix de continuité d'une simulation pour une config.
 	 * @return true s'il faut continuer la simulation sur la config courante
 	 */
 	public boolean continuFittingCleanVersion(){
@@ -529,6 +496,9 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		return oneMoreTurn;
 	}
 
+	//endregion
+
+	//region Fitting hardstuff
 
 	/** Verification de la possibilité de jouer des actions valeur pas relevé de
 	 *  facon synchronisé, le but étant de savoir si une action est encore possible ou si le systeme est bloqué.
@@ -753,6 +723,40 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		return score;
 	}
 
+	/** appelée régulièrement pour vérifier l'avancé de l'usage des memes sur la simulation.
+	 * cqLastXActionDone est mise a jour a chaque action effectivement appliquée. Size de
+	 * circularSize, 200
+	 */
+	public void computeMemeAppliance(){
+		int nbAction = 0;
+		synchronized(cqLastXActionDone){
+			for (Meme meme : cqLastXActionDone) {
+				Toolz.addCountToElementInHashArray(kvLastActionDone, meme, 1);
+				nbAction++;
+			}
+
+			// Si pas mise a zero, et que les 500 tentatives d'action dans la boucle principale
+			// echoue, le prochain relevé de proportion restera identique. TODO[Refact3.0] nouveau, à bien tester
+			cqLastXActionDone.clear();
+		}
+
+		for (Meme meme : kvLastActionDone.keySet()) {
+			kvOverallProportionActionDone.put(meme, (double)kvLastActionDone.get(meme) / nbAction);
+			kvOverallNumberOfActionDone.put(meme, kvLastActionDone.get(meme));
+		}
+
+		kvLastActionDone.clear();
+	}
+
+	/** Ajout d'une densité à l'issu d'un relevé. C'est avec l'ensemble des densités
+	 * récoltés ici qu'on définit la stabilité d'un réseau ou non.
+	 *
+	 * @param density
+	 */
+	public void addDensity(double density){
+		cfqDensityValuesOnOneRun.add(density);
+	}
+
 	/** Renvoi un indice d'évolution d'un coefficient directeur dont le départ se fait sur la moyenne des
 	 * @pourcentageFirstTerm premiers éléments de la série.
 	 *
@@ -783,8 +787,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		}
 		return score;
 	}
-
-	//endregion
 
 	/** Methode la plus simple pour trouver la distance entre deux réseaux.
 	 *
@@ -906,7 +908,9 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		if(debug) System.out.println("Rise des threshold");
 	}
 
-	//region Ensemble de méthode pour compter le nombre d'action réalisée dans le network.
+	//endregion
+
+	//region Event et nb action
 
 	/** Implemente ces handler d'entités pour pouvoir compter le nombre
 	 * d'actions réalisées afin d'etre en mesure de connaitre la progression du network.

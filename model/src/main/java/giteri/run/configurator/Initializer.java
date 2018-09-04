@@ -156,20 +156,14 @@ public class Initializer {
             // La fenetre en elle meme Controller de Model donné a l'IHM
             if(withGraphicalDisplay)
                 fenetre = new IHM(mControl,
-                    networkConstructor,
                     memeFactory,
-                    workerFactory,
                     entiteHandler,
-                    actionFactory,
                     drawerGraphStream,
                     writeNRead);
             else
                 fenetre = new IHM(mControl,
-                        networkConstructor,
                         memeFactory,
-                        workerFactory,
                         entiteHandler,
-                        actionFactory,
                         new DrawerStub(),
                         writeNRead);
 

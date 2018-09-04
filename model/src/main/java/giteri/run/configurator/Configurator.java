@@ -9,6 +9,7 @@ import giteri.tool.math.Toolz;
 
 public final class Configurator {
 
+	// region iniitalizer stuff
 	// VALEURS DONNEES A TITRE INDICATIF, set définitif dans l'initializer
 	// La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
 	// depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent
@@ -19,50 +20,58 @@ public final class Configurator {
 	public static boolean writeNetworkResultOnFitting = true;
 	public static boolean writeMemeResultOnFitting = writeNetworkResultOnFitting || true;
 	public static MemeDistributionType methodOfGeneration = MemeDistributionType.Nothing;
+	// endregion
 
-	// FITTING
+	// region Modèle
 
-	public static EnumExplorationMethod explorator = EnumExplorationMethod.exhaustive;
-	public static FittingBehavior memeCombinaisonOnMap = FittingBehavior.simpleAndComplex;
+	// FONCTIONNEMENT
+	public static boolean manuelNextStep = false; // pas de passage au run suivant, il faut appuyer sur next
+	public static boolean autoPauseIfNexted = false; // mise en pause automatique avant un changement de run. Il faut appuyer sur next
+	public static boolean initializeDefaultBehavior = false;	//fluidité
 
-	// TODO [Refact 6]- pour cohérence avec les méthodes, supprimé ce boolean et avoir la stabilitySearch pour le jar qui utilise direct les ftting
-	public static MemeList typeOfMemeUseForFitting = MemeList.FITTING;
-	// affiche dans la console "param en cours"
-	public static boolean displayFittingProviderApplied = true;
-	// pas de passage au run suivant, il faut appuyer sur next
-	public static boolean manuelNextStep = false;
-	// mise en pause automatique avant un changement de run. Il faut appuyer sur next
-	public static boolean autoPauseIfNexted = false;
+	public static boolean displayPlotWhileSimulation = !jarMode; // Affichage des DD et densité
+	public static boolean displayMemePosessionDuringSimulation = true;
 
-	// PROPAGATION DE MEME
-
+	// PROPAGATION
+	public static boolean usePropagationSecondGeneration = false;
 	public static boolean usePropagation = true;
-	// transmet l'un des memes possédés par l'acteur
-	public static boolean usePropagationSecondGeneration = true;
-	public static boolean memeCanBeReplaceByCategory = true;
-	// les possesseurs initiaux des memes ne peuvent pas les perdre
-	public static boolean fixedSlotForBreeder = true;
-	// Donne des random add et rmv a tt le monde pour (?) gagner du temps
-	// A tester les résultats
+	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
 
-	//fluidité
-	public static boolean initializeDefaultBehavior = true;
+	public static boolean checkWhenFullPropagate = true; 	// All action spread?
+	public static int checkFullProRefreshRate = 100;
 
-	public static boolean checkWhenFullPropagate = true;
-
-
+	// SCORE
 	public static int activationCodeForScore = 55;
 	public static int activationCodeAllAttribExceptDD = 247;
 	public static int activationCodeAllAttrib = 255;
 
-	// applique les filtres tour a tour
-	public static boolean semiStepProgression = false;
-	public final static int semiAutoWaitingTime = 3000;
+	// endregion
 
-	public static boolean useMemePropagationProba = true;
-	public final static double probaEntiteLearning = 0;
+	// region Fitting
+	public static EnumExplorationMethod explorator = EnumExplorationMethod.exhaustive; // Type d'exploration de fitting
+	public static MemeList typeOfMemeUseForFitting = MemeList.FITTING; // Peut etre ONMAP, EXISTING, FITTING
+//	public static
+	//public static FittingBehavior memeCombinaisonOnMap = FittingBehavior.simpleAndComplex; // Repart. des memes.
 
-	// Affichage log
+	// endregion
+
+	// region I/O
+	public static boolean displayFittingProviderApplied = true;	// affiche dans la console "param en cours"
+	// Défini si on écrit les détails des actions dans un fichier texte.
+	//public static boolean writeHeavyDetails = true;
+
+	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
+	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
+	public static int activationCodeForView = 7;
+
+	public static String repByDefault = "defaultRep";
+	public static String fileNameCsvSimple = "NetworkCSV";
+	public static String fileNameCsvDetail = "NetworkDetailsCSV";
+	public static String fileNameMeme = "memeCSV";
+
+	// endregion
+
+	// region Affichage log
 	public static boolean DisplayLogBehaviorColors = false;
 
 	public static boolean displayLogMemeApplication = false;
@@ -77,21 +86,9 @@ public final class Configurator {
 	public static boolean DisplayLogdebugInstantiation = false;
 	public static boolean DisplayLogGetAvailableMeme = false;
 
-	// I/O
-	// Défini si on écrit les détails des actions dans un fichier texte.
-	//public static boolean writeHeavyDetails = true;
-	public static String repByDefault = "defaultRep";
-	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
-	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
-	public static int activationCodeForView = 1;
+	//endregion
 
-	public static String fileNameCsvSimple = "NetworkCSV";
-	public static String fileNameCsvDetail = "NetworkDetailsCSV";
-	public static String fileNameMeme = "memeCSV";
-
-
-	// affichage de debug
-	// Affiche le fait de vouloir passer au step suivant
+	// region affichage de debug
 	public static boolean debugStatAndPlot = true;
 	public static boolean debugFittingClassFast = true;
 	public static boolean debugFittingClass = true;
@@ -103,19 +100,20 @@ public final class Configurator {
 	public static boolean autrucheMode = false;
 	public static boolean debugOpenMole = false;
 
-	// Configuration Modèle
+	// endregion
+
+	//region ancien boolean, osef, etc
+	// moyen osef
 	public static final boolean lotOfNodes = false;
 	public final static int nbNode = lotOfNodes ? 1000 : 100;
 	public static int refreshInfoRate = 500;
 	public final static boolean autoRedoActionIfNoAction = false;
+	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
+	public static boolean useMemePropagationProba = true;
+	public final static double probaEntiteLearning = 0;
+	public static boolean memeCanBeReplaceByCategory = true;
+	public final static int semiAutoWaitingTime = 3000;
 
-	// Affichage
-	public static boolean displayPlotWhileSimulation = !jarMode;
-	public static boolean displayMemePosessionDuringSimulation = true;
-	
-	// Config Temporaire
-
-	//region ancien boolean, osef, etc
 	public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-d_HH'h'mm'm'ss's'");
 	public static File defaultPathForReadingNetwork = new File("model\\default.txt");
 	public static Integer baseSleepTimeMulti = 0;
@@ -134,6 +132,8 @@ public final class Configurator {
 
 	//endregion
 
+	//region Enum & co
+
 	public enum EnumLauncher
 	{
 		ihm,
@@ -141,8 +141,6 @@ public final class Configurator {
 		jarOpenMole,
 		testProvider
 	}
-
-	//region Concernant Meme and co
 
 	/** Exhaustive..
 	 *
@@ -182,18 +180,6 @@ public final class Configurator {
 		simpleAndComplex
 	}
 
-	/** Retourne quelques éléments de la configuration pour les fichiers
-	 * de log
-	 * @return une arraylist, chaque élément sur un point particulier
-	 */
-	public static ArrayList<String> getConfig(){
-		ArrayList<String> elements = new ArrayList<String>();
-		elements.add("Nombre de noeuds: "+ nbNode);
-		elements.add("Méthode de propagation" + (usePropagationSecondGeneration ?
-				"Transmet l'un des meme portée":"Transmission direct du meme joué"));
-		return elements;
-	}
-
 	/** Density..
 	 *
 	 */
@@ -206,7 +192,70 @@ public final class Configurator {
 		NBEDGES,
 		NBNODES,
 		APL,
-		nbEdgesOnNbNodes
+		nbEdgesOnNbNodes;
+	}
+
+
+	/** The most...
+	 *
+	 */
+	public enum AgregatorType{
+		THEMOST,
+		THELEAST,
+//		THEMOSTLINKED,
+//		THELEASTLINKED,
+		MINESUP,
+		MINEINF,
+		MINEDIF,
+		MINEEQUAL,
+		NOTLINKED,
+		LINKED,
+		RANDOM,
+		HOPAWAY;
+	}
+
+	/** Ajout lien...
+	 *
+	 */
+	public enum ActionType {
+		AJOUTLIEN,
+		RETRAITLIEN,
+		COPIERANDOMMEME,
+		EVAPORATION,
+		REFRESH,
+		PURIFY,
+		ANYTHING;
+	}
+
+
+	/** degree
+	 *
+	 */
+	public enum AttributType {
+		DEGREE;
+	}
+
+
+	public enum MemeList {
+		EXISTING,
+		ONMAP,
+		FITTING;
+	}
+
+	//endregion
+
+	// region getter Setter
+
+	/** Retourne quelques éléments de la configuration pour les fichiers
+	 * de log
+	 * @return une arraylist, chaque élément sur un point particulier
+	 */
+	public static ArrayList<String> getConfig(){
+		ArrayList<String> elements = new ArrayList<String>();
+		elements.add("Nombre de noeuds: "+ nbNode);
+		elements.add("Méthode de propagation" + (usePropagationSecondGeneration ?
+				"Transmet l'un des meme portée":"Transmission direct du meme joué"));
+		return elements;
 	}
 
 	public static boolean isAttribActived(int activationCode, NetworkAttribType attribType){
@@ -257,50 +306,6 @@ public final class Configurator {
 		}
 
 		return activator;
-	}
-
-	/** The most...
-	 *
-	 */
-	public enum AgregatorType{
-		THEMOST,
-		THELEAST,
-//		THEMOSTLINKED,
-//		THELEASTLINKED,
-		MINESUP,
-		MINEINF,
-		MINEDIF,
-		MINEEQUAL,
-		NOTLINKED,
-		LINKED,
-		RANDOM,
-		HOPAWAY
-	}
-
-	/** Ajout lien...
-	 *
-	 */
-	public enum ActionType {
-		AJOUTLIEN,
-		RETRAITLIEN,
-		COPIERANDOMMEME,
-		EVAPORATION,
-		REFRESH,
-		PURIFY,
-		ANYTHING
-	}
-
-	/** degree
-	 *
-	 */
-	public enum AttributType {
-		DEGREE
-	}
-
-	public enum MemeList {
-		EXISTING,
-		ONMAP,
-		FITTING
 	}
 
 	@SuppressWarnings("unused")

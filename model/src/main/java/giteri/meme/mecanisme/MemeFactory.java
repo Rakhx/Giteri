@@ -59,8 +59,9 @@ public class MemeFactory {
 	 * @param KVAttributAgregator
 	 * @return
 	 */
-	public Meme registerMemeAction(String name, double proba, ActionType actionAsked, ArrayList<AttributType> attributs,
-								   Hashtable<AttributType, Hashtable<Integer ,AgregatorType>> KVAttributAgregator,boolean addForMap ,boolean addForFitting){
+	public Meme registerMemeAction(String name, double probaOfPropa, boolean fluidite, ActionType actionAsked, ArrayList<AttributType> attributs,
+								   Hashtable<AttributType, Hashtable<Integer ,AgregatorType>> KVAttributAgregator,
+								   boolean addForMap, boolean addForFitting){
 
 		// L'action qui compose le meme
 		ActionFactory.IAction action = actionFactory.getAction(actionAsked);
@@ -86,7 +87,7 @@ public class MemeFactory {
 		}
 
 		// bon bref le meme
-		Meme toReturn = new Meme(name, proba, action, attribs, KVAttribAgreg);
+		Meme toReturn = new Meme(name, probaOfPropa, fluidite ,action, attribs, KVAttribAgreg);
 		for (Meme aMemeExisting : memeExisting) {
 			if(aMemeExisting.getName().compareTo(name) == 0 ){
 				System.err.println("[MemeFactory.registerMemeAction()] : Erreur, meme déjà présent avec le meme nom");
@@ -101,7 +102,6 @@ public class MemeFactory {
 			memeOnMap.add(toReturn);
 
 		kvMemeIndexColor.put(toReturn, ++lastIndexUsed);
-
 		return toReturn;
 	}
 

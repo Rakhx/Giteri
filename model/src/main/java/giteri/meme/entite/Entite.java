@@ -45,7 +45,7 @@ public class Entite implements Comparable<Entite>{
 	public Entite(EntiteHandler ent){
 		associatedNode = null;
 		myMemes = new ArrayList<>();
-		intervalOfSelection = new Hashtable<Meme, Double>();
+		intervalOfSelection = new Hashtable<>();
 //		connectedTimeNodes = new Hashtable<Entite, Integer>();
 		connectedNodes = new HashSet<>();
 		breederOn = new HashSet<>();
@@ -59,13 +59,6 @@ public class Entite implements Comparable<Entite>{
 	@SuppressWarnings("unchecked")
 	public void defineRulesProbaLimited(){
 		double roll;
-//		ArrayList<Meme> myMemeCloned = new ArrayList<>(getMyMemes());
-//		intervalOfSelection.clear();
-//		for (Meme meme : myMemeCloned) {
-//			roll = 1.0 / myMemeCloned.size();
-//			intervalOfSelection.put(meme, roll);
-//		}
-
 		intervalOfSelection.clear();
 		for (Meme meme : getMyMemes()) {
 			roll = 1.0 / getMyMemes().size();
@@ -79,13 +72,6 @@ public class Entite implements Comparable<Entite>{
 	 * @Return le meme qui a été remplacé s'il existe,
 	 */
 	public Boolean receiveMeme(Meme subMeme){
-//		// Concernant l'usage de la proba propre au meme
-//		try {
-//			if(subMeme.probaOfPropagation == 0){
-//			}
-//		} catch (Exception e) {
-//			System.err.println(e.getMessage());
-//		}
 		// (!A || B) && (!A || C) <=> !A && !A || !A && C || !A && B || B && C
 		boolean ok = !Configurator.useMemePropagationProba || Toolz.rollDice(subMeme.getProbaOfPropagation());
 		ok = ok && (!Configurator.useEntitePropagationProba || Toolz.rollDice(this.probaLearning));
@@ -298,6 +284,26 @@ public class Entite implements Comparable<Entite>{
 
 	//region Getter/Setter
 
+	/** Vérifie que les memes possédés par l'entité sont des memes propagés,
+	 * et non slot vide // meme fluidité de bootstrap.
+	 *
+	 * @return
+	 */
+	public boolean isFullActif(){
+		// LA FLEMME
+		if(this.getMyMemes().size() == 2) {
+			for (Meme meme : getMyMemes()) {
+				if (meme.isFluide())
+					return false;
+
+			}
+			return true;
+		}
+
+		return false;
+	}
+
+
 	/**
 	 *
 	 * @param entite
@@ -332,6 +338,7 @@ public class Entite implements Comparable<Entite>{
 
 	/** Obtenir la classe graph stream a laquelle appartient le noeud.
 	 * Utile pour la coloration.
+	 * Composé des actions des memes.
 	 *
 	 * @return
 	 */
@@ -391,13 +398,15 @@ public class Entite implements Comparable<Entite>{
 	}
 
 	public Meme addMeme(Meme e, boolean fixed){
-		synchronized(myMemes){
+		//synchronized(myMemes){
 			if(fixed)
 				breederOn.add(addMeme(e).getAction());
 			else
-				myMemes.add(e);
-		}
-		defineRulesProbaLimited();
+				addMeme(e);
+				//myMemes.add(e);
+		//}
+
+		//defineRulesProbaLimited();
 		return e;
 	}
 

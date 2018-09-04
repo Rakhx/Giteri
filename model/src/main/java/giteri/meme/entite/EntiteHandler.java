@@ -1,7 +1,5 @@
 package giteri.meme.entite;
 
-import giteri.fitting.algo.IExplorationMethod;
-import giteri.fitting.parameters.IModelParameter;
 import giteri.meme.event.ActionApplyEvent;
 import giteri.meme.event.BehavTransmEvent;
 import giteri.meme.event.IActionApplyListener;
@@ -18,9 +16,7 @@ import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.*;
 import giteri.run.controller.Controller.VueController;
 import giteri.tool.math.Toolz;
-import org.apache.commons.collections4.queue.CircularFifoQueue;
 
-import java.io.File;
 import java.util.*;
 
 /**
@@ -39,15 +35,11 @@ public class EntiteHandler extends ThreadHandler {
 	// les entités du réseau
 	protected Set<Entite> entites;
 
-	public ArrayList<Entite> getEntitesActive() {
-		return entitesActive;
-	}
-
 	// Entite possedant des actions
 	private ArrayList<Entite> entitesActive;
 	private Hashtable<String, String> memeTranslationReadable;
-
 	private List<Meme> memeFittingApplied;
+	private boolean allTransmitted = false;
 
 //	private Map<Integer, ArrayList<Meme>> memeCombinaisonFittingAvailable;
 
@@ -184,6 +176,15 @@ public class EntiteHandler extends ThreadHandler {
 				vueController.displayInfo("AvgDgrByMeme", Arrays.asList(checkPropertiesByMemePossession()));
 			}
 		}
+
+		// Verification de la propagation totale des memes initiaux
+		if(Configurator.checkWhenFullPropagate && cptModulo % Configurator.checkFullProRefreshRate == 0){
+			if(!allTransmitted && areAllMemeTransmitted()) {
+				vueController.displayInfo("Propagation", Arrays.asList("ALL TRANSMISTED IN " + cptModulo));
+				allTransmitted = true;
+			}
+		}
+
 	}
 
 	//endregion
@@ -332,7 +333,7 @@ public class EntiteHandler extends ThreadHandler {
 	 * lien et sans meme.
 	 *
 	 */
-	public void resetStat(boolean complete) {
+	public void resetStat() {
 		for (Entite entite : entites) {
 			entite.resetStat();
 		}
@@ -342,14 +343,9 @@ public class EntiteHandler extends ThreadHandler {
 		cptActionRmvTried = 1;
 		cptActionAddFail = 1;
 		cptActionRmvFail = 1;
-
+		allTransmitted = false;
 		memeProperties.clear();
 		entitesActive.clear();
-		// TODO POTENTIAL ERROR Il ne semble pas qu'il soit nécessaire de tout reset puis le TRUE reset
-		// vient de l'appel dans le fitting qui réapply lui meme les IModelMachin.
-		if (complete){
-			//giveMemeToEntite(Configurator.methodOfGeneration);
-		}
 	}
 
 	//endregion
@@ -362,7 +358,6 @@ public class EntiteHandler extends ThreadHandler {
 	 */
 	public void eventMemeChanged(Entite entiteConcernee, Meme ajoutOrR, String message) {
 
-		// On crée un événement rappelant l'état courant concernant les memes;
 		synchronized (entitesActive) {
 			if(!entitesActive.contains(entiteConcernee))
 				entitesActive.add(entiteConcernee);
@@ -451,6 +446,7 @@ public class EntiteHandler extends ThreadHandler {
 	//endregion
 
 	//region Meme
+
 	/** Distribut les memes aux entités suivant certains mode.
 	 * Utilisé pour les lancement manuels. l'apply du IModelParameter DiffuProba
 	 * fourni une liste et appelle giveMemeToEntiteFitting
@@ -516,7 +512,6 @@ public class EntiteHandler extends ThreadHandler {
 	 */
 	public Hashtable<Integer, ArrayList<Meme>> getMemeAvailable(FittingBehavior setAsked,
 																Optional<Hashtable<ActionType, ArrayList<Meme>>> memeByC) {
-
 		Hashtable<Integer, ArrayList<Meme>> memes = new Hashtable<>();
 		if (setAsked == FittingBehavior.onlyComplex || setAsked == FittingBehavior.simpleAndComplex) {
 			memes = getMemeCombinaisonAvailable(memeByC);
@@ -1012,7 +1007,6 @@ public class EntiteHandler extends ThreadHandler {
 
 		if (Configurator.displayLogMemeApplication) {
 			vueController.displayInfo("memeApplication", Arrays.asList("MemeApplied- " + memeApply,"ActionDone- " +  actionDone));
-			// System.out.println(memeApply + " " + actionDone);
 		}
 
 		return actionDone;
@@ -1064,10 +1058,22 @@ public class EntiteHandler extends ThreadHandler {
 //		}
 //	}
 
-
 	//endregion
 
 	//region Meme
+
+	/** Renvoi true si aucune des entités initiales ne possède un slot vide ou de fluidité.
+	 *
+	 * @return False si memes initiaux non intégralement transmis.
+	 */
+	private boolean areAllMemeTransmitted(){
+		for (Entite entite: entitesActive) {
+			if(!entite.isFullActif())
+				return false;
+		}
+
+		return true;
+	}
 
 	/** Donne des memes aux entités. Ici chaque meme est donnée une fois pour une
 	 * entité dans le réseau.
@@ -1222,7 +1228,6 @@ public class EntiteHandler extends ThreadHandler {
 		}
 	}
 
-
 	/**
 	 * Fait le lien entre les agents et les noeuds du réseaux A appeler une fois
 	 * avant de commencer les routines de simulation
@@ -1234,7 +1239,7 @@ public class EntiteHandler extends ThreadHandler {
 
 		// Iterator sur les nodes du réseau pour leur associer des memes
 		for (Iterator<Node> iterator = nodes.iterator(); iterator.hasNext();) {
-			node = (Node) iterator.next();
+			node = iterator.next();
 			toBindToNode = new Entite(this);
 			toBindToNode.setNode(node);
 			entites.add(toBindToNode);
@@ -1266,9 +1271,9 @@ public class EntiteHandler extends ThreadHandler {
 
 	/** utilisé lors du reset des réseaux.
 	 *
-	 * @param network
 	 */
-	public void synchronizeNodeConnectionWithEntiteConnection(Network network) {
+	public void synchronizeNodeConnectionWithEntiteConnection() {
+		Network network = networkConstruct.getNetwork();
 		Entite concerne;
 
 		for (Node node : network.getNodes()) {
@@ -1313,59 +1318,59 @@ public class EntiteHandler extends ThreadHandler {
 		agregators.put(0, notLinked);
 		agregators.put(1, mineInf);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add+", 1, add, attributs,KVAttributAgregator, false ,false);
+		memeFactory.registerMemeAction("Add+", 1, false, add, attributs,KVAttributAgregator, false ,true);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add-",1,add, attributs,KVAttributAgregator, false ,false);
+		memeFactory.registerMemeAction("Add-",1, false, add, attributs,KVAttributAgregator, false ,true);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, theMost);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add∞", .01, add, attributs, KVAttributAgregator, false ,false);
+		memeFactory.registerMemeAction("Add∞", .01, false, add, attributs, KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		agregators.put(0, hopAWay);
 		agregators.put(1, notLinked);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("AddØ-Hop", 1, add, attributs,KVAttributAgregator, false ,false);
+		memeFactory.registerMemeAction("AddØ-Hop", 1, false, add, attributs,KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("AddØ",1, add, attributs, KVAttributAgregator, false, false);
+		memeFactory.registerMemeAction("AddØ",1, false, add, attributs, KVAttributAgregator, true, false);
 		agregators.put(2, random);
 		if(Configurator.initializeDefaultBehavior)
-		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, add, attributs, KVAttributAgregator, false, false);
+		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, true, add, attributs, KVAttributAgregator, false, false);
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("RmvØ",1, remove, attributs,  KVAttributAgregator, false, false);
+		memeFactory.registerMemeAction("RmvØ",1, false, remove, attributs,  KVAttributAgregator, true, true);
 		agregators.put(2, random);
 		if(Configurator.initializeDefaultBehavior) {
-			removeRandom = memeFactory.registerMemeAction("RmvØ-neutral",0, remove, attributs,  KVAttributAgregator, false, false);
+			removeRandom = memeFactory.registerMemeAction("RmvØ-neutral",0, true, remove, attributs,  KVAttributAgregator, false, false);
 		}
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv-", 1, remove, attributs, KVAttributAgregator, false ,false);
+		memeFactory.registerMemeAction("Rmv-", 1, false, remove, attributs, KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, mineInf);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv+", 1, remove, attributs, KVAttributAgregator, false ,false);
+		memeFactory.registerMemeAction("Rmv+", 1, false, remove, attributs, KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		agregators.put(0, hopAWay);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("RmvØ-2hop", .2, remove, attributs, KVAttributAgregator,false ,false);
+		memeFactory.registerMemeAction("RmvØ-2hop", .2, false, remove, attributs, KVAttributAgregator,false ,false);
 
 		agregators.clear();
 		// memeFactory.getMemeAction("Puri",0,puri, attributs,
@@ -1530,6 +1535,10 @@ public class EntiteHandler extends ThreadHandler {
 			}
 		}
 		return resultat;
+	}
+
+	public ArrayList<Entite> getEntitesActive() {
+		return entitesActive;
 	}
 
 	//endregion

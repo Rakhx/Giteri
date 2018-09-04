@@ -157,16 +157,15 @@ public class CommunicationModel implements IModel {
 		eh.suspend();
 		nc.suspend();
 
-		eh.resetStat(false);
+		eh.resetStat();
 		nc.resetStat();
 		wf.getDrawer().resetDisplay();
 		view.resetIHM();
 
 		eh.generateNetwork(activator);
+		eh.synchronizeNodeConnectionWithEntiteConnection();
 
 		wf.getDrawer().drawThisNetwork(nc.networkInstance);
-		eh.synchronizeNodeConnectionWithEntiteConnection(nc.networkInstance);
-
 		eh.giveMemeToEntite(Configurator.methodOfGeneration);
 
 		// Reste en pause après avoir générer les graphes depuis l'interface
@@ -189,7 +188,7 @@ public class CommunicationModel implements IModel {
 	 * du réseau ou de fitting ou autre.
 	 */
 	public void resetStuff(){
-		eh.resetStat(true);
+		eh.resetStat();
 		nc.resetStat();
 		wf.getDrawer().resetDisplay();
 		view.resetIHM();

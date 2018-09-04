@@ -85,7 +85,6 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 			Node noeud = graph.getNode(""+e.entite.getIndex());
 			setNodeClass(noeud, e.entite.getGraphStreamClass());
 			if(Configurator.displayLogMemeTransmission)
-
 				System.out.println(noeud+" "+e.meme.getName());
 		}
 	}
@@ -269,8 +268,8 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 			node.addAttribute("ui.class", attribut);
 	}
 
-	/** Défini les attributs sur le graphe.
-	 *
+	/** Défini la correspondance Combinaison de meme <-> couleur pour Graphstream.
+	 * Parcourt les combinaisons de meme existants dispo sur la map.
 	 * @param graph
 	 */
 	private void defineGraphAttributes(Graph graph){
@@ -282,7 +281,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 		nbMemeSolo--;
 		int aAppliquer;
 
-		for (String combi : entiteHandler.getMemeAvailableAsString(Configurator.memeCombinaisonOnMap)) {
+		for (String combi : entiteHandler.getMemeAvailableAsString(Configurator.FittingBehavior.simpleAndComplex)) {
 			officialIndex = memeFactory.getColorIndexStringConversion(combi);
 
 			if(officialIndex != null)

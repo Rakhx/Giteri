@@ -17,9 +17,15 @@ public class Meme implements Serializable, Comparable<Meme>{
 	// Liste des paramètres pour le giteri.meme en question
 	IAction action;
 	ArrayList<IAttribut> attributs;
-	Hashtable<String, Hashtable<Integer, IAgregator>> KVAttributLAgregator;
+	private Hashtable<String, Hashtable<Integer, IAgregator>> KVAttributLAgregator;
 	private double probaOfPropagation;
 	String name;
+
+	public boolean isFluide() {
+		return fluide;
+	}
+
+	boolean fluide = false;
 
 	/** Constructeur avec une bardée de paramètre.
 	 * 
@@ -29,12 +35,13 @@ public class Meme implements Serializable, Comparable<Meme>{
 	 * @param attributs
 	 * @param KVAttributLAgregator
 	 */
-	public Meme(String name, double probaOfTransmission, IAction action, ArrayList<IAttribut> attributs, Hashtable<String, Hashtable<Integer, IAgregator>> KVAttributLAgregator){
+	public Meme(String name, double probaOfTransmission,boolean fluidite, IAction action, ArrayList<IAttribut> attributs, Hashtable<String, Hashtable<Integer, IAgregator>> KVAttributLAgregator){
 		this.name = name;
 		this.action = action;
 		this.attributs = attributs;
 		this.KVAttributLAgregator = KVAttributLAgregator;
 		probaOfPropagation = probaOfTransmission;
+		fluide = fluidite;
 	}
 	
 	//region Getter/Setter/toString
@@ -131,7 +138,6 @@ public class Meme implements Serializable, Comparable<Meme>{
 		this.probaOfPropagation = target.probaOfPropagation;
 		this.name = target.name;
 	}
-
 
 	public double getProbaOfPropagation() {
 		return probaOfPropagation;

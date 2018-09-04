@@ -94,7 +94,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		if (!(typeOfLaunch == Configurator.EnumLauncher.jarC || typeOfLaunch == Configurator.EnumLauncher.jarOpenMole)) {
 			(new Thread() {
 				public void run() {
-
 					fittingLauncherVersionClean(typeOfLaunch, typeOfExplo, memeActivation, memeProba);
 				}
 			}).start();
@@ -138,15 +137,12 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		List<Boolean> memeActivation = memeActivationOpt.orElse(new ArrayList<>());
 		List<Double> memeProba = memeProbaOpt.orElse(new ArrayList<>());
 
-
 		// Qui définira pour la classe de fitting l'espace de recherche
 		IExplorationMethod explorator = null;
 		NetworkProperties networkTarget = null;
 		FittingClass configuration = null;
 
-
 		// Dans le cas ou on veut un one shot de l'IHM il faut remplir les listes
-//		if(typeOfExplo == EnumExplorationMethod.oneShot && typeOfLaunch == Configurator.EnumLauncher.ihm)
 		if(typeOfExplo == EnumExplorationMethod.oneShot && !memeActivationOpt.isPresent())
 			fitListEMManuel(memeActivation, memeProba);
 
@@ -168,7 +164,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		// ajout de la fitting classe au listener
 		entiteHandler.addEntityListener(configuration);
-
 
 		// Lancement d'une simulation
 		resultat = factorisation(configuration);
@@ -259,10 +254,10 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		Hashtable<Meme, GenericDoubleParameter> memeAndProba = new Hashtable<>();
 		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
 
-
 		// Parcourt la liste des memes
 		for (int i = 0; i < activation.size(); i++) {
-			memeAndProba.put(memeFactory.getMemeFromColorInteger(i), new GenericDoubleParameter(proba.get(i)));
+			if(activation.get(i))
+				memeAndProba.put(memeFactory.getMemeFromColorInteger(i), new GenericDoubleParameter(proba.get(i)));
 		}
 
 		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeAndProba);
@@ -311,9 +306,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 //		fitting.explorator = ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
 
 		return null;
-
 	}
-
 
 	/** prends les listes vides en entrée et les remplis pour les faire correspondre a une
 	 * entrée standard en appelle console.
@@ -328,17 +321,16 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		for (int i = 0; i < existingMeme.size(); i++) {
 
-			if(existingMeme.get(i).toFourCharString().compareToIgnoreCase("ADD+") == 0 ){
-				activator.add(true); proba.add(0.2);
-			} else 	if(existingMeme.get(i).toFourCharString().compareToIgnoreCase("RMV-") == 0 ){
-				activator.add(true); proba.add(0.2);
+			if(existingMeme.get(i).getName().compareToIgnoreCase("ADD+") == 0 ){
+				activator.add(true); proba.add(1.);
+			} else if(existingMeme.get(i).getName().compareToIgnoreCase("ADD-") == 0 ){
+				activator.add(true); proba.add(1.);
 			}
-			else{
+			else {
 				activator.add(false); proba.add(-1.);
 			}
 		}
 	}
-
 
 	/** Classe factorisée pour les traitements de fitting ou searching.
 	 *
