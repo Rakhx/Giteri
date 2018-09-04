@@ -79,23 +79,14 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 	//<editor-fold desc="Properties">
 
-	// worker Factory
-	NetworkConstructor networkConstructor;
 
 	// action , attribut, aggrgator factory
 	MemeFactory memeFactory;
 
-	// StatAndPlot, DrawerInteface ou drawerGraphStream, Network Analyze
-	WorkerFactory workerFactory;
-
 	// networkConstructor, memeFactory, WorkerFactory
 	EntiteHandler entiteHandler;
 
-	// entiteHandler
-	ActionFactory actionFactory ;
-
-	// entitehandler, memefactory, ntworkconstructor
-	//DrawerGraphStream drawerGraphStream;
+	// Huml, devrait passer par communicationModel
 	Interfaces.DrawerInterface drawerGraphStream;
 
 
@@ -214,22 +205,18 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	//</editor-fold>
 
 	public IHM(ModelController modelParam,
-			   NetworkConstructor networkConstructor,
 			   MemeFactory memeFactory,
-			   WorkerFactory workerFactory,
 			   EntiteHandler entiteHandler,
-			   ActionFactory actionFactory ,
 			   Interfaces.DrawerInterface drawerGraphStream,
 			   WriteNRead wnr) {
 
 		super("-");
 
 		modelController = modelParam;
-		this.networkConstructor = networkConstructor;
-		this.memeFactory =memeFactory ;;
-		this.workerFactory= workerFactory ;
+		this.memeFactory =memeFactory ;
+
 		this.entiteHandler =entiteHandler ;
-		this.actionFactory =actionFactory ;
+
 		this.drawerGraphStream= drawerGraphStream ;
 		this.writeNRead = wnr;
 
