@@ -42,6 +42,7 @@ import giteri.meme.event.IBehaviorTransmissionListener;
 public class FittingClass implements IBehaviorTransmissionListener, IActionApplyListener {
 
 	//region Variables diverses
+
 	private boolean debug = Configurator.debugFittingClass;
 	private EntiteHandler entiteHandler;
 	private MemeFactory memeFactory;
@@ -52,18 +53,17 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public CommunicationModel com ;
 	public IExplorationMethod explorator;
 
-	//region CONFIGURATION INITIALE
+	// CONFIGURATION INITIALE
 
 	// Nombre de fois ou on lance un run pour une meme config.
 	public int nbRepetitionByConfig;
-
 	// Nombre d'action réalisé par les entités avant une collecte de données
 	public int nbActionByStep = Configurator.nbNode * 10;
 	public int boucleExterneSize = 30;
+	public int nbActionBeforeQuit = 2500 * Configurator.nbNode;
 
-	//endregion
 
-	//region VARIABLES DE FONCTIONNEMENT
+	// VARIABLES DE FONCTIONNEMENT
 
 	// numero du run en cours
 	public int numeroRun = -1;
@@ -104,9 +104,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	private double risingPourcentage = .4;
 	private int nbActionThreshRising = 7;
 
-	//endregion
 
-	//region RESULTATS DE SIMULATION
+	// RESULTATS DE SIMULATION
 
 	// relevés des différentes densité pour une meme configuration
 	public ArrayList<NetworkProperties> networksSameTurn = new ArrayList<NetworkProperties>();
@@ -117,31 +116,11 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 	public double currentNetworkScore;
 	ArrayList<String> repertoires ;
-
 	ResultSet resultNetwork;
 
 	//endregion
 
-	//endregion
-
 	//region constructeur et init
-
-	/** Mise en place des valeurs par défault pour les variables d'utilisation
-	 *
-	 */
-	private void setDefaultValue(){
-		nbRepetitionByConfig = 2;
-		nbActionByStep = 50;
-		cfqDensityValuesOnOneRun = new CircularFifoQueue<>(boucleExterneSize);
-		cqLastXActionDone = new CircularFifoQueue<>(circularSize);
-		kvLastActionDone = new Hashtable<>();
-		kvOverallProportionActionDone = new Hashtable<>();
-		kvOverallNumberOfActionDone = new Hashtable<>();
-		cfqMemeAppliancePropOnFitting = new CircularFifoQueue<>(nbEltCircularQFitting);
-		cfqMemeApplianceNumberOnFitting = new CircularFifoQueue<>(nbEltCircularQFitting);
-		memesAvailables = memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING);
-		currentNetProperties.createStub();
-	}
 
 	/**	Constructeur.
 	 *
@@ -160,6 +139,23 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		setDefaultValue();
 	}
 
+	/** Mise en place des valeurs par défault pour les variables d'utilisation
+	 *
+	 */
+	private void setDefaultValue(){
+		nbRepetitionByConfig = 100;
+		nbActionByStep = 50;
+		cfqDensityValuesOnOneRun = new CircularFifoQueue<>(boucleExterneSize);
+		cqLastXActionDone = new CircularFifoQueue<>(circularSize);
+		kvLastActionDone = new Hashtable<>();
+		kvOverallProportionActionDone = new Hashtable<>();
+		kvOverallNumberOfActionDone = new Hashtable<>();
+		cfqMemeAppliancePropOnFitting = new CircularFifoQueue<>(nbEltCircularQFitting);
+		cfqMemeApplianceNumberOnFitting = new CircularFifoQueue<>(nbEltCircularQFitting);
+		memesAvailables = memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING);
+		currentNetProperties.createStub();
+	}
+
 	//endregion
 
 	//region Fitting turn & run
@@ -171,7 +167,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public void init(){
 		Configurator.methodOfGeneration = Configurator.MemeDistributionType.Nothing;
 		targetNetProperties = networkFileLoader.getNetworkProperties();
-
 
 		// ECRITURE
 		repertoires = new ArrayList<>(Arrays.asList("Stability"));
@@ -213,7 +208,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			writeNRead.writeSmallFile(repOfTheSearch, Configurator.fileNameCsvDetail,
 					Collections.singletonList(toWriteDetailCSV.toString()));
 		}
-
 	}
 
 	/** Nouveau tour. C a d nouvelle série de Run dans une configuration du modèle donnée.
@@ -235,6 +229,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 */
 	public void newRepetition(){
 		resetSeuilValue();
+		resetAction();
 		numeroRepetitionAsString = "Repetition#" + ++numeroRepetition;
 		repertoires.add(numeroRepetitionAsString);
 		com.suspend();
@@ -246,9 +241,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		currentSeed = new Random().nextLong();
 		Toolz.setSeed(currentSeed);
 
-		// entiteHandler.generateNetwork(1);
-
-
+		com.generateGraph(Configurator.initialNetworkForFitting);
 		explorator.apply();
 		entiteHandler.updateMemeAvailableForProperties();
 
@@ -494,6 +487,16 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			oneMoreTurn &= false;
 
 		return oneMoreTurn;
+	}
+
+	public boolean continuFittingSimpliestVersion(){
+		boolean oneMoreTurn = true;
+		ObjectRef<String> message = new ObjectRef<>("");
+		//oneMoreTurn = readingActionCanContinue(message);
+		if(getNbAction() > nbActionBeforeQuit )
+			oneMoreTurn &= false;
+		return oneMoreTurn;
+
 	}
 
 	//endregion

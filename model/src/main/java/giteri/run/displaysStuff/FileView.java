@@ -3,6 +3,7 @@ package giteri.run.displaysStuff;
 import giteri.run.configurator.Configurator;
 import giteri.run.interfaces.Interfaces;
 import giteri.tool.other.WriteNRead;
+import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import org.jfree.chart.JFreeChart;
 
 import java.io.File;
@@ -90,7 +91,8 @@ public class FileView implements Interfaces.IView {
 
     @Override
     public void setDisplayNbAction(String message) {
-        addLine("nbline", new ArrayList<>(Arrays.asList(message, "" + cpt++)));
+        if(Configurator.writeNbActionPerSec)
+            addLine("nbline", new ArrayList<>(Arrays.asList(message, "" + cpt++)));
     }
 
     @Override

@@ -150,7 +150,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 	 * @param net
 	 * @param nodeToDesignAsTarget
 	 */
-	public void applyTargetColor(Network net, Integer actingEntite ,Set<Integer> nodeToDesignAsTarget){
+	public void applyTargetColor(Network net, Integer actingEntite, Set<Integer> nodeToDesignAsTarget){
 
 		String attrib;
 		boolean found = false;
@@ -236,8 +236,6 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 	 */
 	public void addEdge(int from, int to) {
 		graph.addEdge(""+from+"-"+to, from, to, false);
-
-
 	}
 
 	/** Ajout d'un node dans le graphe visuel

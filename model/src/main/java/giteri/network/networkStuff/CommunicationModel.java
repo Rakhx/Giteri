@@ -192,7 +192,7 @@ public class CommunicationModel implements IModel {
 		nc.resetStat();
 		wf.getDrawer().resetDisplay();
 		view.resetIHM();
-		wf.getDrawer().drawThisNetwork(nc.networkInstance);
+		// wf.getDrawer().drawThisNetwork(nc.networkInstance);
 		generateGraph(2);
 	}
 

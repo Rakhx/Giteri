@@ -205,10 +205,8 @@ public interface IExplorationMethod {
 
 		public ExplorationOneShot(Hashtable<Integer, IModelParameter<?>> provids) {
 			super(provids);
-			
 		}
-		
-		
+
 		@Override
 		public boolean gotoNext() {
 			return false;

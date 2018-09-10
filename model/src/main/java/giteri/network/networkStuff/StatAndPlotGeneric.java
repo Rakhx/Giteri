@@ -45,14 +45,13 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	private Integer nbAction = 0;
 
 	// Empeche l'algo de passer au step suivant de fitting sans le passage manuel
-	// Mis au niveau du configuraztor.
+	// Mis au niveau du configurator.
 	// Met en pause automatiquement quand l'algo essaye de passer au cran suivant
 	public boolean autoPauseIfNexted = Configurator.autoPauseIfNexted;
 	public boolean goNextStepInManuelMode = !Configurator.manuelNextStep;
 
 	boolean debugBeforeSkip = true;
 	boolean debug = Configurator.debugStatAndPlot;
-//	public ArrayList<Double> probaVoulu;
 
 	/** Constructeur de cet élément de base.
 	 * Ne peut etre appelé directement, classe abstract
@@ -74,21 +73,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	/** Lancement de thread qui va comparer un réseau lu et le réseau en cours.
 	 *
 	 */
-//	public Double fitNetwork(){
-//		if(!Configurator.jarMode){
-//			(new Thread(){
-//				public void run() {
-//					 fittingLauncher();
-//				}
-//			}).start();
-//		return 0.;
-//		}else{
-//			return fittingLauncher();
-//		}
-//	}
-	/** Lancement de thread qui va comparer un réseau lu et le réseau en cours.
-	 *
-	 */
 	public Double fitNetwork(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
 							   Optional<List<Boolean>> memeActivation, Optional<List<Double>> memeProba) {
 		if (!(typeOfLaunch == Configurator.EnumLauncher.jarC || typeOfLaunch == Configurator.EnumLauncher.jarOpenMole)) {
@@ -102,30 +86,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			return fittingLauncherVersionClean(typeOfLaunch, typeOfExplo, Optional.empty(), Optional.empty());
 		}
 	}
-
-	/** PREMIERE FONCTION APPELEE DANS LA LONGUE SERIE DES FITTING SEARCHING
-	 *
-	 */
-//	public double fittingLauncher(){
-//		double resultat;
-//		// Classe de configuration qui contient tout ce qu'il faut pour faire une simu
-//		FittingClass configuration = new FittingClass(writeNRead,communicationModel,
-//				memeFactory, networkFileLoader, workerFactory, entiteHandler, networkConstructor);
-//
-//		// ajout de la fitting classe au listener
-//		entiteHandler.addEntityListener(configuration);
-//
-//		// initialise les config de simulation genre répartition des comportments etc
-//		initializeConfigForStability(configuration);
-//
-//		// Lancement d'une simulation
-//		resultat = factorisation(configuration);
-//
-//		// retrait de la fitting classe des listener
-//		entiteHandler.removeEntityListener(configuration);
-//
-//		return resultat;
-//	}
 
 	/** Refact. Fonction commune à tous les appels, premiere de la série.
 	 *
@@ -170,48 +130,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		// retrait de la fitting classe des listener
 		entiteHandler.removeEntityListener(configuration);
-
 		return resultat;
-	}
-
-	/** Initialise et instancie pour préparer le fitting. Behavior présent sur la map,
-	 * leur range de proba. de transmission. Le type d'exploration qu'on va faire de l'espace
-	 * de param.
-	 * TODO [WayPoint] - Mise en place de la configuration pour le fitting ( Step, providers )
-	 * @param fitting
-	 */
-	protected void initializeConfigForStability(FittingClass fitting){
-//		Hashtable<Meme, GenericBooleanParameter> memeDispo = new Hashtable<>();
-//		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
-//
-//		// Rempli la liste des memes que l'on veut pour lancer le fitting.
-//		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING))
-//			memeDispo.put(meme, new GenericBooleanParameter());
-//
-//		MemeAvailability memeProvider = new MemeAvailability(memeDispo);
-//		memeProvider.setEntiteHandler(entiteHandler);
-//		providers.put(1,memeProvider);
-//
-//		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING),
-//				new GenericDoubleParameter(.2,.2,.4,.2));
-//		memeDiffu.setEntiteHandler(entiteHandler);
-//		providers.put(0,memeDiffu);
-//
-//		memeProvider.addMemeListListener(memeDiffu);
-//
-//		if(Configurator.explorator == EnumExplorationMethod.oneShot){
-//			ArrayList<Double> InOrderOfParameter = new ArrayList<>(Arrays.asList(1.,0.365018173274458,0.089130672733655,0.484877681454417,1.));
-//
-//			ArrayList<Double> probaVoulu = new ArrayList<>();
-//			probaVoulu.add(InOrderOfParameter.get(3));
-//			probaVoulu.add(InOrderOfParameter.get(0));
-//			probaVoulu.add(InOrderOfParameter.get(1));
-//			probaVoulu.add(InOrderOfParameter.get(4));
-//			probaVoulu.add(InOrderOfParameter.get(2));
-//			setPreciseValue(probaVoulu, memeDiffu);
-//		}
-//
-//		fitting.explorator = ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
 	}
 
 	/** lorsque le programme est appelé depuis java - et que l'on souhaite utiliser les modelParameter pour cycler.
@@ -239,10 +158,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		memeProvider.addMemeListListener(memeDiffu);
 
-
 		return ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
-
-
 	}
 
 	/** lorsque le fitting est appelé depuis un jar, ou depuis l'IHM mais qu'on veut faire un oneshot.
@@ -311,6 +227,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	/** prends les listes vides en entrée et les remplis pour les faire correspondre a une
 	 * entrée standard en appelle console.
 	 *  Pour faire un oneshot depuis IHM
+	 *  TODO [WayPoint] - ONESHOT CONFIGURATION
 	 * @param activator
 	 * @param proba
 	 */
@@ -321,9 +238,11 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		for (int i = 0; i < existingMeme.size(); i++) {
 
-			if(existingMeme.get(i).getName().compareToIgnoreCase("ADD+") == 0 ){
+			if(existingMeme.get(i).getName().compareToIgnoreCase("ADDØ") == 0 ){
 				activator.add(true); proba.add(1.);
-			} else if(existingMeme.get(i).getName().compareToIgnoreCase("ADD-") == 0 ){
+			//} else if(existingMeme.get(i).getName().compareToIgnoreCase("ADD-") == 0 ){
+				//activator.add(true); proba.add(1.);
+			}else if(existingMeme.get(i).getName().compareToIgnoreCase("RMVØ") == 0 ){
 				activator.add(true); proba.add(1.);
 			}
 			else {
@@ -370,7 +289,8 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 					}
 
 //					debugBeforeSkip = config.continuFittingCleanVersion();
-					debugBeforeSkip = config.continuFittingSimpleVersion();
+					//debugBeforeSkip = config.continuFittingSimpleVersion();
+					debugBeforeSkip = config.continuFittingSimpliestVersion();
 
 					if(!debugBeforeSkip){
 						if(debug) System.out.println("Voudrait passer au step suivant");

@@ -180,7 +180,7 @@ public class EntiteHandler extends ThreadHandler {
 		// Verification de la propagation totale des memes initiaux
 		if(Configurator.checkWhenFullPropagate && cptModulo % Configurator.checkFullProRefreshRate == 0){
 			if(!allTransmitted && areAllMemeTransmitted()) {
-				vueController.displayInfo("Propagation", Arrays.asList("ALL TRANSMISTED IN " + cptModulo));
+				vueController.displayInfo("Propagation", Arrays.asList("ALL TRANSMISTED IN ;" + cptModulo));
 				allTransmitted = true;
 			}
 		}
@@ -1318,13 +1318,13 @@ public class EntiteHandler extends ThreadHandler {
 		agregators.put(0, notLinked);
 		agregators.put(1, mineInf);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add+", 1, false, add, attributs,KVAttributAgregator, false ,true);
+		memeFactory.registerMemeAction("Add+", 1, false, add, attributs,KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add-",1, false, add, attributs,KVAttributAgregator, false ,true);
+		memeFactory.registerMemeAction("Add-",1, false, add, attributs,KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
@@ -1341,7 +1341,7 @@ public class EntiteHandler extends ThreadHandler {
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("AddØ",1, false, add, attributs, KVAttributAgregator, true, false);
+		memeFactory.registerMemeAction("AddØ",1, false, add, attributs, KVAttributAgregator, true, true);
 		agregators.put(2, random);
 		if(Configurator.initializeDefaultBehavior)
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, true, add, attributs, KVAttributAgregator, false, false);

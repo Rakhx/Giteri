@@ -14,7 +14,7 @@ public final class Configurator {
 	// La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
 	// depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent
 	// cette configuration initiale
-	public static boolean withGraphicalDisplay = false;
+	public static boolean withGraphicalDisplay = true;
 	public static boolean jarMode = true;
 	public static boolean systemPaused = false;
 	public static boolean writeNetworkResultOnFitting = true;
@@ -28,17 +28,13 @@ public final class Configurator {
 	public static boolean manuelNextStep = false; // pas de passage au run suivant, il faut appuyer sur next
 	public static boolean autoPauseIfNexted = false; // mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	public static boolean initializeDefaultBehavior = false;	//fluidité
-
 	public static boolean displayPlotWhileSimulation = !jarMode; // Affichage des DD et densité
-	public static boolean displayMemePosessionDuringSimulation = true;
+	public static boolean displayMemePosessionDuringSimulation = false; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
 
 	// PROPAGATION
-	public static boolean usePropagationSecondGeneration = false;
-	public static boolean usePropagation = true;
 	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
-
-	public static boolean checkWhenFullPropagate = true; 	// All action spread?
-	public static int checkFullProRefreshRate = 100;
+	public static boolean checkWhenFullPropagate = true; 	// All action spread? affiche en combien d'action
+	public static int checkFullProRefreshRate = 50; // every X step vérification du full propagate
 
 	// SCORE
 	public static int activationCodeForScore = 55;
@@ -48,37 +44,37 @@ public final class Configurator {
 	// endregion
 
 	// region Fitting
+
 	public static EnumExplorationMethod explorator = EnumExplorationMethod.exhaustive; // Type d'exploration de fitting
 	public static MemeList typeOfMemeUseForFitting = MemeList.FITTING; // Peut etre ONMAP, EXISTING, FITTING
-//	public static
-	//public static FittingBehavior memeCombinaisonOnMap = FittingBehavior.simpleAndComplex; // Repart. des memes.
+	public static int initialNetworkForFitting = 0; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
 
 	// endregion
 
 	// region I/O
-	public static boolean displayFittingProviderApplied = true;	// affiche dans la console "param en cours"
-	// Défini si on écrit les détails des actions dans un fichier texte.
-	//public static boolean writeHeavyDetails = true;
-
+	public static boolean displayFittingProviderApplied = true;	// affiche dans la console apprlications des params:
 	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
-	public static int activationCodeForView = 7;
+	public static int activationCodeForView = 5;
+	// Rafine les affichage de view
+	public static boolean writeNbActionPerSec = false; // pas de fichier nbline
 
 	public static String repByDefault = "defaultRep";
 	public static String fileNameCsvSimple = "NetworkCSV";
 	public static String fileNameCsvDetail = "NetworkDetailsCSV";
 	public static String fileNameMeme = "memeCSV";
 
+
 	// endregion
 
 	// region Affichage log
-	public static boolean DisplayLogBehaviorColors = false;
+	public static boolean DisplayLogBehaviorColors = false; // correspondance meme <=> code couleur
 
-	public static boolean displayLogMemeApplication = false;
-	public static boolean displayLogAvgDegreeByMeme = false;
-	public static boolean displayLogMemeTransmission = false;
+	public static boolean displayLogMemeApplication = false; // Chaque application de meme
+	public static boolean displayLogAvgDegreeByMeme = false; // combinaisons de meme et leur degré + derniere application + application from start
+	public static boolean displayLogMemeTransmission = false; // qui recoit quel meme
 
-	private static boolean faster = false;
+	private static boolean faster = false; // les rations d'echecs sur echec, echec sur réussite...
 	public static boolean displayLogRatioLogFailOverFail = faster;
 	public static boolean displayLogRatioLogFailOverSuccess = faster;
 	public static boolean displayLogRatioTryAddOverTryRmv = faster;
@@ -113,6 +109,9 @@ public final class Configurator {
 	public final static double probaEntiteLearning = 0;
 	public static boolean memeCanBeReplaceByCategory = true;
 	public final static int semiAutoWaitingTime = 3000;
+	public static boolean usePropagation = true;
+	public static boolean usePropagationSecondGeneration = false; // transmet un des memes du porteur, pas forcement celui applied
+
 
 	public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-d_HH'h'mm'm'ss's'");
 	public static File defaultPathForReadingNetwork = new File("model\\default.txt");
