@@ -364,7 +364,7 @@ public interface IModelParameter<T> {
 	 *
 	 * @author Felix
 	 */
-	public class GenericDoubleParameter extends AbstractDoubleParameter {
+	class GenericDoubleParameter extends AbstractDoubleParameter {
 		public GenericDoubleParameter(){}
 
 		public GenericDoubleParameter(Double valeur){
@@ -524,7 +524,7 @@ public interface IModelParameter<T> {
 	/** CLASSE pour la probabilité de diffusion des memes.
 	 *
 	 */
-	public class MemeDiffusionProba extends AbstractMapParameter<GenericDoubleParameter> implements IMemeAvailableListener {
+	class MemeDiffusionProba extends AbstractMapParameter<GenericDoubleParameter> implements IMemeAvailableListener {
 
 		GenericDoubleParameter defautDoubleParam;
 
@@ -638,4 +638,7 @@ public interface IModelParameter<T> {
 			}
 		}
 	}
+
+
+
 }

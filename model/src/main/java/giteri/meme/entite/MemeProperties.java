@@ -63,7 +63,7 @@ public class MemeProperties{
      * @return
      */
     public List<String> updateActionCount(Meme memeApply, int entiteIndex, String message, int cptModulo){
-        if (memeApply != null)
+        if (memeApply != null && !message.contains("Nope"))
         {
             Meme elementRemoveOfCircular = null;
             Toolz.addCountToElementInHashArray(nbActivationByMemes, memeApply, 1);
@@ -94,10 +94,10 @@ public class MemeProperties{
                     cptActionAddFail++;
 
             return Arrays.asList(
-                    "Iteration- "+ cptModulo,
-                    "Ratio Rmv/Add -" + (Configurator.displayLogRatioLogFailOverFail? ((double) cptActionRmvFail / cptActionAddFail) : " NC"),
-                    "Ratio Fail/success -" + (Configurator.displayLogRatioLogFailOverSuccess ? ((double) (cptActionRmvFail + cptActionAddFail) / nbWin) : "NC"),
-                    "Aucune action réalisée par l'entité- " + entiteIndex,
+                    "Iteration-; "+ cptModulo,
+                    ";Ratio Rmv/Add -;" + (Configurator.displayLogRatioLogFailOverFail? ((double) cptActionRmvFail / cptActionAddFail) : " NC"),
+                    ";Ratio Fail/success -;" + (Configurator.displayLogRatioLogFailOverSuccess ? ((double) (cptActionRmvFail + cptActionAddFail) / nbWin) : "NC"),
+                    ";Aucune action réalisée par l'entité- " + entiteIndex,
                     "Message- " + message);
         }
 

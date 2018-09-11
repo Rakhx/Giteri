@@ -68,6 +68,7 @@ public class EntiteHandler extends ThreadHandler {
 	private int cptActionAddTried = 1, cptActionRmvTried = 1,cptActionAddFail = 1, cptActionRmvFail = 1;
 	private ActionType lastAction = ActionType.RETRAITLIEN;
 	private int nbActionBySecond;
+	private List<String> toDisplayForRatio;
 
 	/** Constructeur sans param.
 	 *
@@ -86,7 +87,7 @@ public class EntiteHandler extends ThreadHandler {
 		entityListeners = new ArrayList<>();
 		memeListeners = new ArrayList<>();
 		memeTranslationReadable = new Hashtable<>();
-
+		toDisplayForRatio = new ArrayList<>();
 		memeProperties = new MemeProperties();
 
 		if (Configurator.DisplayLogdebugInstantiation)
@@ -751,12 +752,11 @@ public class EntiteHandler extends ThreadHandler {
 		String rez;
 		synchronized (workerFactory.waitingForReset) {
 			Meme memeAction;
-
+			toDisplayForRatio.clear();
 			// CHOIX D'UNE ENTITÉE AU HASARD
 			Entite entiteActing = selectActingEntiteV2();
 			if(Configurator.debugEntiteHandler)
 				System.out.println("[EH.runEntite]- entite choisie " + entiteActing.getIndex());
-
 			if (entiteActing == null) {
 				if(Configurator.debugEntiteHandler) System.err.println("[EH.runEntite()]- Aucune entité sélectionnée");
 				return ("Nope pas d'entite prete");
@@ -775,21 +775,33 @@ public class EntiteHandler extends ThreadHandler {
 			// Concernant affichage et debugage
 			if (Configurator.displayLogRatioTryAddOverTryRmv) {
 				if (memeAction != null)
+				{
 					if (memeAction.action.getActionType() == ActionType.AJOUTLIEN)
 						cptActionAddTried++;
 					else if (memeAction.action.getActionType() == ActionType.RETRAITLIEN)
 						cptActionRmvTried++;
-				System.out.println("Tried Add/rmv " + (double) cptActionAddTried / cptActionRmvTried);
+				}
+
+				toDisplayForRatio.add("AddTried/rmvTried;" +(double) cptActionAddTried / cptActionRmvTried) ;
+
+				//vueController.displayInfo("TriedAddOverRemove", Arrays.asList(""+ (double) cptActionAddTried / cptActionRmvTried));
+				// System.out.println("Tried Add/rmv " + (double) cptActionAddTried / cptActionRmvTried);
 			}
 
 			// Si on veut afficher les X dernieres actions entreprises & action depuis le début
 			if (Configurator.displayMemePosessionDuringSimulation) {
 				if (Configurator.displayLogRatioLogFailOverFail || Configurator.displayLogRatioLogFailOverSuccess )
-					vueController.displayInfo("Action-Echec",
-						memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez, cptModulo));
+				{
+					List<String> temp = memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez, cptModulo);
+					if(temp != null)
+						toDisplayForRatio.addAll(temp);
+				}
 				else
 					memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez, cptModulo);
 			}
+
+			if(!toDisplayForRatio.isEmpty())
+				vueController.displayInfo("Echecs", toDisplayForRatio);
 
 			// Dans le cas ou on veut les filtres en semi step, remis a zero des couleurs.
 			if (Configurator.semiStepProgression)
