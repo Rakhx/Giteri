@@ -1,5 +1,7 @@
 package giteri.network.networkStuff;
 
+import giteri.network.event.INbNodeChangedListener;
+import giteri.network.event.NbNodeChangedEvent;
 import giteri.run.interfaces.Interfaces.DrawerInterface;
 import giteri.run.interfaces.Interfaces.StatAndPlotInterface;
 
@@ -22,7 +24,7 @@ import giteri.run.configurator.Configurator;
  * Mécanisme qui ne met pas à jour systématiquement la représentation du réseau a chaque action des entités.
  * Le fera si une demande de calcul ou d'affichage est faite.
  */
-public class NetworkConstructor extends ThreadHandler {
+public class NetworkConstructor extends ThreadHandler implements INbNodeChangedListener {
 
 	//region Properties
 	DrawerInterface drawer;
@@ -32,7 +34,7 @@ public class NetworkConstructor extends ThreadHandler {
 
 
 	boolean onceOneStep = true;
-	int nbNodeInit = Configurator.nbNode;
+	int nbNodeInit = Configurator.getNbNode();
 	int cmp = 0;
 	int activator;
 
@@ -395,6 +397,14 @@ public class NetworkConstructor extends ThreadHandler {
 		for (int i = 0; i < nbNodeInit; i++) {
 			networkInstance.addNode();
 		}
+	}
+
+	@Override
+	public void handlerNbNodeChanged(NbNodeChangedEvent e) {
+		nbNodeInit = e.nbNode;
+		networkInstance.fullEesetStat();
+		generateNodes();
+
 	}
 
 	//endregion

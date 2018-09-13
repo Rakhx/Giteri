@@ -129,7 +129,7 @@ public interface IExplorationMethod {
 					provider.get(i).gotoMinValue();
 				}
 			}
-			
+
 			return hasGo;
 		}
 	}
@@ -209,7 +209,17 @@ public interface IExplorationMethod {
 
 		@Override
 		public boolean gotoNext() {
-			return false;
+			boolean hasGo = false;
+			for (int i = 0; i < provider.keySet().size(); i++) {
+				if(provider.get(i).gotoNext()){
+					hasGo = true;
+					break;
+				}else {
+					provider.get(i).gotoMinValue();
+				}
+			}
+
+			return hasGo;
 		}
 		
 	}

@@ -6,6 +6,8 @@ import java.util.*;
 
 import giteri.fitting.algo.Result;
 import giteri.fitting.algo.ResultSet;
+import giteri.network.event.INbNodeChangedListener;
+import giteri.network.event.NbNodeChangedEvent;
 import giteri.tool.math.Toolz;
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.network.NetworkProperties;
@@ -29,6 +31,7 @@ import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.BehavTransmEvent;
 import giteri.meme.event.IBehaviorTransmissionListener;
 
+
 /** Classe de configuration pour lancer un fitting
  * ou autre recherche de stabilité.
  *
@@ -39,7 +42,8 @@ import giteri.meme.event.IBehaviorTransmissionListener;
  * de la simulation. Ne change pas pendant un run.
  *
  */
-public class FittingClass implements IBehaviorTransmissionListener, IActionApplyListener {
+public class FittingClass implements IBehaviorTransmissionListener, IActionApplyListener,
+		INbNodeChangedListener {
 
 	//region Variables diverses
 
@@ -58,9 +62,10 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	// Nombre de fois ou on lance un run pour une meme config.
 	public int nbRepetitionByConfig;
 	// Nombre d'action réalisé par les entités avant une collecte de données
-	public int nbActionByStep = Configurator.nbNode * 10;
+	public int nbActionByStep = Configurator.getNbNode() * 10;
 	public int boucleExterneSize = 30;
-	public int nbActionBeforeQuit = 2500 * Configurator.nbNode;
+	public int nbActionBeforeQuit = Configurator.fixedNbAction ? 100000 :
+			2500 * Configurator.getNbNode();
 
 
 	// VARIABLES DE FONCTIONNEMENT
@@ -125,8 +130,22 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	/**	Constructeur.
 	 *
 	 */
-	public FittingClass(WriteNRead wnr, CommunicationModel com, MemeFactory memeF,
-						NetworkFileLoader nfl, WorkerFactory wf, EntiteHandler eh, NetworkConstructor nc, IExplorationMethod explorator){
+	public FittingClass(){
+	}
+
+	/** Besoin de la référence de la fitting avant puor les listeners...
+	 *
+	 * @param wnr
+	 * @param com
+	 * @param memeF
+	 * @param nfl
+	 * @param wf
+	 * @param eh
+	 * @param nc
+	 * @param explorator
+	 */
+	public void KindaConstructor(WriteNRead wnr, CommunicationModel com, MemeFactory memeF,
+							NetworkFileLoader nfl, WorkerFactory wf, EntiteHandler eh, NetworkConstructor nc, IExplorationMethod explorator){
 		resultNetwork = new ResultSet(wnr);
 		this.com = com;
 		this.memeFactory = memeF;
@@ -143,7 +162,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 *
 	 */
 	private void setDefaultValue(){
-		nbRepetitionByConfig = 100;
+		nbRepetitionByConfig = Configurator.nbRepetitionbyRun;
 		nbActionByStep = 50;
 		cfqDensityValuesOnOneRun = new CircularFifoQueue<>(boucleExterneSize);
 		cqLastXActionDone = new CircularFifoQueue<>(circularSize);
@@ -243,6 +262,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 		com.generateGraph(Configurator.initialNetworkForFitting);
 		explorator.apply();
+		// com.generateGraph(Configurator.initialNetworkForFitting);
+
 		entiteHandler.updateMemeAvailableForProperties();
 
 		// & (3) Application de ces paramètres
@@ -839,12 +860,12 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			case DDAVG:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, Configurator.nbNode - 1);
+				distance = distance(valueOne, valueTwo, Configurator.getNbNode() - 1);
 				break;
 			case DDINTERQRT:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, Configurator.nbNode - 1);
+				distance = distance(valueOne, valueTwo, Configurator.getNbNode() - 1);
 				break;
 			case DDARRAY:
 				break;
@@ -857,7 +878,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			case NBEDGES:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, (Configurator.nbNode - 1) * Configurator.nbNode);
+				distance = distance(valueOne, valueTwo, (Configurator.getNbNode() - 1) * Configurator.getNbNode());
 				break;
 			case NBNODES:
 				break;
@@ -959,6 +980,16 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		synchronized(nbTransmissionCount){
 			return nbTransmissionCount;
 		}
+	}
+
+	@Override
+	public void handlerNbNodeChanged(NbNodeChangedEvent e) {
+		// Changement des steps etc
+		nbActionByStep = e.nbNode * 10;
+		nbActionBeforeQuit = 20 * e.nbNode;
+
+		//
+		com.generateGraph(Configurator.initialNetworkForFitting);
 	}
 
 	//endregion

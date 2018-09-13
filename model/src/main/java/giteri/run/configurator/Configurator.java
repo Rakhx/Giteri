@@ -33,7 +33,7 @@ public final class Configurator {
 	// PROPAGATION
 	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
 	public static boolean checkWhenFullPropagate = true; 	// All action spread? affiche en combien d'action
-	public static int checkFullProRefreshRate = 50; // every X step vérification du full propagate
+	public static int checkFullProRefreshRate = 75; // every X step vérification du full propagate
 
 	// SCORE
 	public static int activationCodeForScore = 55;
@@ -46,7 +46,10 @@ public final class Configurator {
 
 	public static EnumExplorationMethod explorator = EnumExplorationMethod.exhaustive; // Type d'exploration de fitting
 	public static MemeList typeOfMemeUseForFitting = MemeList.FITTING; // Peut etre ONMAP, EXISTING, FITTING
-	public static int initialNetworkForFitting = 0; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
+	public static int initialNetworkForFitting = 2; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
+	public static int nbRepetitionbyRun = 30;
+	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
+
 
 	// endregion
 
@@ -54,8 +57,8 @@ public final class Configurator {
 	public static boolean displayFittingProviderApplied = true;	// affiche dans la console apprlications des params:
 	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
-	public static int activationCodeForView = 5;
-	public static boolean displayMemePosessionDuringSimulation = true; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
+	public static int activationCodeForView = 4;
+	public static boolean displayMemePosessionDuringSimulation = false; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
 	// Rafine les affichage de view
 	public static boolean writeNbActionPerSec = false; // pas de fichier nbline
 
@@ -74,7 +77,7 @@ public final class Configurator {
 	public static boolean displayLogAvgDegreeByMeme = false; // combinaisons de meme et leur degré + derniere application + application from start
 	public static boolean displayLogMemeTransmission = false; // qui recoit quel meme
 
-	private static boolean faster = true; // les rations d'echecs sur echec, echec sur réussite...
+	private static boolean faster = false; // les rations d'echecs sur echec, echec sur réussite...
 	public static boolean displayLogRatioLogFailOverFail = faster;
 	public static boolean displayLogRatioLogFailOverSuccess = faster;
 	public static boolean displayLogRatioTryAddOverTryRmv = faster;
@@ -101,7 +104,8 @@ public final class Configurator {
 	//region ancien boolean, osef, etc
 	// moyen osef
 	public static final boolean lotOfNodes = false;
-	public final static int nbNode = lotOfNodes ? 1000 : 100;
+
+	private static int nbNode = lotOfNodes ? 1000 : 100;
 	public static int refreshInfoRate = 500;
 	public final static boolean autoRedoActionIfNoAction = false;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
@@ -341,6 +345,18 @@ public final class Configurator {
 
 	public static synchronized DateFormat getDateFormat() {
 		return dateFormat;
+	}
+
+	private static Object syncNode = new Object();
+	public static int getNbNode() {
+		synchronized (syncNode) {
+			return nbNode;
+		}
+	}
+	public static void setNbNode(int nbnode) {
+		synchronized (syncNode) {
+			nbNode = nbnode;
+		}
 	}
 
 	//endregion

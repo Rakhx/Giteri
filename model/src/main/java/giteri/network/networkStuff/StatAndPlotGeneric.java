@@ -100,7 +100,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		// Qui définira pour la classe de fitting l'espace de recherche
 		IExplorationMethod explorator = null;
 		NetworkProperties networkTarget = null;
-		FittingClass configuration = null;
+		FittingClass configuration = new FittingClass();
 
 		// Dans le cas ou on veut un one shot de l'IHM il faut remplir les listes
 		if(typeOfExplo == EnumExplorationMethod.oneShot && !memeActivationOpt.isPresent())
@@ -112,14 +112,14 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		// Si appelle oneSot, depuis IHM ou depuis JAR
 		else if(typeOfExplo == EnumExplorationMethod.oneShot)
-			explorator = callFromJar(memeActivation, memeProba);
+			explorator = callFromJar(configuration,memeActivation, memeProba);
 
 		// NON FINI
 		else if (typeOfExplo == EnumExplorationMethod.specific)
 			explorator = callSpecificParam();
 
 		// Classe de configuration qui contient tout ce qu'il faut pour faire une simu
-		configuration = new FittingClass(writeNRead, communicationModel,
+		configuration.KindaConstructor(writeNRead, communicationModel,
 				memeFactory, networkFileLoader, workerFactory, entiteHandler, networkConstructor, explorator);
 
 		// ajout de la fitting classe au listener
@@ -165,7 +165,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 *
 	 * @return
 	 */
-	private IExplorationMethod callFromJar(List<Boolean> activation, List<Double> proba){
+	private IExplorationMethod callFromJar(FittingClass fitter, List<Boolean> activation, List<Double> proba){
 		// appelle sec avec un seul jeu de parametre, aux probas fixés
 		Hashtable<Meme, GenericDoubleParameter> memeAndProba = new Hashtable<>();
 		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
@@ -179,6 +179,15 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeAndProba);
 		memeDiffu.setEntiteHandler(entiteHandler);
 		providers.put(0,memeDiffu);
+
+		IModelParameter.ModelParamNbNode nodesChanging = new IModelParameter.ModelParamNbNode(100, 1000, 100);
+		providers.put(1, nodesChanging);
+
+		// l'ordre est important. Rapport au mise a jour de noeud etc dans les structures de données et graphstream
+		nodesChanging.addMemeListListener(networkConstructor);
+		nodesChanging.addMemeListListener(entiteHandler);
+		nodesChanging.addMemeListListener(fitter);
+
 
 		return ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
 	}

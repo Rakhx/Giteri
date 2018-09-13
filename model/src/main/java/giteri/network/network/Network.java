@@ -18,9 +18,10 @@ public class Network {
 	//endregion
 
 	// Constructeur
+
 	public Network(){
-		nodes = new ArrayList<Node>();
-		edges = new ArrayList<Edge>();
+		nodes = new ArrayList<>();
+		edges = new ArrayList<>();
 		updateId = -1;
 	}
 
@@ -30,7 +31,16 @@ public class Network {
 	public synchronized void resetStat(){
 		edges.clear();
 	}
-	
+
+	/** On supprime tous les edges
+	 *
+	 */
+	public synchronized void fullEesetStat(){
+		edges.clear();
+		nodes.clear();
+	}
+
+
 	//region Public methods
 	
 	/** Méthode pour ajouter un edge 

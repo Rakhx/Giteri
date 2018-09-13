@@ -4,6 +4,9 @@ import java.util.*;
 
 import giteri.meme.event.IMemeAvailableListener;
 import giteri.meme.event.MemeAvailableEvent;
+import giteri.network.event.INbNodeChangedListener;
+import giteri.network.event.NbNodeChangedEvent;
+import giteri.run.configurator.Configurator;
 import giteri.tool.math.Toolz;
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
@@ -217,6 +220,72 @@ public interface IModelParameter<T> {
 		}
 	}
 
+	/** CLASSE ABSTRAITE qui définit T comme un double. Défini un champs step pour connaitre la
+	 * vitesse de progression de minvalue a maxvalue
+	 *
+	 */
+	public abstract class AbstractIntParameter extends AbstractModelParameter<Integer>{
+
+		int step;
+		// détermine l'arrondi fait lors de l'ajout de step a la valeur courante.
+		// Problème de précision autrement ( 0.400000001 au lieu de 0.4 )
+		int precision = 4;
+
+		protected AbstractIntParameter(){
+			minValue = 0;
+			value = minValue;
+		}
+
+		public boolean gotoNext(){
+			int nextValue =value + step;
+			if(nextValue <= maxValue){
+				value = nextValue;
+				return true;
+			}
+			return false;
+		}
+
+		public void gotoRandom(){
+			int diff = maxValue - minValue;
+			int nbStepPossible = (diff / step);
+			// Le max est exclu dans la fonction getRandom
+			int stepChoose = Toolz.getRandomNumber(nbStepPossible + 1);
+			value = minValue + stepChoose * step;
+		}
+
+		public String valueString() {
+			return ""+value;
+		}
+
+		public String nameString(){
+			return "Integer";
+		}
+
+		public List<String> getPossibleValue(){
+			List<String> res = new ArrayList<>();
+			int diff = maxValue - minValue;
+			int nbStepPossible = (diff / step);
+			int value;
+			for (int i = 0; i <= nbStepPossible; i++) {
+				value = minValue + i * step;
+				res.add("" + value);
+			}
+
+
+			return res;
+		}
+
+		public void setPossibleValue(String value){
+			int valueToSet = Integer.parseInt(value);
+			this.value = valueToSet;
+		}
+
+		public String getActualValue(){
+			return valueString();
+		}
+	}
+
+
 	/** CLASSE ABSTRAITE qui définit T comme une Map<Meme, P> ou P est un type quelconque, extend de
 	 * AbractModelParameter. Permet d'avoir a nouveau acces au méthode gotoNext etc etc.
 	 *
@@ -369,7 +438,7 @@ public interface IModelParameter<T> {
 
 		public GenericDoubleParameter(Double valeur){
 			value = maxValue = minValue = valeur;
-			step = Double.MAX_VALUE;
+			step = maxValue;
 		}
 
 		public GenericDoubleParameter(Double valeur, Double min, Double max, Double step){
@@ -525,7 +594,6 @@ public interface IModelParameter<T> {
 	 *
 	 */
 	class MemeDiffusionProba extends AbstractMapParameter<GenericDoubleParameter> implements IMemeAvailableListener {
-
 		GenericDoubleParameter defautDoubleParam;
 
 		/** Constructeur sans paramètre.
@@ -639,6 +707,58 @@ public interface IModelParameter<T> {
 		}
 	}
 
+	class ModelParamNbNode extends AbstractIntParameter{
+		private List<INbNodeChangedListener> listenersToNbNodeChanged = new ArrayList<>();
+
+		public ModelParamNbNode(int miniValue, int maxiValue, int stepi){
+			minValue = miniValue;
+			maxValue = maxiValue;
+			value = minValue;
+			step = stepi;
+		}
+
+		@Override
+		public void apply() {
+			if(value != minValue) {
+				Configurator.setNbNode(value);
+				nbNodesChanged(value, "Nouveau nombre de noeud changé par IModelParam.INbNode");
+			}
+		}
+
+		/** Prévient les listeners d'un nouveau nombdre de noeud dans la simulation
+		 *
+		 * @param nbNodes
+		 * @param message
+		 */
+		public void nbNodesChanged(int nbNodes, String message){
+			NbNodeChangedEvent myEvent = new NbNodeChangedEvent(this, nbNodes, message );
+			for (INbNodeChangedListener iNbNodeChangedListener : listenersToNbNodeChanged) {
+				iNbNodeChangedListener.handlerNbNodeChanged(myEvent);
+			}
+		}
+
+		/** Ajout d'un listener a la liste des listeners a prévenir en cas d'event de
+		 * type entity
+		 *
+		 * @param myListener
+		 */
+		public void addMemeListListener(INbNodeChangedListener myListener) {
+			if (!listenersToNbNodeChanged.contains(myListener)) {
+				listenersToNbNodeChanged.add(myListener);
+			}
+		}
+
+		/** Retrait d'un listener depuis la liste des listeners
+		 *
+		 * @param myListener
+		 */
+		public void removeMemeListListener(INbNodeChangedListener myListener) {
+			if (listenersToNbNodeChanged.contains(myListener)) {
+				listenersToNbNodeChanged.remove(myListener);
+			}
+		}
+
+	}
 
 
 }

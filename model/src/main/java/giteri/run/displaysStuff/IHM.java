@@ -1543,7 +1543,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 					String toPut = memeRef + ": [";
 					// Si tout les noeuds possede ce meme
 					if (nodesHavingXoxoMemes.get(meme.toString()) != null
-							&& nodesHavingXoxoMemes.get(meme.toString()).size() == Configurator.nbNode){
+							&& nodesHavingXoxoMemes.get(meme.toString()).size() == Configurator.getNbNode()){
 						toPut += "ALL]";
 					}
 					// Si tout les noeuds ne sont pas de ce type
@@ -1574,7 +1574,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 						// Partie last 100 compte du nombre
 						nbLastActivationByMemesLabel.get(meme.toString()).setText(memeRef + ": "
 								+ countOfLastMemeActivation.get(meme.toString()) + "("
-								+ countOfLastMemeActivation.get(meme.toString()) * 100 / Configurator.nbNode
+								+ countOfLastMemeActivation.get(meme.toString()) * 100 / Configurator.getNbNode()
 								+"%)");
 						nbLastActivationByMemesLabel.get(meme.toString()).setForeground(associatedColor);
 					}

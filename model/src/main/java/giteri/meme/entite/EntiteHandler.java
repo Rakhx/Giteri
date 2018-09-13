@@ -7,6 +7,8 @@ import giteri.meme.event.IBehaviorTransmissionListener;
 import giteri.meme.mecanisme.AgregatorFactory.IAgregator;
 import giteri.meme.mecanisme.AttributFactory.IAttribut;
 import giteri.meme.mecanisme.MemeFactory;
+import giteri.network.event.INbNodeChangedListener;
+import giteri.network.event.NbNodeChangedEvent;
 import giteri.network.network.Network;
 import giteri.network.network.Node;
 import giteri.network.networkStuff.NetworkConstructor;
@@ -23,7 +25,7 @@ import java.util.*;
  * Classe qui gère les entités du réseau.
  *
  */
-public class EntiteHandler extends ThreadHandler {
+public class EntiteHandler extends ThreadHandler implements INbNodeChangedListener {
 
 	//region properties & constructeur
 
@@ -1568,6 +1570,12 @@ public class EntiteHandler extends ThreadHandler {
 			if(myMemes.size() == 2 && myMemes.get(0).equals(myMemes.get(1)))
 				System.out.println("Scandale deux fois le meme");
 		}
+	}
+
+	@Override
+	public void handlerNbNodeChanged(NbNodeChangedEvent e) {
+		entites.clear();
+		bindNodeWithEntite(networkConstruct.getNetwork());
 	}
 
 	public class memeComparatorAscending implements Comparator<Meme> {
