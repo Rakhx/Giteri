@@ -31,6 +31,9 @@ public class MemeProperties{
     public CircularFifoQueue<Meme> lastHundredActionDone;
     public int sizeOfCircularQueue = 100;
 
+    public List<Integer> lastFailActionTried;
+
+
     // Combinaison de meme disponible
     public Map<Integer, ArrayList<Meme>> memeCombinaisonFittingAvailable;
 
@@ -40,6 +43,7 @@ public class MemeProperties{
         nbActivationByMemes = new Hashtable<>();
         countOfLastMemeActivation = new Hashtable<>();
         lastHundredActionDone = new CircularFifoQueue<>(sizeOfCircularQueue);
+        lastFailActionTried = new ArrayList<>();
 
     }
 
@@ -63,6 +67,7 @@ public class MemeProperties{
      * @return
      */
     public List<String> updateActionCount(Meme memeApply, int entiteIndex, String message, int cptModulo){
+        // SUCCES: En cas de réussite de l'action
         if (memeApply != null && !message.contains("Nope"))
         {
             Meme elementRemoveOfCircular = null;
@@ -79,7 +84,7 @@ public class MemeProperties{
             Toolz.addCountToElementInHashArray(countOfLastMemeActivation, memeApply, 1);
         }
 
-        // Dans le cas ou il n'y a pas de meme apply, c'est a dire que l'action d'application du meme a échouée.
+        // ECHEC: Dans le cas ou il n'y a pas de meme apply, c'est a dire que l'action d'application du meme à échouée.
         else if (Configurator.displayLogRatioLogFailOverFail || Configurator.displayLogRatioLogFailOverSuccess )
         {
             int nbWin = 0;
@@ -88,20 +93,33 @@ public class MemeProperties{
                     nbWin += winTimes;
 
             if(Configurator.displayLogRatioLogFailOverFail)
-                if (message.contains("RMLK"))
+                if (message.contains("RMLK")) {
                     cptActionRmvFail++;
-                else if (message.contains("ADLK"))
+                    lastFailActionTried.add(-1);
+                }
+                else if (message.contains("ADLK")) {
                     cptActionAddFail++;
-
+                    lastFailActionTried.add(+1);
+                }
             return Arrays.asList(
                     "Iteration-; "+ cptModulo,
-                    ";Ratio Rmv/Add -;" + (Configurator.displayLogRatioLogFailOverFail? ((double) cptActionRmvFail / cptActionAddFail) : " NC"),
+                    ";Ratio fail Rmv/Add -;" + (Configurator.displayLogRatioLogFailOverFail? ((double) cptActionRmvFail / cptActionAddFail) : " NC"),
                     ";Ratio Fail/success -;" + (Configurator.displayLogRatioLogFailOverSuccess ? ((double) (cptActionRmvFail + cptActionAddFail) / nbWin) : "NC"),
                     ";Aucune action réalisée par l'entité- " + entiteIndex,
                     "Message- " + message);
         }
 
         return null;
+    }
+
+    /** Check des derniers echecs sur une fenetre glissante;
+     *
+     * @return
+     */
+    public List<String> lastFailAction(){
+        List<String> res = new ArrayList<String>(Arrays.asList(""+lastFailActionTried.stream().reduce(0,Integer::sum)));
+        lastFailActionTried.clear();
+        return res;
     }
 
     // region Ecriture dans fichier

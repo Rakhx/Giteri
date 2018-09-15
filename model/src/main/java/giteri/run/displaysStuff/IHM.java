@@ -358,7 +358,9 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 	@Override
 	public void displayInfo(String type, List<String> info) {
-
+		// méthode crasseuse
+		if(type == "FAILSTUFF")
+			time1.setText(info.stream().reduce("", String::concat));
 	}
 
 	/** Affichage des éléments concernants les memes qui sont joués sur la map
@@ -369,11 +371,9 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	 * @param lastXMemeApplied
 	 */
 	public void displayXLastAction(int nbAction, Map<String, Integer> nbActivByMeme, Map<String,Integer> nbLastActivByMeme, List<String> lastXMemeApplied){
-
 		lastHundredActionDone = lastXMemeApplied;
 		nbActivationByMemes = nbActivByMeme;
 		countOfLastMemeActivation = nbLastActivByMeme;
-
 		updateInformationDisplay();
 	}
 

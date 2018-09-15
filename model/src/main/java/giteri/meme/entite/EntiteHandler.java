@@ -752,17 +752,18 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private String runEntite() {
 
 		String rez;
+		Meme memeAction;
+
 		synchronized (workerFactory.waitingForReset) {
-			Meme memeAction;
 			toDisplayForRatio.clear();
+
 			// CHOIX D'UNE ENTITÉE AU HASARD
 			Entite entiteActing = selectActingEntiteV2();
 			if(Configurator.debugEntiteHandler)
 				System.out.println("[EH.runEntite]- entite choisie " + entiteActing.getIndex());
 			if (entiteActing == null) {
 				if(Configurator.debugEntiteHandler) System.err.println("[EH.runEntite()]- Aucune entité sélectionnée");
-				return ("Nope pas d'entite prete");
-			}
+				return ("Nope pas d'entite prete");  }
 
 			// CHOIX DE L'ACTION POUR CETTE ENTITE
 			memeAction = actionSelectionRulesVersion(entiteActing);
@@ -774,7 +775,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			if(Configurator.debugEntiteHandler)
 				System.out.println("[EH.runEntite]- resultat de l'action" + rez);
 
-			// Concernant affichage et debugage
+			// AFFICHAGE ET DEBUGGUAGE
 			if (Configurator.displayLogRatioTryAddOverTryRmv) {
 				if (memeAction != null)
 				{
@@ -782,12 +783,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 						cptActionAddTried++;
 					else if (memeAction.action.getActionType() == ActionType.RETRAITLIEN)
 						cptActionRmvTried++;
+
+					toDisplayForRatio.add(memeAction.action.getActionType().name());
+					toDisplayForRatio.add("AddTried/rmvTried;" +(double) cptActionAddTried / cptActionRmvTried) ;
 				}
-
-				toDisplayForRatio.add("AddTried/rmvTried;" +(double) cptActionAddTried / cptActionRmvTried) ;
-
-				//vueController.displayInfo("TriedAddOverRemove", Arrays.asList(""+ (double) cptActionAddTried / cptActionRmvTried));
-				// System.out.println("Tried Add/rmv " + (double) cptActionAddTried / cptActionRmvTried);
 			}
 
 			// Si on veut afficher les X dernieres actions entreprises & action depuis le début
@@ -800,10 +799,14 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				}
 				else
 					memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez, cptModulo);
+
+				if(cptModulo % (Configurator.refreshInfoRate * 25)== 0)
+					vueController.displayInfo("FAILSTUFF", memeProperties.lastFailAction());
 			}
 
 			if(!toDisplayForRatio.isEmpty())
 				vueController.displayInfo("Echecs", toDisplayForRatio);
+
 
 			// Dans le cas ou on veut les filtres en semi step, remis a zero des couleurs.
 			if (Configurator.semiStepProgression)
@@ -855,7 +858,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @return le meme sélectionné
 	 */
 	private Meme actionSelectionRulesVersion(Entite movingOne) {
-		return movingOne.chooseAction();
+		if(!Configurator.oneAddForOneRmv)
+			return movingOne.chooseAction();
+		else
+			return actionSelectionControlledVersion(movingOne);
 	}
 
 	/** Application de l'action de l'entité
@@ -1026,11 +1032,11 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		return actionDone;
 	}
 
-	/** Mise a jour de la liste des X derniers meme applied ainsi que la liste
-	 * des memes applied depuis le début du run.
-	 * Appelé a chaque action réalisée.
-	 * @param memeApply
-	 */
+//	/** Mise a jour de la liste des X derniers meme applied ainsi que la liste
+//	 * des memes applied depuis le début du run.
+//	 * Appelé a chaque action réalisée.
+//	 * @param memeApply
+//	 */
 //	private void updateActionCount(Meme memeApply, int entiteIndex, String message){
 //
 //		if (memeApply != null)
@@ -1332,7 +1338,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(0, notLinked);
 		agregators.put(1, mineInf);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add+", 1, false, add, attributs,KVAttributAgregator, false ,false);
+		memeFactory.registerMemeAction("Add+", 1, false, add, attributs,KVAttributAgregator, true ,false);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
@@ -1344,7 +1350,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(0, notLinked);
 		agregators.put(1, theMost);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add∞", .01, false, add, attributs, KVAttributAgregator, false ,false);
+		memeFactory.registerMemeAction("Add∞", 1, false, add, attributs, KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		agregators.put(0, hopAWay);
@@ -1355,7 +1361,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("AddØ",1, false, add, attributs, KVAttributAgregator, true, true);
+		memeFactory.registerMemeAction("AddØ",1, false, add, attributs, KVAttributAgregator, false, true);
 		agregators.put(2, random);
 		if(Configurator.initializeDefaultBehavior)
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, true, add, attributs, KVAttributAgregator, false, false);
@@ -1366,7 +1372,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		memeFactory.registerMemeAction("RmvØ",1, false, remove, attributs,  KVAttributAgregator, true, true);
 		agregators.put(2, random);
 		if(Configurator.initializeDefaultBehavior) {
-			removeRandom = memeFactory.registerMemeAction("RmvØ-neutral",0, true, remove, attributs,  KVAttributAgregator, false, false);
+		removeRandom = memeFactory.registerMemeAction("RmvØ-neutral",0, true, remove, attributs,  KVAttributAgregator, false, false);
 		}
 
 		agregators.clear();
@@ -1384,7 +1390,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();
 		agregators.put(0, hopAWay);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("RmvØ-2hop", .2, false, remove, attributs, KVAttributAgregator,false ,false);
+		memeFactory.registerMemeAction("RmvØ-2hop", 1, false, remove, attributs, KVAttributAgregator,false ,false);
 
 		agregators.clear();
 		// memeFactory.getMemeAction("Puri",0,puri, attributs,

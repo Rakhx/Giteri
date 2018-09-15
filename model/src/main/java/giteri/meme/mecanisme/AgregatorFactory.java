@@ -241,7 +241,6 @@ public class AgregatorFactory {
 			entites.addAll(resultat);
 		}
 
-		@Override
 		public AgregatorType getEnumType() {
 			return AgregatorType.MINESUP;
 		}
@@ -250,7 +249,6 @@ public class AgregatorFactory {
 			return "MineSup";
 		}
 
-		@Override
 		public String getFourCharName() {
 			return "MNSP";
 		}
@@ -261,12 +259,12 @@ public class AgregatorFactory {
 	 */
 	public class MineInf implements IAgregator{
 
-
-		@Override
 		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
-			ArrayList<Entite> resultat = new ArrayList<Entite>();
+			ArrayList<Entite> resultat = new ArrayList<>();
 			for (Entite entite : entites) {
-				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) == 1)
+				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) == 1 ||
+						(Configurator.strictEqualityInComparaison ? false :
+						attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) == 0))
 				{
 					resultat.add(entite);
 				}
@@ -276,7 +274,6 @@ public class AgregatorFactory {
 			entites.addAll(resultat);
 		}
 
-		@Override
 		public AgregatorType getEnumType() {
 			return AgregatorType.MINEINF;
 		}
@@ -285,7 +282,6 @@ public class AgregatorFactory {
 			return "MineInf";
 		}
 
-		@Override
 		public String getFourCharName() {
 			return "MNIF";
 		}

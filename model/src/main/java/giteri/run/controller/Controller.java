@@ -92,7 +92,7 @@ public class Controller {
 		 */
 		public void addDensityOverProbaValue(double x, double y)
 		{
-			for (Interfaces.IView vue:  vues) {
+			for (Interfaces.IView vue: vues) {
 				vue.addValueToDensityOverProbaSerie(x,y);
 			}
 		}

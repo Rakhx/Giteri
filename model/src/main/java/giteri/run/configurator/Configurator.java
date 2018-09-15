@@ -14,7 +14,7 @@ public final class Configurator {
 	// La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
 	// depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent
 	// cette configuration initiale
-	public static boolean withGraphicalDisplay = false;
+	public static boolean withGraphicalDisplay = true;
 	public static boolean jarMode = true;
 	public static boolean systemPaused = false;
 	public static boolean writeNetworkResultOnFitting = true; // Screenshot, network.csv...
@@ -27,8 +27,12 @@ public final class Configurator {
 	// FONCTIONNEMENT
 	public static boolean manuelNextStep = false; // pas de passage au run suivant, il faut appuyer sur next
 	public static boolean autoPauseIfNexted = false; // mise en pause automatique avant un changement de run. Il faut appuyer sur next
-	public static boolean initializeDefaultBehavior = false;	//fluidité
 	public static boolean displayPlotWhileSimulation = !jarMode; // Affichage des DD et densité
+	public static boolean initializeDefaultBehavior = true;	//fluidité
+	public static boolean oneAddForOneRmv = true;
+
+	// MEME
+	public static boolean strictEqualityInComparaison = true;
 
 	// PROPAGATION
 	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
@@ -57,16 +61,17 @@ public final class Configurator {
 	public static boolean displayFittingProviderApplied = true;	// affiche dans la console apprlications des params:
 	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
-	public static int activationCodeForView = 4;
-	public static boolean displayMemePosessionDuringSimulation = false; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
-	// Rafine les affichage de view
+	public static int activationCodeForView = 5;
+	public static boolean displayMemePosessionDuringSimulation = true; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
 	public static boolean writeNbActionPerSec = false; // pas de fichier nbline
+	public static boolean writeFailDensityLink = true; // fichier d'info sur les Fails X density variation
 
-	public static String repByDefault = "defaultRep";
+
+	public static String repByDefault = "DefaultRep";
+	public static String repForFitting = "Stability";
 	public static String fileNameCsvSimple = "NetworkCSV";
 	public static String fileNameCsvDetail = "NetworkDetailsCSV";
 	public static String fileNameMeme = "memeCSV";
-
 
 	// endregion
 
@@ -77,7 +82,7 @@ public final class Configurator {
 	public static boolean displayLogAvgDegreeByMeme = false; // combinaisons de meme et leur degré + derniere application + application from start
 	public static boolean displayLogMemeTransmission = false; // qui recoit quel meme
 
-	private static boolean faster = false; // les rations d'echecs sur echec, echec sur réussite...
+	private static boolean faster = true; // les rations d'echecs sur echec, echec sur réussite...
 	public static boolean displayLogRatioLogFailOverFail = faster;
 	public static boolean displayLogRatioLogFailOverSuccess = faster;
 	public static boolean displayLogRatioTryAddOverTryRmv = faster;
@@ -106,7 +111,7 @@ public final class Configurator {
 	public static final boolean lotOfNodes = false;
 
 	private static int nbNode = lotOfNodes ? 1000 : 100;
-	public static int refreshInfoRate = 500;
+	public static int refreshInfoRate = 10;
 	public final static boolean autoRedoActionIfNoAction = false;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
 	public static boolean useMemePropagationProba = true;
