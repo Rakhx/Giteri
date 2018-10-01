@@ -1,9 +1,6 @@
 package giteri.meme.mecanisme;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import giteri.tool.math.Toolz;
 import giteri.run.configurator.Configurator;
@@ -52,6 +49,8 @@ public class AgregatorFactory {
 				return new random();
 			case HOPAWAY:
 				return new HopWay();
+			case TRIANGLE:
+				return new Triangle();
 
 			default:
 				return null;
@@ -232,7 +231,9 @@ public class AgregatorFactory {
 		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			ArrayList<Entite> resultat = new ArrayList<Entite>();
 			for (Entite entite : entites) {
-				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) == -1){
+				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) == -1 ||
+						(Configurator.strictEqualityInComparaison ? false :
+								attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) == 0)){
 					resultat.add(entite);
 				}
 			}
@@ -468,10 +469,11 @@ public class AgregatorFactory {
 
 			if(Configurator.debugHopAway){
 				String result = "before Entites";
+
 				for (Entite entite : entites) {
 					result +=":" + entite.getIndex();
 				}
-				System.out.println(result);
+				System.out.println(result); // l'ensemble des entites pré filtrage
 			}
 
 			getNeightboor(entiteResult, entites, asker, reach);
@@ -523,11 +525,48 @@ public class AgregatorFactory {
 				}
 			}
 
+			if(deepToGo == 0)
 			entiteToReturn.addAll(entiteAccepted);
-			if(deepToGo > 0)
+			else if(deepToGo > 0)
 				for (Entite entite : entiteAccepted)
 					getNeightboor(entiteToReturn, entiteSearchSpace, entite, deepToGo);
 		}
 
 	}
+
+	/** retourne les noeuds liés entre eux de ceux pris en param.
+	 * Plus optimal si une réduction a déja été appelé avant
+	 */
+	public class Triangle extends Agregator implements IAgregator {
+
+		@Override
+		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+			Set<Entite> resultat = new HashSet<>();
+
+			for (Entite entite : entites) {
+				for (Entite entiteCo : entite.getConnectedEntite()) {
+					if(asker.getConnectedEntite().contains(entiteCo))
+						resultat.add(entiteCo);
+				}
+			}
+
+			entites.retainAll(resultat);
+		}
+
+		@Override
+		public AgregatorType getEnumType() {
+			return AgregatorType.TRIANGLE;
+		}
+
+		@Override
+		public String getFourCharName() {
+			return "GL";
+		}
+
+		public String toString(){
+			return "Triangle";
+		}
+
+	}
+
 }

@@ -44,6 +44,7 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.DefaultFormatter;
+import javax.swing.text.html.Option;
 
 import giteri.tool.math.Toolz;
 import giteri.meme.mecanisme.MemeFactory;
@@ -89,7 +90,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	// Huml, devrait passer par communicationModel
 	Interfaces.DrawerInterface drawerGraphStream;
 
-
 	WriteNRead writeNRead;
 
 	// à voir avec les éléments d'interface
@@ -108,8 +108,12 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	JPanel jpPaneTwo;
 	public JLabel jlDensityLabel;
 	public JLabel jlDensityMaxLabel;
+	public JLabel jlDensitySD;
 	public double densityMaxValue;
+	public double sdDensity;
+	private ArrayList<Double> densityValues;
 	private double densityValue;
+	private double temp = 0.;
 
 	public Hashtable<String, JLabel> times;
 	public JLabel time1, time2, time3, time4, time5;
@@ -231,6 +235,8 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		nodesHavingXoxoMemesLabel = new Hashtable<String, JLabel>();
 		lastActionRatioLabel = new JLabel();
 		jlScore = new JLabel();
+		densityValues = new ArrayList<>();
+
 
 		memesTitle = new Hashtable<String, Meme>();
 		this.setSelectedMeme(existingMeme);
@@ -927,8 +933,11 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		jlDensityLabel.setText("DENSITY");
 		jlDensityMaxLabel = new JLabel();
 		jlDensityMaxLabel.setText("DENSITY MAX");
+		jlDensitySD = new JLabel();
+		jlDensityMaxLabel.setText("DENSITY SD");
 		panel.add(jlDensityLabel);
 		panel.add(jlDensityMaxLabel);
+		panel.add(jlDensitySD);
 
 		return panel;
 	}
@@ -1599,10 +1608,18 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 				}
 
 				seriesDensity.add(compteurSerieDensity++, netProp.getDensity());
-				if (refreshDDArray) {
+				if (refreshDDArray)
 					displayDDChart(netProp.getDd());
+				if(Configurator.displayOnIHMDensitySD)
+				{
+					densityValues.add(netProp.getDensity());
+					try {
+						temp = Toolz.getNumberCutToPrecision(Toolz.getDeviation(densityValues, Optional.ofNullable(null)), 4);
+					}catch (Exception e){}
 
+					jlDensitySD.setText("SD density: " + temp);
 				}
+
 			}catch (Exception e){
 				if(!Configurator.autrucheMode) 	System.err.println("Erreur de mise a jour de l'interface "+ e.getMessage());
 			}

@@ -512,7 +512,7 @@ public class Toolz {
 	public static double getNumberCutToPrecision(Double input, int precision){
 		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.getDefault());
 		otherSymbols.setDecimalSeparator('.');
-		// otherSymbols.setGroupingSeparator('.');
+		// otherSymbols.setGroupingSeparator(',');
 		DecimalFormat decimal = new DecimalFormat("", otherSymbols);
 		decimal.setMaximumFractionDigits(precision); // arrondi à 2 chiffres apres la virgules
 		decimal.setMinimumFractionDigits(0);

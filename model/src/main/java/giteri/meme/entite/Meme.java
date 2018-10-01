@@ -35,7 +35,8 @@ public class Meme implements Serializable, Comparable<Meme>{
 	 * @param attributs
 	 * @param KVAttributLAgregator
 	 */
-	public Meme(String name, double probaOfTransmission,boolean fluidite, IAction action, ArrayList<IAttribut> attributs, Hashtable<String, Hashtable<Integer, IAgregator>> KVAttributLAgregator){
+	public Meme(String name, double probaOfTransmission,boolean fluidite, IAction action, ArrayList<IAttribut> attributs,
+				Hashtable<String, Hashtable<Integer, IAgregator>> KVAttributLAgregator){
 		this.name = name;
 		this.action = action;
 		this.attributs = attributs;

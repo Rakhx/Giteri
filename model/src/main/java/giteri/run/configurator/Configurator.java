@@ -28,11 +28,12 @@ public final class Configurator {
 	public static boolean manuelNextStep = false; // pas de passage au run suivant, il faut appuyer sur next
 	public static boolean autoPauseIfNexted = false; // mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	public static boolean displayPlotWhileSimulation = !jarMode; // Affichage des DD et densité
-	public static boolean initializeDefaultBehavior = true;	//fluidité
-	public static boolean oneAddForOneRmv = true;
+	public static boolean initializeDefaultBehavior = false;	//fluidité
+	public static boolean oneAddForOneRmv = false; // Joue tour a tour un ajout d'un retrait
+	public static boolean onlyOneOfEachAction = false; // Réduit le nombre d'action a
 
 	// MEME
-	public static boolean strictEqualityInComparaison = true;
+	public static boolean strictEqualityInComparaison = false; // FALSE : >= || TRUE : >
 
 	// PROPAGATION
 	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
@@ -50,7 +51,7 @@ public final class Configurator {
 
 	public static EnumExplorationMethod explorator = EnumExplorationMethod.exhaustive; // Type d'exploration de fitting
 	public static MemeList typeOfMemeUseForFitting = MemeList.FITTING; // Peut etre ONMAP, EXISTING, FITTING
-	public static int initialNetworkForFitting = 2; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
+	public static int initialNetworkForFitting = 0; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
 	public static int nbRepetitionbyRun = 30;
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
 
@@ -61,11 +62,11 @@ public final class Configurator {
 	public static boolean displayFittingProviderApplied = true;	// affiche dans la console apprlications des params:
 	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
-	public static int activationCodeForView = 5;
+	public static int activationCodeForView = 1;
 	public static boolean displayMemePosessionDuringSimulation = true; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
 	public static boolean writeNbActionPerSec = false; // pas de fichier nbline
-	public static boolean writeFailDensityLink = true; // fichier d'info sur les Fails X density variation
 
+	public static boolean writeFailDensityLink = false; // fichier d'info sur les Fails X density variation
 
 	public static String repByDefault = "DefaultRep";
 	public static String repForFitting = "Stability";
@@ -73,6 +74,7 @@ public final class Configurator {
 	public static String fileNameCsvDetail = "NetworkDetailsCSV";
 	public static String fileNameMeme = "memeCSV";
 
+	public static boolean displayOnIHMDensitySD = false;
 	// endregion
 
 	// region Affichage log
@@ -219,7 +221,8 @@ public final class Configurator {
 		NOTLINKED,
 		LINKED,
 		RANDOM,
-		HOPAWAY;
+		HOPAWAY,
+		TRIANGLE
 	}
 
 	/** Ajout lien...

@@ -228,15 +228,17 @@ public class ActionFactory{
 		public String applyAction(Entite asker, Set<Entite> cibles) {
 			String actionDone = "";
 
-			// Va choisir une cible parmi celle disponible.
-			Entite cible = Toolz.getRandomElement(cibles);
+			//if(Toolz.rollDice(.9)) {
+				// Va choisir une cible parmi celle disponible.
+				Entite cible = Toolz.getRandomElement(cibles);
 
-			// Application de l'action
-			if (applier.removeLink(asker, cible)) {
-				actionDone += this.toString() + " " + asker.getIndex() + " => " + cible.getIndex();
-			}
-			if(actionDone.isEmpty()) actionDone = "Nope, lien inexistant";
+				// Application de l'action
+				if (applier.removeLink(asker, cible)) {
+					actionDone += this.toString() + " " + asker.getIndex() + " => " + cible.getIndex();
+				}
 
+				if (actionDone.isEmpty()) actionDone = "Nope, lien inexistant";
+			//}
 			return actionDone;
 		}
 

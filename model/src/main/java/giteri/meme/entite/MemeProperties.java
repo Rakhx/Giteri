@@ -6,6 +6,7 @@ import giteri.meme.event.IMemeAvailableListener;
 import giteri.meme.event.MemeAvailableEvent;
 import giteri.run.configurator.Configurator;
 import giteri.tool.math.Toolz;
+import giteri.tool.objects.ObjectRef;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import java.io.File;
@@ -103,7 +104,7 @@ public class MemeProperties{
                 }
             return Arrays.asList(
                     "Iteration-; "+ cptModulo,
-                    ";Ratio fail Rmv/Add -;" + (Configurator.displayLogRatioLogFailOverFail? ((double) cptActionRmvFail / cptActionAddFail) : " NC"),
+                    ";Ratio fail Rmv/Add -;" + (Configurator.displayLogRatioLogFailOverFail ? ((double) cptActionRmvFail / cptActionAddFail) : " NC"),
                     ";Ratio Fail/success -;" + (Configurator.displayLogRatioLogFailOverSuccess ? ((double) (cptActionRmvFail + cptActionAddFail) / nbWin) : "NC"),
                     ";Aucune action réalisée par l'entité- " + entiteIndex,
                     "Message- " + message);
@@ -114,12 +115,13 @@ public class MemeProperties{
 
     /** Check des derniers echecs sur une fenetre glissante;
      *
-     * @return
+     * @return la somme des derniers fail, rmv étant -1, add +1
      */
-    public List<String> lastFailAction(){
-        List<String> res = new ArrayList<String>(Arrays.asList(""+lastFailActionTried.stream().reduce(0,Integer::sum)));
+    public int lastFailAction(ObjectRef<Integer> nbAction){
+        nbAction.setValue(lastFailActionTried.size());
+        int sumOfFail = lastFailActionTried.stream().reduce(0,Integer::sum);
         lastFailActionTried.clear();
-        return res;
+        return sumOfFail;
     }
 
     // region Ecriture dans fichier

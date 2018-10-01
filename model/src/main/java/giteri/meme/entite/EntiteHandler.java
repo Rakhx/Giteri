@@ -18,6 +18,7 @@ import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.*;
 import giteri.run.controller.Controller.VueController;
 import giteri.tool.math.Toolz;
+import giteri.tool.objects.ObjectRef;
 
 import java.util.*;
 
@@ -43,17 +44,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private List<Meme> memeFittingApplied;
 	private boolean allTransmitted = false;
 
-//	private Map<Integer, ArrayList<Meme>> memeCombinaisonFittingAvailable;
-
-	// Liste des memes applied sur les X derniers actions et depuis le début de la simu
-	// Nombre de fois ou le meme a été appelé
-	//public Map<Meme, Integer> nbActivationByMemes;
-	// Nombre de fois ou le meme a été appelé sur les 20 dernieres actions
-	//public Map<Meme, Integer> countOfLastMemeActivation;
-	// Sur les 100 dernières actions, quel meme a été appelé
-	//public CircularFifoQueue<Meme> lastHundredActionDone;
-	//public int sizeOfCircularQueue = 100;
-
 	public MemeProperties memeProperties;
 
 	// Listener pour les évènements issu de l'obtention de meme ou application
@@ -70,8 +60,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private int cptActionAddTried = 1, cptActionRmvTried = 1,cptActionAddFail = 1, cptActionRmvFail = 1;
 	private ActionType lastAction = ActionType.RETRAITLIEN;
 	private int nbActionBySecond;
-	private List<String> toDisplayForRatio;
-
+	private List<String> toDisplayForRatio; // String pour affichage en utilisant la vueManager
+	private double lastDensity;
+	private int sumFailAction;
+	private ObjectRef<Integer> nbFail = new ObjectRef<>(0);
 	/** Constructeur sans param.
 	 *
 	 */
@@ -166,28 +158,39 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			checkAPM();
 		}
 		cptModulo++;
-		if (cptModulo % (Configurator.refreshInfoRate * 25) == 0) {
 
+		// Indicateur meme repartition, etc.
+		if (cptModulo % (Configurator.refreshInfoRate * 25) == 0) {
 			if (Configurator.displayMemePosessionDuringSimulation) {
 				vueController.displayMemeUsage(cptModulo,
 						memeProperties.getNbActivationByMemes(),
 						memeProperties.countOfLastMemeActivation,
-						memeProperties.lastHundredActionDone);
-			}
+						memeProperties.lastHundredActionDone); }
 
-			if (Configurator.displayLogAvgDegreeByMeme) {
+			if (Configurator.displayLogAvgDegreeByMeme)
 				vueController.displayInfo("AvgDgrByMeme", Arrays.asList(checkPropertiesByMemePossession()));
-			}
 		}
 
 		// Verification de la propagation totale des memes initiaux
-		if(Configurator.checkWhenFullPropagate && cptModulo % Configurator.checkFullProRefreshRate == 0){
-			if(!allTransmitted && areAllMemeTransmitted()) {
-				vueController.displayInfo("Propagation", Arrays.asList("ALL TRANSMISTED IN ;" + cptModulo));
+		if(!allTransmitted && Configurator.checkWhenFullPropagate && cptModulo % Configurator.checkFullProRefreshRate == 0) {
+//			if(areAllMemeTransmitted()) {
+//                allTransmitted = true;
+//                vueController.displayInfo("Propagation", Arrays.asList("ALL TRANSMISTED IN ;" + cptModulo));
+//			}
+
+			int resDetail = areAllMemeTransmittedDetails();
+			if ((resDetail & 1) == 0){
+				System.out.println("all add transmitted");
+				vueController.displayInfo("Propagation", Arrays.asList("ALL ADD TRANSMISTED IN ;" + cptModulo));
+		}
+			if((resDetail & 2) == 0) {
+				System.out.println("all rmv transmitted");
+				vueController.displayInfo("Propagation", Arrays.asList("ALL RMV TRANSMISTED IN ;" + cptModulo));
+			}
+			if((resDetail & 3) == 0){
 				allTransmitted = true;
 			}
 		}
-
 	}
 
 	//endregion
@@ -341,6 +344,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			entite.resetStat();
 		}
 
+		lastDensity = 0;
 		cptModulo = 0;
 		cptActionAddTried = 1;
 		cptActionRmvTried = 1;
@@ -800,8 +804,16 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				else
 					memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez, cptModulo);
 
-				if(cptModulo % (Configurator.refreshInfoRate * 25)== 0)
-					vueController.displayInfo("FAILSTUFF", memeProperties.lastFailAction());
+				if(cptModulo % (Configurator.refreshInfoRate * 25)== 0) {
+
+                    sumFailAction =  memeProperties.lastFailAction(nbFail);
+                    //vueController.displayInfo("FAILSTUFF", Arrays.asList("" + sumFailAction));
+
+					if(Configurator.writeFailDensityLink)
+                    	vueController.displayInfo("failXDensity", getFailXDensity( nbFail.getValue(),
+                            networkConstruct.updatePreciseNetworkProperties
+                            (Configurator.getIndicateur(NetworkAttribType.DENSITY)).getDensity(),sumFailAction));
+                }
 			}
 
 			if(!toDisplayForRatio.isEmpty())
@@ -1004,9 +1016,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 							if (entite.receiveMeme(selectedMeme))
 								eventMemeChanged(entite, selectedMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
 						}
-						else
-							// ou transmission du behavior appliqué
-						if (entite.receiveMeme(memeAction))
+						// ou transmission du behavior appliqué
+						else if (entite.receiveMeme(memeAction))
 							eventMemeChanged(entite, memeAction,Configurator.MemeActivityPossibility.AjoutMeme.toString());
 					}
 
@@ -1094,6 +1105,37 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		return true;
 	}
+
+	/** Vérifie si les memes d'ajout // de retrait sont tous transmis.
+	 *
+	 * @return 1er bit pour les ajout, 2er les retrait
+	 */
+	private int areAllMemeTransmittedDetails(){
+		int res = 0;
+		int nothere = 0;
+		boolean add = true, rmv = true, addtmp, rmvtmp;
+		for (Entite entite: entitesActive) {
+			if(add || rmv) {
+				addtmp = rmvtmp = false;
+				for (Meme myMeme : entite.getMyMemes()) {
+					if (add && myMeme.getAction().getActionType() == ActionType.AJOUTLIEN) {
+						addtmp = true;
+					}
+					if (rmv && myMeme.getAction().getActionType() == ActionType.RETRAITLIEN) {
+						rmvtmp = true;
+					}
+				}
+				add &= addtmp;
+				rmv &= rmvtmp;
+			}else // si add & rmv FALSE
+				return 0;
+		}
+
+		if(add) res += 1;
+		if(rmv) res += 2;
+		return res;
+	}
+
 
 	/** Donne des memes aux entités. Ici chaque meme est donnée une fois pour une
 	 * entité dans le réseau.
@@ -1331,6 +1373,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		AgregatorType mineSup = AgregatorType.MINESUP;
 		AgregatorType random = AgregatorType.RANDOM;
 		AgregatorType hopAWay = AgregatorType.HOPAWAY;
+		AgregatorType triangle = AgregatorType.TRIANGLE;
+
 		AgregatorType theMost = AgregatorType.THEMOST;
 		KVAttributAgregator.put(degree, agregators);
 
@@ -1338,7 +1382,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(0, notLinked);
 		agregators.put(1, mineInf);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add+", 1, false, add, attributs,KVAttributAgregator, true ,false);
+		memeFactory.registerMemeAction("Add+", 1, false, add, attributs,KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
@@ -1350,18 +1394,20 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(0, notLinked);
 		agregators.put(1, theMost);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add∞", 1, false, add, attributs, KVAttributAgregator, false ,false);
+		memeFactory.registerMemeAction("Add∞", 1, false, add, attributs, KVAttributAgregator, false,false);
 
 		agregators.clear();
 		agregators.put(0, hopAWay);
 		agregators.put(1, notLinked);
-		agregators.put(2, random);
+		agregators.put(2, theMost);
+		agregators.put(3, mineInf);
+		agregators.put(4, random);
 		memeFactory.registerMemeAction("AddØ-Hop", 1, false, add, attributs,KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("AddØ",1, false, add, attributs, KVAttributAgregator, false, true);
+		memeFactory.registerMemeAction("AddØ",1, false, add, attributs, KVAttributAgregator, true, false);
 		agregators.put(2, random);
 		if(Configurator.initializeDefaultBehavior)
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, true, add, attributs, KVAttributAgregator, false, false);
@@ -1369,11 +1415,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("RmvØ",1, false, remove, attributs,  KVAttributAgregator, true, true);
+		memeFactory.registerMemeAction("RmvØ",1, false, remove, attributs,  KVAttributAgregator, true, false);
 		agregators.put(2, random);
-		if(Configurator.initializeDefaultBehavior) {
+		if(Configurator.initializeDefaultBehavior)
 		removeRandom = memeFactory.registerMemeAction("RmvØ-neutral",0, true, remove, attributs,  KVAttributAgregator, false, false);
-		}
 
 		agregators.clear();
 		agregators.put(0, linked);
@@ -1388,18 +1433,17 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		memeFactory.registerMemeAction("Rmv+", 1, false, remove, attributs, KVAttributAgregator, false ,false);
 
 		agregators.clear();
-		agregators.put(0, hopAWay);
-		agregators.put(1, random);
+		agregators.put(0, linked);
+		agregators.put(1, triangle);
+		agregators.put(2, random);
 		memeFactory.registerMemeAction("RmvØ-2hop", 1, false, remove, attributs, KVAttributAgregator,false ,false);
 
 		agregators.clear();
-		// memeFactory.getMemeAction("Puri",0,puri, attributs,
-		// KVAttributAgregator, true);
+		memeFactory.registerMemeAction("Puri",0,false, puri, attributs, KVAttributAgregator, false, false);
 
 		for (Meme memeDispo : memeFactory.getMemes(Configurator.MemeList.EXISTING,Configurator.ActionType.ANYTHING)) {
 			memeTranslationReadable.put(memeDispo.toFourCharString(),memeDispo.getName());
 		}
-
 	}
 
 	/**
@@ -1475,6 +1519,17 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	//endregion
 
 	//region divers
+
+    /** indicateurs liant echec d'application de meme et variation de densité.
+     *
+     * @return
+     */
+    private List<String> getFailXDensity(int nbActionTaken,double newDensity, int failSum){
+        List<String> resultat = new ArrayList<>(Arrays.asList("After X failActions",""+nbActionTaken,"densityVaration[New-Old]", "" + (newDensity-lastDensity), "FailSum[ifNeg=rmvFail]", "" + failSum));
+        lastDensity = newDensity;
+        return resultat;
+
+    }
 
 	/**
 	 * Utilisé pour mettre a jour l'affichage du nombre d'action par seconde

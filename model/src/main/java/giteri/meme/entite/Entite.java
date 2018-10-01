@@ -46,10 +46,8 @@ public class Entite implements Comparable<Entite>{
 		associatedNode = null;
 		myMemes = new ArrayList<>();
 		intervalOfSelection = new Hashtable<>();
-//		connectedTimeNodes = new Hashtable<Entite, Integer>();
 		connectedNodes = new HashSet<>();
 		breederOn = new HashSet<>();
-		//probaLearning = Configurator.getProbaLearning(Configurator.probaEntiteLearning * - 1);
 		eh = ent;
 	}
 
@@ -295,13 +293,13 @@ public class Entite implements Comparable<Entite>{
 			for (Meme meme : getMyMemes()) {
 				if (meme.isFluide())
 					return false;
-
 			}
 			return true;
 		}
 
 		return false;
 	}
+
 
 
 	/**
