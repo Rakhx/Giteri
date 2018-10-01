@@ -182,7 +182,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			if ((resDetail & 1) == 0){
 				System.out.println("all add transmitted");
 				vueController.displayInfo("Propagation", Arrays.asList("ALL ADD TRANSMISTED IN ;" + cptModulo));
-		}
+			}
 			if((resDetail & 2) == 0) {
 				System.out.println("all rmv transmitted");
 				vueController.displayInfo("Propagation", Arrays.asList("ALL RMV TRANSMISTED IN ;" + cptModulo));
@@ -1098,7 +1098,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @return False si memes initiaux non intégralement transmis.
 	 */
 	private boolean areAllMemeTransmitted(){
-		for (Entite entite: entitesActive) {
+		for (Entite entite: entites) {
 			if(!entite.isFullActif())
 				return false;
 		}
@@ -1111,24 +1111,23 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @return 1er bit pour les ajout, 2er les retrait
 	 */
 	private int areAllMemeTransmittedDetails(){
-		int res = 0;
-		int nothere = 0;
+		int res = 4;
 		boolean add = true, rmv = true, addtmp, rmvtmp;
-		for (Entite entite: entitesActive) {
+		for (Entite entite: entites) {
 			if(add || rmv) {
 				addtmp = rmvtmp = false;
 				for (Meme myMeme : entite.getMyMemes()) {
-					if (add && myMeme.getAction().getActionType() == ActionType.AJOUTLIEN) {
+					if (add && myMeme.getAction().getActionType() == ActionType.AJOUTLIEN && !myMeme.isFluide()) {
 						addtmp = true;
 					}
-					if (rmv && myMeme.getAction().getActionType() == ActionType.RETRAITLIEN) {
+					if (rmv && myMeme.getAction().getActionType() == ActionType.RETRAITLIEN && !myMeme.isFluide()) {
 						rmvtmp = true;
 					}
 				}
 				add &= addtmp;
 				rmv &= rmvtmp;
 			}else // si add & rmv FALSE
-				return 0;
+				return 4;
 		}
 
 		if(add) res += 1;

@@ -28,7 +28,7 @@ public final class Configurator {
 	public static boolean manuelNextStep = false; // pas de passage au run suivant, il faut appuyer sur next
 	public static boolean autoPauseIfNexted = false; // mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	public static boolean displayPlotWhileSimulation = !jarMode; // Affichage des DD et densité
-	public static boolean initializeDefaultBehavior = false;	//fluidité
+	public static boolean initializeDefaultBehavior = true;	//fluidité
 	public static boolean oneAddForOneRmv = false; // Joue tour a tour un ajout d'un retrait
 	public static boolean onlyOneOfEachAction = false; // Réduit le nombre d'action a
 
