@@ -34,7 +34,6 @@ public class MemeProperties{
 
     public List<Integer> lastFailActionTried;
 
-
     // Combinaison de meme disponible
     public Map<Integer, ArrayList<Meme>> memeCombinaisonFittingAvailable;
 

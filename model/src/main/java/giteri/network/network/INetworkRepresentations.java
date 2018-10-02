@@ -4,6 +4,7 @@ import giteri.run.interfaces.Interfaces.INetworkRepresentation;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Map;
 
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.NetworkAttribType;
@@ -22,7 +23,7 @@ public interface INetworkRepresentations extends INetworkRepresentation{
 	 */
 	public class TinyNetworks implements INetworkRepresentations{
 		private int networkVersion;
-		private Hashtable<Integer, ArrayList<Integer>> nodesAndConnections;
+		private Map<Integer, ArrayList<Integer>> nodesAndConnections;
 		private int nbNodes, nbEdges;
 		
 		/** Constructeur sans param. 
@@ -30,7 +31,7 @@ public interface INetworkRepresentations extends INetworkRepresentation{
 		 */
 		public TinyNetworks(){
 			networkVersion = -1;
-			nodesAndConnections = new Hashtable<Integer, ArrayList<Integer>>();
+			nodesAndConnections = new Hashtable<>();
 			nbNodes = -1;
 			nbEdges = -1;
 		}

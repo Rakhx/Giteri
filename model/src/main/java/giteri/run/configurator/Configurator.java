@@ -28,7 +28,7 @@ public final class Configurator {
 	public static boolean manuelNextStep = false; // pas de passage au run suivant, il faut appuyer sur next
 	public static boolean autoPauseIfNexted = false; // mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	public static boolean displayPlotWhileSimulation = !jarMode; // Affichage des DD et densité
-	public static boolean initializeDefaultBehavior = true;	//fluidité
+	public static boolean initializeDefaultBehavior = false;	//fluidité
 	public static boolean oneAddForOneRmv = false; // Joue tour a tour un ajout d'un retrait
 	public static boolean onlyOneOfEachAction = false; // Réduit le nombre d'action a
 
@@ -52,7 +52,7 @@ public final class Configurator {
 	public static EnumExplorationMethod explorator = EnumExplorationMethod.exhaustive; // Type d'exploration de fitting
 	public static MemeList typeOfMemeUseForFitting = MemeList.FITTING; // Peut etre ONMAP, EXISTING, FITTING
 	public static int initialNetworkForFitting = 0; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
-	public static int nbRepetitionbyRun = 30;
+	public static int nbRepetitionbyRun = 100;
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
 
 

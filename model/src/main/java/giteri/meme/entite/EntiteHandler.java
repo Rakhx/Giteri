@@ -1406,7 +1406,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("AddØ",1, false, add, attributs, KVAttributAgregator, true, false);
+		memeFactory.registerMemeAction("AddØ",1, false, add, attributs, KVAttributAgregator, true, true);
 		agregators.put(2, random);
 		if(Configurator.initializeDefaultBehavior)
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, true, add, attributs, KVAttributAgregator, false, false);
@@ -1414,7 +1414,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("RmvØ",1, false, remove, attributs,  KVAttributAgregator, true, false);
+		memeFactory.registerMemeAction("RmvØ",1, false, remove, attributs,  KVAttributAgregator, true, true);
 		agregators.put(2, random);
 		if(Configurator.initializeDefaultBehavior)
 		removeRandom = memeFactory.registerMemeAction("RmvØ-neutral",0, true, remove, attributs,  KVAttributAgregator, false, false);

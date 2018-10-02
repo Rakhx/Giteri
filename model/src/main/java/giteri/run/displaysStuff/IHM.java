@@ -1572,7 +1572,8 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 						// NOMBRE D'APPEL DES MEMES DEPUIS LE DEBUT DE LA SIMULATION
 						// Savoir combien de fois le meme a été appelé depuis le début de la simulation
-						nbAppel = nbActivationByMemes.get(meme.toString());
+						nbAppel = nbActivationByMemes.
+								get(meme.toString());
 						// LABEL générique
 						nbActivationByMemesLabel.get(meme.toString()).setText(memeRef + ":" + nbAppel );
 						nbActivationByMemesLabel.get(meme.toString()).setForeground(associatedColor);
@@ -1620,7 +1621,11 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 					jlDensitySD.setText("SD density: " + temp);
 				}
 
-			}catch (Exception e){
+			}
+			catch(NullPointerException npe){
+				System.err.println(npe.getMessage());
+			}
+			catch (Exception e){
 				if(!Configurator.autrucheMode) 	System.err.println("Erreur de mise a jour de l'interface "+ e.getMessage());
 			}
 		}
