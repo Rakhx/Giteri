@@ -11,6 +11,7 @@ import giteri.run.configurator.Configurator.NetworkAttribType;
 
 /** Interface et impplémentations des différentes représentation 
  * du reseau.
+ * Pour garder les implémentations de network dans le meme fichier...
  * 
  */
 public interface INetworkRepresentations extends INetworkRepresentation{
@@ -24,12 +25,14 @@ public interface INetworkRepresentations extends INetworkRepresentation{
 	public class TinyNetworks implements INetworkRepresentations{
 		private int networkVersion;
 		private Map<Integer, ArrayList<Integer>> nodesAndConnections;
+		private Object syncOnNodes;
 		private int nbNodes, nbEdges;
-		
-		/** Constructeur sans param. 
-		 * 
+
+		/** Constructeur sans param.
+		 *
 		 */
 		public TinyNetworks(){
+			syncOnNodes = new Object();
 			networkVersion = -1;
 			nodesAndConnections = new Hashtable<>();
 			nbNodes = -1;
@@ -41,16 +44,17 @@ public interface INetworkRepresentations extends INetworkRepresentation{
 			ArrayList<Integer> linkOfANode;
 			nbNodes = 0;
 			nbEdges = 0;
-			
-			for (Node node : toCopy.getNodes()){
-				nbNodes++;
-				linkOfANode = new ArrayList<Integer>();
-				for (Integer integer : node.getConnectedNodes()) 
-					linkOfANode.add(new Integer(integer));
-				nbEdges += node.getConnectedNodes().size();
-				nodesAndConnections.put(node.index, linkOfANode);
+
+			synchronized (syncOnNodes) {
+				for (Node node : toCopy.getNodes()) {
+					nbNodes++;
+					linkOfANode = new ArrayList<>();
+					for (Integer integer : node.getConnectedNodes())
+						linkOfANode.add(new Integer(integer));
+					nbEdges += node.getConnectedNodes().size();
+					nodesAndConnections.put(node.index, linkOfANode);
+				}
 			}
-			
 			networkVersion = toCopy.getUpdateId();
 		}
 
@@ -100,68 +104,79 @@ public interface INetworkRepresentations extends INetworkRepresentation{
 				if(avgClust) 
 					clustByNode = new Hashtable<Integer, Double>();
 
-				for (ArrayList<Integer> connections : nodesAndConnections.values()) {
-					distrib[connections.size()] = ++(distrib[connections.size()]);
-				}
-				
-				networkPropertiesResulting.setDd(distrib);
-				
-				// Si espace interquartile
-				if(Configurator.isAttribActived(activationCode, NetworkAttribType.DDINTERQRT) ){
-					// Ecart inter quartile
-					parcouru = 0;
-					index = -1;
-					double temp = nbNodes * .25f;
-					do
-					{
-						index++;
-						parcouru += distrib[index];			
-					} while ( parcouru < temp);
-					
-					firstQ = index; 
-					
-					// 3er quartile
-					parcouru = 0;
-					index = -1;
-					temp = nbNodes * .75f;
-					do
-					{
-						index++;
-						parcouru += distrib[index];			
-					} while ( parcouru < temp);
-					
-					thirdQ = index;
-					ddInterQrt = thirdQ - firstQ;
-					networkPropertiesResulting.ddInterQrt = ddInterQrt;
-				}
-				
-				//si avgClustering
-				if(avgClust){
-					for (Integer nodeCentral : nodesAndConnections.keySet()) {
-						nodeClustering = 0;
-						for (Integer neigthboor : nodesAndConnections.get(nodeCentral)) {
-							for (Integer neightOfNeight : nodesAndConnections.get(neigthboor)) {
-								if(nodesAndConnections.get(nodeCentral).contains(neightOfNeight))
-									nodeClustering++;
-							}
-						}
-						
-						nodeClustering /= nodesAndConnections.get(nodeCentral).size() * ( nodesAndConnections.get(nodeCentral).size() - 1 );
-						clustByNode.put(nodeCentral, nodeClustering);
+				synchronized (syncOnNodes) {
+					for (ArrayList<Integer> connections : nodesAndConnections.values()) {
+						distrib[connections.size()] = ++(distrib[connections.size()]);
 					}
-					
-					// on retire les cas ou les noeuds n'ont aucune connexion.
-					for (Double clust : clustByNode.values()) 
-						if(!clust.isNaN())
-						networkClustering += clust;
-					
-					networkClustering /= clustByNode.values().size();
-					networkPropertiesResulting.avgClust = networkClustering;
+
+					networkPropertiesResulting.setDd(distrib);
+
+					// Si espace interquartile
+					if (Configurator.isAttribActived(activationCode, NetworkAttribType.DDINTERQRT)) {
+						// Ecart inter quartile
+						parcouru = 0;
+						index = -1;
+						double temp = nbNodes * .25f;
+						do {
+							index++;
+							parcouru += distrib[index];
+						} while (parcouru < temp);
+
+						firstQ = index;
+
+						// 3er quartile
+						parcouru = 0;
+						index = -1;
+						temp = nbNodes * .75f;
+						do {
+							index++;
+							parcouru += distrib[index];
+						} while (parcouru < temp);
+
+						thirdQ = index;
+						ddInterQrt = thirdQ - firstQ;
+						networkPropertiesResulting.ddInterQrt = ddInterQrt;
+					}
+
+					//si avgClustering
+					if (avgClust) {
+						for (Integer nodeCentral : nodesAndConnections.keySet()) {
+							nodeClustering = 0;
+							for (Integer neigthboor : nodesAndConnections.get(nodeCentral)) {
+								for (Integer neightOfNeight : nodesAndConnections.get(neigthboor)) {
+									if (nodesAndConnections.get(nodeCentral).contains(neightOfNeight))
+										nodeClustering++;
+								}
+							}
+
+							nodeClustering /= nodesAndConnections.get(nodeCentral).size() * (nodesAndConnections.get(nodeCentral).size() - 1);
+							clustByNode.put(nodeCentral, nodeClustering);
+						}
+
+						// on retire les cas ou les noeuds n'ont aucune connexion.
+						for (Double clust : clustByNode.values())
+							if (!clust.isNaN())
+								networkClustering += clust;
+
+						networkClustering /= clustByNode.values().size();
+						networkPropertiesResulting.avgClust = networkClustering;
+					}
 				}
 			}
 			
 			return networkPropertiesResulting;
 		}
+
+		/**
+		 *
+		 * @return
+		 */
+		public Map<Integer, ArrayList<Integer>> getNodesAndConnections() {
+			synchronized (nodesAndConnections) {
+				return nodesAndConnections;
+			}
+		}
+
 
 		/** Obtient l'id du réseau représenté
 		 * 
