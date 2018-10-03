@@ -231,7 +231,28 @@ public class Toolz {
 			return false;
 		}
 	}
-	
+
+	/** pareil mais en plus générique.
+	 *
+	 * @param table
+	 * @param key
+	 * @param value
+	 * @param <T1>
+	 * @param <T2>
+	 * @return
+	 */
+	public static <T1 extends Object, T2 extends Object> boolean addElementInMap(Map<T1,List<T2>> table,T1 key, T2 value){
+		if(table.containsKey(key)){
+			table.get(key).add(value);
+			return true;
+		}else
+		{
+			table.put(key, new ArrayList<T2>(Arrays.asList(value)));
+			return false;
+		}
+	}
+
+
 	/** Ajoute, dans une hashtable(key, arraylist<value>) une valeur, que la key existe
 	 * déjà ou non. 
 	 * 

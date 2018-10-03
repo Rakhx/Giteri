@@ -39,9 +39,14 @@ public class StopWatchFactory {
 		if(parent == null){
 			parent = watches;
 		}
-		
-		TreeNode<StopWatch> child = parent.addChild(name, new StopWatch(name));
-		child.parent = parent;
+		TreeNode<StopWatch> watch = watches.findNode(name);
+		if(watch == null) {
+			TreeNode<StopWatch> child = parent.addChild(name, new StopWatch(name));
+			child.parent = parent;
+		} else{
+			System.out.println("Watch "+ watch + " existe déjà");
+		}
+
 		return true;
 	}
 
