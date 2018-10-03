@@ -43,6 +43,9 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private Hashtable<String, String> memeTranslationReadable;
 	private List<Meme> memeFittingApplied;
 	private boolean allTransmitted = false;
+	private boolean allAddTransmitted = false;
+	private boolean allrmvTransmitted = false;
+
 
 	public MemeProperties memeProperties;
 
@@ -173,22 +176,24 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		// Verification de la propagation totale des memes initiaux
 		if(!allTransmitted && Configurator.checkWhenFullPropagate && cptModulo % Configurator.checkFullProRefreshRate == 0) {
-//			if(areAllMemeTransmitted()) {
-//                allTransmitted = true;
-//                vueController.displayInfo("Propagation", Arrays.asList("ALL TRANSMISTED IN ;" + cptModulo));
-//			}
+			if(areAllMemeTransmitted()) {
+                allTransmitted = true;
+                vueController.displayInfo("Propagation", Arrays.asList("ALL TRANSMISTED IN ;" + cptModulo));
+			}
 
 			int resDetail = areAllMemeTransmittedDetails();
-			if ((resDetail & 1) == 0){
+			if ((resDetail & 1) == 1){
 				System.out.println("all add transmitted");
 				vueController.displayInfo("Propagation", Arrays.asList("ALL ADD TRANSMISTED IN ;" + cptModulo));
+				allAddTransmitted =true;
 			}
-			if((resDetail & 2) == 0) {
+			if((resDetail & 2) == 2) {
 				System.out.println("all rmv transmitted");
 				vueController.displayInfo("Propagation", Arrays.asList("ALL RMV TRANSMISTED IN ;" + cptModulo));
+				allrmvTransmitted = true;
 			}
-			if((resDetail & 3) == 0){
-				allTransmitted = true;
+			if((resDetail & 3) == 3){
+				 allTransmitted = true;
 			}
 		}
 	}
@@ -351,6 +356,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		cptActionAddFail = 1;
 		cptActionRmvFail = 1;
 		allTransmitted = false;
+		allAddTransmitted = false;
+		allrmvTransmitted = false;
 		memeProperties.clear();
 		entitesActive.clear();
 	}
@@ -1113,8 +1120,18 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private int areAllMemeTransmittedDetails(){
 		int res = 4;
 		boolean add = true, rmv = true, addtmp, rmvtmp;
+		if(allAddTransmitted){
+			add = false;
+			res += 1;
+		}
+		if(allrmvTransmitted){
+			rmv = false;
+			res += 2;
+		}
+
 		for (Entite entite: entites) {
-			if(add || rmv) {
+			if(add || rmv)
+			{
 				addtmp = rmvtmp = false;
 				for (Meme myMeme : entite.getMyMemes()) {
 					if (add && myMeme.getAction().getActionType() == ActionType.AJOUTLIEN && !myMeme.isFluide()) {
@@ -1124,6 +1141,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 						rmvtmp = true;
 					}
 				}
+
 				add &= addtmp;
 				rmv &= rmvtmp;
 			}else // si add & rmv FALSE
@@ -1240,7 +1258,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private void giveMemeToEntiteSpecific() {
 		int i = 0;
 		Entite entiteReceptrice;
-		ArrayList<Double> scParamSet = new ArrayList<>(Arrays.asList(0.788335449538696,0.373092466173732,0.292052580578804,0.438882845642738,0.109153677952613));
 		ArrayList<Double> swParamSet3 = new ArrayList<>(Arrays.asList(0.907489970963927,0.363546615459677,0.458976194767827,0.247873953220028,0.984710568248182));
 		ArrayList<Double> currentParamSet = swParamSet3;
 		Iterator<Entite> entitees = entites.iterator();

@@ -248,11 +248,12 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		for (int i = 0; i < existingMeme.size(); i++) {
 
 
-			if(existingMeme.get(i).getName().compareToIgnoreCase("ADD+") == 0 ) {
-				activator.add(true);proba.add(1.); }
+//			if(existingMeme.get(i).getName().compareToIgnoreCase("ADD+") == 0 ) {
+//				activator.add(true);proba.add(1.); }
 
-//			else if(existingMeme.get(i).getName().compareToIgnoreCase("ADDØ") == 0 ){
-//				activator.add(true); proba.add(1.);}
+//			else
+           if(existingMeme.get(i).getName().compareToIgnoreCase("ADDØ") == 0 ){
+				activator.add(true); proba.add(1.);}
 
 			 //else if(existingMeme.get(i).getName().compareToIgnoreCase("ADD-") == 0 ){
 				//activator.add(true); proba.add(1.);
