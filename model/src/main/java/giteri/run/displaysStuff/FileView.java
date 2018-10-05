@@ -92,7 +92,7 @@ public class FileView implements Interfaces.IView {
     @Override
     public void setDisplayNbAction(String message) {
         if(Configurator.writeNbActionPerSec)
-            addLine("nbline", new ArrayList<>(Arrays.asList(message, "" + cpt++)));
+            addLine("nbline", new ArrayList<>(Arrays.asList(message, "&" + cpt++)));
     }
 
     @Override

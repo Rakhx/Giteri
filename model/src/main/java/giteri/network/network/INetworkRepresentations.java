@@ -18,9 +18,7 @@ public interface INetworkRepresentations extends INetworkRepresentation{
 	
 	/** Représentation direct du giteri.network. Utile pour copier le réseau
 	 * courant sous une forme plus simple, et pouvoir ensuite calculer
-	 * des propriétés sur ce réseau en laissant l'original se modifier. 
-	 * 
-	 *
+	 * des propriétés sur ce réseau en laissant l'original se modifier.
 	 */
 	public class TinyNetworks implements INetworkRepresentations{
 		private int networkVersion;

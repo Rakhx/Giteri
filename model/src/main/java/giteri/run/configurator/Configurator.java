@@ -27,8 +27,7 @@ public final class Configurator {
 	// FONCTIONNEMENT
 	public static boolean manuelNextStep = false; // pas de passage au run suivant, il faut appuyer sur next
 	public static boolean autoPauseIfNexted = false; // mise en pause automatique avant un changement de run. Il faut appuyer sur next
-	public static boolean displayPlotWhileSimulation = !jarMode; // Affichage des DD et densité
-	public static boolean initializeDefaultBehavior = false;	//fluidité
+	public static boolean initializeDefaultBehavior = true;	//fluidité
 	public static boolean oneAddForOneRmv = false; // Joue tour a tour un ajout d'un retrait
 	public static boolean onlyOneOfEachAction = false; // Réduit le nombre d'action a
 
@@ -63,9 +62,10 @@ public final class Configurator {
 	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
 	public static int activationCodeForView = 5;
+
+	public static boolean displayPlotWhileSimulation = !jarMode; // Affichage des DD et densité
 	public static boolean displayMemePosessionDuringSimulation = true; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
 	public static boolean writeNbActionPerSec = false; // pas de fichier nbline
-
 	public static boolean writeFailDensityLink = false; // fichier d'info sur les Fails X density variation
 
 	public static String repByDefault = "DefaultRep";

@@ -58,6 +58,9 @@ public class TestClassFactory {
         watch.publishResult();
     }
 
+    /** Interface pour les classes qui font se faire tester auto.
+     *
+     */
     public interface IDummy{
         String myOSix();
         <R,T> List<Function<R,T>> getFunctions();
@@ -66,24 +69,38 @@ public class TestClassFactory {
         addElementInMap(Map<T1,List<T2>> table,T1 key, T2 value);
     }
 
+    /** Implémentation de base de l'interface.
+     *
+     * @param <R>
+     * @param <T>
+     */
     public abstract class AbstractDummy<R,T> implements IDummy{
         public List<Function> fntToTest = new ArrayList<>();
         Map<Integer, List<Double>> nodesAndConnections;
 
+        /** Ajout manuel des fonctions a tester.
+         *
+         */
         public AbstractDummy(){
             fntToTest.add(ajout);
             fntToTest.add(lecture);
         }
 
+        /** Nom de la classe testée.
+         *
+         * @return
+         */
         public String myOSix(){
-
             return this.getClass().toString().split("\\$")[this.getClass().toString().split("\\$").length-1];
         }
 
+        /** Liste des fonctions a tester.
+         *
+         * @return
+         */
         public List<Function> getFunctions(){
             return fntToTest;
         }
-
 
         public Function<Integer, Double> ajout = (Integer input) -> {
             addElementInMap(getList(),input,(input*Math.PI));
@@ -100,15 +117,9 @@ public class TestClassFactory {
                     break;
             }
 
-
             return 0.;
         };
-
-
-
-
     }
-
 
     public class dummyManuelSynchro extends AbstractDummy<Number,Number> {
 
