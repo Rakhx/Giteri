@@ -1007,18 +1007,19 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 			// Le dernier filtre appliqué est tjrs un random() unitaire : sauf purify
 			if (cibles.size() == 1 || memeAction.getAction().getFourCharName() == "PURI") {
+				actionDone += memeAction.getAction().applyAction(movingOne, cibles);
 
-//				// region PROPAGATION du meme
-//				if(cibles.size() > 1 && Configurator.onlyOneToPropagate) {
-//					ite = cibles.iterator();
-//					for (int i = 0; i < Toolz.getRandomNumber(cibles.size()); i++) {
-//						ite.next();
-//					}
-//
-//					one = ite.next();
-//					cibles.clear();
-//					cibles.add(one);
-//				}
+				// region PROPAGATION du meme
+				if(cibles.size() > 1 && Configurator.onlyOneToPropagate) {
+					ite = cibles.iterator();
+					for (int i = 0; i < Toolz.getRandomNumber(cibles.size()); i++) {
+						ite.next();
+					}
+
+					one = ite.next();
+					cibles.clear();
+					cibles.add(one);
+				}
 
 				if (Configurator.usePropagation)
 					for (Entite entite : cibles)
@@ -1437,7 +1438,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("AddØ",1, false, add, attributs, KVAttributAgregator, true, true);
+		memeFactory.registerMemeAction("AddØ",0.1, false, add, attributs, KVAttributAgregator, true, true);
 		agregators.put(2, random);
 		if(Configurator.initializeDefaultBehavior)
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, true, add, attributs, KVAttributAgregator, false, false);
@@ -1469,7 +1470,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		memeFactory.registerMemeAction("RmvØ-2hop", 1, false, remove, attributs, KVAttributAgregator,false ,false);
 
 		agregators.clear();
-		memeFactory.registerMemeAction("Puri",0.001,false, puri, attributs, KVAttributAgregator, false, false);
+		memeFactory.registerMemeAction("Puri",1,false, puri, attributs, KVAttributAgregator, true, false);
 
 		for (Meme memeDispo : memeFactory.getMemes(Configurator.MemeList.EXISTING,Configurator.ActionType.ANYTHING)) {
 			memeTranslationReadable.put(memeDispo.toFourCharString(),memeDispo.getName());
