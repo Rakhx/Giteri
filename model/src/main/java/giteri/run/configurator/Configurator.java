@@ -120,7 +120,9 @@ public final class Configurator {
 	public final static double probaEntiteLearning = 0;
 	public static boolean memeCanBeReplaceByCategory = true;
 	public final static int semiAutoWaitingTime = 3000;
+
 	public static boolean usePropagation = true;
+	public static boolean onlyOneToPropagate = true;
 	public static boolean usePropagationSecondGeneration = false; // transmet un des memes du porteur, pas forcement celui applied
 
 

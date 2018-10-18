@@ -355,7 +355,7 @@ public class ActionFactory{
 
 			for (Entite entite : cibles)
 			{
-				if(Toolz.rollDice(1)){
+				if(Toolz.rollDice(.2)){
 					connectedNodeSeveralConnection.clear();
 					if(entite.getDegree() > 1){
 						for (Integer indexEventuality : entite.getConnectedNodesIndex()) {
@@ -377,7 +377,7 @@ public class ActionFactory{
 
 		@Override
 		public ActionType getActionType() {
-			return ActionType.PURIFY;
+			return ActionType.RETRAITLIEN;
 		}
 
 		@Override
