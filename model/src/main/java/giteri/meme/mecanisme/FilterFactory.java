@@ -8,10 +8,10 @@ import giteri.run.configurator.Configurator.AgregatorType;
 import giteri.meme.entite.Entite;
 import giteri.meme.entite.EntiteHandler;
 
-public class AgregatorFactory {
+public class FilterFactory {
 
 	EntiteHandler entiteHandler;
-	public AgregatorFactory(){
+	public FilterFactory(){
 	}
 
 	public void setEntiteHandler(EntiteHandler eh){
@@ -23,7 +23,7 @@ public class AgregatorFactory {
 	 * @param agregatorName
 	 * @return une classe implémentant l'interface d'agrégator.
 	 */
-	public IAgregator getAgregator(Configurator.AgregatorType agregatorName){
+	public IFilter getFilter(Configurator.AgregatorType agregatorName){
 		switch (agregatorName) {
 			case THEMOST:
 				return new TheMost();
@@ -60,8 +60,16 @@ public class AgregatorFactory {
 	/** INTERFACE d'attribut
 	 *
 	 */
-	public interface IAgregator {
-		<T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut);
+	public interface IFilter {
+		/** Modifie la liste @entites en renvoyant un sous ensemble, fonction de l'attribut sur lequel faire les comparaisons
+		 * et l'aggregator sélectionné.
+		 *
+		 * @param asker
+		 * @param entites
+		 * @param attribut
+		 * @param <T>
+		 */
+		<T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut);
 
 		AgregatorType getEnumType();
 
@@ -72,7 +80,7 @@ public class AgregatorFactory {
 	/** Classe fournissant des méthodes de bases
 	 *
 	 */
-	public abstract class Agregator {
+	public abstract class Filter {
 
 		/** Méthode qui renvoi le sous ensemble des entités linked
 		 * a l'entité asker.
@@ -104,12 +112,12 @@ public class AgregatorFactory {
 	 * Depuis la liste d'entité entites, sur l'attribut comparable attribut
 	 * implémentant l'interface d'agregator.
 	 */
-	public class TheMost implements IAgregator{
+	public class TheMost implements IFilter {
 
 		/** Renvoi, depuis la liste en entrée, et l'attribut, les éléments qui répondent aux critères.
 		 * Ici : ceux qui ont la plus grande valeur sur l'attribut spécifié.
 		 */
-		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 
 		    ArrayList<Entite> resultat = new ArrayList<>();
 			Entite bestEntitee = null ;
@@ -165,13 +173,13 @@ public class AgregatorFactory {
 	/** CLASSE The least de la map.
 	 *
 	 */
-	public class TheLeast implements IAgregator{
+	public class TheLeast implements IFilter {
 
 		/** Renvoi, depuis la liste des entrées, et de l'attribut,
 		 * les éléments qui répondent au critére suivant : Min sur la
 		 * valeur de l'attribut spécifié
 		 */
-		public <T extends Comparable<T>> void applyAggregator(Entite asker,Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			ArrayList<Entite> resultat = new ArrayList<Entite>();
 			Entite bestEntitee = null ;
 			boolean firstStep = true;
@@ -225,10 +233,10 @@ public class AgregatorFactory {
 	/** CLASSE valeur de l'attribut strictement supérieur é celle des entités sélectionnées
 	 *
 	 */
-	public class MineSup implements IAgregator{
+	public class MineSup implements IFilter {
 
 		@Override
-		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			ArrayList<Entite> resultat = new ArrayList<Entite>();
 			for (Entite entite : entites) {
 				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) == -1 ||
@@ -258,9 +266,9 @@ public class AgregatorFactory {
 	/** CLASSE Valeur de l'attribut strictement inférieur a celle des entités sélectionnées
 	 *
 	 */
-	public class MineInf implements IAgregator{
+	public class MineInf implements IFilter {
 
-		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			ArrayList<Entite> resultat = new ArrayList<>();
 			for (Entite entite : entites) {
 				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) == 1 ||
@@ -291,9 +299,9 @@ public class AgregatorFactory {
 	/** CLASSE Valeur de l'attribut différente a celle des entités sélectionnées
 	 *
 	 */
-	public class MineDif implements IAgregator{
+	public class MineDif implements IFilter {
 		@Override
-		public <T extends Comparable<T>> void applyAggregator(	Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			ArrayList<Entite> resultat = new ArrayList<Entite>();
 			for (Entite entite : entites) {
 				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) != 0 ){
@@ -323,9 +331,9 @@ public class AgregatorFactory {
 	/** CLASSE Valeur de l'attribut égale a celle des entités sélectionnées
 	 *
 	 */
-	public class MineEgal implements IAgregator{
+	public class MineEgal implements IFilter {
 		@Override
-		public <T extends Comparable<T>> void applyAggregator(	Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			ArrayList<Entite> resultat = new ArrayList<Entite>();
 			for (Entite entite : entites) {
 				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) == 0){
@@ -352,15 +360,15 @@ public class AgregatorFactory {
 		}
 	}
 
-	/** Agregator de type not linked, depuis une liste renvoi les éléments qui
+	/** Filter de type not linked, depuis une liste renvoi les éléments qui
 	 * ne sont pas linké a l'entité en paramètre.
 	 */
-	public class notLinked extends Agregator implements IAgregator{
+	public class notLinked extends Filter implements IFilter {
 
 		/** Renvoi la liste des éléments non connectés a l'asker
 		 *
 		 */
-		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			this.getNotLinked(asker, entites);
 		}
 
@@ -384,13 +392,13 @@ public class AgregatorFactory {
 	/** renvoi la liste des éléments link a l'élément asker
 	 *
 	 */
-	public class linked extends Agregator implements IAgregator{
+	public class linked extends Filter implements IFilter {
 
 		/** Renvoi un item au hasard depuis la liste fourni en parametre, qui n'est
 		 * pas connecté au noeud en question.
 		 *
 		 */
-		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			 this.getLinked(asker, entites);
 		}
 
@@ -415,12 +423,12 @@ public class AgregatorFactory {
 	 * de facon équiprobable pour tout ses éléments.
 	 *
 	 */
-	public class random extends Agregator implements IAgregator {
+	public class random extends Filter implements IFilter {
 
 		/** Application de l'agrégateur.
 		 *
 		 */
-		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			if(entites.size() > 1){
 				Entite selected = null;
 				int nbStep = Toolz.getRandomNumber(entites.size());
@@ -458,12 +466,12 @@ public class AgregatorFactory {
 	/** Renvoi les noeuds liés a une distance de @reach
 	 *
 	 */
-	public class HopWay extends Agregator implements IAgregator {
+	public class HopWay extends Filter implements IFilter {
 
 		public int reach = 2;
 
 		@Override
-		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 
 			Set<Entite> entiteResult = new HashSet<>();
 
@@ -537,10 +545,10 @@ public class AgregatorFactory {
 	/** retourne les noeuds liés entre eux de ceux pris en param.
 	 * Plus optimal si une réduction a déja été appelé avant
 	 */
-	public class Triangle extends Agregator implements IAgregator {
+	public class Triangle extends Filter implements IFilter {
 
 		@Override
-		public <T extends Comparable<T>> void applyAggregator(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			Set<Entite> resultat = new HashSet<>();
 
 			for (Entite entite : entites) {

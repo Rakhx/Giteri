@@ -57,7 +57,7 @@ public class AttributFactory {
 		 * @param n
 		 * @return
 		 */
-//		public int getDistance(IAgregator ag, Node n,ArrayList<Entite> cibles);
+//		public int getDistance(IFilter ag, Node n,ArrayList<Entite> cibles);
 	}
 
 	/** Attribut de nom degré, de type comparable Integer
@@ -80,7 +80,7 @@ public class AttributFactory {
 		/**
 		 *
 		 */
-//		public int getDistance(IAgregator ag, Node n, ArrayList<Entite> cibles) {
+//		public int getDistance(IFilter ag, Node n, ArrayList<Entite> cibles) {
 //			int degree = getAttributValue(n);
 //			int malus = 0;
 //			switch (ag.getEnumType()){

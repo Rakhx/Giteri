@@ -355,7 +355,7 @@ public class ActionFactory{
 
 			for (Entite entite : cibles)
 			{
-				if(Toolz.rollDice(.01)){
+				if(Toolz.rollDice(1)){
 					connectedNodeSeveralConnection.clear();
 					if(entite.getDegree() > 1){
 						for (Integer indexEventuality : entite.getConnectedNodesIndex()) {

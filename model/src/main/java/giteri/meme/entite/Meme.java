@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import giteri.meme.mecanisme.ActionFactory.IAction;
-import giteri.meme.mecanisme.AgregatorFactory.IAgregator;
+import giteri.meme.mecanisme.FilterFactory;
+import giteri.meme.mecanisme.FilterFactory.IFilter;
 import giteri.meme.mecanisme.AttributFactory.IAttribut;
 
 /** Classe qui va définir le type de comportement que peuvent avoir les agents.
@@ -17,7 +18,7 @@ public class Meme implements Serializable, Comparable<Meme>{
 	// Liste des paramètres pour le giteri.meme en question
 	IAction action;
 	ArrayList<IAttribut> attributs;
-	private Hashtable<String, Hashtable<Integer, IAgregator>> KVAttributLAgregator;
+	private Hashtable<String, Hashtable<Integer, IFilter>> KVAttributLAgregator;
 	private double probaOfPropagation;
 	String name;
 
@@ -36,7 +37,7 @@ public class Meme implements Serializable, Comparable<Meme>{
 	 * @param KVAttributLAgregator
 	 */
 	public Meme(String name, double probaOfTransmission,boolean fluidite, IAction action, ArrayList<IAttribut> attributs,
-				Hashtable<String, Hashtable<Integer, IAgregator>> KVAttributLAgregator){
+				Hashtable<String, Hashtable<Integer, IFilter>> KVAttributLAgregator){
 		this.name = name;
 		this.action = action;
 		this.attributs = attributs;
@@ -71,7 +72,7 @@ public class Meme implements Serializable, Comparable<Meme>{
 		this.action = action;
 	}
 
-	public Hashtable<Integer, IAgregator> getAgregators(String attribut){
+	public Hashtable<Integer, FilterFactory.IFilter> getFilter(String attribut){
 		return KVAttributLAgregator.get(attribut);
 	}
 	
@@ -91,7 +92,7 @@ public class Meme implements Serializable, Comparable<Meme>{
 		String resultat = "";
 		String strAttribut = "";
 		String strAgregator ="";
-		Hashtable<Integer, IAgregator> aggregators;
+		Hashtable<Integer, FilterFactory.IFilter> aggregators;
 		
 		if(mode == 1)
 			resultat += ":";

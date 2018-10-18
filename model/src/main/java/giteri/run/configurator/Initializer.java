@@ -5,7 +5,7 @@ import giteri.fitting.parameters.IModelParameter;
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
 import giteri.meme.mecanisme.ActionFactory;
-import giteri.meme.mecanisme.AgregatorFactory;
+import giteri.meme.mecanisme.FilterFactory;
 import giteri.meme.mecanisme.AttributFactory;
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.networkStuff.*;
@@ -73,9 +73,9 @@ public class Initializer {
 
         WriteNRead writeNRead = new WriteNRead();
         AttributFactory attributFactory = new AttributFactory();
-        AgregatorFactory agregatorFactory = new AgregatorFactory();
+        FilterFactory filterFactory = new FilterFactory();
         ActionFactory actionFactory = new ActionFactory() ;
-        MemeFactory memeFactory = new MemeFactory(actionFactory, agregatorFactory, attributFactory);
+        MemeFactory memeFactory = new MemeFactory(actionFactory, filterFactory, attributFactory);
         WorkerFactory workerFactory = new WorkerFactory();
         NetworkConstructor networkConstructor = new NetworkConstructor();
         EntiteHandler entiteHandler = new EntiteHandler(networkConstructor, memeFactory, workerFactory);
@@ -106,7 +106,7 @@ public class Initializer {
 
         networkFileLoader.setCommunicationModel(communicationModel);
         actionFactory.setEntiteHandler(entiteHandler);
-        agregatorFactory.setEntiteHandler(entiteHandler);
+        filterFactory.setEntiteHandler(entiteHandler);
 
         if(ihmLauncher && withGraphicalDisplay ){
             workerFactory.setNecessary(drawerGraphStream, drawerGraphStream);

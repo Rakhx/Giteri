@@ -2,7 +2,6 @@ package giteri.meme.mecanisme;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;
 
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.ActionType;
@@ -33,19 +32,19 @@ public class MemeFactory {
 	private Integer lastIndexUsed = -1;
 
 	private ActionFactory actionFactory;
-	private AgregatorFactory agregatorFactory;
+	private FilterFactory filterFactory;
 	private AttributFactory attributFactory;
 
 	//endregion
 
 	//region  Constructor & Co
-	public MemeFactory(ActionFactory actionFac, AgregatorFactory agregatorFac, AttributFactory attributFac ){
+	public MemeFactory(ActionFactory actionFac, FilterFactory agregatorFac, AttributFactory attributFac ){
 		memeExisting = new ArrayList<Meme>();
 		memeFitting = new ArrayList<Meme>();
 		memeOnMap = new ArrayList<>();
 		kvMemeIndexColor = new Hashtable<Meme, Integer>();
 		actionFactory = actionFac;
-		agregatorFactory = agregatorFac;
+		filterFactory = agregatorFac;
 		attributFactory = attributFac;
 	}
 
@@ -67,10 +66,10 @@ public class MemeFactory {
 		ActionFactory.IAction action = actionFactory.getAction(actionAsked);
 		@SuppressWarnings("rawtypes")
 		ArrayList<AttributFactory.IAttribut> attribs = new ArrayList<>();
-		Hashtable<String, Hashtable<Integer ,AgregatorFactory.IAgregator>> KVAttribAgreg = new Hashtable<>();
+		Hashtable<String, Hashtable<Integer , FilterFactory.IFilter>> KVAttribAgreg = new Hashtable<>();
 
 		AttributFactory.IAttribut<?> attribut;
-		Hashtable<Integer ,AgregatorFactory.IAgregator> listAgregator;
+		Hashtable<Integer , FilterFactory.IFilter> listAgregator;
 		Hashtable<Integer ,AgregatorType> listAgreType;
 
 		// Pour chaque attribut sur lequel porte le meme
@@ -82,7 +81,7 @@ public class MemeFactory {
 
 			listAgreType = KVAttributAgregator.get(attributType);
 			for (Integer agregatorTypeOrder : listAgreType.keySet()) {
-				listAgregator.put(agregatorTypeOrder ,agregatorFactory.getAgregator(listAgreType.get(agregatorTypeOrder)));
+				listAgregator.put(agregatorTypeOrder , filterFactory.getFilter(listAgreType.get(agregatorTypeOrder)));
 			}
 		}
 

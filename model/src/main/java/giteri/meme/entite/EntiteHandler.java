@@ -4,7 +4,8 @@ import giteri.meme.event.ActionApplyEvent;
 import giteri.meme.event.BehavTransmEvent;
 import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.IBehaviorTransmissionListener;
-import giteri.meme.mecanisme.AgregatorFactory.IAgregator;
+import giteri.meme.mecanisme.FilterFactory;
+import giteri.meme.mecanisme.FilterFactory.IFilter;
 import giteri.meme.mecanisme.AttributFactory.IAttribut;
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.event.INbNodeChangedListener;
@@ -895,7 +896,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		String memeApply = "";
 		Set<Entite> cibles ;
 		Set<Integer> ciblesIndex = new HashSet<>();
-		IAgregator currentFilter = null;
+		FilterFactory.IFilter currentFilter = null;
 
 		// Execution d'un meme de l'entite.
 		if (memeAction != null) {
@@ -906,9 +907,9 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			for (IAttribut<Integer> attribut : memeAction.getAttributs()) {
 
 				// Pour chaque filtre appliqué a un attribut
-				for (int order = 0; order < memeAction.getAgregators(attribut.toString()).size(); order++) {
-					currentFilter = memeAction.getAgregators(attribut.toString()).get(order);
-					currentFilter.applyAggregator(movingOne, cibles, attribut);
+				for (int order = 0; order < memeAction.getFilter(attribut.toString()).size(); order++) {
+					currentFilter = memeAction.getFilter(attribut.toString()).get(order);
+					currentFilter.applyFilter(movingOne, cibles, attribut);
 				}
 			}
 
@@ -970,28 +971,28 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	@SuppressWarnings("unchecked")
 	private String doAction(Entite movingOne, Meme memeAction) {
-		String actionDone = "";
-		String memeApply = "";
-		Set<Entite> cibles ;
-		Set<Integer> ciblesIndex = new HashSet<>();
-		IAgregator currentFilter = null;
+		String actionDone = "";String memeApply = "";Set<Entite> cibles ;Set<Integer> ciblesIndex = new HashSet<>();
+		IFilter currentFilter = null;
 
 		// Execution d'un meme de l'entite.
 		if (memeAction != null) {
 			cibles = new HashSet<>(entites);
 			cibles.remove(movingOne);
 
-			// Pour chaque attribut sur lesquels on applique des filtres
+			// FILTRE Pour chaque attribut sur lesquels on applique des filtres
 			for (IAttribut<Integer> attribut : memeAction.getAttributs()) {
+				// region semi auto
+				// Si semi automatique.
 				if (Configurator.semiStepProgression && filterOnSemiAuto(null, null)) {
 					System.out.println("On va appliquer les filtres suivants pour l'action " + memeAction.name);
-					System.out.println(memeAction.getAgregators(attribut.toString()).values()); }
+					System.out.println(memeAction.getFilter(attribut.toString()).values());
+				} //endregion
 
 				// Pour chaque filtre appliqué a un attribut
-				for (int order = 0; order < memeAction.getAgregators(attribut.toString()).size(); order++) {
-					currentFilter = memeAction.getAgregators(attribut.toString()).get(order);
-					currentFilter.applyAggregator(movingOne, cibles, attribut);
-
+				for (int order = 0; order < memeAction.getFilter(attribut.toString()).size(); order++) {
+					currentFilter = memeAction.getFilter(attribut.toString()).get(order);
+					currentFilter.applyFilter(movingOne, cibles, attribut);
+					//region semi-auto
 					// Dans le cas ou on veut un mode semi automatique
 					if (Configurator.semiStepProgression && filterOnSemiAuto(memeAction, currentFilter)) {
 						ciblesIndex.clear();
@@ -1000,14 +1001,14 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 						System.out.println("Application du filtre suivant: " + currentFilter.getFourCharName());
 						this.giveEntiteTargetedColor(movingOne.getIndex(), ciblesIndex);
 						pauseStepInSemiAutoAction();
-					}
+					} // endregion
 				}
 			}
 
-			// Le dernier filtre appliqué est tjrs un random() unitaire
-			if (cibles.size() == 1) {
+			// Le dernier filtre appliqué est tjrs un random() unitaire : sauf purify
+			if (cibles.size() == 1 || memeAction.getAction().getActionType() == ActionType.PURIFY) {
 				actionDone += memeAction.getAction().applyAction(movingOne, cibles);
-
+				// region propagation
 				// PROPAGATION du meme
 				if (Configurator.usePropagation)
 					for (Entite entite : cibles)
@@ -1026,26 +1027,29 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 						// ou transmission du behavior appliqué
 						else if (entite.receiveMeme(memeAction))
 							eventMemeChanged(entite, memeAction,Configurator.MemeActivityPossibility.AjoutMeme.toString());
-					}
+					} // endregion
 
 				// evenement d'application d'une action
-				// 2- A revoir niveau timing
 				eventActionDone(movingOne, memeAction, actionDone);
+			}
 
-			} else {
+			// Dans le cas ou il y a plus d'une cible // ou pas action purify // ou aucune cible.
+			else {
 				if (cibles.size() > 1) System.err.println("Plusieurs cibles pour une action, pas normal");
-
-				actionDone = "Nope, Entite " + movingOne.getIndex()
-						+ " Aucune(ou trop de) cible pour l'action" + memeAction.toFourCharString();
+				actionDone = "Nope, Entite " + movingOne.getIndex()  + " Aucune(ou trop de) cible pour l'action" + memeAction.toFourCharString();
 				eventActionDone(movingOne, null, "NOTARGET " + actionDone);
 			}
-		} else {
-			actionDone = "Nope, Entite " + movingOne.getIndex() + " Liste d'action vide ou aucune action sélectionnée";
-			eventActionDone(movingOne, null, "NOACTION");}
-
-		if (Configurator.displayLogMemeApplication) {
-			vueController.displayInfo("memeApplication", Arrays.asList("MemeApplied- " + memeApply,"ActionDone- " +  actionDone));
 		}
+
+		// Si le meme action est NULL
+		else
+		{
+			actionDone = "Nope, Entite " + movingOne.getIndex() + " Liste d'action vide ou aucune action sélectionnée";
+			eventActionDone(movingOne, null, "NOACTION");
+		}
+
+		if (Configurator.displayLogMemeApplication)
+			vueController.displayInfo("memeApplication", Arrays.asList("MemeApplied- " + memeApply,"ActionDone- " +  actionDone));
 
 		return actionDone;
 	}
@@ -1398,7 +1402,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(0, notLinked);
 		agregators.put(1, mineInf);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add+", 1, false, add, attributs,KVAttributAgregator, false ,false);
+		memeFactory.registerMemeAction("Add+", 1, false, add, attributs,KVAttributAgregator, true ,false);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
@@ -1423,7 +1427,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("AddØ",1, false, add, attributs, KVAttributAgregator, true, true);
+		memeFactory.registerMemeAction("AddØ",1, false, add, attributs, KVAttributAgregator, false, true);
 		agregators.put(2, random);
 		if(Configurator.initializeDefaultBehavior)
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, true, add, attributs, KVAttributAgregator, false, false);
@@ -1455,7 +1459,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		memeFactory.registerMemeAction("RmvØ-2hop", 1, false, remove, attributs, KVAttributAgregator,false ,false);
 
 		agregators.clear();
-		memeFactory.registerMemeAction("Puri",0,false, puri, attributs, KVAttributAgregator, false, false);
+		memeFactory.registerMemeAction("Puri",0,false, puri, attributs, KVAttributAgregator, true, false);
 
 		for (Meme memeDispo : memeFactory.getMemes(Configurator.MemeList.EXISTING,Configurator.ActionType.ANYTHING)) {
 			memeTranslationReadable.put(memeDispo.toFourCharString(),memeDispo.getName());
@@ -1580,7 +1584,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @param actualFilter
 	 * @return
 	 */
-	private boolean filterOnSemiAuto(Meme meme, IAgregator actualFilter) {
+	private boolean filterOnSemiAuto(Meme meme, IFilter actualFilter) {
 		if (meme != null && actualFilter != null
 				&& actualFilter.getEnumType() == AgregatorType.HOPAWAY)
 			return true;
