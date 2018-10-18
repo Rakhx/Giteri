@@ -93,7 +93,7 @@ public class Entite implements Comparable<Entite>{
 
 		// On parcourt les meme existant et regarde si un meme de la meme catégorie existe
 		for (Meme possededMeme : getMyMemes())
-			if(memeToAdd.getAction().toString() == possededMeme.getAction().toString())
+			if(memeToAdd.getAction().getActionType() == possededMeme.getAction().getActionType())
 			{
 				// si oui, il faudra que la configuration l'autorise pour remplacer l'ancien meme.
 				memeReplaced = possededMeme;
