@@ -213,7 +213,7 @@ public class MemeFactory {
 	 */
 	public Meme getMemeFromFourString(String foursizeName){
 		for (Meme meme: getMemes(Configurator.MemeList.EXISTING, ActionType.ANYTHING )) {
-			if(meme.toFourCharString() == foursizeName)
+			if(meme.toFourCharString().compareTo(foursizeName)==0)
 				return meme;
 		}
 

@@ -4,6 +4,7 @@ import giteri.meme.event.ActionApplyEvent;
 import giteri.meme.event.BehavTransmEvent;
 import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.IBehaviorTransmissionListener;
+import giteri.meme.mecanisme.ActionFactory;
 import giteri.meme.mecanisme.FilterFactory;
 import giteri.meme.mecanisme.FilterFactory.IFilter;
 import giteri.meme.mecanisme.AttributFactory.IAttribut;
@@ -884,84 +885,84 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			return actionSelectionControlledVersion(movingOne);
 	}
 
-	/** Application de l'action de l'entité
-	 *
-	 * @param movingOne
-	 * @param memeAction
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	private String doActionFast(Entite movingOne, Meme memeAction) {
-		String actionDone = "";
-		String memeApply = "";
-		Set<Entite> cibles ;
-		Set<Integer> ciblesIndex = new HashSet<>();
-		FilterFactory.IFilter currentFilter = null;
-
-		// Execution d'un meme de l'entite.
-		if (memeAction != null) {
-			cibles = new HashSet<>(entites);
-			cibles.remove(movingOne);
-
-			// Pour chaque attribut sur lesquels on applique des filtres
-			for (IAttribut<Integer> attribut : memeAction.getAttributs()) {
-
-				// Pour chaque filtre appliqué a un attribut
-				for (int order = 0; order < memeAction.getFilter(attribut.toString()).size(); order++) {
-					currentFilter = memeAction.getFilter(attribut.toString()).get(order);
-					currentFilter.applyFilter(movingOne, cibles, attribut);
-				}
-			}
-
-			// Le dernier filtre appliqué est tjrs un random() unitaire
-			if (cibles.size() == 1) {
-				actionDone += memeAction.getAction().applyAction(movingOne, cibles);
-
-				// PROPAGATION du meme
-				//if (Configurator.usePropagation)
-				for (Entite entite : cibles)
-				{
-					// Transmission de l'un de behavior possédé par l'acting.
-					if (Configurator.usePropagationSecondGeneration)
-					{
-						// Selectionne un meme en fonction de sa proba de propagation
-						Meme selectedMeme = movingOne.chooseAction();
-						if(selectedMeme == null){
-							Double error = 1.;
-							error = error / 0;
-							if(Configurator.debugEntiteHandler) System.out.println("Meme joué par " + movingOne.toString() + " disparu");
-						}
-
-//						memeApply = selectedMeme.toFourCharString();
-						if (entite.receiveMeme(selectedMeme))
-							eventMemeChanged(entite, selectedMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-					}
-					else
-						// ou transmission du behavior appliqué
-						if (entite.receiveMeme(memeAction))
-							eventMemeChanged(entite, memeAction,Configurator.MemeActivityPossibility.AjoutMeme.toString());
-				}
-
-				// evenement d'application d'une action
-				// 2- A revoir niveau timing
-				eventActionDone(movingOne, memeAction, actionDone);
-
-			} else {
-				if (cibles.size() > 1) System.err.println("Plusieurs cibles pour une action, pas normal");
-
-				actionDone = "Nope, Entite " + movingOne.getIndex()
-						+ " Aucune(ou trop de) cible pour l'action" + memeAction.toFourCharString();
-				eventActionDone(movingOne, null, "NOTARGET " + actionDone);
-			}
-		} else {
-			actionDone = "Nope, Entite " + movingOne.getIndex() + " Liste d'action vide ou aucune action sélectionnée";
-			eventActionDone(movingOne, null, "NOACTION");}
-
-		if (Configurator.displayLogMemeApplication)
-			System.out.println(memeApply + " " + actionDone);
-
-		return actionDone;
-	}
+//	/** Application de l'action de l'entité
+//	 *
+//	 * @param movingOne
+//	 * @param memeAction
+//	 * @return
+//	 */
+//	@SuppressWarnings("unchecked")
+//	private String doActionFast(Entite movingOne, Meme memeAction) {
+//		String actionDone = "";
+//		String memeApply = "";
+//		Set<Entite> cibles ;
+//		Set<Integer> ciblesIndex = new HashSet<>();
+//		FilterFactory.IFilter currentFilter = null;
+//
+//		// Execution d'un meme de l'entite.
+//		if (memeAction != null) {
+//			cibles = new HashSet<>(entites);
+//			cibles.remove(movingOne);
+//
+//			// Pour chaque attribut sur lesquels on applique des filtres
+//			for (IAttribut<Integer> attribut : memeAction.getAttributs()) {
+//
+//				// Pour chaque filtre appliqué a un attribut
+//				for (int order = 0; order < memeAction.getFilter(attribut.toString()).size(); order++) {
+//					currentFilter = memeAction.getFilter(attribut.toString()).get(order);
+//					currentFilter.applyFilter(movingOne, cibles, attribut);
+//				}
+//			}
+//
+//			// Le dernier filtre appliqué est tjrs un random() unitaire
+//			if (cibles.size() == 1) {
+//				actionDone += memeAction.getAction().applyAction(movingOne, cibles);
+//
+//				// PROPAGATION du meme
+//				//if (Configurator.usePropagation)
+//				for (Entite entite : cibles)
+//				{
+//					// Transmission de l'un de behavior possédé par l'acting.
+//					if (Configurator.usePropagationSecondGeneration)
+//					{
+//						// Selectionne un meme en fonction de sa proba de propagation
+//						Meme selectedMeme = movingOne.chooseAction();
+//						if(selectedMeme == null){
+//							Double error = 1.;
+//							error = error / 0;
+//							if(Configurator.debugEntiteHandler) System.out.println("Meme joué par " + movingOne.toString() + " disparu");
+//						}
+//
+////						memeApply = selectedMeme.toFourCharString();
+//						if (entite.receiveMeme(selectedMeme))
+//							eventMemeChanged(entite, selectedMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
+//					}
+//					else
+//						// ou transmission du behavior appliqué
+//						if (entite.receiveMeme(memeAction))
+//							eventMemeChanged(entite, memeAction,Configurator.MemeActivityPossibility.AjoutMeme.toString());
+//				}
+//
+//				// evenement d'application d'une action
+//				// 2- A revoir niveau timing
+//				eventActionDone(movingOne, memeAction, actionDone);
+//
+//			} else {
+//				if (cibles.size() > 1) System.err.println("Plusieurs cibles pour une action, pas normal");
+//
+//				actionDone = "Nope, Entite " + movingOne.getIndex()
+//						+ " Aucune(ou trop de) cible pour l'action" + memeAction.toFourCharString();
+//				eventActionDone(movingOne, null, "NOTARGET " + actionDone);
+//			}
+//		} else {
+//			actionDone = "Nope, Entite " + movingOne.getIndex() + " Liste d'action vide ou aucune action sélectionnée";
+//			eventActionDone(movingOne, null, "NOACTION");}
+//
+//		if (Configurator.displayLogMemeApplication)
+//			System.out.println(memeApply + " " + actionDone);
+//
+//		return actionDone;
+//	}
 
 	/** Application de l'action de l'entité
 	 *
@@ -1024,7 +1025,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				if (Configurator.usePropagation)
 					for (Entite entite : cibles)
 					{
-						// Transmission de l'un de behavior possédé par l'acting.
+						// region Transmission de l'un de behavior possédé par l'acting.
 						if (Configurator.usePropagationSecondGeneration)
 						{
 							Meme selectedMeme = movingOne.chooseAction();
@@ -1035,10 +1036,14 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 							if (entite.receiveMeme(selectedMeme))
 								eventMemeChanged(entite, selectedMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
 						}
+						// endregion
+
 						// ou transmission du behavior appliqué
 						else if (entite.receiveMeme(memeAction))
 							eventMemeChanged(entite, memeAction,Configurator.MemeActivityPossibility.AjoutMeme.toString());
-					} // endregion
+					}
+
+				// endregion
 
 				// evenement d'application d'une action
 				eventActionDone(movingOne, memeAction, actionDone);
@@ -1692,25 +1697,28 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	public void purgeLink() {
 
-		Entite target;
-		ArrayList<Entite> connectedNodeSeveralConnection = new ArrayList<Entite>();
+		Meme purify = memeFactory.getMemeFromFourString("PURIDG");
+		purify.getAction().applyAction(null, entites);
 
-		for (Entite entite : entites) {
-			connectedNodeSeveralConnection.clear();
-			if (entite.getDegree() > 1) {
-				for (Entite entite2 : entite.getConnectedEntite()) {
-					if (entite2.getDegree() > 1) {
-						connectedNodeSeveralConnection.add(entite2);
-					}
-				}
-
-				if (connectedNodeSeveralConnection.size() > 1) {
-					target = connectedNodeSeveralConnection.get
-							(Toolz.getRandomNumber(connectedNodeSeveralConnection.size()));
-					removeLink(entite, target);
-				}
-			}
-		}
+//		Entite target;
+//		ArrayList<Entite> connectedNodeSeveralConnection = new ArrayList<Entite>();
+//
+//		for (Entite entite : entites) {
+//			connectedNodeSeveralConnection.clear();
+//			if (entite.getDegree() > 1) {
+//				for (Entite entite2 : entite.getConnectedEntite()) {
+//					if (entite2.getDegree() > 1) {
+//						connectedNodeSeveralConnection.add(entite2);
+//					}
+//				}
+//
+//				if (connectedNodeSeveralConnection.size() > 1) {
+//					target = connectedNodeSeveralConnection.get
+//							(Toolz.getRandomNumber(connectedNodeSeveralConnection.size()));
+//					removeLink(entite, target);
+//				}
+//			}
+//		}
 	}
 
 	/** Obtient les memes effectivements présent sur la map.

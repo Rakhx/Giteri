@@ -123,7 +123,7 @@ public final class Configurator {
 
 	public static boolean usePropagation = true;
 	public static boolean onlyOneToPropagate = true;
-	public static boolean usePropagationSecondGeneration = false; // transmet un des memes du porteur, pas forcement celui applied
+	public static boolean useEntitySuccesProba = true;
 
 
 	public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-d_HH'h'mm'm'ss's'");
@@ -138,6 +138,7 @@ public final class Configurator {
 	// Ancien mecanismes
 	public static boolean desgressiveLearningProba = false;
 	public static boolean useEntitePropagationProba = false;
+	public static boolean usePropagationSecondGeneration = false; // transmet un des memes du porteur, pas forcement celui applied
 	public static boolean learningOnlyOnce = false;
 
 //	public static long randomSeed;

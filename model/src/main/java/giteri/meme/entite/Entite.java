@@ -26,6 +26,7 @@ public class Entite implements Comparable<Entite>{
 	int index;
 	Node associatedNode;
 	double probaLearning;
+	double probaAppliying;
 
 	// Liste de memes
 	private ArrayList<Meme> myMemes;
@@ -49,6 +50,7 @@ public class Entite implements Comparable<Entite>{
 		connectedNodes = new HashSet<>();
 		breederOn = new HashSet<>();
 		eh = ent;
+		probaAppliying = 1;
 	}
 
 	/** Défini les regles de sélection de facon équiprobable.
@@ -70,9 +72,17 @@ public class Entite implements Comparable<Entite>{
 	 * @Return le meme qui a été remplacé s'il existe,
 	 */
 	public Boolean receiveMeme(Meme subMeme){
+
+
 		// (!A || B) && (!A || C) <=> !A && !A || !A && C || !A && B || B && C
-		boolean ok = !Configurator.useMemePropagationProba || Toolz.rollDice(subMeme.getProbaOfPropagation());
+		boolean ok;
+		ok = !getMyMemes().contains(subMeme);
+
+		ok = ok && !Configurator.useMemePropagationProba || Toolz.rollDice(subMeme.getProbaOfPropagation());
+
 		ok = ok && (!Configurator.useEntitePropagationProba || Toolz.rollDice(this.probaLearning));
+
+
 		if(ok) {
 			return addOrReplaceFast(subMeme);
 		}
@@ -91,7 +101,7 @@ public class Entite implements Comparable<Entite>{
 		boolean addedOrReplaced = false;
 		Meme memeReplaced = null;
 
-		// On parcourt les meme existant et regarde si un meme de la meme catégorie existe
+		// On parcourt les meme existant et regarde si un meme of the same category exists
 		for (Meme possededMeme : getMyMemes())
 			if(memeToAdd.getAction().getActionType() == possededMeme.getAction().getActionType())
 			{
@@ -118,6 +128,7 @@ public class Entite implements Comparable<Entite>{
 			synchronized(myMemes){
 				myMemes.remove(memeReplaced);
 			}
+
 			eh.eventMemeChanged(this, memeReplaced, Configurator.MemeActivityPossibility.RetraitMeme.toString());
 			okToBeAdded = true;
 		}

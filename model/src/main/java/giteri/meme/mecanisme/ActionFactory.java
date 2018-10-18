@@ -355,15 +355,19 @@ public class ActionFactory{
 
 			for (Entite entite : cibles)
 			{
-				if(Toolz.rollDice(.2)){
+				// Pour chaque entité, a X%
+				if(Toolz.rollDice(1)){
 					connectedNodeSeveralConnection.clear();
-					if(entite.getDegree() > 1){
+					// si l'entité est connecté a plus de Y noeud
+					if(entite.getDegree() > 2){
 						for (Integer indexEventuality : entite.getConnectedNodesIndex()) {
+							// Et si le noeud auquel elle est connecté possede aussi un degré Sup a Z
 							if(applier.getEntityCorresponding(indexEventuality).getDegree() > 1){
 								connectedNodeSeveralConnection.add(applier.getEntityCorresponding(indexEventuality));
 							}
 						}
 
+						// On supprime au hasard l'un de ces liens // noeuds
 						if(connectedNodeSeveralConnection.size() > 1){
 							target = connectedNodeSeveralConnection.get(Toolz.getRandomNumber(connectedNodeSeveralConnection.size()));
 							applier.removeLink(entite, target);
