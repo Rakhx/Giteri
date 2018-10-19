@@ -29,15 +29,23 @@ public final class Configurator {
 	public static boolean autoPauseIfNexted = false; // mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	public static boolean initializeDefaultBehavior = false	;	//fluidité
 	public static boolean oneAddForOneRmv = false; // Joue tour a tour un ajout d'un retrait
-	public static boolean onlyOneOfEachAction = false; // Réduit le nombre d'action a
+
+	public static double probaFirePropagate = 1;
+	public static double dividerProbaFire = 2;
+
 
 	// MEME
 	public static boolean strictEqualityInComparaison = false; // FALSE : >= || TRUE : >
 
 	// PROPAGATION
+	public static boolean usePropagation = true; // utilisation de la propagation
 	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
 	public static boolean checkWhenFullPropagate = true; 	// All action spread? affiche en combien d'action
 	public static int checkFullProRefreshRate = 75; // every X step vérification du full propagate
+	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
+	public static boolean onlyOneToPropagate = true; // Dans le cas ou une action s'applique sur plusieurs entités
+	public static boolean useEntitySuccesProba = false; // Prend en compte la proba porté pour l'entité pour APPLY a meme
+	public static boolean usePropagationSecondGeneration = false; // transmet un des memes du porteur, pas forcement celui applied
 
 	// SCORE
 	public static int activationCodeForScore = 55;
@@ -53,7 +61,6 @@ public final class Configurator {
 	public static int initialNetworkForFitting = 0; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
 	public static int nbRepetitionbyRun = 100;
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
-
 
 	// endregion
 
@@ -111,20 +118,12 @@ public final class Configurator {
 	//region ancien boolean, osef, etc
 	// moyen osef
 	public static final boolean lotOfNodes = false;
-
 	private static int nbNode = lotOfNodes ? 1000 : 100;
 	public static int refreshInfoRate = 10;
 	public final static boolean autoRedoActionIfNoAction = false;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
-	public static boolean useMemePropagationProba = true;
-	public final static double probaEntiteLearning = 0;
 	public static boolean memeCanBeReplaceByCategory = true;
 	public final static int semiAutoWaitingTime = 3000;
-
-	public static boolean usePropagation = true;
-	public static boolean onlyOneToPropagate = true;
-	public static boolean useEntitySuccesProba = true;
-
 
 	public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-d_HH'h'mm'm'ss's'");
 	public static File defaultPathForReadingNetwork = new File("model\\default.txt");
@@ -132,16 +131,12 @@ public final class Configurator {
 	private static Integer threadSleepMultiplicateur = baseSleepTimeMulti;
 
 	// Construction aléatoire du réseau ou non // systeme en pause au lancement
-	private static double probaRetraitLien = 0.;
 	private static Object lockOnPause = new Object();
 
 	// Ancien mecanismes
 	public static boolean desgressiveLearningProba = false;
 	public static boolean useEntitePropagationProba = false;
-	public static boolean usePropagationSecondGeneration = false; // transmet un des memes du porteur, pas forcement celui applied
 	public static boolean learningOnlyOnce = false;
-
-//	public static long randomSeed;
 
 	//endregion
 
@@ -225,7 +220,8 @@ public final class Configurator {
 		LINKED,
 		RANDOM,
 		HOPAWAY,
-		TRIANGLE
+		TRIANGLE,
+		THEIRSUP
 	}
 
 	/** Ajout lien...
@@ -320,14 +316,6 @@ public final class Configurator {
 		}
 
 		return activator;
-	}
-
-	@SuppressWarnings("unused")
-	public static double getProbaLearning(double max){
-		if(probaEntiteLearning <= 1 && probaEntiteLearning >= 0)
-			return probaEntiteLearning;
-		else
-			return Toolz.getProba() * max;
 	}
 
 	public static void setThreadSpeed(int speedToSet){

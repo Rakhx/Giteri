@@ -784,7 +784,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				System.out.println("[EH.runEntite]- action choisie " + memeAction.toFourCharString());
 
 			// APPLICATION ET PROPAGATION DE L'ACTION
-			rez = doAction(entiteActing, memeAction);
+			if(!Configurator.useEntitySuccesProba || Toolz.rollDice(entiteActing.getProbaAppliying()) )
+				rez = doAction(entiteActing, memeAction);
+			else
+				rez = "Nope, entite";
 			if(Configurator.debugEntiteHandler)
 				System.out.println("[EH.runEntite]- resultat de l'action" + rez);
 
@@ -973,7 +976,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	@SuppressWarnings("unchecked")
 	private String doAction(Entite movingOne, Meme memeAction) {
 		String actionDone = "";String memeApply = "";Set<Entite> cibles ;Set<Integer> ciblesIndex = new HashSet<>();
-		IFilter currentFilter = null; Iterator<Entite> ite; Entite one;
+		IFilter currentFilter = null; Iterator<Entite> ite; Entite one; Meme memeReturned;
 
 		// Execution d'un meme de l'entite.
 		if (memeAction != null) {
@@ -1028,19 +1031,43 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 						// region Transmission de l'un de behavior possédé par l'acting.
 						if (Configurator.usePropagationSecondGeneration)
 						{
+
+
+
 							Meme selectedMeme = movingOne.chooseAction();
 							if(selectedMeme == null){
 								if(Configurator.debugEntiteHandler) System.out.println("Meme joué par " + movingOne.toString() + " disparu");
 							}
-							memeApply = selectedMeme.toFourCharString();
-							if (entite.receiveMeme(selectedMeme))
-								eventMemeChanged(entite, selectedMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
+							memeReturned = entite.receiveMeme(selectedMeme);
+							// Si retour du meme a a jouter
+							if(memeReturned == selectedMeme)
+								eventMemeChanged(entite, selectedMeme,Configurator.MemeActivityPossibility.AjoutMeme.toString());
+
+							// alors il y a eu remplacement
+							if(memeReturned != null && memeReturned != selectedMeme){
+								// un retrait
+								eventMemeChanged(entite, memeReturned, Configurator.MemeActivityPossibility.RetraitMeme.toString());
+								// et un ajout
+								eventMemeChanged(entite, selectedMeme,Configurator.MemeActivityPossibility.AjoutMeme.toString());
+							}
 						}
 						// endregion
 
 						// ou transmission du behavior appliqué
-						else if (entite.receiveMeme(memeAction))
-							eventMemeChanged(entite, memeAction,Configurator.MemeActivityPossibility.AjoutMeme.toString());
+						else {
+							memeReturned = entite.receiveMeme(memeAction);
+							// Si retour du meme a a jouter
+							if(memeReturned == memeAction)
+								eventMemeChanged(entite, memeAction,Configurator.MemeActivityPossibility.AjoutMeme.toString());
+
+							// alors il y a eu remplacement
+							if(memeReturned != null && memeReturned != memeAction){
+								// un retrait
+								eventMemeChanged(entite, memeReturned, Configurator.MemeActivityPossibility.RetraitMeme.toString());
+								// et un ajout
+								eventMemeChanged(entite, memeAction,Configurator.MemeActivityPossibility.AjoutMeme.toString());
+							}
+						}
 					}
 
 				// endregion
@@ -1338,7 +1365,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		// Iterator sur les nodes du réseau pour leur associer des memes
 		for (Iterator<Node> iterator = nodes.iterator(); iterator.hasNext();) {
 			node = iterator.next();
-			toBindToNode = new Entite(this);
+			toBindToNode = new Entite();
 			toBindToNode.setNode(node);
 			entites.add(toBindToNode);
 		}
@@ -1410,6 +1437,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		AgregatorType random = AgregatorType.RANDOM;
 		AgregatorType hopAWay = AgregatorType.HOPAWAY;
 		AgregatorType triangle = AgregatorType.TRIANGLE;
+		AgregatorType theirSup = AgregatorType.THEIRSUP;
+
 
 		AgregatorType theMost = AgregatorType.THEMOST;
 		KVAttributAgregator.put(degree, agregators);
@@ -1427,10 +1456,13 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		memeFactory.registerMemeAction("Add-",1, false, add, attributs,KVAttributAgregator, false ,false);
 
 		agregators.clear();
-		agregators.put(0, notLinked);
-		agregators.put(1, theMost);
-		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add∞", 1, false, add, attributs, KVAttributAgregator, false,false);
+		// agregators.put(0, notLinked);
+		agregators.put(0, theMost);
+		agregators.put(1, random);
+		memeFactory.registerMemeAction("Add∞", 1, false, add, attributs, KVAttributAgregator, true,false);
+
+
+
 
 		agregators.clear();
 		agregators.put(0, hopAWay);
@@ -1443,7 +1475,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("AddØ",0.1, false, add, attributs, KVAttributAgregator, true, true);
+		memeFactory.registerMemeAction("AddØ",0., false, add, attributs, KVAttributAgregator, true, false);
 		agregators.put(2, random);
 		if(Configurator.initializeDefaultBehavior)
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, true, add, attributs, KVAttributAgregator, false, false);
@@ -1451,10 +1483,20 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("RmvØ",1, false, remove, attributs,  KVAttributAgregator, true, true);
+		memeFactory.registerMemeAction("RmvØ",1, false, remove, attributs,  KVAttributAgregator, false, false);
 		agregators.put(2, random);
 		if(Configurator.initializeDefaultBehavior)
 		removeRandom = memeFactory.registerMemeAction("RmvØ-neutral",0, true, remove, attributs,  KVAttributAgregator, false, false);
+
+
+		agregators.clear();
+		agregators.put(0, linked);
+		agregators.put(1, theirSup);
+		agregators.put(2, random);
+		memeFactory.registerMemeAction("Rmv2",1, false, remove, attributs,  KVAttributAgregator, true, false);
+
+
+
 
 		agregators.clear();
 		agregators.put(0, linked);
@@ -1475,7 +1517,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		memeFactory.registerMemeAction("RmvØ-2hop", 1, false, remove, attributs, KVAttributAgregator,false ,false);
 
 		agregators.clear();
-		memeFactory.registerMemeAction("Puri",1,false, puri, attributs, KVAttributAgregator, true, false);
+		memeFactory.registerMemeAction("Puri",.1,false, puri, attributs, KVAttributAgregator, false, false);
 
 		for (Meme memeDispo : memeFactory.getMemes(Configurator.MemeList.EXISTING,Configurator.ActionType.ANYTHING)) {
 			memeTranslationReadable.put(memeDispo.toFourCharString(),memeDispo.getName());

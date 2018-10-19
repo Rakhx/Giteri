@@ -21,11 +21,14 @@ public class Entite implements Comparable<Entite>{
 
 	//region Properties
 
-	EntiteHandler eh;
-
 	int index;
 	Node associatedNode;
 	double probaLearning;
+
+	public double getProbaAppliying() {
+		return probaAppliying;
+	}
+
 	double probaAppliying;
 
 	// Liste de memes
@@ -43,13 +46,12 @@ public class Entite implements Comparable<Entite>{
 	/** Constructeur d'entite.
 	 *
 	 */
-	public Entite(EntiteHandler ent){
+	public Entite(){
 		associatedNode = null;
 		myMemes = new ArrayList<>();
 		intervalOfSelection = new Hashtable<>();
 		connectedNodes = new HashSet<>();
 		breederOn = new HashSet<>();
-		eh = ent;
 		probaAppliying = 1;
 	}
 
@@ -69,33 +71,31 @@ public class Entite implements Comparable<Entite>{
 	/** Apres application d'une action, l'entité apprend de cette action
 	 * qu'il a vu.
 	 *
-	 * @Return le meme qui a été remplacé s'il existe,
+	 * @Return Null si aucun ajout, l'ancien meme si remplacement, le nouveau meme si ajout sans remplacement
 	 */
-	public Boolean receiveMeme(Meme subMeme){
-
+	public Meme receiveMeme(Meme subMeme){
 
 		// (!A || B) && (!A || C) <=> !A && !A || !A && C || !A && B || B && C
 		boolean ok;
 		ok = !getMyMemes().contains(subMeme);
-
-		ok = ok && !Configurator.useMemePropagationProba || Toolz.rollDice(subMeme.getProbaOfPropagation());
-
+		ok = ok && (!Configurator.useMemePropagationProba || Toolz.rollDice(subMeme.getProbaOfPropagation()));
 		ok = ok && (!Configurator.useEntitePropagationProba || Toolz.rollDice(this.probaLearning));
-
 
 		if(ok) {
 			return addOrReplaceFast(subMeme);
 		}
-		return false;
+
+		// null si aucun ajout a l'entité
+		return null;
 	}
 
 	/** ajoute un meme ou remplace un meme déja existant,
 	 * avec une notion de slot pour meme d'ajout et meme de retrait.
 	 *
 	 * @param memeToAdd
-	 * @return true si le meme a bien été remplacé.
+	 * @return memetoAdd si ajout, l'ancien meme si remplacement, null si rien
 	 */
-	public boolean addOrReplaceFast(Meme memeToAdd){
+	public Meme addOrReplaceFast(Meme memeToAdd){
 		boolean okToBeAdded = true;
 		boolean needToBeReplaced = false;
 		boolean addedOrReplaced = false;
@@ -121,7 +121,7 @@ public class Entite implements Comparable<Entite>{
 				for (IAction iAction : breederOn) {
 					// Dans le cas ou il s'agit d'une action de breeder, donc à ne pas remplacer
 					if(memeReplaced.getAction().toString() == iAction.toString()){
-						return false;
+						return null;
 					}
 				}
 			}
@@ -129,7 +129,6 @@ public class Entite implements Comparable<Entite>{
 				myMemes.remove(memeReplaced);
 			}
 
-			eh.eventMemeChanged(this, memeReplaced, Configurator.MemeActivityPossibility.RetraitMeme.toString());
 			okToBeAdded = true;
 		}
 
@@ -142,7 +141,8 @@ public class Entite implements Comparable<Entite>{
 			myMemes.sort(null);
 		}
 
-		return addedOrReplaced;
+		return needToBeReplaced ? memeReplaced : memeToAdd;
+
 	}
 
 
@@ -186,7 +186,7 @@ public class Entite implements Comparable<Entite>{
 				myMemes.remove(memeToReplace);
 			}
 
-			eh.eventMemeChanged(this, memeToReplace, Configurator.MemeActivityPossibility.RetraitMeme.toString());
+			//eh.eventMemeChanged(this, memeToReplace, Configurator.MemeActivityPossibility.RetraitMeme.toString());
 			okToBeAdded = true;
 		}
 
@@ -373,6 +373,7 @@ public class Entite implements Comparable<Entite>{
 	public void setNode(Node myPlaceee){
 		associatedNode = myPlaceee;
 		index = myPlaceee.getIndex();
+		probaAppliying = (index + 1.) / Configurator.getNbNode();
 	}
 
 	public ArrayList<Integer> getConnectedNodesIndex(){

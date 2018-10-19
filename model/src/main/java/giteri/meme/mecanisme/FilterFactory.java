@@ -51,7 +51,8 @@ public class FilterFactory {
 				return new HopWay();
 			case TRIANGLE:
 				return new Triangle();
-
+			case THEIRSUP:
+				return new TheirSup();
 			default:
 				return null;
 		}
@@ -260,6 +261,37 @@ public class FilterFactory {
 
 		public String getFourCharName() {
 			return "MNSP";
+		}
+	}
+
+	public class TheirSup implements IFilter {
+
+		int valueAttribut = 2;
+
+
+		@Override
+		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+			ArrayList<Entite> resultat = new ArrayList<Entite>();
+			for (Entite entite : entites) {
+					if(entite.getDegree() >= valueAttribut)
+						resultat.add(entite);
+				}
+
+
+			entites.clear();
+			entites.addAll(resultat);
+		}
+
+		public AgregatorType getEnumType() {
+			return AgregatorType.THEIRSUP;
+		}
+
+		public String toString(){
+			return "TheirSup";
+		}
+
+		public String getFourCharName() {
+			return "TRSP";
 		}
 	}
 

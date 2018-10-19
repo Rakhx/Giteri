@@ -356,7 +356,7 @@ public class ActionFactory{
 			for (Entite entite : cibles)
 			{
 				// Pour chaque entité, a X%
-				if(Toolz.rollDice(1)){
+				if(Toolz.rollDice(.5)){
 					connectedNodeSeveralConnection.clear();
 					// si l'entité est connecté a plus de Y noeud
 					if(entite.getDegree() > 2){
