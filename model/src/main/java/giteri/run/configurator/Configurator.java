@@ -34,17 +34,19 @@ public final class Configurator {
 	public static double dividerProbaFire = 2;
 
 
+	public static boolean allActionPerEntite = true; // Faire l'ajout et le retrait dans le meme temps
+
 	// MEME
-	public static boolean strictEqualityInComparaison = false; // FALSE : >= || TRUE : >
+	public static boolean strictEqualityInComparaison = true; // FALSE : >= || TRUE : >
 
 	// PROPAGATION
 	public static boolean usePropagation = true; // utilisation de la propagation
 	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
 	public static boolean checkWhenFullPropagate = true; 	// All action spread? affiche en combien d'action
 	public static int checkFullProRefreshRate = 75; // every X step vérification du full propagate
-	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 	public static boolean onlyOneToPropagate = true; // Dans le cas ou une action s'applique sur plusieurs entités
 	public static boolean useEntitySuccesProba = false; // Prend en compte la proba porté pour l'entité pour APPLY a meme
+	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 	public static boolean usePropagationSecondGeneration = false; // transmet un des memes du porteur, pas forcement celui applied
 
 	// SCORE

@@ -654,14 +654,12 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		return resultat;
 	}
 
-	// ECRITURE CSV POUR FITTING
-
-	/**
-	 *
-	 * @param param
-	 * @param forRepetition si pour répetition, valeur de la répétition, sinon, celui des répétitions du runs
-	 * @return
-	 */
+//	/**
+//	 *
+//	 * @param param
+//	 * @param forRepetition si pour répetition, valeur de la répétition, sinon, celui des répétitions du runs
+//	 * @return
+//	 */
 //	public String getStringHeaderMemeDetail(List<IModelParameter<?>> param, boolean forRepetition){
 //		String header = "Run-Rep";
 //		for (IModelParameter<?> model :param)
@@ -764,8 +762,11 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	private String runEntite() {
 
-		String rez;
-		Meme memeAction;
+		List<String> rez = new ArrayList<>();
+		// Meme memeAction;
+
+		boolean actionMe ;
+		List<Meme> memeActions = new ArrayList<>();
 
 		synchronized (workerFactory.waitingForReset) {
 			toDisplayForRatio.clear();
@@ -779,58 +780,72 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				return ("Nope pas d'entite prete");  }
 
 			// CHOIX DE L'ACTION POUR CETTE ENTITE
-			memeAction = actionSelectionRulesVersion(entiteActing);
-			if(Configurator.debugEntiteHandler)
-				System.out.println("[EH.runEntite]- action choisie " + memeAction.toFourCharString());
+			if(!Configurator.allActionPerEntite) {
+				memeActions.add(actionSelectionRulesVersion(entiteActing));
+				if(Configurator.debugEntiteHandler)
+					System.out.println("[EH.runEntite]- action choisie " + memeActions.get(0).toFourCharString());
+			}
+			else
+				memeActions.addAll(entiteActing.getMyMemes());
 
 			// APPLICATION ET PROPAGATION DE L'ACTION
-			if(!Configurator.useEntitySuccesProba || Toolz.rollDice(entiteActing.getProbaAppliying()) )
-				rez = doAction(entiteActing, memeAction);
-			else
-				rez = "Nope, entite";
-			if(Configurator.debugEntiteHandler)
-				System.out.println("[EH.runEntite]- resultat de l'action" + rez);
+			actionMe = !Configurator.useEntitySuccesProba || Toolz.rollDice(entiteActing.getProbaAppliying());
+
+			for (Meme memeAction : memeActions) {
+				if(actionMe)
+					rez.add(doAction(entiteActing, memeAction));
+				else {
+					rez.add("Nope, entite ne veux pas agir");
+					if (Configurator.debugEntiteHandler)
+						System.out.println("[EH.runEntite]- resultat de l'action" + rez);
+				}
+			}
 
 			// AFFICHAGE ET DEBUGGUAGE
 			if (Configurator.displayLogRatioTryAddOverTryRmv) {
-				if (memeAction != null)
-				{
-					if (memeAction.action.getActionType() == ActionType.AJOUTLIEN)
-						cptActionAddTried++;
-					else if (memeAction.action.getActionType() == ActionType.RETRAITLIEN)
-						cptActionRmvTried++;
+				for (Meme memeAction : memeActions) {
+					if (memeAction != null) {
+						if (memeAction.action.getActionType() == ActionType.AJOUTLIEN)
+							cptActionAddTried++;
+						else if (memeAction.action.getActionType() == ActionType.RETRAITLIEN)
+							cptActionRmvTried++;
 
-					toDisplayForRatio.add(memeAction.action.getActionType().name());
-					toDisplayForRatio.add("AddTried/rmvTried;" +(double) cptActionAddTried / cptActionRmvTried) ;
+						toDisplayForRatio.add(memeAction.action.getActionType().name());
+						toDisplayForRatio.add("AddTried/rmvTried;" + (double) cptActionAddTried / cptActionRmvTried);
+					}
 				}
 			}
 
 			// Si on veut afficher les X dernieres actions entreprises & action depuis le début
 			if (Configurator.displayMemePosessionDuringSimulation) {
-				if (Configurator.displayLogRatioLogFailOverFail || Configurator.displayLogRatioLogFailOverSuccess )
-				{
-					List<String> temp = memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez, cptModulo);
-					if(temp != null)
-						toDisplayForRatio.addAll(temp);
+				int i = -1;
+				for (Meme memeAction : memeActions) {
+					i++;
+					if (Configurator.displayLogRatioLogFailOverFail || Configurator.displayLogRatioLogFailOverSuccess )
+					{
+						List<String> temp = memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez.get(i), cptModulo);
+						if(temp != null)
+							toDisplayForRatio.addAll(temp);
+					}
+					else
+						memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez.get(i), cptModulo);
+
+					if(cptModulo % (Configurator.refreshInfoRate * 25)== 0) {
+
+						sumFailAction =  memeProperties.lastFailAction(nbFail);
+						//vueController.displayInfo("FAILSTUFF", Arrays.asList("" + sumFailAction));
+
+						if(Configurator.writeFailDensityLink)
+							vueController.displayInfo("failXDensity", getFailXDensity( nbFail.getValue(),
+									networkConstruct.updatePreciseNetworkProperties
+											(Configurator.getIndicateur(NetworkAttribType.DENSITY)).getDensity(),sumFailAction));
+					}
 				}
-				else
-					memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez, cptModulo);
 
-				if(cptModulo % (Configurator.refreshInfoRate * 25)== 0) {
-
-                    sumFailAction =  memeProperties.lastFailAction(nbFail);
-                    //vueController.displayInfo("FAILSTUFF", Arrays.asList("" + sumFailAction));
-
-					if(Configurator.writeFailDensityLink)
-                    	vueController.displayInfo("failXDensity", getFailXDensity( nbFail.getValue(),
-                            networkConstruct.updatePreciseNetworkProperties
-                            (Configurator.getIndicateur(NetworkAttribType.DENSITY)).getDensity(),sumFailAction));
-                }
 			}
 
 			if(!toDisplayForRatio.isEmpty())
 				vueController.displayInfo("Echecs", toDisplayForRatio);
-
 
 			// Dans le cas ou on veut les filtres en semi step, remis a zero des couleurs.
 			if (Configurator.semiStepProgression)
@@ -843,7 +858,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 
 		workerFactory.getCalculator().incrementNbAction();
-		return rez;
+		return rez.stream().reduce(String::concat).toString();
 	}
 
 	/** Choix aléatoire d'une entité qui va faire une action.
@@ -887,85 +902,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		else
 			return actionSelectionControlledVersion(movingOne);
 	}
-
-//	/** Application de l'action de l'entité
-//	 *
-//	 * @param movingOne
-//	 * @param memeAction
-//	 * @return
-//	 */
-//	@SuppressWarnings("unchecked")
-//	private String doActionFast(Entite movingOne, Meme memeAction) {
-//		String actionDone = "";
-//		String memeApply = "";
-//		Set<Entite> cibles ;
-//		Set<Integer> ciblesIndex = new HashSet<>();
-//		FilterFactory.IFilter currentFilter = null;
-//
-//		// Execution d'un meme de l'entite.
-//		if (memeAction != null) {
-//			cibles = new HashSet<>(entites);
-//			cibles.remove(movingOne);
-//
-//			// Pour chaque attribut sur lesquels on applique des filtres
-//			for (IAttribut<Integer> attribut : memeAction.getAttributs()) {
-//
-//				// Pour chaque filtre appliqué a un attribut
-//				for (int order = 0; order < memeAction.getFilter(attribut.toString()).size(); order++) {
-//					currentFilter = memeAction.getFilter(attribut.toString()).get(order);
-//					currentFilter.applyFilter(movingOne, cibles, attribut);
-//				}
-//			}
-//
-//			// Le dernier filtre appliqué est tjrs un random() unitaire
-//			if (cibles.size() == 1) {
-//				actionDone += memeAction.getAction().applyAction(movingOne, cibles);
-//
-//				// PROPAGATION du meme
-//				//if (Configurator.usePropagation)
-//				for (Entite entite : cibles)
-//				{
-//					// Transmission de l'un de behavior possédé par l'acting.
-//					if (Configurator.usePropagationSecondGeneration)
-//					{
-//						// Selectionne un meme en fonction de sa proba de propagation
-//						Meme selectedMeme = movingOne.chooseAction();
-//						if(selectedMeme == null){
-//							Double error = 1.;
-//							error = error / 0;
-//							if(Configurator.debugEntiteHandler) System.out.println("Meme joué par " + movingOne.toString() + " disparu");
-//						}
-//
-////						memeApply = selectedMeme.toFourCharString();
-//						if (entite.receiveMeme(selectedMeme))
-//							eventMemeChanged(entite, selectedMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-//					}
-//					else
-//						// ou transmission du behavior appliqué
-//						if (entite.receiveMeme(memeAction))
-//							eventMemeChanged(entite, memeAction,Configurator.MemeActivityPossibility.AjoutMeme.toString());
-//				}
-//
-//				// evenement d'application d'une action
-//				// 2- A revoir niveau timing
-//				eventActionDone(movingOne, memeAction, actionDone);
-//
-//			} else {
-//				if (cibles.size() > 1) System.err.println("Plusieurs cibles pour une action, pas normal");
-//
-//				actionDone = "Nope, Entite " + movingOne.getIndex()
-//						+ " Aucune(ou trop de) cible pour l'action" + memeAction.toFourCharString();
-//				eventActionDone(movingOne, null, "NOTARGET " + actionDone);
-//			}
-//		} else {
-//			actionDone = "Nope, Entite " + movingOne.getIndex() + " Liste d'action vide ou aucune action sélectionnée";
-//			eventActionDone(movingOne, null, "NOACTION");}
-//
-//		if (Configurator.displayLogMemeApplication)
-//			System.out.println(memeApply + " " + actionDone);
-//
-//		return actionDone;
-//	}
 
 	/** Application de l'action de l'entité
 	 *
@@ -1031,9 +967,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 						// region Transmission de l'un de behavior possédé par l'acting.
 						if (Configurator.usePropagationSecondGeneration)
 						{
-
-
-
 							Meme selectedMeme = movingOne.chooseAction();
 							if(selectedMeme == null){
 								if(Configurator.debugEntiteHandler) System.out.println("Meme joué par " + movingOne.toString() + " disparu");
@@ -1058,7 +991,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 							memeReturned = entite.receiveMeme(memeAction);
 							// Si retour du meme a a jouter
 							if(memeReturned == memeAction)
-								eventMemeChanged(entite, memeAction,Configurator.MemeActivityPossibility.AjoutMeme.toString());
+								eventMemeChanged(entite, memeAction, Configurator.MemeActivityPossibility.AjoutMeme.toString());
 
 							// alors il y a eu remplacement
 							if(memeReturned != null && memeReturned != memeAction){
@@ -1447,21 +1380,19 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(0, notLinked);
 		agregators.put(1, mineInf);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add+", 1, false, add, attributs,KVAttributAgregator, false ,false);
+		memeFactory.registerMemeAction("Add+", 1, false, add, attributs,KVAttributAgregator, true ,false);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add-",1, false, add, attributs,KVAttributAgregator, false ,false);
+		memeFactory.registerMemeAction("Add-",1, false, add, attributs,KVAttributAgregator, true ,false);
 
 		agregators.clear();
 		// agregators.put(0, notLinked);
 		agregators.put(0, theMost);
 		agregators.put(1, random);
 		memeFactory.registerMemeAction("Add∞", 1, false, add, attributs, KVAttributAgregator, true,false);
-
-
 
 
 		agregators.clear();
@@ -1475,7 +1406,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("AddØ",0., false, add, attributs, KVAttributAgregator, true, false);
+		memeFactory.registerMemeAction("AddØ",0, false, add, attributs, KVAttributAgregator, true, false);
 		agregators.put(2, random);
 		if(Configurator.initializeDefaultBehavior)
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, true, add, attributs, KVAttributAgregator, false, false);
@@ -1483,26 +1414,22 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("RmvØ",1, false, remove, attributs,  KVAttributAgregator, false, false);
+		memeFactory.registerMemeAction("RmvØ",0, false, remove, attributs,  KVAttributAgregator, true, false);
 		agregators.put(2, random);
 		if(Configurator.initializeDefaultBehavior)
 		removeRandom = memeFactory.registerMemeAction("RmvØ-neutral",0, true, remove, attributs,  KVAttributAgregator, false, false);
-
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, theirSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv2",1, false, remove, attributs,  KVAttributAgregator, true, false);
-
-
-
+		memeFactory.registerMemeAction("Rmv2",1, false, remove, attributs,  KVAttributAgregator, false, false);
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv-", 1, false, remove, attributs, KVAttributAgregator, false ,false);
+		memeFactory.registerMemeAction("Rmv-", 1, false, remove, attributs, KVAttributAgregator, true ,false);
 
 		agregators.clear();
 		agregators.put(0, linked);
