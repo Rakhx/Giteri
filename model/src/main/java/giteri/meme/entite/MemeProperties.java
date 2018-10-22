@@ -73,14 +73,15 @@ public class MemeProperties{
             Meme elementRemoveOfCircular = null;
             Toolz.addCountToElementInHashArray(nbActivationByMemes, memeApply, 1);
 
-            // partie last twenty
-            if(lastHundredActionDone.size() == lastHundredActionDone.maxSize())
-            {
-                elementRemoveOfCircular = lastHundredActionDone.poll();
-                Toolz.removeCountToElementInHashArray(countOfLastMemeActivation, elementRemoveOfCircular, 1);
-            }
+            synchronized (lastHundredActionDone) {
+                // partie last twenty
+                if (lastHundredActionDone.size() == lastHundredActionDone.maxSize()) {
+                    elementRemoveOfCircular = lastHundredActionDone.poll();
+                    Toolz.removeCountToElementInHashArray(countOfLastMemeActivation, elementRemoveOfCircular, 1);
+                }
 
-            lastHundredActionDone.add(memeApply);
+                lastHundredActionDone.add(memeApply);
+            }
             Toolz.addCountToElementInHashArray(countOfLastMemeActivation, memeApply, 1);
         }
 

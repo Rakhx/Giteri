@@ -77,8 +77,10 @@ public class Controller {
 					forEach(kv -> nbActiByMeme.put(kv.getKey().toFourCharString(),kv.getValue()));
 			countOfLastMemeActivation.entrySet().stream().
 					forEach(kv -> nbLastActivByMeme.put(kv.getKey().toFourCharString(),kv.getValue()));
-			lastHundredActionDone.stream().
-					forEach(l -> lastHundred.add(l.toFourCharString()));
+			synchronized (lastHundredActionDone) {
+				lastHundredActionDone.stream().
+						forEach(l -> lastHundred.add(l.toFourCharString()));
+			}
 
 			for (Interfaces.IView vue: vues) {
 				vue.displayXLastAction(nbAction, nbActiByMeme,  nbLastActivByMeme, lastHundred);

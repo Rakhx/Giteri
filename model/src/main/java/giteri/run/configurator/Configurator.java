@@ -33,8 +33,7 @@ public final class Configurator {
 	public static double probaFirePropagate = 1;
 	public static double dividerProbaFire = 2;
 
-
-	public static boolean allActionPerEntite = true; // Faire l'ajout et le retrait dans le meme temps
+	public static boolean rebranchementAction = false; // Faire l'ajout et le retrait dans le meme temps
 
 	// MEME
 	public static boolean strictEqualityInComparaison = true; // FALSE : >= || TRUE : >
@@ -42,12 +41,16 @@ public final class Configurator {
 	// PROPAGATION
 	public static boolean usePropagation = true; // utilisation de la propagation
 	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
-	public static boolean checkWhenFullPropagate = true; 	// All action spread? affiche en combien d'action
-	public static int checkFullProRefreshRate = 75; // every X step vérification du full propagate
+	public static boolean autoMemeForBreeder = false;	// Les breeder ont associé un meme complémement, rmd ajout ou retrait.
 	public static boolean onlyOneToPropagate = true; // Dans le cas ou une action s'applique sur plusieurs entités
+	public static boolean usePropagationSecondGeneration = false; // transmet un des memes du porteur, pas forcement celui applied
+
 	public static boolean useEntitySuccesProba = false; // Prend en compte la proba porté pour l'entité pour APPLY a meme
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
-	public static boolean usePropagationSecondGeneration = false; // transmet un des memes du porteur, pas forcement celui applied
+
+	public static boolean checkWhenFullPropagate = true; 	// All action spread? affiche en combien d'action
+	public static int checkFullProRefreshRate = 75; // every X step vérification du full propagate
+
 
 	// SCORE
 	public static int activationCodeForScore = 55;
@@ -60,9 +63,10 @@ public final class Configurator {
 
 	public static EnumExplorationMethod explorator = EnumExplorationMethod.exhaustive; // Type d'exploration de fitting
 	public static MemeList typeOfMemeUseForFitting = MemeList.FITTING; // Peut etre ONMAP, EXISTING, FITTING
-	public static int initialNetworkForFitting = 0; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
+	public static int initialNetworkForFitting = 2; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
 	public static int nbRepetitionbyRun = 100;
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
+	public static int multiplicatorNbAction  = 250; //  Par combein on multiplie le nombdre de noeud sur la simulation
 
 	// endregion
 

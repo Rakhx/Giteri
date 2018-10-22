@@ -4,8 +4,6 @@ import giteri.meme.event.ActionApplyEvent;
 import giteri.meme.event.BehavTransmEvent;
 import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.IBehaviorTransmissionListener;
-import giteri.meme.mecanisme.ActionFactory;
-import giteri.meme.mecanisme.FilterFactory;
 import giteri.meme.mecanisme.FilterFactory.IFilter;
 import giteri.meme.mecanisme.AttributFactory.IAttribut;
 import giteri.meme.mecanisme.MemeFactory;
@@ -69,6 +67,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private double lastDensity;
 	private int sumFailAction;
 	private ObjectRef<Integer> nbFail = new ObjectRef<>(0);
+
 	/** Constructeur sans param.
 	 *
 	 */
@@ -374,10 +373,11 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	public void eventMemeChanged(Entite entiteConcernee, Meme ajoutOrR, String message) {
 
-		synchronized (entitesActive) {
-			if(!entitesActive.contains(entiteConcernee))
-				entitesActive.add(entiteConcernee);
-		}
+	    if(!Configurator.rebranchementAction || entiteConcernee.getMyMemes().size() > 1)
+            synchronized (entitesActive) {
+                if(!entitesActive.contains(entiteConcernee))
+                    entitesActive.add(entiteConcernee);
+            }
 
 		BehavTransmEvent myEvent = new BehavTransmEvent(this, entiteConcernee, ajoutOrR, message);
 
@@ -780,7 +780,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				return ("Nope pas d'entite prete");  }
 
 			// CHOIX DE L'ACTION POUR CETTE ENTITE
-			if(!Configurator.allActionPerEntite) {
+			if(!Configurator.rebranchementAction) {
 				memeActions.add(actionSelectionRulesVersion(entiteActing));
 				if(Configurator.debugEntiteHandler)
 					System.out.println("[EH.runEntite]- action choisie " + memeActions.get(0).toFourCharString());
@@ -790,7 +790,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 			// APPLICATION ET PROPAGATION DE L'ACTION
 			actionMe = !Configurator.useEntitySuccesProba || Toolz.rollDice(entiteActing.getProbaAppliying());
-
 			for (Meme memeAction : memeActions) {
 				if(actionMe)
 					rez.add(doAction(entiteActing, memeAction));
@@ -1301,6 +1300,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			toBindToNode = new Entite();
 			toBindToNode.setNode(node);
 			entites.add(toBindToNode);
+			if(Configurator.autoMemeForBreeder) {
+				toBindToNode.ajoutRandomFlemme = addRandom;
+				toBindToNode.retraitRandomFlemme = removeRandom;
+			}
 		}
 
 		for (Entite entite : entites) {
@@ -1371,8 +1374,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		AgregatorType hopAWay = AgregatorType.HOPAWAY;
 		AgregatorType triangle = AgregatorType.TRIANGLE;
 		AgregatorType theirSup = AgregatorType.THEIRSUP;
-
-
 		AgregatorType theMost = AgregatorType.THEMOST;
 		KVAttributAgregator.put(degree, agregators);
 
@@ -1386,14 +1387,13 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(0, notLinked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add-",1, false, add, attributs,KVAttributAgregator, true ,false);
+		memeFactory.registerMemeAction("Add-",1, false, add, attributs,KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		// agregators.put(0, notLinked);
 		agregators.put(0, theMost);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("Add∞", 1, false, add, attributs, KVAttributAgregator, true,false);
-
+		memeFactory.registerMemeAction("Add∞", 1, false, add, attributs, KVAttributAgregator, false,false);
 
 		agregators.clear();
 		agregators.put(0, hopAWay);
@@ -1406,30 +1406,30 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("AddØ",0, false, add, attributs, KVAttributAgregator, true, false);
+		memeFactory.registerMemeAction("AddØ",0, false, add, attributs, KVAttributAgregator, false, false);
 		agregators.put(2, random);
-		if(Configurator.initializeDefaultBehavior)
+//		if(Configurator.initializeDefaultBehavior)
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, true, add, attributs, KVAttributAgregator, false, false);
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("RmvØ",0, false, remove, attributs,  KVAttributAgregator, true, false);
+		memeFactory.registerMemeAction("RmvØ",1, false, remove, attributs,  KVAttributAgregator, true, false);
 		agregators.put(2, random);
-		if(Configurator.initializeDefaultBehavior)
+//		if(Configurator.initializeDefaultBehavior)
 		removeRandom = memeFactory.registerMemeAction("RmvØ-neutral",0, true, remove, attributs,  KVAttributAgregator, false, false);
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, theirSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv2",1, false, remove, attributs,  KVAttributAgregator, false, false);
+		memeFactory.registerMemeAction("Rmv2",.5, false, remove, attributs,  KVAttributAgregator, false, false);
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv-", 1, false, remove, attributs, KVAttributAgregator, true ,false);
+		memeFactory.registerMemeAction("Rmv-", .1, false, remove, attributs, KVAttributAgregator, false ,false);
 
 		agregators.clear();
 		agregators.put(0, linked);
@@ -1441,7 +1441,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(0, linked);
 		agregators.put(1, triangle);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("RmvØ-2hop", 1, false, remove, attributs, KVAttributAgregator,false ,false);
+		memeFactory.registerMemeAction("RmvØ-2hop", .3, false, remove, attributs, KVAttributAgregator,false ,false);
 
 		agregators.clear();
 		memeFactory.registerMemeAction("Puri",.1,false, puri, attributs, KVAttributAgregator, false, false);

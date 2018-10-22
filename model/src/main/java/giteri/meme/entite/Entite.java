@@ -25,6 +25,9 @@ public class Entite implements Comparable<Entite>{
 	Node associatedNode;
 	double probaLearning;
 
+	Meme ajoutRandomFlemme;
+	Meme retraitRandomFlemme;
+
 	public double getProbaAppliying() {
 		return probaAppliying;
 	}
@@ -373,7 +376,8 @@ public class Entite implements Comparable<Entite>{
 	public void setNode(Node myPlaceee){
 		associatedNode = myPlaceee;
 		index = myPlaceee.getIndex();
-		probaAppliying = (index + 1.) / Configurator.getNbNode();
+		if(Configurator.useEntitySuccesProba)
+			probaAppliying = (index + 1.) / Configurator.getNbNode();
 	}
 
 	public ArrayList<Integer> getConnectedNodesIndex(){
@@ -408,15 +412,16 @@ public class Entite implements Comparable<Entite>{
 	}
 
 	public Meme addMeme(Meme e, boolean fixed){
-		//synchronized(myMemes){
-			if(fixed)
-				breederOn.add(addMeme(e).getAction());
-			else
-				addMeme(e);
-				//myMemes.add(e);
-		//}
-
-		//defineRulesProbaLimited();
+		if(fixed) {
+			breederOn.add(addMeme(e).getAction());
+			if(Configurator.autoMemeForBreeder)
+				if(e.getAction().getActionType() == ActionType.AJOUTLIEN )
+					addMeme(retraitRandomFlemme);
+				else
+					addMeme(ajoutRandomFlemme);
+		}
+		else
+			addMeme(e);
 		return e;
 	}
 

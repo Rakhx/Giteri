@@ -40,7 +40,6 @@ import giteri.meme.event.IBehaviorTransmissionListener;
  * Step: Pendant un run, interval de temps entre deux mesures
  * Config // set de parametre : valeur des paramètres de configuration
  * de la simulation. Ne change pas pendant un run.
- *
  */
 public class FittingClass implements IBehaviorTransmissionListener, IActionApplyListener,
 		INbNodeChangedListener {
@@ -65,7 +64,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public int nbActionByStep = Configurator.getNbNode() * 10;
 	public int boucleExterneSize = 30;
 	public int nbActionBeforeQuit = Configurator.fixedNbAction ? 100000 :
-			2500 * Configurator.getNbNode();
+			Configurator.multiplicatorNbAction * Configurator.getNbNode();
 
 
 	// VARIABLES DE FONCTIONNEMENT
@@ -81,9 +80,9 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	// Compteur du nombre de relevé fait pour un meme run
 	public int turnCount = 0;
 	File repOfTheSearch ;
-	private Integer nbActionCount = 0;
+	private Integer nbActionCount = 0; // Nombre d'action sur la répétition
+	private Integer nbActionCountLocal = 0; // Nombre d'action depuis le dernier reset; plusieurs reset par répétition
 	private Integer nbTransmissionCount = 0;
-	public int nbActionLocal = 0;
 	public long currentSeed ;
 
 	public int circularSize = 200;
@@ -108,7 +107,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	// every nbActionThreshrising rise threshold of risingPourcentage
 	private double risingPourcentage = .4;
 	private int nbActionThreshRising = 7;
-
 
 	// RESULTATS DE SIMULATION
 
@@ -513,7 +511,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public boolean continuFittingSimpliestVersion(){
 		boolean oneMoreTurn = true;
 		ObjectRef<String> message = new ObjectRef<>("");
-		//oneMoreTurn = readingActionCanContinue(message);
+		oneMoreTurn = readingActionCanContinue(message);
 		if(getNbAction() > nbActionBeforeQuit )
 			oneMoreTurn &= false;
 		return oneMoreTurn;
@@ -533,8 +531,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	private boolean readingActionCanContinue(ObjectRef<String> message){
 		String resume = "\n [ReadingActionCanContinu]- ";
 		boolean resultat = true;
-		nbActionLocal = getNbAction();
-		if(nbActionLocal == 0){
+		if(getNbActionLocal() == 0){
 			// Et si aucune action n'a pu etre forcée a être faite
 			if(!entiteHandler.forceAction()){
 				resultat = false;
@@ -543,7 +540,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		} // Si on a réussi a faire faire une action
 		else{
 			resume += "[ActionReading] - passé par un soft end d'actions réalisées";
-			resetAction();
+			resetActionLocal();
 		}
 
 		message.setValue(message.getValue() + resume);
@@ -954,6 +951,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public void newAction(){
 		synchronized(nbActionCount){
 			nbActionCount++;
+			nbActionCountLocal++;
 		}
 	}
 	public void resetAction(){
@@ -961,11 +959,23 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			nbActionCount = 0;
 		}
 	}
+	public void resetActionLocal(){
+		synchronized(nbActionCountLocal){
+			nbActionCountLocal = 0;
+		}
+	}
+
 	public int getNbAction(){
-		synchronized(nbTransmissionCount){
+		synchronized(nbActionCount){
 			return nbActionCount;
 		}
 	}
+	public int getNbActionLocal(){
+		synchronized(nbActionCountLocal){
+			return nbActionCountLocal;
+		}
+	}
+
 	public void newBehaviorTransmitted(){
 		synchronized(nbTransmissionCount){
 			nbTransmissionCount++;

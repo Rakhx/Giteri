@@ -332,7 +332,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 			for (int g = 0; g <= 250; g += 250/nbColorWanted)
 				for (int b = 0; b <= 250; b += 250/nbColorWanted)
 				{
-					if(r + g + b == 0)
+					if(r == g && r == b)
 						continue;
 					colorPieAsColor.put(i, new Color(r,g,b));
 					i++;
@@ -352,6 +352,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 			colorPieAsColor. put(100, new Color(204,0,0));
 			colorPieAsString.put(101, "rgb(0,0,0)");
 			colorPieAsColor. put(101, new Color(0,0,0));
+			new Color(180,180,180);
 		}
 	}
 
