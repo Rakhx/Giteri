@@ -58,9 +58,9 @@ public class MemeFactory {
 	 * @param KVAttributAgregator
 	 * @return
 	 */
-	public Meme registerMemeAction(String name, double probaOfPropa, boolean fluidite, ActionType actionAsked, ArrayList<AttributType> attributs,
-								   Hashtable<AttributType, Hashtable<Integer ,AgregatorType>> KVAttributAgregator,
-								   boolean addForMap, boolean addForFitting){
+	public Meme registerMemeAction(String name, double probaOfPropa, boolean addForMap, boolean addForFitting, ActionType actionAsked,
+								   ArrayList<AttributType> attributs,
+								   Hashtable<AttributType, Hashtable<Integer ,AgregatorType>> KVAttributAgregator, boolean fluidite){
 
 		// L'action qui compose le meme
 		ActionFactory.IAction action = actionFactory.getAction(actionAsked);
