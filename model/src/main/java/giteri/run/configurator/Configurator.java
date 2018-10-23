@@ -63,10 +63,12 @@ public final class Configurator {
 
 	public static EnumExplorationMethod explorator = EnumExplorationMethod.exhaustive; // Type d'exploration de fitting
 	public static MemeList typeOfMemeUseForFitting = MemeList.FITTING; // Peut etre ONMAP, EXISTING, FITTING
+
+
 	public static int initialNetworkForFitting = 2; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
-	public static int nbRepetitionbyRun = 100;
+	public static int nbRepetitionbyRun = 5;
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
-	public static int multiplicatorNbAction  = 250; //  Par combein on multiplie le nombdre de noeud sur la simulation
+	public static int multiplicatorNbAction  = 2500; //  Par combein on multiplie le nombdre de noeud sur la simulation
 
 	// endregion
 

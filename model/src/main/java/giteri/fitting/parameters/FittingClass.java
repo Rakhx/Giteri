@@ -911,7 +911,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		threshSeDensity = 0.5 ;
 		threshHeDensity = 0.005;
 		threshSeCoeff = 0.01;
-//		threshHeCoeff = 0.001;
 		threshSeAppliance = 0.3;
 		threshHeAppliance = 0.1;
 	}
@@ -923,7 +922,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		threshSeDensity *= (1 + risingPourcentage) ;
 		threshHeDensity *= (1 + risingPourcentage) ;
 		threshSeCoeff *= (1 + risingPourcentage) ;
-//		threshHeCoeff *= (1 + risingPourcentage) ;
 		threshSeAppliance *= (1 + risingPourcentage) ;
 		threshHeAppliance *= (1 + risingPourcentage) ;
 		if(debug) System.out.println("Rise des threshold");
@@ -997,8 +995,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		// Changement des steps etc
 		nbActionByStep = e.nbNode * 10;
 		nbActionBeforeQuit = 20 * e.nbNode;
-
-		//
 		com.generateGraph(Configurator.initialNetworkForFitting);
 	}
 

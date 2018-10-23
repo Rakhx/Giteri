@@ -110,7 +110,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		if(typeOfExplo == EnumExplorationMethod.exhaustive)
 			explorator = callFromJava();
 
-		// Si appelle oneSot, depuis IHM ou depuis JAR
+		// Si appelle oneShot, depuis IHM ou depuis JAR
 		else if(typeOfExplo == EnumExplorationMethod.oneShot)
 			explorator = callFromJar(configuration,memeActivation, memeProba);
 
@@ -149,10 +149,10 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		MemeAvailability memeProvider = new MemeAvailability(memeDispo);
 		memeProvider.setEntiteHandler(entiteHandler);
-		providers.put(1,memeProvider);
+		// providers.put(1,memeProvider);
 
 		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING),
-				new GenericDoubleParameter(.2,.2,.4,.2));
+				new GenericDoubleParameter(.1,.1,1.,.1));
 		memeDiffu.setEntiteHandler(entiteHandler);
 		providers.put(0,memeDiffu);
 
