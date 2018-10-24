@@ -134,7 +134,7 @@ public final class Configurator {
 	public final static int semiAutoWaitingTime = 3000;
 
 	public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-d_HH'h'mm'm'ss's'");
-	public static File defaultPathForReadingNetwork = new File("model\\default.txt");
+	public static File defaultPathForReadingNetwork = new File("model"+File.separator+"default.txt");
 	public static Integer baseSleepTimeMulti = 0;
 	private static Integer threadSleepMultiplicateur = baseSleepTimeMulti;
 

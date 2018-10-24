@@ -192,45 +192,33 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		return ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
 	}
 
-	/** Retourne
+	/** Retourne une liste spécifique a explorer.
 	 *
 	 * @return
 	 */
 	private IExplorationMethod callSpecificParam(){
-//		//
-//		Hashtable<Meme, GenericBooleanParameter> memeDispo = new Hashtable<>();
-//		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
-//
-//		// Rempli la liste des memes que l'on veut pour lancer le fitting.
-//		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING))
-//			memeDispo.put(meme, new GenericBooleanParameter());
-//
-//		MemeAvailability memeProvider = new MemeAvailability(memeDispo);
-//		memeProvider.setEntiteHandler(entiteHandler);
-//		providers.put(1,memeProvider);
-//
-//		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING),
-//				new GenericDoubleParameter(.2,.2,.4,.2));
-//		memeDiffu.setEntiteHandler(entiteHandler);
-//		providers.put(0,memeDiffu);
-//
-//		memeProvider.addMemeListListener(memeDiffu);
-//
-//		if(Configurator.explorator == EnumExplorationMethod.oneShot){
-//			ArrayList<Double> InOrderOfParameter = new ArrayList<>(Arrays.asList(1.,0.365018173274458,0.089130672733655,0.484877681454417,1.));
-//
-//			ArrayList<Double> probaVoulu = new ArrayList<>();
-//			probaVoulu.add(InOrderOfParameter.get(3));
-//			probaVoulu.add(InOrderOfParameter.get(0));
-//			probaVoulu.add(InOrderOfParameter.get(1));
-//			probaVoulu.add(InOrderOfParameter.get(4));
-//			probaVoulu.add(InOrderOfParameter.get(2));
-//			setPreciseValue(probaVoulu, memeDiffu);
-//		}
-//
-//		fitting.explorator = ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
+		// appelle sec avec un seul jeu de parametre, aux probas fixés
+		Hashtable<Meme, GenericDoubleParameter> memeAndProba = new Hashtable<>();
+		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
+		List<Meme> existingMeme = memeFactory.getMemes(Configurator.MemeList.EXISTING, Configurator.ActionType.ANYTHING);
 
-		return null;
+		for (int i = 0; i < existingMeme.size(); i++) {
+ 			if(existingMeme.get(i).getName().compareToIgnoreCase("ADDØ") == 0 ){
+				memeAndProba.put(existingMeme.get(i),new GenericDoubleParameter(1.,1.,1.,1.));
+ 			}
+			else if(existingMeme.get(i).getName().compareToIgnoreCase("RMV+") == 0 ){
+				memeAndProba.put(existingMeme.get(i),new GenericDoubleParameter(0.,0.,1.,.1));
+			}
+			else if(existingMeme.get(i).getName().compareToIgnoreCase("RMV-") == 0 ){
+				memeAndProba.put(existingMeme.get(i),new GenericDoubleParameter(0.,0.,1.,.1));
+			}
+		}
+
+		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeAndProba);
+		memeDiffu.setEntiteHandler(entiteHandler);
+		providers.put(0,memeDiffu);
+
+		return ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
 	}
 
 	/** prends les listes vides en entrée et les remplis pour les faire correspondre a une

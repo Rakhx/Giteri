@@ -108,7 +108,7 @@ public class Interfaces {
 	 */
 	public interface IModel {
 
-		void stabilityResearch();
+		void fittingSpecificConfig();
 		void fittingNetworks();
 		void displayPolar();
 		void fittingNextStep();

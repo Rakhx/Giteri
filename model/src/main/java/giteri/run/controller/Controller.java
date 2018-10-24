@@ -198,7 +198,7 @@ public class Controller {
 		//region calcul pour la mise à jour d'éléments de l'interface
 
 		public void stabilityResearch(){
-			model.stabilityResearch();
+			model.fittingSpecificConfig();
 		}
 
 		public void fittingNetworks(){

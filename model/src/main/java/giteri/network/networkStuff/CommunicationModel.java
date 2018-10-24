@@ -98,7 +98,8 @@ public class CommunicationModel implements IModel {
 	/**
 	 *
 	 */
-	public void stabilityResearch() {
+	public void fittingSpecificConfig() {
+		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.specific, Optional.empty(), Optional.empty());
 
 	}
 

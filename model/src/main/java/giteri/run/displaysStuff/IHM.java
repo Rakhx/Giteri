@@ -1,8 +1,5 @@
 package giteri.run.displaysStuff;
 
-import giteri.meme.mecanisme.ActionFactory;
-import giteri.network.networkStuff.NetworkConstructor;
-import giteri.network.networkStuff.WorkerFactory;
 import giteri.run.configurator.Configurator;
 import giteri.run.interfaces.Interfaces;
 import giteri.run.interfaces.Interfaces.IReadNetwork;
@@ -44,7 +41,6 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.DefaultFormatter;
-import javax.swing.text.html.Option;
 
 import giteri.tool.math.Toolz;
 import giteri.meme.mecanisme.MemeFactory;
@@ -138,7 +134,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	public JButton btPolar;
 	public JButton btNextStep;
 	public JButton bFittingOneStep;
-	public JButton btRandomConfig;
+	public JButton btSpecificConfig;
 	public JButton btSemiAutomaticStep;
 
 	public JTextField tfPath;
@@ -652,7 +648,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		btPolar = new JButton("Polar");
 		btNextStep = new JButton("Next Step");
 		bFittingOneStep = new JButton("FittingOnce");
-		btRandomConfig = new JButton("Find Stability");
+		btSpecificConfig = new JButton("Specific Config");
 		btSemiAutomaticStep= new JButton("ToggleSemiautoAction");
 
 		plNetworkPlaying = new JPanel();
@@ -688,7 +684,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 								.addComponent(bFittingOneStep,
 										GroupLayout.DEFAULT_SIZE,
 										hauteurComponent, hauteurComponent)
-								.addComponent(btRandomConfig,
+								.addComponent(btSpecificConfig,
 										GroupLayout.DEFAULT_SIZE,
 										hauteurComponent, hauteurComponent)
 								.addComponent(btSemiAutomaticStep,
@@ -741,7 +737,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 								.addComponent(bFittingOneStep,
 										GroupLayout.DEFAULT_SIZE,
 										hauteurComponent, hauteurComponent)
-								.addComponent(btRandomConfig,
+								.addComponent(btSpecificConfig,
 										GroupLayout.DEFAULT_SIZE,
 										hauteurComponent, hauteurComponent)
 								.addComponent(btSemiAutomaticStep,
@@ -1360,7 +1356,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		btPolar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				modelController.stabilityResearch();
 			}
 		});
 
@@ -1372,7 +1367,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		bFittingOneStep.addActionListener(e -> modelController.fittingOnce());
 
-		btRandomConfig.addActionListener(e -> modelController.rdmConfig());
+		btSpecificConfig.addActionListener(e ->modelController.stabilityResearch());
 
 		btSemiAutomaticStep.addActionListener(e -> modelController.toggleActionSemiAuto());
 

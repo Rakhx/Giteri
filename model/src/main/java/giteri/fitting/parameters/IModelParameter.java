@@ -80,7 +80,7 @@ public interface IModelParameter<T> {
 	 *
 	 * @param <T>
 	 */
-	 abstract class AbstractModelParameter<T> implements IModelParameter<T>{
+	abstract class AbstractModelParameter<T> implements IModelParameter<T>{
 		T value;
 		T minValue;
 		T maxValue;
@@ -104,7 +104,7 @@ public interface IModelParameter<T> {
 	 *
 	 *
 	 */
-	public abstract class AbstractBooleanParameter extends AbstractModelParameter<Boolean>{
+	abstract class AbstractBooleanParameter extends AbstractModelParameter<Boolean>{
 
 		protected AbstractBooleanParameter(){
 			minValue = true;
@@ -159,7 +159,7 @@ public interface IModelParameter<T> {
 	 * vitesse de progression de minvalue a maxvalue
 	 *
 	 */
-	public abstract class AbstractDoubleParameter extends AbstractModelParameter<Double>{
+	abstract class AbstractDoubleParameter extends AbstractModelParameter<Double>{
 
 		Double step;
 		// détermine l'arrondi fait lors de l'ajout de step a la valeur courante.
@@ -224,7 +224,7 @@ public interface IModelParameter<T> {
 	 * vitesse de progression de minvalue a maxvalue
 	 *
 	 */
-	public abstract class AbstractIntParameter extends AbstractModelParameter<Integer>{
+	abstract class AbstractIntParameter extends AbstractModelParameter<Integer>{
 
 		int step;
 		// détermine l'arrondi fait lors de l'ajout de step a la valeur courante.
@@ -284,7 +284,6 @@ public interface IModelParameter<T> {
 			return valueString();
 		}
 	}
-
 
 	/** CLASSE ABSTRAITE qui définit T comme une Map<Meme, P> ou P est un type quelconque, extend de
 	 * AbractModelParameter. Permet d'avoir a nouveau acces au méthode gotoNext etc etc.
@@ -415,7 +414,7 @@ public interface IModelParameter<T> {
 	 *
 	 * @author Felix
 	 */
-	 class GenericBooleanParameter extends AbstractBooleanParameter{
+	class GenericBooleanParameter extends AbstractBooleanParameter{
 
 		public GenericBooleanParameter(){}
 
@@ -467,7 +466,7 @@ public interface IModelParameter<T> {
 	 *
 	 *
 	 */
-	 class MemeAvailability extends AbstractMapParameter<GenericBooleanParameter> {
+	class MemeAvailability extends AbstractMapParameter<GenericBooleanParameter> {
 		private List<Meme> activatedMeme = new ArrayList<>();
 		private List<IMemeAvailableListener> memeAvailableListeners = new ArrayList<>();
 
@@ -671,9 +670,9 @@ public interface IModelParameter<T> {
 		 * les memes actifs sur le network.
 		 *
 		 */
-		public void gotoMinValue(){
-			super.gotoMinValue();
-		}
+//		public void gotoMinValue(){
+//			super.gotoMinValue();
+//		}
 
 		public void setValue(Hashtable<Meme, GenericDoubleParameter> value){
 			this.value = value;
@@ -707,6 +706,9 @@ public interface IModelParameter<T> {
 		}
 	}
 
+	/** Permet de cycler sur le nombre de noeud présent dans la simulation.
+	 *
+	 */
 	class ModelParamNbNode extends AbstractIntParameter{
 		private List<INbNodeChangedListener> listenersToNbNodeChanged = new ArrayList<>();
 
