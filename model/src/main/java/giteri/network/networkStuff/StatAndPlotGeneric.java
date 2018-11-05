@@ -207,10 +207,10 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 				memeAndProba.put(existingMeme.get(i),new GenericDoubleParameter(1.,1.,1.,1.));
  			}
 			else if(existingMeme.get(i).getName().compareToIgnoreCase("RMV+") == 0 ){
-				memeAndProba.put(existingMeme.get(i),new GenericDoubleParameter(0.,0.,1.,.1));
+				memeAndProba.put(existingMeme.get(i),new GenericDoubleParameter(0.1,0.1,.4,.01));
 			}
 			else if(existingMeme.get(i).getName().compareToIgnoreCase("RMV-") == 0 ){
-				memeAndProba.put(existingMeme.get(i),new GenericDoubleParameter(0.,0.,1.,.1));
+				memeAndProba.put(existingMeme.get(i),new GenericDoubleParameter(0.2,0.2,1.,.4));
 			}
 		}
 

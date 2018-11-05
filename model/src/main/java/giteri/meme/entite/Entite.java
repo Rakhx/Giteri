@@ -301,19 +301,20 @@ public class Entite implements Comparable<Entite>{
 	 *
 	 * @return
 	 */
-	public boolean isFullActif(){
+	public boolean isFullActif() {
 		// LA FLEMME
-		if(this.getMyMemes().size() == 2) {
-			for (Meme meme : getMyMemes()) {
-				if (meme.isFluide())
-					return false;
+		synchronized (myMemes) {
+			if (this.myMemes.size() == 2) {
+				for (Meme meme : myMemes) {
+					if (meme.isFluide())
+						return false;
+				}
+				return true;
 			}
-			return true;
+
+			return false;
 		}
-
-		return false;
 	}
-
 
 
 	/**
