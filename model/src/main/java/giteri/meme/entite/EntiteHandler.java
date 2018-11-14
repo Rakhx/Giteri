@@ -1381,10 +1381,9 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("AddØ",1, true, true, add, attributs, KVAttributAgregator, false);
+		memeFactory.registerMemeAction("AddØ",0.1, true, false, add, attributs, KVAttributAgregator, false);
 		agregators.put(2, random);
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, false, false, add, attributs, KVAttributAgregator, true);
-
 
 		agregators.put(0, notLinked);
 		agregators.put(1, mineInf);
@@ -1409,12 +1408,12 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(2, theMost);
 		agregators.put(3, mineInf);
 		agregators.put(4, random);
-		memeFactory.registerMemeAction("AddØ-Hop", 1, false, false, add,attributs, KVAttributAgregator ,false);
+		memeFactory.registerMemeAction("AddØ-Hop", 1, true, false, add,attributs, KVAttributAgregator ,false);
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("RmvØ",1, false, false, remove,  attributs, KVAttributAgregator, false);
+		memeFactory.registerMemeAction("RmvØ",1, true, false, remove,  attributs, KVAttributAgregator, false);
 		agregators.put(2, random);
 		removeRandom = memeFactory.registerMemeAction("RmvØ-neutral",0, false, false, remove,  attributs, KVAttributAgregator, true);
 
@@ -1428,13 +1427,13 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(0, linked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv-", .1, true, true, remove, attributs, KVAttributAgregator ,false);
+		memeFactory.registerMemeAction("Rmv-", 1, false, false, remove, attributs, KVAttributAgregator ,false);
 
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, mineInf);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv+", 1, true, true, remove, attributs, KVAttributAgregator ,false);
+		memeFactory.registerMemeAction("Rmv+", 1, false, false, remove, attributs, KVAttributAgregator ,false);
 
 		agregators.clear();
 		agregators.put(0, linked);

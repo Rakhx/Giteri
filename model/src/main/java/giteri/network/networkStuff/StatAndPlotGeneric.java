@@ -382,7 +382,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 * Mise à jour depuis le tinyNetwork en paramètre, et non le courant d'une classe.
 	 * L'UUID du networkProperties est mis a jour ssi le code d'activation a demandé une mise a jour de tout
 	 * les attributs.
-	 *
+	 * TODO [Waypoint]- Calcul des propriétés du réseau en fichier texte.
 	 */
 	public void updateNetworkProperties(TinyNetwork net, NetworkProperties networkProp, int activationCode){
 		double nbNodes, nbEdges, parcouru, firstQ, thirdQ;

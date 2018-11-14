@@ -56,6 +56,10 @@ public interface INetworkRepresentations extends INetworkRepresentation{
 			networkVersion = toCopy.getUpdateId();
 		}
 
+
+		/** TODO [Waypoint]- Calcul des propriétés du réseau courant.
+		 *
+		 */
 		@Override
 		public NetworkProperties getNetworkProperties(int activationCode) {
 
@@ -73,7 +77,7 @@ public interface INetworkRepresentations extends INetworkRepresentation{
 //			ArrayList<Integer> connections = null;
 			double nodeClustering = 0;
 			double networkClustering = 0;
-			NetworkProperties networkPropertiesResulting = new NetworkProperties();
+			NetworkProperties networkPropertiesResulting = new NetworkProperties("Courant");
 			networkPropertiesResulting.createStub();
 			networkPropertiesResulting.setNetworkUuidInstance(networkVersion);
 			

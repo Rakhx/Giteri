@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 public class RandomTest {
     public static void main(String[] args)  {
 
+
         int rez1, rez2, rez3, succes = 0;
         int nbIter = 10000000;
         for (int i = 0; i < nbIter; i++) {
@@ -20,7 +21,6 @@ public class RandomTest {
         }
 
         System.out.println((double)succes / nbIter);
-
 
         // OPTIONAL
 //        Optional<Double> opt = Optional.of(new Double(3.));
@@ -44,12 +44,9 @@ public class RandomTest {
 //
 //        System.out.println(quantity);
 
-
-
         // BITWISE
 //        bitwiseAdd(10,10);
 //        add(10,18);
-
 
           // TEST DU SHUFFLE DE MAP DETERMINISTE ET NON
 //        HashMap<Integer, Double> map = new HashMap<>();
@@ -61,9 +58,6 @@ public class RandomTest {
 //
 //        Map<Integer,Double> randomized2 = Toolz.shuffleHashmap(map, true);
 //        System.out.println(randomized2);
-
-
-
     }
 
     static void changeRef(Optional<Double> changera){

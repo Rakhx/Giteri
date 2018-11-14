@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -1262,86 +1263,53 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		});
 
 		btPause.addActionListener(new PauseAction());
-
-		// new ActionListener() {
-		// public void actionPerformed(ActionEvent e)
-		// {
-		// if(!Configurator.isSystemPaused()){
-		// modelController.suspend();
-		// }else {
-		// modelController.resume();
-		// }
-		//
-		// Configurator.setSystemPaused(!Configurator.isSystemPaused());
-		// }
-		// });
-
-		// jbNextStep.addActionListener(new ActionListener() {
-		// public void actionPerformed(ActionEvent e)
-		// {
-		// modelController.oneStep();
-		// }
-		// });
 		btStep.addActionListener(new StepAction());
-
 		btReset.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
 			}
 		});
 
-//		launchSimu.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				(new Thread() {
-//					public void run() {
-//					}
-//				}).start();
-//
-//			}
-//		});
-
 		btFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser chooser = new JFileChooser();
-				chooser.setCurrentDirectory(new java.io.File("."));
+				chooser.setCurrentDirectory(new java.io.File("./Model"));
 				chooser.setDialogTitle("choosertitle");
 				chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 				chooser.setAcceptAllFileFilterUsed(false);
 				if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-					Configurator.defaultPathForReadingNetwork = chooser
-							.getSelectedFile();
+					Configurator.defaultPathForReadingNetwork = chooser.getSelectedFile();
+					tfPath.setText(""+Configurator.defaultPathForReadingNetwork);
 
 				} else {
-					System.out.println("No Selection ");
+					System.out.println("No Selection");
 				}
 			}
 		});
 
 		btAnalyze.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				IReadNetwork nl = modelController.getReader();
-				NetworkProperties readedProperties;
-				NetworkProperties cNetworkProperties;
+				IReadNetwork fileNetRdr = modelController.getReader();
+				NetworkProperties fileReadProperties;
+				NetworkProperties currentNetProperties;
 
-//				try {
-//				//	writeNRead.readAndCreateNetwork("" + Configurator.defaultPathForReadingNetwork, nl," ", "#");
-//				} catch (IOException e1) {
-//					e1.printStackTrace();
-//				}
+				try {
+					fileNetRdr = writeNRead.readAndCreateNetwork("" + Configurator.defaultPathForReadingNetwork, fileNetRdr," ", "#");
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 
-//				nl.test();
-
-				readedProperties = nl.getNetworkProperties();
-				cNetworkProperties = modelController.getCurrentNetProperties(Configurator.activationCodeAllAttrib);
+				fileReadProperties = fileNetRdr.getNetworkProperties();
+				currentNetProperties = modelController.getCurrentNetProperties(Configurator.activationCodeAllAttrib);
 				// Mettre dnas les bons JP
 				plNetworkRead.removeAll();
-				plNetworkRead.add(createComponentLabelNetworkAnalyzedInformation(readedProperties));
+				plNetworkRead.add(createComponentLabelNetworkAnalyzedInformation(fileReadProperties));
 
 				plNetworkPlaying.removeAll();
-				plNetworkPlaying.add(createComponentLabelNetworkAnalyzedInformation(cNetworkProperties));
+				plNetworkPlaying.add(createComponentLabelNetworkAnalyzedInformation(currentNetProperties));
 
 				plNetworkRead.getRootPane().repaint();
-				double score = FittingClass.getNetworksDistanceDumb(Configurator.activationCodeForScore, readedProperties, cNetworkProperties);
+				double score = FittingClass.getNetworksDistanceDumb(Configurator.activationCodeForScore, fileReadProperties, currentNetProperties);
 				jlScore.setText("Score:" + score );
 			}
 		});

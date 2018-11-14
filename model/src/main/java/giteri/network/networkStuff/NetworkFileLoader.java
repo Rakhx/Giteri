@@ -75,7 +75,8 @@ public class NetworkFileLoader implements IReadNetwork {
 		// Toolz.addElementInHash(nodesAndLinks, value, key);
 	}
 
-	/** Renvoi les propriétés du réseau que le networkLoader a chargé.
+	/** TODO [Waypoint]- Calcul des propriétés du réseau en fichier texte.
+	 * Renvoi les propriétés du réseau que le networkLoader a chargé.
 	 * Si le réseau viens d'etre chargée, calcul le lu pour créer le tinyNetwork
 	 *
 	 * @return
