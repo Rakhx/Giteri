@@ -1,26 +1,23 @@
 package giteri.network.networkStuff;
 
+import giteri.network.network.IInternalNetReprestn;
 import giteri.run.interfaces.Interfaces.IReadNetwork;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
-
+import java.util.Optional;
 import javax.swing.JFrame;
-
 import giteri.tool.math.Toolz;
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.network.NetworkProperties;
-import giteri.network.network.TinyNetwork;
-
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.jfree.chart.ChartUtilities;
-
-
 import giteri.tool.other.WriteNRead;
 import giteri.run.configurator.Configurator;
+import giteri.network.network.IInternalNetReprestn.TinyNetworks;
 
 /** classe pour loader un network depuis des lignes données en paramètres
  * Défini ce qu'il faut faire lors de la lecture d'une ligne d'un fichier.
@@ -34,7 +31,7 @@ public class NetworkFileLoader implements IReadNetwork {
 	WriteNRead writeNRead;
 	Hashtable<Integer, ArrayList<Integer>> nodesAndLinks = new Hashtable<>();
 	boolean changed = true;
-	private TinyNetwork net;
+	private TinyNetworks net;
 	int nombreScreen = 0;
 
 	/** Constructeur sans paramètre.
@@ -87,13 +84,8 @@ public class NetworkFileLoader implements IReadNetwork {
 			changed = false;
 		}
 
-		NetworkProperties netProp = new NetworkProperties("Lu");
-		communicationModel.calculator.updateNetworkProperties(net, netProp, Configurator.activationCodeAllAttrib);
-
-		// TODO Ici se passait le calcul lié au APL
-//		Graph graph = getGraphFromDataRead();
-//		netProp.computeAPL(graph);
-
+		NetworkProperties netProp  ;
+		netProp = net.getNetworkProperties(Optional.empty(),"lu", Configurator.activationCodeAllAttrib);
 		return netProp;
 	}
 
@@ -141,19 +133,21 @@ public class NetworkFileLoader implements IReadNetwork {
 	 *
 	 */
 	private void achieve(){
-		net = new TinyNetwork();
+		net = new TinyNetworks();
 		int nbEdges= 0;
-		for (Integer nodeIndex : nodesAndLinks.keySet()){
-			if(!net.isContainingNode(nodeIndex)){
-				net.nodes.put(nodeIndex, net.new TinyNode(nodeIndex, nodesAndLinks.get(nodeIndex)));
-				nbEdges += nodesAndLinks.get(nodeIndex).size();
-			} else
-				System.out.println("Ca ne devrait pas arriver");
+		ArrayList<Integer> edges ;
+		for (Integer nodeIndex : nodesAndLinks.keySet()) {
+			edges = new ArrayList<>();
+			for (Integer integer : nodesAndLinks.get(nodeIndex)) {
+				edges.add(integer);
+				nbEdges++;
+			}
+			net.nodesAndConnections.put(nodeIndex, edges);
 		}
 
 		net.nbNodes = nodesAndLinks.keySet().size();
 		net.nbEdges = nbEdges;
-		net.networkUpdateVersion = -4;
+		net.networkVersion = -4;
 	}
 
 

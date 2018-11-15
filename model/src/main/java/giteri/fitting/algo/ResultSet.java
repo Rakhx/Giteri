@@ -93,7 +93,7 @@ public class ResultSet extends Hashtable<Integer, Result> {
 
 		// Prendre la moyenne a chaque fois?
 		// à encadrer avec l'entete etc
-		toWrite += lastProp.getCSVFormatDoubleColonne(null, Configurator.activationCodeAllAttribExceptDD);
+		toWrite += lastProp.getCSVFormatDoubleColonne(null, Configurator.activationCodeAllAttrib);
 
 		// Concernant les scores
 		toWrite += ";" + result.getLastScore();
@@ -123,7 +123,7 @@ public class ResultSet extends Hashtable<Integer, Result> {
 		List<String> parameter = result.getCurrentConfig();
 
 		// Mise à jour des valeurs de moyenne et d'écart type pour les réseaux
-		updateMeanAndSD(ListOfproperties, Configurator.activationCodeAllAttribExceptDD, netMean, netSD);
+		updateMeanAndSD(ListOfproperties, Configurator.activationCodeAllAttrib, netMean, netSD);
 		toWriteSimple += numeroRun;
 		toWriteDetailled += numeroRun;
 
@@ -137,7 +137,7 @@ public class ResultSet extends Hashtable<Integer, Result> {
 		toWriteSimple += netMean.getCSVFormatDoubleColonne(netSD, activator);
 
 		// STEP: Partie detaillé
-		toWriteDetailled += netMean.getCSVFormatDoubleColonne(netSD, Configurator.activationCodeAllAttribExceptDD);
+		toWriteDetailled += netMean.getCSVFormatDoubleColonne(netSD, Configurator.activationCodeAllAttrib);
 		// Pour le champs moyenne qui n'a pas de sens sur le dernier run
 		toWriteDetailled += ";NA";
 

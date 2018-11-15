@@ -1249,18 +1249,12 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	 *
 	 */
 	private void associateComportementToButton() {
-		btDisplayDD.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				netProp = modelController.getCurrentNetProperties(Configurator.activationCodeAllAttribExceptDD);
-				displayDDChart(netProp.getDd());
-			}
+		btDisplayDD.addActionListener(e -> {
+			netProp = modelController.getCurrentNetProperties(Configurator.activationCodeAllAttrib);
+			displayDDChart(netProp.getDd());
 		});
 
-		btScreenshot.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				modelController.takeScreenshot(Optional.ofNullable(null));
-			}
-		});
+		btScreenshot.addActionListener(e -> modelController.takeScreenshot(Optional.ofNullable(null)));
 
 		btPause.addActionListener(new PauseAction());
 		btStep.addActionListener(new StepAction());
@@ -1287,6 +1281,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 			}
 		});
 
+		// TODO [Waypoint]- Appel des fonctions pour la comparaisons des networks
 		btAnalyze.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				IReadNetwork fileNetRdr = modelController.getReader();

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import giteri.network.network.INetworkRepresentations;
+import giteri.network.network.IInternalNetReprestn;
 
 /** Classe qui permet la lecture et l'écriture depuis / vers
  * les fichiers texte
@@ -129,7 +129,7 @@ public class WriteNRead {
 	 * @param nr Représentation du réseau qui va etre transcrit en liste d'edge
 	 * @throws IOException
 	 */
-	public void writeFileFromNetwork(File reps,String fileName, INetworkRepresentations nr) throws IOException {
+	public void writeFileFromNetwork(File reps,String fileName, IInternalNetReprestn nr) throws IOException {
 		Path path = Paths.get(reps  + System.getProperty("file.separator")	+ fileName + ".txt");
 		try (BufferedWriter writer = Files.newBufferedWriter(path, ENCODING))
 		{

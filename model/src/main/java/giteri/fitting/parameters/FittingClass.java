@@ -214,7 +214,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			// STEP: DETAILLED
 			toWriteDetailCSV.append(header);
 			for (Configurator.NetworkAttribType attrib :
-					currentNetProperties.getActivatedAttrib(Configurator.activationCodeAllAttribExceptDD)) {
+					currentNetProperties.getActivatedAttrib(Configurator.activationCodeAllAttrib)) {
 					toWriteDetailCSV.append(";").append(attrib.toString());
 					toWriteDetailCSV.append(";" + "SD ").append(attrib.toString());
 			}
@@ -300,7 +300,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public void endRepetition(){
 
 		// STEP: On prend les properties courantes pour calculer une distance avec le réseau cible
-		networkConstructor.updateAllNetworkProperties();
+		networkConstructor.updatePreciseNetworkProperties(Configurator.activationCodeAllAttrib);
 
 		// passe par le tinyNetwork
 		currentNetProperties = networkConstructor.getNetworkProperties();

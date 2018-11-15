@@ -6,7 +6,6 @@ import java.util.List;
 
 import giteri.network.network.Network;
 import giteri.network.network.NetworkProperties;
-import giteri.network.network.TinyNetwork;
 
 import giteri.run.configurator.Configurator;
 import org.graphstream.graph.Graph;
@@ -68,7 +67,7 @@ public class Interfaces {
 		// Fonction d'obtention des stats
 		public String getDDInfos();
 		
-		public void updateNetworkProperties(TinyNetwork net, NetworkProperties netProp, int activationCode);
+		// public void updateNetworkProperties(IInternalNetReprestn.TinyNetworks net, NetworkProperties netProp, int activationCode);
 		public double getAPL();
 		public Double fitNetwork(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
 								 Optional<List<Boolean>> memeActivation, Optional<List<Double>> memeProba);
@@ -129,16 +128,6 @@ public class Interfaces {
 		void generateGraph(int activator);
 		void purgeLinks();
 	}
-
-	/** Interface pour un giteri.network.
-	 * 
-	 *
-	 */
-	public interface INetwork{
-//		public void addNode();
-		public void addEdge(int from, int to);
-		public void removeEdge(int from, int to);
-	}
 	
 	/** Interface qui définit une forme de représentation, ainsi que des
 	 * calculs sur les propriétés de cette représentation
@@ -157,7 +146,7 @@ public class Interfaces {
 		 * 
 		 * @param activator
 		 */
-		public NetworkProperties getNetworkProperties(int activator);
+		public NetworkProperties getNetworkProperties(Optional<NetworkProperties> toModify,String netName,int activator);
 		/** Obtenir l'UUID du giteri.network que la représentation copie.
 		 * {@inheritDoc}
 		 * @return

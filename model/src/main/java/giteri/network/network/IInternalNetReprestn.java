@@ -2,29 +2,31 @@ package giteri.network.network;
 
 import giteri.run.interfaces.Interfaces.INetworkRepresentation;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.*;
 
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.NetworkAttribType;
+import org.graphstream.algorithm.APSP;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.implementations.SingleGraph;
 
 /** Interface et impplémentations des différentes représentation 
  * du reseau.
- * Pour garder les implémentations de network dans le meme fichier...
+ * Pour garder les implémentations de network dans le meme fichier.
  * 
  */
-public interface INetworkRepresentations extends INetworkRepresentation{
+public interface IInternalNetReprestn extends INetworkRepresentation{
 	
 	/** Représentation direct du giteri.network. Utile pour copier le réseau
 	 * courant sous une forme plus simple, et pouvoir ensuite calculer
 	 * des propriétés sur ce réseau en laissant l'original se modifier.
 	 */
-	public class TinyNetworks implements INetworkRepresentations{
-		private int networkVersion;
-		private Map<Integer, ArrayList<Integer>> nodesAndConnections;
+	public class TinyNetworks implements IInternalNetReprestn {
+		public int networkVersion;
+		public Map<Integer, ArrayList<Integer>> nodesAndConnections;
 		private Object syncOnNodes;
-		private int nbNodes, nbEdges;
+		public int nbNodes, nbEdges;
+		private Graph graphForApl;
 
 		/** Constructeur sans param.
 		 *
@@ -35,8 +37,13 @@ public interface INetworkRepresentations extends INetworkRepresentation{
 			nodesAndConnections = new Hashtable<>();
 			nbNodes = -1;
 			nbEdges = -1;
+			graphForApl = new SingleGraph("properties");
 		}
-		
+
+		/** Update le tinyNetworks par rapport au réseau donné en param.
+		 *
+		 * @param toCopy Le réseau a copier.
+		 */
 		@Override
 		public void ConvertNetwork(Network toCopy) {
 			ArrayList<Integer> linkOfANode;
@@ -56,15 +63,18 @@ public interface INetworkRepresentations extends INetworkRepresentation{
 			networkVersion = toCopy.getUpdateId();
 		}
 
+		public Map<Integer, ArrayList<Integer>> getNetwork(){
+			return nodesAndConnections;
+		}
 
 		/** TODO [Waypoint]- Calcul des propriétés du réseau courant.
 		 *
 		 */
 		@Override
-		public NetworkProperties getNetworkProperties(int activationCode) {
-
+		public NetworkProperties getNetworkProperties(Optional<NetworkProperties> toModify, String networkName, int activationCode) {
 			int parcouru, index,firstQ, thirdQ;
 			double density = -1, avgDegre = -1 ;
+			double apl = -1;
 			int[] distrib = new int[0];
 			int ddInterQrt = -1;
 			@SuppressWarnings("unused")
@@ -72,31 +82,29 @@ public interface INetworkRepresentations extends INetworkRepresentation{
 			// Pas de passage par le gc pour "libérer" une variable simple, plus performant que d'appeler plusieurs fois le configurator.isattribActivated
 			boolean avgClust = Configurator.isAttribActived(activationCode, NetworkAttribType.AVGCLUST);
 			//RP: Concernant le calcul pour les clustering moyen
-//			Hashtable<Integer, ArrayList<Integer>> connectionsByNode = null;
-			Hashtable<Integer, Double> clustByNode = null; 
-//			ArrayList<Integer> connections = null;
+			Hashtable<Integer, Double> clustByNode = null;
 			double nodeClustering = 0;
 			double networkClustering = 0;
-			NetworkProperties networkPropertiesResulting = new NetworkProperties("Courant");
-			networkPropertiesResulting.createStub();
-			networkPropertiesResulting.setNetworkUuidInstance(networkVersion);
-			
-			networkPropertiesResulting.nbEdges = nbEdges;
-			networkPropertiesResulting.nbNodes = nbNodes;
-			
+			Set<Integer> allrdyDoneNodes = new HashSet<>(nbNodes);
+			NetworkProperties netPropDefault = new NetworkProperties(networkName);
+			netPropDefault.createStub();
+			netPropDefault.setNetworkUuidInstance(networkVersion);
+			NetworkProperties netPropResult = toModify.orElse(netPropDefault);
+
+			netPropResult.nbEdges = nbEdges;
+			netPropResult.nbNodes = nbNodes;
+
 			// Calcul de la densité
 			if (Configurator.isAttribActived(activationCode, NetworkAttribType.DENSITY)) {
 				density = (double) nbEdges / ( nbNodes * (nbNodes -1));
-				networkPropertiesResulting.density = density;
+				netPropResult.setValue(NetworkAttribType.DENSITY,density);
 			}
-
 			// degré moyen sur les nodes
 			if (Configurator.isAttribActived(activationCode, NetworkAttribType.DDAVG)){
 				avgDegre = (double)nbEdges / (nbNodes);
-				networkPropertiesResulting.ddAvg = avgDegre;
+				netPropResult.setValue(NetworkAttribType.DDAVG,avgDegre);
 			}
-			
-			// DD
+			// region DD
 			if(	Configurator.isAttribActived(activationCode, NetworkAttribType.DDINTERQRT) ||
 				Configurator.isAttribActived(activationCode, NetworkAttribType.DDARRAY) ||
 				Configurator.isAttribActived(activationCode, NetworkAttribType.AVGCLUST) ) {
@@ -111,8 +119,7 @@ public interface INetworkRepresentations extends INetworkRepresentation{
 						distrib[connections.size()] = ++(distrib[connections.size()]);
 					}
 
-					networkPropertiesResulting.setDd(distrib);
-
+					netPropResult.setDd(distrib);
 					// Si espace interquartile
 					if (Configurator.isAttribActived(activationCode, NetworkAttribType.DDINTERQRT)) {
 						// Ecart inter quartile
@@ -137,7 +144,7 @@ public interface INetworkRepresentations extends INetworkRepresentation{
 
 						thirdQ = index;
 						ddInterQrt = thirdQ - firstQ;
-						networkPropertiesResulting.ddInterQrt = ddInterQrt;
+						netPropResult.setValue(NetworkAttribType.DDINTERQRT,ddInterQrt);
 					}
 
 					//si avgClustering
@@ -161,12 +168,49 @@ public interface INetworkRepresentations extends INetworkRepresentation{
 								networkClustering += clust;
 
 						networkClustering /= clustByNode.values().size();
-						networkPropertiesResulting.avgClust = networkClustering;
+						netPropResult.setValue(NetworkAttribType.AVGCLUST, networkClustering);
 					}
 				}
+			} // endregion
+
+			// region APL
+			if (Configurator.isAttribActived(activationCode, NetworkAttribType.APL)) {
+				graphForApl.clear();
+				synchronized (syncOnNodes) {
+					for (Integer nodeIndex : this.nodesAndConnections.keySet()) {
+						graphForApl.addNode("" + nodeIndex);
+					}
+
+					for (Integer nodeIndex : this.nodesAndConnections.keySet()) {
+						allrdyDoneNodes.add(nodeIndex);
+						for (Integer connectedNodeIndex : this.nodesAndConnections.get(nodeIndex)) {
+							if(!allrdyDoneNodes.contains(connectedNodeIndex))
+								graphForApl.addEdge(nodeIndex + "-" + connectedNodeIndex, nodeIndex, connectedNodeIndex, false);
+						}
+					}
+				}
+
+				APSP apsp = new APSP();
+				apsp.init(graphForApl);
+				apsp.setDirected(false);
+				apsp.compute();
+				APSP.APSPInfo info;// = graphForApl.getNode("10").getAttribute(APSP.APSPInfo.ATTRIBUTE_NAME);
+				double total = 0;
+				int nbValue = 0;
+				for (int i = 0; i < graphForApl.getNodeCount(); i++) {
+					info =  graphForApl.getNode(""+i).getAttribute(APSP.APSPInfo.ATTRIBUTE_NAME);
+					for (String string : info.targets.keySet()) {
+						total += info.targets.get(string).distance;
+						nbValue++;
+					}
+				}
+
+				apl = (double)total / nbValue;
+				netPropResult.setValue(NetworkAttribType.APL,(double)total / nbValue);
 			}
-			
-			return networkPropertiesResulting;
+			// endregion
+
+			return netPropResult;
 		}
 
 		/**
@@ -222,7 +266,7 @@ public interface INetworkRepresentations extends INetworkRepresentation{
 	 * rapide sur ce genre de représentation. 
 	 *
 	 */
-	public class AdjacencyMatrixNetwork implements INetworkRepresentations {
+	public class AdjacencyMatrixNetwork implements IInternalNetReprestn {
 
 		int[][] matrix;
 		int nbNodes;
@@ -236,7 +280,7 @@ public interface INetworkRepresentations extends INetworkRepresentation{
 		}
 
 		@Override
-		public NetworkProperties getNetworkProperties(int activator) {
+		public NetworkProperties getNetworkProperties(Optional<NetworkProperties> toModify,String netName,int activator) {
 			return null;
 		}
 

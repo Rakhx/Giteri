@@ -231,7 +231,8 @@ public class NetworkProperties implements Cloneable{
 				ddAvg = (double) value;
 				break;
 			case DDINTERQRT:
-				ddInterQrt = (double) value;
+				ddInterQrt = Double.valueOf(""+value);
+//						(double) value;
 				break;
 			case DDARRAY:
 				dd  = (int[]) value;

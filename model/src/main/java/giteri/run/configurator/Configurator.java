@@ -54,7 +54,7 @@ public final class Configurator {
 
 	// SCORE
 	public static int activationCodeForScore = 55;
-	public static int activationCodeAllAttribExceptDD = 247;
+//	public static int activationCodeAllAttribExceptDD = 247;
 	public static int activationCodeAllAttrib = 255;
 
 	// endregion

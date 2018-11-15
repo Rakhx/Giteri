@@ -77,10 +77,7 @@ public class CommunicationModel implements IModel {
 	 *
 	 */
 	public NetworkProperties getCurrentNetProperties(int activator){
-		if(activator != Configurator.activationCodeAllAttribExceptDD)
-			nc.updatePreciseNetworkProperties(activator);
-		else
-			nc.updateAllNetworkProperties();
+		nc.updatePreciseNetworkProperties(activator);
 		return nc.getNetworkProperties();
 	}
 

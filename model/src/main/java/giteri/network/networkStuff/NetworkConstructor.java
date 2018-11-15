@@ -3,17 +3,17 @@ package giteri.network.networkStuff;
 import giteri.network.event.INbNodeChangedListener;
 import giteri.network.event.NbNodeChangedEvent;
 import giteri.run.interfaces.Interfaces.DrawerInterface;
-import giteri.run.interfaces.Interfaces.StatAndPlotInterface;
 
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Optional;
 import java.util.Set;
 
 import giteri.tool.math.Toolz;
 import giteri.network.network.Edge;
-import giteri.network.network.INetworkRepresentations;
-import giteri.network.network.INetworkRepresentations.TinyNetworks;
+import giteri.network.network.IInternalNetReprestn;
+import giteri.network.network.IInternalNetReprestn.TinyNetworks;
 import giteri.network.network.Network;
 import giteri.network.network.NetworkProperties;
 import giteri.run.ThreadHandler;
@@ -29,7 +29,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	//region Properties
 	DrawerInterface drawer;
 	final Network networkInstance;
-	INetworkRepresentations networkRepresentation;
+	IInternalNetReprestn networkRepresentation;
 	NetworkProperties networkInstanceProperties;
 
 
@@ -120,18 +120,18 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 
 	/** Met à jour l'ensemble des propriétés du réseau dans l'instance
 	 * networkInstanceProperties dans le cas ou la source du calcul de ces valeurs, le tinyNetwork,
-	 * ait subit des modifications
+	 * a subit des modifications
 	 *
 	 */
-	public void updateAllNetworkProperties(){
-		if(!isNetPropUpToDate()){
-			synchronized (networkInstance) {
-				networkRepresentation.ConvertNetwork(networkInstance);
-			}
-
-			networkInstanceProperties = networkRepresentation.getNetworkProperties(Configurator.activationCodeAllAttribExceptDD);
-		}
-	}
+//	public void updateAllNetworkProperties(){
+//		if(!isNetPropUpToDate()){
+//			synchronized (networkInstance) {
+//				networkRepresentation.ConvertNetwork(networkInstance);
+//			}
+//
+//			networkInstanceProperties = networkRepresentation.getNetworkProperties(Configurator.activationCodeAllAttribExceptDD);
+//		}
+//	}
 
 	/** Dans le cas ou on ne les veux pas tous, on ne met pas a jour la valeur de tinynetwork changed.
 	 * On recalcule ainsi que la valeur que l'on souhaite sans empecher la mise a jour des autres valeurs
@@ -141,13 +141,16 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	 * @return
 	 */
 	public NetworkProperties updatePreciseNetworkProperties(int activator){
-		if(!isNetPropUpToDate()){
+		// Si le tiny n'es pas en accord avec le current
+		if(!isNetPropUpToDate()) {
 			synchronized (networkInstance) {
 				networkRepresentation.ConvertNetwork(networkInstance);
 			}
-
-			networkInstanceProperties = networkRepresentation.getNetworkProperties(activator);
 		}
+
+		networkInstanceProperties = networkRepresentation.getNetworkProperties
+				(Optional.of(networkInstanceProperties),"Courant",activator);
+
 		return networkInstanceProperties;
 	}
 
@@ -364,7 +367,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	 *
 	 * @return
 	 */
-	public INetworkRepresentations getNetworkRepresentations(){
+	public IInternalNetReprestn getNetworkRepresentations(){
 		return networkRepresentation;
 	}
 
@@ -381,7 +384,8 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	 * @return
 	 */
 	public boolean isNetPropUpToDate(){
-		return networkInstance.getUpdateId() == networkInstanceProperties.getNetworkInstance();
+		return (Integer.compare(networkInstance.getUpdateId(),networkInstanceProperties.getNetworkInstance() ) == 0);
+
 	}
 
 	//endregion
