@@ -29,10 +29,6 @@ public final class Configurator {
 	public static boolean autoPauseIfNexted = false; // mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	public static boolean initializeDefaultBehavior = false	;	//fluidité
 	public static boolean oneAddForOneRmv = false; // Joue tour a tour un ajout d'un retrait
-
-	public static double probaFirePropagate = 1;
-	public static double dividerProbaFire = 2;
-
 	public static boolean rebranchementAction = false; // Faire l'ajout et le retrait dans le meme temps
 
 	// MEME
@@ -54,7 +50,6 @@ public final class Configurator {
 
 	// SCORE
 	public static int activationCodeForScore = 55;
-//	public static int activationCodeAllAttribExceptDD = 247;
 	public static int activationCodeAllAttrib = 255;
 
 	// endregion
@@ -125,8 +120,8 @@ public final class Configurator {
 
 	//region ancien boolean, osef, etc
 	// moyen osef
-	public static final boolean lotOfNodes = false;
-	private static int nbNode = lotOfNodes ? 1000 : 100;
+	public static final boolean lotOfNodes = true;
+	private static int nbNode = lotOfNodes ? 4039 : 100;
 	public static int refreshInfoRate = 10;
 	public final static boolean autoRedoActionIfNoAction = false;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour

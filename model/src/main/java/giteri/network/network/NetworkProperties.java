@@ -221,7 +221,6 @@ public class NetworkProperties implements Cloneable{
 		}
 	}
 
-
 	public void setValue(Configurator.NetworkAttribType type, Object value){
 		switch (type) {
 			case DENSITY:

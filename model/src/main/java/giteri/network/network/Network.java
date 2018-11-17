@@ -215,7 +215,16 @@ public class Network {
 		if(edge != null)
 			edge.setMyColor(color);
 	}
-	
+
+	/** Return true si les noeuds représentés par leur index sont connectés.
+	 *
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	public boolean areNodesConnected(int from, int to){
+		return nodes.get(from).getConnectedNodes().contains(to);
+	}
 	//endregion
 
 	//region Private Methode
