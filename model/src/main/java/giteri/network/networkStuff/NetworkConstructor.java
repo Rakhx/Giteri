@@ -162,17 +162,16 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	 * @param activator
 	 */
 	public void generateNetwork(int activator){
-		int nbEdgeToAdd ;
-		int choosenNodeToAdd;
+		int nbEdgeToAdd, choosenNodeToAdd;
 		ArrayList<Integer> availableNodes = new ArrayList<Integer>();
+		Hashtable<Integer,Double> KVNodeDegree = new Hashtable<>();
+		Integer target;
 		// 4% et 30% respectivement.
 		int pourcentageLow = 2;
 		int pourcentageMiddle = 50;
 
+		// Soit 1 a 4% soit 2 a 30(50?) %
 		int nbEdgeToAddByNode = activator == 1 ? (nbNodeInit * pourcentageLow/200) : (nbNodeInit * pourcentageMiddle/200);
-//					nbNodeInit * ((double)pourcentageLow/200) : nbNodeInit * ((double)pourcentageMiddle/200);
-		Hashtable<Integer,Double> KVNodeDegree = new Hashtable<Integer, Double>();
-		Integer target;
 
 		// Scale free
 		if(activator == 3)
@@ -209,7 +208,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 			double probaRelink = .1;
 			int newTarget;
 
-			// pour chaque noeud le connecté au deux suivants modulo
+			// pour chaque noeud le connecter au deux suivants modulo
 			for (int i = 0; i < nbNodeInit; i++) {
 				// Ajout de deux link
 				for (int j = 1; j < 3; j++) {
@@ -218,8 +217,9 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 						do
 						{
 							newTarget = Toolz.getRandomNumber(nbNodeInit);
-							networkInstance.addEdgeToNodes(i, newTarget, false);
-						} while(newTarget == i||newTarget == (i+j)%nbNodeInit );
+						} while(newTarget == i || networkInstance.areNodesConnected(i,newTarget) );//newTarget == (i+j) % nbNodeInit );
+
+						networkInstance.addEdgeToNodes(i, newTarget, false);
 					}
 					else{
 						networkInstance.addEdgeToNodes(i, (i + j) % nbNodeInit, false);
@@ -243,8 +243,8 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 				nbEdgeToAdd = 0;
 				if(activator == 1 || activator == 2)
 					nbEdgeToAdd = nbEdgeToAddByNode;
-				if(activator == 5)
-					nbEdgeToAdd = Toolz.getRandomNumber(nbNodeInit / 2);
+//				if(activator == 5)
+//					nbEdgeToAdd = Toolz.getRandomNumber(nbNodeInit / 2);
 
 				if(activator != 0){
 					do
