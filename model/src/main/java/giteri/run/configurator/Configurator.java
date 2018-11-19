@@ -25,11 +25,11 @@ public final class Configurator {
 	// region Modèle
 
 	// FONCTIONNEMENT
-	public static boolean manuelNextStep = false; // pas de passage au run suivant, il faut appuyer sur next
-	public static boolean autoPauseIfNexted = false; // mise en pause automatique avant un changement de run. Il faut appuyer sur next
-	public static boolean initializeDefaultBehavior = false	;	//fluidité
-	public static boolean oneAddForOneRmv = false; // Joue tour a tour un ajout d'un retrait
-	public static boolean rebranchementAction = false; // Faire l'ajout et le retrait dans le meme temps
+	public static boolean manuelNextStep = false; // NO-AUTOSKIP pas de passage au run suivant, il faut appuyer sur next
+	public static boolean autoPauseIfNexted = false; // AUTOPAUSE mise en pause automatique avant un changement de run. Il faut appuyer sur next
+	public static boolean initializeDefaultBehavior = false	;	// ----FLUIDITE----
+	public static boolean oneAddForOneRmv = false; // ONEforONE Joue tour a tour un ajout d'un retrait
+	public static boolean rebranchementAction = false; // REWIRE Faire l'ajout et le retrait dans le meme temps
 
 	// MEME
 	public static boolean strictEqualityInComparaison = true; // FALSE : >= || TRUE : >
@@ -59,8 +59,7 @@ public final class Configurator {
 	public static EnumExplorationMethod explorator = EnumExplorationMethod.exhaustive; // Type d'exploration de fitting
 	public static MemeList typeOfMemeUseForFitting = MemeList.FITTING; // Peut etre ONMAP, EXISTING, FITTING
 
-
-	public static int initialNetworkForFitting = 2; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
+	public static int initialNetworkForFitting = 0; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
 	public static int nbRepetitionbyRun = 15;
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
 	public static int multiplicatorNbAction  = 2500; //  Par combein on multiplie le nombdre de noeud sur la simulation
@@ -121,7 +120,7 @@ public final class Configurator {
 	//region ancien boolean, osef, etc
 	// moyen osef
 	public static final boolean lotOfNodes = true;
-	private static int nbNode = lotOfNodes ? 4039 : 100;
+	private static int nbNode = lotOfNodes ? 500 : 100;
 	public static int refreshInfoRate = 10;
 	public final static boolean autoRedoActionIfNoAction = false;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour

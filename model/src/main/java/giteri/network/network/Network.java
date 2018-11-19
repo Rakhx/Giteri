@@ -19,7 +19,7 @@ public class Network {
 
 	// Constructeur
 
-	public Network(){
+	public Network (){
 		nodes = new ArrayList<>();
 		edges = new ArrayList<>();
 		updateId = -1;
