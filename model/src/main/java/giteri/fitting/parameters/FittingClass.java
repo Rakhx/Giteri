@@ -1,6 +1,9 @@
 package giteri.fitting.parameters;
 
 import java.io.File;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -193,8 +196,10 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		String toWriteNormalCSV = "";
 		StringBuilder toWriteDetailCSV = new StringBuilder();
 		String toWriteMemeCSV = "";
+        String toWriteConfiguratorFile = "";
 
-		// Creation des fichiers CSV avec entete
+		// region Result
+        // Creation des fichiers CSV avec entete
 		if(Configurator.writeNetworkResultOnFitting)
 		{
 			// STEP: HEADER
@@ -225,6 +230,32 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			writeNRead.writeSmallFile(repOfTheSearch, Configurator.fileNameCsvDetail,
 					Collections.singletonList(toWriteDetailCSV.toString()));
 		}
+		// endregion
+
+        toWriteConfiguratorFile = "Champs;Valeurs";
+        writeNRead.writeSmallFile(repOfTheSearch,"configurator",
+                Collections.singletonList(toWriteConfiguratorFile));
+
+
+        // region fichier configurator
+        Class<?> conf = new Configurator().getClass();
+        for (int i = 0; i < conf.getFields().length; i++) {
+            Field fieldOne = conf.getFields()[i];
+            Annotation ae = fieldOne.getAnnotation(Configurator.toOutput.class);
+            if(ae != null && ((Configurator.toOutput) ae).yes() == true ){
+                try {
+                    writeNRead.writeSmallFile(repOfTheSearch,"configurator",
+                            Collections.singletonList(fieldOne.getName()+";"+fieldOne.get(fieldOne)));
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+//                System.out.println("fiesta " + fieldOne.getName());
+            }
+        }
+
+
+
+
 	}
 
 	/** Nouveau tour. C a d nouvelle série de Run dans une configuration du modèle donnée.

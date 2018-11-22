@@ -1,6 +1,8 @@
 package giteri.run.configurator;
 
 import java.io.File;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,11 +29,13 @@ public final class Configurator {
 	// FONCTIONNEMENT
 	public static boolean manuelNextStep = false; // NO-AUTOSKIP pas de passage au run suivant, il faut appuyer sur next
 	public static boolean autoPauseIfNexted = false; // AUTOPAUSE mise en pause automatique avant un changement de run. Il faut appuyer sur next
+	@toOutput ( yes = true )
 	public static boolean initializeDefaultBehavior = false	;	// ----FLUIDITE----
 	public static boolean oneAddForOneRmv = false; // ONEforONE Joue tour a tour un ajout d'un retrait
 	public static boolean rebranchementAction = false; // REWIRE Faire l'ajout et le retrait dans le meme temps
 
 	// MEME
+	@toOutput ( yes = true )
 	public static boolean strictEqualityInComparaison = true; // FALSE : >= || TRUE : >
 
 	// PROPAGATION
@@ -57,8 +61,11 @@ public final class Configurator {
 	public static MemeList typeOfMemeUseForFitting = MemeList.FITTING; // Peut etre ONMAP, EXISTING, FITTING
 
 	public static int initialNetworkForFitting = 0; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
-	public static int nbRepetitionbyRun = 15;
+	@toOutput ( yes = true )
+	public static int nbRepetitionbyRun = 10;
+	@toOutput ( yes = true )
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
+	@toOutput ( yes = true )
 	public static int multiplicatorNbAction  = 2500; //  Par combein on multiplie le nombdre de noeud sur la simulation
 
 	// endregion
@@ -361,5 +368,10 @@ public final class Configurator {
 	}
 
 	//endregion
+	@Retention(RetentionPolicy.RUNTIME)
+	public @interface toOutput {
+		boolean yes();
+	}
+
 }
 

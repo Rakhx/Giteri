@@ -9,18 +9,23 @@ import java.util.stream.Collectors;
 public class RandomTest {
     public static void main(String[] args)  {
 
+        Double kiki = 4.;
+        if(true)
+            kiki = lolade();
+        System.out.println(kiki);
 
-        int rez1, rez2, rez3, succes = 0;
-        int nbIter = 10000000;
-        for (int i = 0; i < nbIter; i++) {
-            rez1 = Toolz.getRandomNumber(6) + 1;
-            rez2 = Toolz.getRandomNumber(6) + 1;
-            rez3 = Toolz.getRandomNumber(6) + 1;
-            if(rez1 == rez2 || rez3 == rez2 || rez1 == rez3)
-                succes++;
-        }
 
-        System.out.println((double)succes / nbIter);
+//        int rez1, rez2, rez3, succes = 0;
+//        int nbIter = 10000000;
+//        for (int i = 0; i < nbIter; i++) {
+//            rez1 = Toolz.getRandomNumber(6) + 1;
+//            rez2 = Toolz.getRandomNumber(6) + 1;
+//            rez3 = Toolz.getRandomNumber(6) + 1;
+//            if(rez1 == rez2 || rez3 == rez2 || rez1 == rez3)
+//                succes++;
+//        }
+//
+//        System.out.println((double)succes / nbIter);
 
         // OPTIONAL
 //        Optional<Double> opt = Optional.of(new Double(3.));
@@ -58,6 +63,11 @@ public class RandomTest {
 //
 //        Map<Integer,Double> randomized2 = Toolz.shuffleHashmap(map, true);
 //        System.out.println(randomized2);
+    }
+
+    static public Double lolade(){
+        return  new Double(10.0);
+
     }
 
     static void changeRef(Optional<Double> changera){

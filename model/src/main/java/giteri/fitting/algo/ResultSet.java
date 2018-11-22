@@ -182,9 +182,11 @@ public class ResultSet extends Hashtable<Integer, Result> {
 
 		// For each Attribut existant
 		for (int i = 0; i < Configurator.NetworkAttribType.values().length; i++) {
+
 			attribut = NetworkAttribType.values()[i];
+
 			// Si l'attribut est actif
-			if (Configurator.isAttribActived(activationCode, attribut)) {
+			if (Configurator.isAttribActived(activationCode, attribut) && attribut != NetworkAttribType.DDARRAY) {
 				netPropValues.clear();
 				// On regarde tous les réseaux en param
 				for (NetworkProperties netProp : networksToRead)
