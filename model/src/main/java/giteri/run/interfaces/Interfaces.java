@@ -68,7 +68,7 @@ public class Interfaces {
 		public String getDDInfos();
 		
 		// public void updateNetworkProperties(IInternalNetReprestn.TinyNetworks net, NetworkProperties netProp, int activationCode);
-		public double getAPL();
+//		public double getAPL();
 		public Double fitNetwork(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
 								 Optional<List<Boolean>> memeActivation, Optional<List<Double>> memeProba);
 //		public void searchStability();
@@ -114,7 +114,8 @@ public class Interfaces {
 		void fittingOnce();
 		void rdmConfig();
 		void takeSnapshot(long seed, Optional<ArrayList<String>> simulationPath);
-		
+		void comparaisonScreenS();
+
 		void suspend();
 		void resume();
 		void oneStep();

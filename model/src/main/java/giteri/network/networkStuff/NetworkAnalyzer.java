@@ -50,10 +50,10 @@ public class NetworkAnalyzer extends StatAndPlotGeneric {
 		}
 	}
 
-	@Override
-	public double getAPL() {
-		return 0;
-	}
+//	@Override
+//	public double getAPL() {
+//		return 0;
+//	}
 
 	//endregion
 

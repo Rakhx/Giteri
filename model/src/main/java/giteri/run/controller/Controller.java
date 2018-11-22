@@ -193,6 +193,10 @@ public class Controller {
 			model.takeSnapshot(Toolz.getLastSeed(), simulationPath);
 		}
 
+		public void comparaisonScreenshot(){
+			model.comparaisonScreenS();
+		}
+
 		//endregion
 
 		//region calcul pour la mise à jour d'éléments de l'interface

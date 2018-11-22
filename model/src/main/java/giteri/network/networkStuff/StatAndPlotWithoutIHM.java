@@ -21,10 +21,10 @@ public class StatAndPlotWithoutIHM extends StatAndPlotGeneric {
         super(entiteHandler, memeFactory, networkConstructor, wnr, nfl, wf);
     }
 
-    @Override
-    public double getAPL() {
-        return 0;
-    }
+//    @Override
+//    public double getAPL() {
+//        return 0;
+//    }
 
     @Override
     public void handlerActionApply(ActionApplyEvent e) {

@@ -1258,11 +1258,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		btPause.addActionListener(new PauseAction());
 		btStep.addActionListener(new StepAction());
-		btReset.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-
-			}
-		});
+		btReset.addActionListener(e-> modelController.comparaisonScreenshot());
 
 		btFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

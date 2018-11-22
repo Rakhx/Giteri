@@ -137,6 +137,10 @@ public class CommunicationModel implements IModel {
 		path.remove(screen);
 	}
 
+	public void comparaisonScreenS(){
+
+	}
+
 	/** Lorsqu'on fait du step by step pour le fitting.
 	 *
 	 */

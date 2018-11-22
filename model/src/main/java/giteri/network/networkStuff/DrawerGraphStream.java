@@ -401,24 +401,24 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 	/** Calcul du chemin le plus court moyen
 	 *
 	 */
-	public double getAPL(){
-		APSP apsp = new APSP();
-		apsp.init(graph);
-		apsp.setDirected(false);
-		apsp.compute();
-		APSPInfo info = graph.getNode("10").getAttribute(APSPInfo.ATTRIBUTE_NAME);
-		double total = 0;
-		int nbValue = 0;
-		for (int i = 0; i < graph.getNodeCount(); i++) {
-			info =  graph.getNode(""+i).getAttribute(APSPInfo.ATTRIBUTE_NAME);
-			for (String string : info.targets.keySet()) {
-				total += info.targets.get(string).distance;
-				nbValue++;
-			}
-		}
-
-		return  total / nbValue;
-	}
+//	public double getAPL(){
+//		APSP apsp = new APSP();
+//		apsp.init(graph);
+//		apsp.setDirected(false);
+//		apsp.compute();
+//		APSPInfo info = graph.getNode("10").getAttribute(APSPInfo.ATTRIBUTE_NAME);
+//		double total = 0;
+//		int nbValue = 0;
+//		for (int i = 0; i < graph.getNodeCount(); i++) {
+//			info =  graph.getNode(""+i).getAttribute(APSPInfo.ATTRIBUTE_NAME);
+//			for (String string : info.targets.keySet()) {
+//				total += info.targets.get(string).distance;
+//				nbValue++;
+//			}
+//		}
+//
+//		return  total / nbValue;
+//	}
 
 	//endregion
 }
