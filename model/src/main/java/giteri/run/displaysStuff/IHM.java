@@ -1571,13 +1571,13 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 					try {
 						temp = Toolz.getNumberCutToPrecision(Toolz.getDeviation(densityValues, Optional.ofNullable(null)), 4);
 					}catch (Exception e){}
-
 					jlDensitySD.setText("SD density: " + temp);
 				}
 
 			}
 			catch(NullPointerException npe){
-				System.err.println("[IHM-updateInformationDisplay()]-" + npe.getMessage());
+				if(Configurator.overallDebug)
+					System.err.println("[IHM-updateInformationDisplay()]-" + npe.getMessage());
 			}
 			catch (Exception e){
 				if(!Configurator.autrucheMode) 	System.err.println("Erreur de mise a jour de l'interface "+ e.getMessage());

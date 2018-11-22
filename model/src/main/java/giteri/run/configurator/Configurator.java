@@ -44,9 +44,6 @@ public final class Configurator {
 	public static boolean useEntitySuccesProba = false; // Prend en compte la proba porté pour l'entité pour APPLY a meme
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 
-	public static boolean checkWhenFullPropagate = true; 	// All action spread? affiche en combien d'action
-	public static int checkFullProRefreshRate = 75; // every X step vérification du full propagate
-
 
 	// SCORE
 	public static int activationCodeForScore = 55;
@@ -70,7 +67,7 @@ public final class Configurator {
 	public static boolean displayFittingProviderApplied = true;	// affiche dans la console apprlications des params:
 	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
-	public static int activationCodeForView = 5;
+	public static int activationCodeForView = 1;
 
 	public static boolean displayPlotWhileSimulation = !jarMode; // Affichage des DD et densité
 	public static boolean displayMemePosessionDuringSimulation = true; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
@@ -100,6 +97,9 @@ public final class Configurator {
 
 	public static boolean DisplayLogdebugInstantiation = false;
 	public static boolean DisplayLogGetAvailableMeme = false;
+
+	public static boolean checkWhenFullPropagate = false; 	// All action spread? affiche en combien d'action
+	public static int checkFullProRefreshRate = 75; // every X step vérification du full propagate
 
 	//endregion
 

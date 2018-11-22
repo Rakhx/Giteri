@@ -721,7 +721,7 @@ public interface IModelParameter<T> {
 
 		@Override
 		public void apply() {
-			if(value != minValue) {
+			if(!value.equals(minValue)) {
 				Configurator.setNbNode(value);
 				nbNodesChanged(value, "Nouveau nombre de noeud changé par IModelParam.INbNode");
 			}
@@ -758,6 +758,10 @@ public interface IModelParameter<T> {
 			if (listenersToNbNodeChanged.contains(myListener)) {
 				listenersToNbNodeChanged.remove(myListener);
 			}
+		}
+
+		public String nameString(){
+			return "nb nodes";
 		}
 
 	}

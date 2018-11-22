@@ -289,8 +289,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 						resetNbAction();
 					}
 
-//					debugBeforeSkip = config.continuFittingCleanVersion();
-					//debugBeforeSkip = config.continuFittingSimpleVersion();
 					debugBeforeSkip = config.continuFittingSimpliestVersion();
 
 					if(!debugBeforeSkip){

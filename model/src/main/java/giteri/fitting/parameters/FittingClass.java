@@ -249,7 +249,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		resetAction();
 		numeroRepetitionAsString = "Repetition#" + ++numeroRepetition;
 		repertoires.add(numeroRepetitionAsString);
-		com.suspend();
+		// com.suspend();
 		synchronized(workerFactory.waitingForReset)
 		{
 			com.resetStuff();
@@ -298,6 +298,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 *
 	 */
 	public void endRepetition(){
+
+		com.suspend();
 
 		// STEP: On prend les properties courantes pour calculer une distance avec le réseau cible
 		networkConstructor.updatePreciseNetworkProperties(Configurator.activationCodeAllAttrib);
