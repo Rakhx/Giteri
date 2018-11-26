@@ -30,8 +30,9 @@ public final class Configurator {
 	public static boolean manuelNextStep = false; // NO-AUTOSKIP pas de passage au run suivant, il faut appuyer sur next
 	public static boolean autoPauseIfNexted = false; // AUTOPAUSE mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	@toOutput ( yes = true )
-	public static boolean initializeDefaultBehavior = false	;	// ----FLUIDITE----
+	public static boolean initializeDefaultBehavior = true	;	// ----FLUIDITE----
 	public static boolean oneAddForOneRmv = false; // ONEforONE Joue tour a tour un ajout d'un retrait
+	@toOutput ( yes = true )
 	public static boolean rebranchementAction = false; // REWIRE Faire l'ajout et le retrait dans le meme temps
 
 	// MEME
@@ -41,6 +42,7 @@ public final class Configurator {
 	// PROPAGATION
 	public static boolean usePropagation = true; // utilisation de la propagation
 	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
+	@toOutput ( yes = true )
 	public static boolean autoMemeForBreeder = false;	// Les breeder ont associé un meme complémement, rmd ajout ou retrait.
 	public static boolean onlyOneToPropagate = true; // Dans le cas ou une action s'applique sur plusieurs entités
 	public static boolean usePropagationSecondGeneration = false; // transmet un des memes du porteur, pas forcement celui applied
@@ -74,7 +76,7 @@ public final class Configurator {
 	public static boolean displayFittingProviderApplied = true;	// affiche dans la console apprlications des params:
 	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
-	public static int activationCodeForView = 1;
+	public static int activationCodeForView = 5;
 
 	public static boolean displayPlotWhileSimulation = !jarMode; // Affichage des DD et densité
 	public static boolean displayMemePosessionDuringSimulation = true; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,

@@ -16,6 +16,7 @@ import giteri.network.networkStuff.WorkerFactory;
 import giteri.run.ThreadHandler;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.*;
+import giteri.run.controller.Controller;
 import giteri.run.controller.Controller.VueController;
 import giteri.tool.math.Toolz;
 import giteri.tool.objects.ObjectRef;
@@ -856,6 +857,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			}
 		}
 
+
+		vueController.displayInfo("Density", Arrays.asList(""+networkConstruct.updatePreciseNetworkProperties
+				(Configurator.getIndicateur(NetworkAttribType.DENSITY)).getDensity() ));
+
 		workerFactory.getCalculator().incrementNbAction();
 		return rez.stream().reduce(String::concat).toString();
 	}
@@ -1408,7 +1413,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(2, theMost);
 		agregators.put(3, mineInf);
 		agregators.put(4, random);
-		memeFactory.registerMemeAction("AddØ-Hop", 1, true, true, add,attributs, KVAttributAgregator ,false);
+		memeFactory.registerMemeAction("AddØ-Hop", 1, false, true, add,attributs, KVAttributAgregator ,false);
 
 		agregators.clear();
 		agregators.put(0, linked);
