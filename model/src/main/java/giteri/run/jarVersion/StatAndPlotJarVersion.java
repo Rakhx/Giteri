@@ -1,28 +1,16 @@
 package giteri.run.jarVersion;
 
-import giteri.fitting.algo.IExplorationMethod;
-import giteri.fitting.parameters.FittingClass;
-import giteri.fitting.parameters.IModelParameter;
-import giteri.fitting.parameters.IModelParameter.GenericBooleanParameter;
-import giteri.fitting.parameters.IModelParameter.GenericDoubleParameter;
-import giteri.fitting.parameters.IModelParameter.MemeAvailability;
-import giteri.fitting.parameters.IModelParameter.MemeDiffusionProba;
 import giteri.meme.entite.EntiteHandler;
-import giteri.meme.entite.Meme;
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.networkStuff.NetworkAnalyzer;
 import giteri.network.networkStuff.NetworkConstructor;
 import giteri.network.networkStuff.NetworkFileLoader;
 import giteri.network.networkStuff.WorkerFactory;
-import giteri.run.configurator.Configurator;
 import giteri.tool.other.WriteNRead;
-
-import java.util.ArrayList;
-import java.util.Hashtable;
 
 public class StatAndPlotJarVersion extends NetworkAnalyzer {
 
-	/** Constructeur sans paramètre.
+	/**
 	 *
 	 */
 	public StatAndPlotJarVersion(EntiteHandler entiteHandler, MemeFactory memeFactory, NetworkConstructor networkConstructor,

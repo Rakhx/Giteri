@@ -46,14 +46,16 @@ public class JarVersion {
 			memeProba.add(Double.parseDouble(args[i]));
 		}
 
-		if(debug) System.out.println("Actication recup " + memeActi);
+		if(debug) System.out.println("Activation recup " + memeActi);
 		if(debug) System.out.println("Proba Recup "+ memeProba);
 
-		run(inputFile,
+	 	run(inputFile,
 				memeActi.get(0),memeActi.get(1),memeActi.get(2),memeActi.get(3),memeActi.get(4),
 				memeActi.get(5),memeActi.get(6),memeActi.get(7),memeActi.get(8),
 				memeProba.get(0),memeProba.get(1),memeProba.get(2),memeProba.get(3),memeProba.get(4),
 				memeProba.get(5),memeProba.get(6),memeProba.get(7),memeProba.get(8));
+
+		 System.exit(0);
     }
 
     /** Run lancé depuis openMole, ou depuis le main@JarVersion.
@@ -72,7 +74,7 @@ public class JarVersion {
 							 double param1, double param2, double param3, double param4, double param5,
 							 double param6, double param7, double param8, double param9
 	) {
-        ArrayList<Double> probaBehavior = new ArrayList<Double>();
+        ArrayList<Double> probaBehavior = new ArrayList<>();
         ArrayList<Boolean> memeAtivation = new ArrayList<>();
         memeAtivation.addAll(Arrays.asList(acti1,acti2,acti3,acti4,acti5, acti6, acti7, acti8, acti9));
         probaBehavior.addAll(Arrays.asList(param1,param2,param3,param4,param5, param6, param7, param8, param9));

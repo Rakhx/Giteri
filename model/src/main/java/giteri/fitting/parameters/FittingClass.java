@@ -236,7 +236,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
         writeNRead.writeSmallFile(repOfTheSearch,"configurator",
                 Collections.singletonList(toWriteConfiguratorFile));
 
-
         // region fichier configurator
         Class<?> conf = new Configurator().getClass();
         for (int i = 0; i < conf.getFields().length; i++) {
@@ -252,10 +251,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 //                System.out.println("fiesta " + fieldOne.getName());
             }
         }
-
-
-
-
 	}
 
 	/** Nouveau tour. C a d nouvelle série de Run dans une configuration du modèle donnée.

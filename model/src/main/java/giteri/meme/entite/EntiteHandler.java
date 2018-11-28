@@ -121,7 +121,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 *
 	 * @param control
 	 */
-	public void setIHMController(VueController control) {
+	public void setVueController(VueController control) {
 		vueController = control;
 	}
 
@@ -841,7 +841,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 											(Configurator.getIndicateur(NetworkAttribType.DENSITY)).getDensity(),sumFailAction));
 					}
 				}
-
 			}
 
 			if(!toDisplayForRatio.isEmpty())
@@ -857,9 +856,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			}
 		}
 
-
-		vueController.displayInfo("Density", Arrays.asList(""+networkConstruct.updatePreciseNetworkProperties
-				(Configurator.getIndicateur(NetworkAttribType.DENSITY)).getDensity() ));
+//		vueController.displayInfo("Density", Arrays.asList(""+networkConstruct.updatePreciseNetworkProperties
+//				(Configurator.getIndicateur(NetworkAttribType.DENSITY)).getDensity() ));
 
 		workerFactory.getCalculator().incrementNbAction();
 		return rez.stream().reduce(String::concat).toString();

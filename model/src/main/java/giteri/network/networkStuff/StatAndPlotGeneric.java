@@ -72,12 +72,12 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		if (!(typeOfLaunch == Configurator.EnumLauncher.jarC || typeOfLaunch == Configurator.EnumLauncher.jarOpenMole)) {
 			(new Thread() {
 				public void run() {
-					fittingLauncherVersionClean(typeOfLaunch, typeOfExplo, memeActivation, memeProba);
+					fittingLauncherVersionClean(typeOfLaunch, typeOfExplo, Optional.empty(), Optional.empty());
 				}
 			}).start();
 			return 0.;
 		} else {
-			return fittingLauncherVersionClean(typeOfLaunch, typeOfExplo, Optional.empty(), Optional.empty());
+			return fittingLauncherVersionClean(typeOfLaunch, typeOfExplo, memeActivation, memeProba);
 		}
 	}
 
@@ -106,7 +106,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		// Si appelle oneShot, depuis IHM ou depuis JAR
 		else if(typeOfExplo == EnumExplorationMethod.oneShot)
-			explorator = callFromJar(configuration,memeActivation, memeProba);
+			explorator = callFromJar(configuration, memeActivation, memeProba);
 
 		// NON FINI
 		else if (typeOfExplo == EnumExplorationMethod.specific)
@@ -173,17 +173,18 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeAndProba);
 		memeDiffu.setEntiteHandler(entiteHandler);
 		providers.put(0,memeDiffu);
+		Configurator.nbRepetitionbyRun = 1;
+
 
 		IModelParameter.ModelParamNbNode nodesChanging = new IModelParameter.ModelParamNbNode(100, 1000, 100);
-		providers.put(1, nodesChanging);
+//		providers.put(1, nodesChanging);
 
 		// l'ordre est important. Rapport au mise a jour de noeud etc dans les structures de données et graphstream
 		nodesChanging.addMemeListListener(networkConstructor);
 		nodesChanging.addMemeListListener(entiteHandler);
 		nodesChanging.addMemeListListener(fitter);
 
-
-		return ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
+		return ExplorationMethod.getSpecificExplorator(EnumExplorationMethod.oneShot, providers);
 	}
 
 	/** Retourne une liste spécifique a explorer.

@@ -124,8 +124,19 @@ public class Initializer {
         if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.jarOpenMole) {
 
             // La fenetre en elle meme Controller de Model donné a l'IHM
-            IHMStub fenetre = new IHMStub();
+//            IHMStub fenetre = new IHMStub();
+            IHM fenetre = new IHM(mControl,
+                    memeFactory,
+                    entiteHandler,
+                    new DrawerStub(),
+                    writeNRead);
+
             vControl.addView(fenetre);
+            if((Configurator.activationCodeForView & 4) == 4)
+                vControl.addView(new FileView(false));
+            if((Configurator.activationCodeForView & 2) == 2)
+                vControl.addView(new ConsoleView());
+            entiteHandler.setVueController(vControl);
             entiteHandler.initialisation();
             entiteHandler.addMemeListener(workerFactory.getDrawer());
             entiteHandler.addEntityListener(workerFactory.getCalculator());
@@ -191,7 +202,7 @@ public class Initializer {
             }
 
             fenetre.setVisible(true);
-            entiteHandler.setIHMController(vControl);
+            entiteHandler.setVueController(vControl);
 
             // fait le lien entre les entités d'action et de transmission de meme
             // avec l'IHM, pour permettre la mise a jour des affichages etc

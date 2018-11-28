@@ -65,16 +65,13 @@ public class Interfaces {
 	public interface StatAndPlotInterface extends IActionApplyListener {
 		
 		// Fonction d'obtention des stats
-		public String getDDInfos();
-		
-		// public void updateNetworkProperties(IInternalNetReprestn.TinyNetworks net, NetworkProperties netProp, int activationCode);
-//		public double getAPL();
-		public Double fitNetwork(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
+		 String getDDInfos();
+		 Double fitNetwork(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
 								 Optional<List<Boolean>> memeActivation, Optional<List<Double>> memeProba);
-//		public void searchStability();
-		public void fitNextStep();
-		public void testStability();
-		public void incrementNbAction();
+//		 void searchStability();
+		 void fitNextStep();
+		 void testStability();
+		 void incrementNbAction();
 	}
 	
 	/** Interface qui définit les actions possibles sur l'IHM
