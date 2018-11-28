@@ -2,6 +2,7 @@ package giteri.network.networkStuff;
 
 import giteri.run.interfaces.Interfaces.DrawerInterface;
 import giteri.run.interfaces.Interfaces.StatAndPlotInterface;
+import giteri.run.jarVersion.StatAndPlotJarVersion;
 import giteri.run.jarVersion.WorkerFactoryJarVersion;
 import giteri.network.network.Network;
 import giteri.run.configurator.Configurator;
@@ -34,7 +35,7 @@ public class WorkerFactory {
 		drawer = dra;
 	}
 
-	public WorkerFactory(NetworkAnalyzer anal ) {
+	public WorkerFactory(StatAndPlotJarVersion anal ) {
 		calculator = anal;
 		drawer = new DrawerStub();
 	}

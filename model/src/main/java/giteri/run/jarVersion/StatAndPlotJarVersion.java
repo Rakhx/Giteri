@@ -1,14 +1,16 @@
 package giteri.run.jarVersion;
 
 import giteri.meme.entite.EntiteHandler;
+import giteri.meme.event.ActionApplyEvent;
 import giteri.meme.mecanisme.MemeFactory;
-import giteri.network.networkStuff.NetworkAnalyzer;
-import giteri.network.networkStuff.NetworkConstructor;
-import giteri.network.networkStuff.NetworkFileLoader;
-import giteri.network.networkStuff.WorkerFactory;
+import giteri.network.networkStuff.*;
+import giteri.run.configurator.Configurator;
 import giteri.tool.other.WriteNRead;
 
-public class StatAndPlotJarVersion extends NetworkAnalyzer {
+public class StatAndPlotJarVersion extends StatAndPlotGeneric {
+
+	// Attribut propre a la classe
+	private int module = 0;
 
 	/**
 	 *
@@ -18,6 +20,15 @@ public class StatAndPlotJarVersion extends NetworkAnalyzer {
 		super(entiteHandler, memeFactory, networkConstructor, wnr, nfl, wf);
 	}
 
+	/** lors d'un changement de type ajout ou retrait de lien
+	 *
+	 */
+	public void handlerActionApply(ActionApplyEvent e) {
+		if(++module% Configurator.refreshInfoRate == 0){
+			module = 0;
+			// mise a jour d'un boolean
+		}
+	}
 //	protected void initializeConfigForStability(FittingClass fitting){
 ////		int i = 0;
 ////		double value;
