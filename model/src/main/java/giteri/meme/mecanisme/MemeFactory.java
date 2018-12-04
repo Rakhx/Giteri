@@ -27,7 +27,7 @@ public class MemeFactory {
 	private ArrayList<Meme> memeFitting;
 
 	// association meme & index, pour coloration ET fitting
-	private Hashtable<Meme, Integer> kvMemeIndexColor;
+	private Hashtable<Meme, Integer> kvMemeIndex;
 
 	private Integer lastIndexUsed = -1;
 
@@ -42,7 +42,7 @@ public class MemeFactory {
 		memeExisting = new ArrayList<Meme>();
 		memeFitting = new ArrayList<Meme>();
 		memeOnMap = new ArrayList<>();
-		kvMemeIndexColor = new Hashtable<Meme, Integer>();
+		kvMemeIndex = new Hashtable<Meme, Integer>();
 		actionFactory = actionFac;
 		filterFactory = agregatorFac;
 		attributFactory = attributFac;
@@ -100,7 +100,7 @@ public class MemeFactory {
 		if(addForMap)
 			memeOnMap.add(toReturn);
 
-		kvMemeIndexColor.put(toReturn, ++lastIndexUsed);
+		kvMemeIndex.put(toReturn, ++lastIndexUsed);
 		return toReturn;
 	}
 
@@ -228,8 +228,8 @@ public class MemeFactory {
 	 * @param thismeme
 	 * @return
 	 */
-	public Integer getColorIndex(Meme thismeme){
-		return kvMemeIndexColor.get(thismeme);
+	public Integer getIndexFromMeme(Meme thismeme){
+		return kvMemeIndex.get(thismeme);
 	}
 
 	/** Pour l'affichage
@@ -237,10 +237,10 @@ public class MemeFactory {
 	 * @param memeAsString
 	 * @return
 	 */
-	public Integer getColorIndexStringConversion(String memeAsString){
-		for (Meme meme : kvMemeIndexColor.keySet()) {
+	public Integer getIndexFromMemeFourChar(String memeAsString){
+		for (Meme meme : kvMemeIndex.keySet()) {
 			if(meme.toFourCharString().compareTo(memeAsString) == 0)
-				return kvMemeIndexColor.get(meme);
+				return kvMemeIndex.get(meme);
 		}
 		return null;
 	}
@@ -250,9 +250,9 @@ public class MemeFactory {
 	 * @param numero
 	 * @return
 	 */
-	public Meme getMemeFromColorInteger(int numero){
-		for (Meme meme : kvMemeIndexColor.keySet()) {
-			if(kvMemeIndexColor.get(meme) == numero)
+	public Meme getMemeFromIndex(int numero){
+		for (Meme meme : kvMemeIndex.keySet()) {
+			if(kvMemeIndex.get(meme) == numero)
 				return meme;
 		}
 		return null;

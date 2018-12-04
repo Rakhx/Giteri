@@ -2,7 +2,6 @@ package giteri.fitting.parameters;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.util.*;
@@ -765,7 +764,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		// Affichage dans la fenetre de l'évolution des meme appliances
 		Hashtable<Integer, Double>  kvMemeValue = new Hashtable<Integer, Double>() ;
 		for (Meme meme : kvEcartTypeOrPropMemeAppliance.keySet())
-			kvMemeValue.put(memeFactory.getColorIndex(meme), kvEcartTypeOrPropMemeAppliance.get(meme));
+			kvMemeValue.put(memeFactory.getIndexFromMeme(meme), kvEcartTypeOrPropMemeAppliance.get(meme));
 		com.view.addValueToApplianceSerie(nbCallContinuOnThisConfig, kvMemeValue);
 
 		message.setValue(message.getValue() + resume);

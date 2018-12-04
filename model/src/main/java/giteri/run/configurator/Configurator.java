@@ -121,7 +121,7 @@ public final class Configurator {
 	public static boolean overallDebug = !jarMode;
 	public static boolean debugHopAway = false;
 	public static boolean autrucheMode = false;
-	public static boolean debugOpenMole = false;
+	public static boolean debugJarMode = true;
 
 	// endregion
 

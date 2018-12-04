@@ -163,26 +163,34 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		// appelle sec avec un seul jeu de parametre, aux probas fixés
 		Hashtable<Meme, GenericDoubleParameter> memeAndProba = new Hashtable<>();
 		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
+		ArrayList<String> memesSelectionnes = null;
+
+		if(Configurator.debugJarMode)
+			memesSelectionnes = new ArrayList<>();
 
 		// Parcourt la liste des memes
 		for (int i = 0; i < activation.size(); i++) {
-			if(activation.get(i))
-				memeAndProba.put(memeFactory.getMemeFromColorInteger(i), new GenericDoubleParameter(proba.get(i)));
+			if(activation.get(i)) {
+				memeAndProba.put(memeFactory.getMemeFromIndex(i), new GenericDoubleParameter(proba.get(i)));
+				if(Configurator.debugJarMode)
+					memesSelectionnes.add(";" + memeFactory.getMemeFromIndex(i) + "-" + proba.get(i));
+			}
 		}
+
+		if(Configurator.debugJarMode)
+			System.out.println("Memes voulus "+memesSelectionnes.stream().reduce(String::concat));
 
 		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeAndProba);
 		memeDiffu.setEntiteHandler(entiteHandler);
 		providers.put(0,memeDiffu);
-		Configurator.nbRepetitionbyRun = 1;
 
-
-		IModelParameter.ModelParamNbNode nodesChanging = new IModelParameter.ModelParamNbNode(100, 1000, 100);
+//		IModelParameter.ModelParamNbNode nodesChanging = new IModelParameter.ModelParamNbNode(100, 1000, 100);
 //		providers.put(1, nodesChanging);
-
-		// l'ordre est important. Rapport au mise a jour de noeud etc dans les structures de données et graphstream
-		nodesChanging.addMemeListListener(networkConstructor);
-		nodesChanging.addMemeListListener(entiteHandler);
-		nodesChanging.addMemeListListener(fitter);
+//
+//		// l'ordre est important. Rapport au mise a jour de noeud etc dans les structures de données et graphstream
+//		nodesChanging.addMemeListListener(networkConstructor);
+//		nodesChanging.addMemeListListener(entiteHandler);
+//		nodesChanging.addMemeListListener(fitter);
 
 		return ExplorationMethod.getSpecificExplorator(EnumExplorationMethod.oneShot, providers);
 	}
@@ -358,7 +366,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 *
 	 */
 	public String getDDInfosByMeme(){
-
 		Hashtable<Integer, Double> furDurchschnitt = new Hashtable<Integer, Double>();
 		String total = "";
 		networkConstructor.updatePreciseNetworkProperties(Configurator.getIndicateur(NetworkAttribType.DDARRAY));

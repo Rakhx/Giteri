@@ -39,6 +39,7 @@ public class JarVersion {
 
 
 		for (int i = 1; i <= args.length/2; i++) {
+			memeActi.add(args[i].compareToIgnoreCase("0") != 0);
 			memeActi.add(Boolean.parseBoolean(""+args[i]));
 		}
 

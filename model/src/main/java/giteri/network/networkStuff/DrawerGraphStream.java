@@ -11,9 +11,6 @@ import giteri.network.network.Edge;
 import giteri.network.network.Network;
 
 import giteri.tool.math.Toolz;
-import giteri.tool.objects.ObjectRef;
-import org.graphstream.algorithm.APSP;
-import org.graphstream.algorithm.APSP.APSPInfo;
 import org.graphstream.algorithm.Toolkit;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
@@ -280,7 +277,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 		int aAppliquer;
 
 		for (String combi : entiteHandler.getMemeAvailableAsString(Configurator.FittingBehavior.simpleAndComplex)) {
-			officialIndex = memeFactory.getColorIndexStringConversion(combi);
+			officialIndex = memeFactory.getIndexFromMemeFourChar(combi);
 
 			if(officialIndex != null)
 				aAppliquer = officialIndex;

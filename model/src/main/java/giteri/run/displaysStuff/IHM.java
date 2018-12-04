@@ -1395,7 +1395,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		// Pour chaque série qu'on veut ajouter
 		for (XYSeries serie : seriesAppliances) {
 			// on crée les série dans l'ordre a partir de 0 et regarde le meme associé a cet index dans MemeFactory
-			memeConcerne = memeFactory.getMemeFromColorInteger(numbSerie);
+			memeConcerne = memeFactory.getMemeFromIndex(numbSerie);
 			if(memeConcerne != null){
 				// label son petit nom
 				labelSerie = entiteHandler.translateMemeCombinaisonReadable(memeConcerne.toFourCharString());
@@ -1496,7 +1496,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 				netProp = modelController.getCurrentNetProperties(activator);
 
 				for (Meme meme : selectedMemeOnSimulation) {
-					associatedColor = drawerGraphStream.getColorAsColor(memeFactory.getColorIndexStringConversion(meme.toFourCharString()));
+					associatedColor = drawerGraphStream.getColorAsColor(memeFactory.getIndexFromMemeFourChar(meme.toFourCharString()));
 
 					// NOMBRE DE POSSESSION DE MEME PAR LES ENTITES
 					// Savoir quel noeud possède quel meme;

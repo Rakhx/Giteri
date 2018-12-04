@@ -40,7 +40,6 @@ public class Initializer {
         // A instancier dans les if. à lancer dans tous les cas a la fin?
         Runnable willBeRun;
         boolean ihmLauncher = (launcher == Configurator.EnumLauncher.ihm) ;
-
         if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.jarOpenMole){
             // La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
 	        // depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent cette configuration initiale
@@ -49,6 +48,7 @@ public class Initializer {
             Configurator.jarMode = true;
             Configurator.systemPaused = false;
             Configurator.writeNetworkResultOnFitting = true;
+            Configurator.nbRepetitionbyRun = 1;
         }
 
         else if(launcher == Configurator.EnumLauncher.ihm){
