@@ -19,6 +19,7 @@ import giteri.fitting.algo.IExplorationMethod.ExplorationMethod;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.EnumExplorationMethod;
 import giteri.run.configurator.Configurator.NetworkAttribType;
+import giteri.run.configurator.Configurator.MemeList;
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
 
@@ -164,6 +165,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		Hashtable<Meme, GenericDoubleParameter> memeAndProba = new Hashtable<>();
 		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
 		ArrayList<String> memesSelectionnes = null;
+		Meme selectedMeme;
 
 		if(Configurator.debugJarMode)
 			memesSelectionnes = new ArrayList<>();
@@ -171,9 +173,17 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		// Parcourt la liste des memes
 		for (int i = 0; i < activation.size(); i++) {
 			if(activation.get(i)) {
-				memeAndProba.put(memeFactory.getMemeFromIndex(i), new GenericDoubleParameter(proba.get(i)));
-				if(Configurator.debugJarMode)
-					memesSelectionnes.add(";" + memeFactory.getMemeFromIndex(i) + "-" + proba.get(i));
+
+				//	memeAndProba.put(memeFactory.getMemeFromIndex(i), new GenericDoubleParameter(proba.get(i)));
+				selectedMeme = memeFactory.getIemeMemeFromSpecList(MemeList.FITTING, i);
+				if(selectedMeme != null) {
+					memeAndProba.put(selectedMeme, new GenericDoubleParameter(proba.get(i)));
+					if (Configurator.debugJarMode)
+						memesSelectionnes.add(";" + memeFactory.getMemeFromIndex(i) + "-" + proba.get(i));
+				}else {
+					System.err.println("[StatAndPlotGeneric.CallFromJar]- Pas assez de meme dans la liste de fitting pour le nombre de param appelé");
+
+				}
 			}
 		}
 

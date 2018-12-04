@@ -9,6 +9,8 @@ import giteri.run.configurator.Configurator.AgregatorType;
 import giteri.run.configurator.Configurator.AttributType;
 import giteri.meme.entite.Meme;
 
+import giteri.run.configurator.Configurator.MemeList;
+
 /** Permet de gérer les meme du graph
  *
  */
@@ -34,6 +36,8 @@ public class MemeFactory {
 	private ActionFactory actionFactory;
 	private FilterFactory filterFactory;
 	private AttributFactory attributFactory;
+
+	private boolean hasBeenSorted = false;
 
 	//endregion
 
@@ -212,7 +216,7 @@ public class MemeFactory {
 	 * @return
 	 */
 	public Meme getMemeFromFourString(String foursizeName){
-		for (Meme meme: getMemes(Configurator.MemeList.EXISTING, ActionType.ANYTHING )) {
+		for (Meme meme: getMemes(MemeList.EXISTING, ActionType.ANYTHING )) {
 			if(meme.toFourCharString().compareTo(foursizeName)==0)
 				return meme;
 		}
@@ -255,6 +259,24 @@ public class MemeFactory {
 			if(kvMemeIndex.get(meme) == numero)
 				return meme;
 		}
+		return null;
+	}
+
+	public Meme getIemeMemeFromSpecList(MemeList list, int ieme){
+		if(!hasBeenSorted){
+			memeExisting.sort(null);
+			memeFitting.sort(null);
+			memeOnMap.sort(null);
+			hasBeenSorted = true;
+		}
+
+		int position = 0;
+		for (Meme meme: getMemes(list, ActionType.ANYTHING )) {
+			if(ieme == position++){
+				return meme;
+			}
+		}
+
 		return null;
 	}
 
