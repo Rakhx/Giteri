@@ -179,7 +179,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 				if(selectedMeme != null) {
 					memeAndProba.put(selectedMeme, new GenericDoubleParameter(proba.get(i)));
 					if (Configurator.debugJarMode)
-						memesSelectionnes.add(";" + memeFactory.getMemeFromIndex(i) + "-" + proba.get(i));
+						memesSelectionnes.add(";" + entiteHandler.translateMemeCombinaisonReadable(selectedMeme.toString()) + "-" + proba.get(i));
 				}else {
 					System.err.println("[StatAndPlotGeneric.CallFromJar]- Pas assez de meme dans la liste de fitting pour le nombre de param appelé");
 
@@ -189,6 +189,8 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		if(Configurator.debugJarMode)
 			System.out.println("Memes voulus "+memesSelectionnes.stream().reduce(String::concat));
+
+
 
 		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeAndProba);
 		memeDiffu.setEntiteHandler(entiteHandler);

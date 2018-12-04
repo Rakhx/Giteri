@@ -47,15 +47,27 @@ public class Meme implements Serializable, Comparable<Meme>{
 	}
 	
 	//region Getter/Setter/toString
-	
+
+	/**
+	 *
+	 * @return
+	 */
 	public String toString(){
 		return getMemeName(0);
 	}
-	
+
+	/** link:add:deg:sup:mine
+	 *
+	 * @return
+	 */
 	public String toShortString(){
 		return getMemeName(1);
 	}
-	
+
+	/**
+	 *
+	 * @return ADLKDGRDMMNIFNTLK
+	 */
 	public String toFourCharString(){
 		return getMemeName(0);
 	}
