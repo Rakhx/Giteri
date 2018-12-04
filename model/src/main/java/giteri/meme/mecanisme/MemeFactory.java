@@ -64,7 +64,7 @@ public class MemeFactory {
 
 		// L'action qui compose le meme
 		ActionFactory.IAction action = actionFactory.getAction(actionAsked);
-		@SuppressWarnings("rawtypes")
+
 		ArrayList<AttributFactory.IAttribut> attribs = new ArrayList<>();
 		Hashtable<String, Hashtable<Integer , FilterFactory.IFilter>> KVAttribAgreg = new Hashtable<>();
 

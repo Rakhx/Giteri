@@ -45,18 +45,31 @@ public class ResultSet extends Hashtable<Integer, Result> {
 	 * Renvoi les scores en fonction du numéro de run en fonction des distributions
 	 */
 	public double displayResult() {
-		double res = 0;
+		double resForOneRun = 0;
+		double resOfSimu = 0;
+		double stdDevia = 0;
+		int nbRun = 0;
+
 		if (Configurator.jarMode) {
-			for (Integer numeroRun : keySet())
-				res = get(numeroRun).getAvgScore();
-			System.out.println(res);
+			for (Integer numeroRun : keySet()) {
+				resForOneRun = get(numeroRun).getAvgScore();
+				stdDevia = get(numeroRun).getScoreStdDvt();
+				if(stdDevia > 0)
+					resForOneRun *= stdDevia;
+				nbRun++;
+				resOfSimu += resForOneRun;
+			}
+
+			resOfSimu /= nbRun;
+			System.out.println(resOfSimu);
+
 		} else {
 			for (Integer numeroRun : keySet()) {
 				System.out.println("_____________________________________");
 				System.out.println("Configuration " + get(numeroRun).getCurrentConfig());
 			}
 		}
-		return res;
+		return resOfSimu;
 	}
 
 	/** Ajoute un score pour le Result correspondant au numero de run courant.

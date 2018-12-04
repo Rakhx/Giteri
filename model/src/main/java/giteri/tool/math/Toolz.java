@@ -450,6 +450,28 @@ public class Toolz {
 		return Math.sqrt(deviation / entry.size());
 	}
 
+	/** Obtenir l'écart type des valeurs autour de la moyenne, fourni en paramètre ou non.
+	 *
+	 * @param entry
+	 * @param avg
+	 * @return
+	 */
+	public static <T extends Number> Double getDeviation(List<T> entry, Optional<Double> avg ){
+		Double avgValue;
+		Double deviation = .0;
+		if (!avg.isPresent())
+			avgValue = getAvg(entry);
+		else
+			avgValue = avg.get();
+
+
+		for (Number number : entry) {
+			deviation += Math.pow(/*(Double)number*/Double.parseDouble(""+number) - avgValue, 2);
+		}
+
+		return Math.sqrt(deviation / entry.size());
+	}
+
 	/** Calcule la deviation d'une liste de Number en circularqueue
 	 * 
 	 * @param queue

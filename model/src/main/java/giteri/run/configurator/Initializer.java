@@ -48,7 +48,7 @@ public class Initializer {
             Configurator.jarMode = true;
             Configurator.systemPaused = false;
             Configurator.writeNetworkResultOnFitting = true;
-            Configurator.nbRepetitionbyRun = 1;
+            Configurator.nbRepetitionbyRun = Configurator.nbRepetitionForJar;
         }
 
         else if(launcher == Configurator.EnumLauncher.ihm){

@@ -65,6 +65,9 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static int nbRepetitionbyRun = 10;
 	@toOutput ( yes = true )
+	public static int nbRepetitionForJar = 7;
+
+	@toOutput ( yes = true )
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
 	@toOutput ( yes = true )
 	public static int multiplicatorNbAction  = 2500; //  Par combein on multiplie le nombdre de noeud sur la simulation

@@ -75,6 +75,14 @@ public class Result {
         return Toolz.getAvg(score);
     }
 
+    /** L'écart type des scores des répétitions au sein du RUN
+     *
+     * @return
+     */
+    public double getScoreStdDvt() {
+        return Toolz.getDeviation(score, Optional.empty());
+    }
+
     public double getLastScore(){
         if(score.size()> 0)
             return score.get(score.size() - 1);
