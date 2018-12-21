@@ -1,10 +1,6 @@
 package giteri.test;
 
-import com.sun.deploy.uitoolkit.ToolkitStore;
-import giteri.tool.math.Toolz;
-
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 public class RandomTest {
     public static void main(String[] args)  {

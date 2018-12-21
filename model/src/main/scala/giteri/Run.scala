@@ -13,17 +13,20 @@ import giteri.run.jarVersion.{JarVersion, StatAndPlotJarVersion, WorkerFactoryJa
 import giteri.tool.other.WriteNRead
 
 object Run {
-
-  def run(network: File, one: Double, two: Double, three: Double, four: Double, five : Double, seed: Long):Double ={ //region Param
+  def run(network: File, one: Double, oneActi: Boolean, two: Double, twoActi: Boolean,
+          three: Double, threeActi: Boolean, four: Double, fourActi: Boolean,
+          five : Double, fiveActi: Boolean, six: Double, sixActi:Boolean,
+          sevn: Double, sevnActi: Boolean, hei: Double, heiActi: Boolean,
+          nine: Double, nineActi: Boolean, seed: Long):Double ={ //region Param
     val rand = new java.util.Random(seed)
-    JarVersion.run(network, one, two, three, four, five)
+    JarVersion.run(network,
+      oneActi,twoActi, threeActi, fourActi, fiveActi, sixActi, sevnActi, heiActi, nineActi,
+      one, two, three, four, five, six, sevn, hei, nine)
+
     // val s = io.Source.fromFile(network).getLines()
    //  (math.abs(one * 2 - 10) + rand.nextGaussian(), math.abs(10 - two) + rand.nextGaussian())
 
   }
-
-
-
 }
 
 object Appli extends App{

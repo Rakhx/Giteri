@@ -75,10 +75,13 @@ public final class Configurator {
 	// endregion
 
 	// region I/O
-	public static boolean displayFittingProviderApplied = true;	// affiche dans la console apprlications des params:
+	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
+
+
+	public static boolean displayFittingProviderApplied = fullSilent ? false : true;	// affiche dans la console apprlications des params:
 	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
-	public static int activationCodeForView = 5;
+	public static int activationCodeForView = fullSilent? 0 : 5;
 
 	public static boolean displayPlotWhileSimulation = !jarMode; // Affichage des DD et densité
 	public static boolean displayMemePosessionDuringSimulation = true; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
@@ -115,16 +118,16 @@ public final class Configurator {
 	//endregion
 
 	// region affichage de debug
-	public static boolean debugStatAndPlot = true;
-	public static boolean debugFittingClassFast = true;
-	public static boolean debugFittingClass = true;
+	public static boolean debugStatAndPlot = false;
+	public static boolean debugFittingClassFast = false;
+	public static boolean debugFittingClass = false;
 	public static boolean debugEntite = false;
 	public static boolean debugEntiteHandler = false;
 
 	public static boolean overallDebug = !jarMode;
 	public static boolean debugHopAway = false;
 	public static boolean autrucheMode = false;
-	public static boolean debugJarMode = true;
+	public static boolean debugJarMode = false;
 
 	// endregion
 

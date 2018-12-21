@@ -25,6 +25,7 @@ public class JarVersion {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+
 		//region Param
 		ArrayList<Double> memeProba = new ArrayList<>();
 		ArrayList<Boolean> memeActi = new ArrayList<>();
