@@ -1,0 +1,69 @@
+// Define the variables that are transmitted between the tasks
+val one = Val[Double]
+val oneA = Val[Int]
+val two = Val[Double]
+val twoA = Val[Int]
+val three = Val[Double]
+val threeA = Val[Int]
+val four = Val[Double]
+val fourA = Val[Int]
+val five = Val[Double]
+val fiveA = Val[Int]
+val six = Val[Double]
+val sixA = Val[Int]
+val seven = Val[Double]
+val sevenA = Val[Int]
+val height = Val[Double]
+val heightA = Val[Int]
+val nine = Val[Double]
+val nineA = Val[Int]
+
+val network = Val[File]
+val seed = Val[Long]
+
+// Score d'output du réseau obtenu par rapport au cible
+val o1 = Val[Double]
+
+
+val model =
+  ScalaTask("""
+   |val (o1) = giteri.Run.run(network, one,oneA,two,twoA,three,threeA,four,fourA,five,fiveA,six,sixA,seven,sevenA,height,heightA, nine,nineA,seed)
+   |""".stripMargin) set (
+      inputs += (one,oneA,two,twoA,three,threeA,four,fourA,five,fiveA,six,sixA,seven,sevenA,height,heightA, nine,nineA, network, seed),
+      outputs += (o1),
+      network := workDirectory / "default.txt",
+    )
+
+val evolution =
+  SteadyStateEvolution(
+    algorithm =   
+      NSGA2(
+        mu = 200,
+        genome = Seq(one in (0.0, 1.0),two in (0.0,1.0),three in (0.0,1.0),four in (0.0,1.0),five in (0.0,1.0),six in (0.0,1.0),seven in (0.0,1.0),height in (0.0,1.0),nine in (0.0,1.0),
+        oneA in (0 to 1 by 1),twoA in (0 to 1 by 1),threeA in (0 to 1 by 1),fourA in (0 to 1 by 1),fiveA in (0 to 1 by 1),sixA in (0 to 1 by 1),sevenA in (0 to 1 by 1),heightA in (0 to 1 by 1),nineA in (0 to 1 by 1)
+        ),
+        objectives = Seq(o1),
+        stochastic = Stochastic(seed = seed)
+      ),
+    evaluation = model,
+    parallelism = 4,
+    termination = 20 minutes
+)
+
+val save = SavePopulationHook(evolution, workDirectory / "calibration")
+val env = LocalEnvironment(4) 
+
+(evolution hook save on env) 
+  
+  
+// Define the island model with 2,000 concurrent islands.
+// The algorithm stops after 200,000 islands evaluations.
+//val island = IslandEvolution(evolution, parallelism = 1000, termination = 100000)
+  
+// Define a hook to save the Pareto frontier
+
+//val save = SavePopulationHook(island, workDirectory / "calibration")
+//val env = EGIEnvironment("vo.complex-systems.eu")
+
+//(island hook save on env)
+
