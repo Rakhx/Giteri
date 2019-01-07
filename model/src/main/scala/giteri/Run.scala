@@ -1,26 +1,18 @@
 package giteri
 
 import java.io.File
-import java.util
 
-import giteri.meme.entite.EntiteHandler
-import giteri.network.networkStuff.NetworkConstructor
-import giteri.run.configurator.Configurator
-import giteri.run.controller.Controller
-import giteri.run.displaysStuff.IHMStub
-import giteri.run.interfaces.Interfaces
-import giteri.run.jarVersion.{JarVersion, StatAndPlotJarVersion, WorkerFactoryJarVersion}
-import giteri.tool.other.WriteNRead
+import giteri.run.jarVersion.JarVersion
 
 object Run {
-  def run(network: File, one: Double, oneActi: Boolean, two: Double, twoActi: Boolean,
-          three: Double, threeActi: Boolean, four: Double, fourActi: Boolean,
-          five : Double, fiveActi: Boolean, six: Double, sixActi:Boolean,
-          sevn: Double, sevnActi: Boolean, hei: Double, heiActi: Boolean,
-          nine: Double, nineActi: Boolean, seed: Long):Double ={ //region Param
+  def run(network: File, one: Double, oneActi: Integer, two: Double, twoActi: Integer,
+          three: Double, threeActi: Integer, four: Double, fourActi: Integer,
+          five : Double, fiveActi: Integer, six: Double, sixActi:Integer,
+          sevn: Double, sevnActi: Integer, hei: Double, heiActi: Integer,
+          nine: Double, nineActi: Integer, seed: Long):Double ={ //region Param
     val rand = new java.util.Random(seed)
     JarVersion.run(network,
-      oneActi,twoActi, threeActi, fourActi, fiveActi, sixActi, sevnActi, heiActi, nineActi,
+      oneActi.==(1),twoActi.==(1), threeActi.==(1), fourActi.==(1), fiveActi.==(1), sixActi.==(1), sevnActi.==(1), heiActi.==(1), nineActi.==(1),
       one, two, three, four, five, six, sevn, hei, nine)
 
     // val s = io.Source.fromFile(network).getLines()

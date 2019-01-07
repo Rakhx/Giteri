@@ -65,7 +65,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static int nbRepetitionbyRun = 10;
 	@toOutput ( yes = true )
-	public static int nbRepetitionForJar = 7;
+	public static int nbRepetitionForJar = 3;
 
 	@toOutput ( yes = true )
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud

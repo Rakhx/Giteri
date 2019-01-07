@@ -3,7 +3,9 @@ package giteri.network.networkStuff;
 import giteri.fitting.algo.IExplorationMethod;
 import giteri.run.interfaces.Interfaces.StatAndPlotInterface;
 
+import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import giteri.tool.math.Toolz;
 import giteri.tool.other.WriteNRead;
@@ -166,6 +168,8 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
 		ArrayList<String> memesSelectionnes = null;
 		Meme selectedMeme;
+		File toWrite = writeNRead.createAndGetDirFromString(Arrays.asList("."));
+		writeNRead.writeSmallFile(toWrite, "RezTemp", activation.stream().map(e->e.toString()).collect(Collectors.toList()));
 
 		if(Configurator.debugJarMode)
 			memesSelectionnes = new ArrayList<>();
@@ -187,8 +191,9 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			}
 		}
 
-		if(Configurator.debugJarMode)
-			System.out.println("Memes voulus "+memesSelectionnes.stream().reduce(String::concat));
+		writeNRead.writeSmallFile(toWrite, "RezTemp", memeAndProba.keySet().stream().map(e->e.toString()).collect(Collectors.toList()));
+	//	if(Configurator.debugJarMode)
+//			System.out.println("Memes voulus "+memesSelectionnes.stream().reduce(String::concat));
 
 
 

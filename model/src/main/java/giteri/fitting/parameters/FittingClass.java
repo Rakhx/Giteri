@@ -22,7 +22,6 @@ import giteri.tool.objects.ObjectRef;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import giteri.tool.other.WriteNRead;
-import scala.util.Random;
 import giteri.fitting.algo.IExplorationMethod;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.NetworkAttribType;
@@ -186,6 +185,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public void init(){
 		Configurator.methodOfGeneration = Configurator.MemeDistributionType.Nothing;
 		targetNetProperties = networkFileLoader.getNetworkProperties();
+		boolean doTheWrite = !Configurator.autrucheMode;
 
 		// ECRITURE
 		repertoires = new ArrayList<>(Arrays.asList("Stability"));
@@ -212,6 +212,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			toWriteNormalCSV += currentNetProperties.getCsvHeader(Configurator.activationCodeForScore);
 			toWriteNormalCSV += ";moyenne des scores";
 			toWriteNormalCSV += ";Variance des scores";
+			if(doTheWrite)
 			writeNRead.writeSmallFile(repOfTheSearch, Configurator.fileNameCsvSimple,
 					Collections.singletonList(toWriteNormalCSV));
 
@@ -226,17 +227,20 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			toWriteDetailCSV.append(";scores");
 			toWriteDetailCSV.append(";moyenne des scores");
 			toWriteDetailCSV.append(";Variance des scores");
+			if(doTheWrite)
 			writeNRead.writeSmallFile(repOfTheSearch, Configurator.fileNameCsvDetail,
 					Collections.singletonList(toWriteDetailCSV.toString()));
 		}
 		// endregion
 
         toWriteConfiguratorFile = "Champs;Valeurs";
-        writeNRead.writeSmallFile(repOfTheSearch,"configurator",
+        if(doTheWrite)
+		writeNRead.writeSmallFile(repOfTheSearch,"configurator",
                 Collections.singletonList(toWriteConfiguratorFile));
 
         // region fichier configurator
         Class<?> conf = new Configurator().getClass();
+        if(doTheWrite)
         for (int i = 0; i < conf.getFields().length; i++) {
             Field fieldOne = conf.getFields()[i];
             Annotation ae = fieldOne.getAnnotation(Configurator.toOutput.class);
