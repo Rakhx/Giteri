@@ -297,8 +297,12 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	}
 
 	private void fitListAnotherHJ(List<Boolean> activator, List<Double> proba) {
-		proba.addAll(Arrays.asList(0.041,0.618,.155,0.811,0.594,0.582,1.,.446,.557));
-		activator.addAll(Arrays.asList(true, false, false, true, false, true,true,true,true));
+		// small world? @ 100 noeuds
+//		proba.addAll(Arrays.asList(0.041,0.618,.155,0.811,0.594,0.582,1.,.446,.557));
+//		activator.addAll(Arrays.asList(true, false, false, true, false, true,true,true,true));
+		// Jazz @ 194 noeud
+		proba.addAll(Arrays.asList(0.4374,0.,.963,0.513,1.,0.388,.5914,.0,.989));
+		activator.addAll(Arrays.asList(false, true, false, true, false, true,true,false,true));
 
 	}
 

@@ -135,8 +135,11 @@ public class ResultSet extends Hashtable<Integer, Result> {
 		List<Double> scores = result.getScores();
 		List<String> parameter = result.getCurrentConfig();
 
+		// activator pour le score,
+		// AvgClustering:5 - nbEdges:6 - APL  - 8 = 256 +
+		int newActivator = 352;
 		// Mise à jour des valeurs de moyenne et d'écart type pour les réseaux
-		updateMeanAndSD(ListOfproperties, Configurator.activationCodeAllAttrib, netMean, netSD);
+		updateMeanAndSD(ListOfproperties, newActivator, netMean, netSD);
 		toWriteSimple += numeroRun;
 		toWriteDetailled += numeroRun;
 

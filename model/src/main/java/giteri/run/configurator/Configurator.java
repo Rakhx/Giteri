@@ -130,7 +130,7 @@ public final class Configurator {
 	//region ancien boolean, osef, etc
 	// moyen osef
 	public static final boolean lotOfNodes = false;
-	private static int nbNode = lotOfNodes ? 500 : 100;
+	private static int nbNode = lotOfNodes ? 500 : 194;
 	public static int refreshInfoRate = 10;
 	public final static boolean autoRedoActionIfNoAction = false;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
