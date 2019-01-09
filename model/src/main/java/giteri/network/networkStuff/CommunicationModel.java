@@ -100,6 +100,15 @@ public class CommunicationModel implements IModel {
 
 	}
 
+	/** Plus de fonctionnalité
+	 *
+	 */
+	public void fittingOnce(){
+		Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
+		Configurator.typeOfMemeUseForFitting = Configurator.MemeList.FITTING;
+		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.oneShot,Optional.empty(),Optional.empty());
+	}
+
 	/** Lancement du processus de fittage du réseau courant a celui
 	 * en paramètre.
 	 *
@@ -110,15 +119,6 @@ public class CommunicationModel implements IModel {
 
 	public void displayPolar(){
 
-	}
-
-	/** Plus de fonctionnalité
-	 *
-	 */
-	public void fittingOnce(){
-		Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
-		Configurator.typeOfMemeUseForFitting = Configurator.MemeList.FITTING;
-		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.oneShot,Optional.empty(),Optional.empty());
 	}
 
 	public void rdmConfig(){

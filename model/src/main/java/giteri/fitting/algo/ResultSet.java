@@ -166,8 +166,8 @@ public class ResultSet extends Hashtable<Integer, Result> {
 				//+ ";" + ((scoreMeanAndSd[0] * scoreMeanAndSd[0]) / (scoreMeanAndSd[0] - scoreMeanAndSd[1]));
 
 		// TODO [WayPoint]- Ecriture dans les deux csv, normal et détaillé.
-		writeNRead.writeSmallFile(rep, "NetworkCSV", Arrays.asList(toWriteSimple));
-		writeNRead.writeSmallFile(rep, "NetworkDetailsCSV", Arrays.asList(toWriteDetailled));
+		writeNRead.writeSmallFile(rep, Configurator.fileNameCsvSimple, Arrays.asList(toWriteSimple));
+		writeNRead.writeSmallFile(rep, Configurator.fileNameCsvDetail, Arrays.asList(toWriteDetailled));
 	}
 
 	//endregion

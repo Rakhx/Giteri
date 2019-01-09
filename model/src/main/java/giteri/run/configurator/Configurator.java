@@ -11,6 +11,9 @@ import giteri.tool.math.Toolz;
 
 public final class Configurator {
 
+	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
+
+
 	// region iniitalizer stuff
 	// VALEURS DONNEES A TITRE INDICATIF, set définitif dans l'initializer
 	// La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
@@ -19,7 +22,7 @@ public final class Configurator {
 	public static boolean withGraphicalDisplay = true;
 	public static boolean jarMode = true;
 	public static boolean systemPaused = false;
-	public static boolean writeNetworkResultOnFitting = true; // Screenshot, network.csv...
+	public static boolean writeNetworkResultOnFitting = !fullSilent; // Screenshot, network.csv...
 	public static boolean writeMemeResultOnFitting = writeNetworkResultOnFitting || true; // NetworkDetails.csv
 	public static MemeDistributionType methodOfGeneration = MemeDistributionType.Nothing;
 	// endregion
@@ -31,7 +34,6 @@ public final class Configurator {
 	public static boolean autoPauseIfNexted = false; // AUTOPAUSE mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	@toOutput ( yes = true )
 	public static boolean initializeDefaultBehavior = true	;	// ----FLUIDITE----
-	public static boolean oneAddForOneRmv = false; // ONEforONE Joue tour a tour un ajout d'un retrait
 	@toOutput ( yes = true )
 	public static boolean rebranchementAction = false; // REWIRE Faire l'ajout et le retrait dans le meme temps
 
@@ -75,8 +77,6 @@ public final class Configurator {
 	// endregion
 
 	// region I/O
-	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
-
 
 	public static boolean displayFittingProviderApplied = fullSilent ? false : true;	// affiche dans la console apprlications des params:
 	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
@@ -84,7 +84,7 @@ public final class Configurator {
 	public static int activationCodeForView = fullSilent? 0 : 5;
 
 	public static boolean displayPlotWhileSimulation = !jarMode; // Affichage des DD et densité
-	public static boolean displayMemePosessionDuringSimulation = true; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
+	public static boolean displayMemePosessionDuringSimulation = !jarMode; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
 	public static boolean writeNbActionPerSec = false; // pas de fichier nbline
 	public static boolean writeFailDensityLink = false; // fichier d'info sur les Fails X density variation
 
@@ -109,9 +109,6 @@ public final class Configurator {
 	public static boolean displayLogRatioLogFailOverSuccess = faster;
 	public static boolean displayLogRatioTryAddOverTryRmv = faster;
 
-	public static boolean DisplayLogdebugInstantiation = false;
-	public static boolean DisplayLogGetAvailableMeme = false;
-
 	public static boolean checkWhenFullPropagate = false; 	// All action spread? affiche en combien d'action
 	public static int checkFullProRefreshRate = 75; // every X step vérification du full propagate
 
@@ -126,7 +123,6 @@ public final class Configurator {
 
 	public static boolean overallDebug = !jarMode;
 	public static boolean debugHopAway = false;
-	public static boolean autrucheMode = false;
 	public static boolean debugJarMode = false;
 
 	// endregion
@@ -141,6 +137,7 @@ public final class Configurator {
 	public static boolean memeCanBeReplaceByCategory = true;
 	public final static int semiAutoWaitingTime = 3000;
 
+	public static boolean oneAddForOneRmv = false; // ONEforONE Joue tour a tour un ajout d'un retrait
 	public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-d_HH'h'mm'm'ss's'");
 	public static File defaultPathForReadingNetwork = new File("model"+File.separator+"default.txt");
 	public static Integer baseSleepTimeMulti = 0;

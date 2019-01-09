@@ -44,15 +44,8 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	 *
 	 */
 	public NetworkConstructor() {
-		if(Configurator.DisplayLogdebugInstantiation)
-			System.out.println("Network Constructor Initialisation");
-
 		networkInstance = new Network();
 		generateNodes();
-
-		if(Configurator.DisplayLogdebugInstantiation)
-			System.out.println("Network Constructor Closing");
-
 		networkInstanceProperties = new NetworkProperties("Courant");
 		networkInstanceProperties.createStub();
 		networkRepresentation = new TinyNetworks();

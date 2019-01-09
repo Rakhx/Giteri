@@ -25,6 +25,8 @@ import org.graphstream.ui.view.Viewer;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+
+import static giteri.run.configurator.Configurator.fullSilent;
 import static giteri.run.configurator.Configurator.withGraphicalDisplay;
 
 /** Classe d'initialisation des objets nécessaires à l'utilisation du framework
@@ -47,7 +49,7 @@ public class Initializer {
             Configurator.withGraphicalDisplay = false;
             Configurator.jarMode = true;
             Configurator.systemPaused = false;
-            Configurator.writeNetworkResultOnFitting = true;
+            Configurator.writeNetworkResultOnFitting = !fullSilent;
             Configurator.nbRepetitionbyRun = Configurator.nbRepetitionForJar;
         }
 
@@ -57,7 +59,7 @@ public class Initializer {
             // Configurator.withGraphicalDisplay = true; // On le laisse a la valeur donné dans le configurator
             Configurator.jarMode = false;
             Configurator.systemPaused = true;
-            Configurator.writeNetworkResultOnFitting = true;
+            Configurator.writeNetworkResultOnFitting = !fullSilent;
             Configurator.explorator = Configurator.EnumExplorationMethod.exhaustive;
         }
 

@@ -74,9 +74,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	public EntiteHandler(NetworkConstructor networkC, MemeFactory memeF, WorkerFactory workF) {
 
-		if (Configurator.DisplayLogdebugInstantiation)
-			System.out.println("EntiteHandler constructor Initialisation");
-
 		networkConstruct = networkC;
 		memeFactory = memeF;
 		workerFactory = workF;
@@ -88,9 +85,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		memeTranslationReadable = new Hashtable<>();
 		toDisplayForRatio = new ArrayList<>();
 		memeProperties = new MemeProperties();
-
-		if (Configurator.DisplayLogdebugInstantiation)
-			System.out.println("EntiteHandler constructor Closing");
 	}
 
 	public void initialisation(){
@@ -565,12 +559,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 			memesAsString.add(classe);
 		}
-
-		if (Configurator.DisplayLogGetAvailableMeme)
-			for (String string : memesAsString) {
-				System.out.println(string);
-			}
-
 		return memesAsString;
 	}
 

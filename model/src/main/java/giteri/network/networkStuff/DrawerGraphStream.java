@@ -37,8 +37,6 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 	public DrawerGraphStream(EntiteHandler entiteHandler, MemeFactory memeFactory, NetworkConstructor networkConstructor,
 							 WriteNRead wnr, NetworkFileLoader nfl, WorkerFactory wf) {
 		super(entiteHandler, memeFactory, networkConstructor, wnr, nfl, wf);
-		if(Configurator.DisplayLogdebugInstantiation)
-			System.out.println("DrawerGraphStream Constructor");
 		colorPieAsString = new Hashtable<>();
 		colorPieAsColor = new Hashtable<>();
 		setColorPie();
@@ -114,9 +112,6 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 	 *
 	 */
 	public void drawThisNetwork(Network net) {
-		if(Configurator.DisplayLogdebugInstantiation)
-			System.out.println("DrawThisNetwork Initialisation");
-
 		String attrib;
 		for (giteri.network.network.Node node : net.getNodes())
 		{
@@ -134,9 +129,6 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 		{
 			this.addEdge(edge.getNodeFrom().getIndex(), edge.getNodeTo().getIndex());
 		}
-
-		if(Configurator.DisplayLogdebugInstantiation)
-			System.out.println("DrawThisNetwork Ending");
 	}
 
 	/** Associe aux noeuds du réseau des classes qui permettront de changer leur couleurs d'affichage.

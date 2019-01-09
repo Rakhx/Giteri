@@ -25,6 +25,8 @@ import giteri.run.configurator.Configurator.MemeList;
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
 
+import static giteri.run.configurator.Configurator.debugJarMode;
+
 /** Classe commune à tous les statAndPlot
  *
  */
@@ -73,6 +75,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	public Double fitNetwork(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
 							   Optional<List<Boolean>> memeActivation, Optional<List<Double>> memeProba) {
 		if (!(typeOfLaunch == Configurator.EnumLauncher.jarC || typeOfLaunch == Configurator.EnumLauncher.jarOpenMole)) {
+			// appelé depuis IHM
 			(new Thread() {
 				public void run() {
 					fittingLauncherVersionClean(typeOfLaunch, typeOfExplo, Optional.empty(), Optional.empty());
@@ -80,6 +83,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			}).start();
 			return 0.;
 		} else {
+			// appelé quand on lance en jar
 			return fittingLauncherVersionClean(typeOfLaunch, typeOfExplo, memeActivation, memeProba);
 		}
 	}
@@ -100,8 +104,13 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		FittingClass configuration = new FittingClass();
 
 		// Dans le cas ou on veut un one shot de l'IHM il faut remplir les listes
+		// En gros quand on lance depuis lIHM
 		if(typeOfExplo == EnumExplorationMethod.oneShot && !memeActivationOpt.isPresent())
-			fitListEMManuel(memeActivation, memeProba);
+			//fitListEMManuel(memeActivation, memeProba);
+			fitListAnotherHJ(memeActivation,memeProba);
+
+
+
 
 		// Si appelle toutifruiti, explo full ou random, depuis IHM Besoin de cycler sur les config de IModel, etc etc.
 		if(typeOfExplo == EnumExplorationMethod.exhaustive)
@@ -169,9 +178,10 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		ArrayList<String> memesSelectionnes = null;
 		Meme selectedMeme;
 		File toWrite = writeNRead.createAndGetDirFromString(Arrays.asList("."));
-		writeNRead.writeSmallFile(toWrite, "RezTemp", activation.stream().map(e->e.toString()).collect(Collectors.toList()));
+		if(debugJarMode)
+			writeNRead.writeSmallFile(toWrite, "RezTemp", activation.stream().map(e->e.toString()).collect(Collectors.toList()));
 
-		if(Configurator.debugJarMode)
+		if(debugJarMode)
 			memesSelectionnes = new ArrayList<>();
 
 		// Parcourt la liste des memes
@@ -182,7 +192,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 				selectedMeme = memeFactory.getIemeMemeFromSpecList(MemeList.FITTING, i);
 				if(selectedMeme != null) {
 					memeAndProba.put(selectedMeme, new GenericDoubleParameter(proba.get(i)));
-					if (Configurator.debugJarMode)
+					if (debugJarMode)
 						memesSelectionnes.add(";" + entiteHandler.translateMemeCombinaisonReadable(selectedMeme.toString()) + "-" + proba.get(i));
 				}else {
 					System.err.println("[StatAndPlotGeneric.CallFromJar]- Pas assez de meme dans la liste de fitting pour le nombre de param appelé");
@@ -190,8 +200,8 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 				}
 			}
 		}
-
-		writeNRead.writeSmallFile(toWrite, "RezTemp", memeAndProba.keySet().stream().map(e->e.toString()).collect(Collectors.toList()));
+		if(debugJarMode)
+			writeNRead.writeSmallFile(toWrite, "RezTemp", memeAndProba.keySet().stream().map(e->e.toString()).collect(Collectors.toList()));
 	//	if(Configurator.debugJarMode)
 //			System.out.println("Memes voulus "+memesSelectionnes.stream().reduce(String::concat));
 
@@ -253,36 +263,50 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 */
 	private void fitListEMManuel(List<Boolean> activator, List<Double> proba){
 		activator.clear(); proba.clear();
-
 		List<Meme> existingMeme = memeFactory.getMemes(Configurator.MemeList.EXISTING, Configurator.ActionType.ANYTHING);
 
 		for (int i = 0; i < existingMeme.size(); i++) {
-
-
-			if(existingMeme.get(i).getName().compareToIgnoreCase("ADD+") == 0 ) {
+			if(existingMeme.get(i).getName().compareToIgnoreCase("AddØ-Hop") == 0 ) {
 				activator.add(true);proba.add(1.); }
-
-//			else
-// 			if(existingMeme.get(i).getName().compareToIgnoreCase("ADDØ") == 0 ){
-//				activator.add(true); proba.add(1.);}
-
-			 //else if(existingMeme.get(i).getName().compareToIgnoreCase("ADD-") == 0 ){
-				//activator.add(true); proba.add(1.);
-
-			else if(existingMeme.get(i).getName().compareToIgnoreCase("RMVØ") == 0 ){
-				activator.add(true); proba.add(1.); }
-
-			else {
-				activator.add(false); proba.add(-1.);
-			}
+			else
+ 				if(existingMeme.get(i).getName().compareToIgnoreCase("Add+") == 0 ){
+				activator.add(true); proba.add(1.);}
+			 else
+			 	if(existingMeme.get(i).getName().compareToIgnoreCase("Add-") == 0 ){
+				activator.add(true); proba.add(1.);}
+			else
+				if(existingMeme.get(i).getName().compareToIgnoreCase("Add∞") == 0 ){
+					activator.add(true); proba.add(1.); }
+			else
+				if(existingMeme.get(i).getName().compareToIgnoreCase("AddØ") == 0 ){
+					activator.add(true); proba.add(1.); }
+			else
+				if(existingMeme.get(i).getName().compareToIgnoreCase("RmvØ-2hop") == 0 ){
+					activator.add(true); proba.add(1.); }
+			else
+				if(existingMeme.get(i).getName().compareToIgnoreCase("RMVØ") == 0 ){
+					activator.add(true); proba.add(1.); }
+			else
+				if(existingMeme.get(i).getName().compareToIgnoreCase("Rmv+") == 0 ){
+					activator.add(true); proba.add(1.); }
+			else
+				if(existingMeme.get(i).getName().compareToIgnoreCase("Rmv-") == 0 ){
+					activator.add(true); proba.add(1.); }
 		}
+
 	}
 
-	/** Classe factorisée pour les traitements de fitting ou searching.
-	 *
-	 * @param config
-	 * @return le score de la config testé
-	 */
+	private void fitListAnotherHJ(List<Boolean> activator, List<Double> proba) {
+		proba.addAll(Arrays.asList(0.041,0.618,.155,0.811,0.594,0.582,1.,.446,.557));
+		activator.addAll(Arrays.asList(true, false, false, true, false, true,true,true,true));
+
+	}
+
+		/** Classe factorisée pour les traitements de fitting ou searching.
+         *
+         * @param config
+         * @return le score de la config testé
+         */
 	private double factorisation(FittingClass config){
 		config.init();
 		int nbActionPassee;

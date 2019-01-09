@@ -185,7 +185,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public void init(){
 		Configurator.methodOfGeneration = Configurator.MemeDistributionType.Nothing;
 		targetNetProperties = networkFileLoader.getNetworkProperties();
-		boolean doTheWrite = !Configurator.autrucheMode;
+		boolean doTheWrite = !Configurator.fullSilent;
 
 		// ECRITURE
 		repertoires = new ArrayList<>(Arrays.asList("Stability"));
