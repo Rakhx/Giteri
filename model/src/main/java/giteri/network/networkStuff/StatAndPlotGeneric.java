@@ -300,9 +300,21 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		// small world? @ 100 noeuds
 //		proba.addAll(Arrays.asList(0.041,0.618,.155,0.811,0.594,0.582,1.,.446,.557));
 //		activator.addAll(Arrays.asList(true, false, false, true, false, true,true,true,true));
-		// Jazz @ 194 noeud
-		proba.addAll(Arrays.asList(0.4374,0.,.963,0.513,1.,0.388,.5914,.0,.989));
-		activator.addAll(Arrays.asList(false, true, false, true, false, true,true,false,true));
+		// Jazz @ 194 noeud @ bad scoring
+		// proba.addAll(Arrays.asList(0.4374,0.,.963,0.513,1.,0.388,.5914,.0,.989));
+		// activator.addAll(Arrays.asList(false, true, false, true, false, true,true,false,true));
+		// Jazz @ 194 noeud @  scoring 352
+//		proba.addAll(Arrays.asList(0.7759,0.9701,.15157,0.6078,.69379,0.6541,.8387,.100,.8346));
+//		activator.addAll(Arrays.asList(true, false, true, false, false, false,true,true,true));
+
+		// Jazz @ 194 noeud @  scoring 174 20 min iteration marche pas mal
+		proba.addAll(Arrays.asList(0.8361,0.0587,0.,0.1333,.4851,0.35549,.08054,.17551,.24969));
+		activator.addAll(Arrays.asList(true, true, true, false, false, true,false,false,false));
+		// Jazz @ 194 noeud @  scoring 174 10h itération
+//		proba.addAll(Arrays.asList(0.36619,0.662239,0.2188339,0.7548696,.5282568,0.55852,.835418,.77056,.045));
+//		activator.addAll(Arrays.asList(false, false, false, 	true, 	 false, 	true,  true, true,  false));
+
+
 
 	}
 

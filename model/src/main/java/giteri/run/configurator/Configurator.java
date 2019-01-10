@@ -23,7 +23,7 @@ public final class Configurator {
 	public static boolean jarMode = true;
 	public static boolean systemPaused = false;
 	public static boolean writeNetworkResultOnFitting = !fullSilent; // Screenshot, network.csv...
-	public static boolean writeMemeResultOnFitting = writeNetworkResultOnFitting || true; // NetworkDetails.csv
+	public static boolean writeMemeResultOnFitting = writeNetworkResultOnFitting; // NetworkDetails.csv
 	public static MemeDistributionType methodOfGeneration = MemeDistributionType.Nothing;
 	// endregion
 
@@ -56,6 +56,7 @@ public final class Configurator {
 	public static int activationCodeForScore = 55;
 	public static int activationCodeAllAttrib = 255;
 
+
 	// endregion
 
 	// region Fitting
@@ -65,9 +66,9 @@ public final class Configurator {
 
 	public static int initialNetworkForFitting = 0; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
 	@toOutput ( yes = true )
-	public static int nbRepetitionbyRun = 10;
+	public static int nbRepetitionbyRun = 2;
 	@toOutput ( yes = true )
-	public static int nbRepetitionForJar = 3;
+	public static int nbRepetitionForJar = 5;
 
 	@toOutput ( yes = true )
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
@@ -83,8 +84,8 @@ public final class Configurator {
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
 	public static int activationCodeForView = fullSilent? 0 : 5;
 
-	public static boolean displayPlotWhileSimulation = !jarMode; // Affichage des DD et densité
-	public static boolean displayMemePosessionDuringSimulation = !jarMode; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
+	public static boolean displayPlotWhileSimulation = !fullSilent; // Affichage des DD et densité
+	public static boolean displayMemePosessionDuringSimulation = !fullSilent; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
 	public static boolean writeNbActionPerSec = false; // pas de fichier nbline
 	public static boolean writeFailDensityLink = false; // fichier d'info sur les Fails X density variation
 

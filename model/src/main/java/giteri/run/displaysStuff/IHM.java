@@ -1580,7 +1580,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 					System.err.println("[IHM-updateInformationDisplay()]-" + npe.getMessage());
 			}
 			catch (Exception e){
-				if(!Configurator.fullSilent) 	System.err.println("Erreur de mise a jour de l'interface "+ e.getMessage());
+				if(!Configurator.fullSilent) System.err.println("Erreur de mise a jour de l'interface "+ e.getMessage());
 			}
 		}
 	}
