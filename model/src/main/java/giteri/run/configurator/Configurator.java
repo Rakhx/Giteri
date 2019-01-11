@@ -55,6 +55,7 @@ public final class Configurator {
 	// SCORE
 	public static int activationCodeForScore = 55;
 	public static int activationCodeAllAttrib = 255;
+	// public static int activationCodeActual = 255;
 
 
 	// endregion
@@ -131,7 +132,7 @@ public final class Configurator {
 	//region ancien boolean, osef, etc
 	// moyen osef
 	public static final boolean lotOfNodes = false;
-	private static int nbNode = lotOfNodes ? 500 : 194;
+	private static int nbNode = lotOfNodes ? 500 : 198;
 	public static int refreshInfoRate = 10;
 	public final static boolean autoRedoActionIfNoAction = false;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour

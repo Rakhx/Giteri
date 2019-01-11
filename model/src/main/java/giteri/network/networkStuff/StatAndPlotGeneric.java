@@ -313,8 +313,12 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		// Jazz @ 194 noeud @  scoring 174 10h itération
 //		proba.addAll(Arrays.asList(0.36619,0.662239,0.2188339,0.7548696,.5282568,0.55852,.835418,.77056,.045));
 //		activator.addAll(Arrays.asList(false, false, false, 	true, 	 false, 	true,  true, true,  false));
-
-
+		// bof @ 1h de simu 3 repet par config
+		//proba.addAll(Arrays.asList(0.36619,0.662239,0.2188339,0.5524068,.5282568,0.9388505,.835418,.77056,.549245149));
+		//activator.addAll(Arrays.asList(false, false, false, 	true, 	 false, 	true,  false, false,  true));
+// Good @ 12h de simu avec
+//		proba.addAll(Arrays.asList(0.537244,0.1521694,0.2188339,0.5524068,.5282568,0.218909,.835418,.77056,.549245149));
+//		activator.addAll(Arrays.asList(true, true, false, 	false, 	 false, 	true,  false, false,  false));
 
 	}
 
