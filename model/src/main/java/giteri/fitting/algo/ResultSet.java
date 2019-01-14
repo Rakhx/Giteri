@@ -135,11 +135,8 @@ public class ResultSet extends Hashtable<Integer, Result> {
 		List<Double> scores = result.getScores();
 		List<String> parameter = result.getCurrentConfig();
 
-		// activator pour le score,
-		// AvgClustering:5 - nbEdges:6 - APL  - 8 = 256 +
-		int newActivator = 352;
 		// Mise à jour des valeurs de moyenne et d'écart type pour les réseaux
-		updateMeanAndSD(ListOfproperties, newActivator, netMean, netSD);
+		updateMeanAndSD(ListOfproperties, Configurator.activationCodeAllAttrib, netMean, netSD);
 		toWriteSimple += numeroRun;
 		toWriteDetailled += numeroRun;
 
@@ -181,7 +178,7 @@ public class ResultSet extends Hashtable<Integer, Result> {
 	 * Pour l'autre seulement les champs activé
 	 *
 	 * @param networksToRead IN
-	 * @param activationCode IN
+	 * @param activationCode IN Détermine quelles propriétés a écrire dans les fichiers.
 	 * @param netMean        passage par "référence" IN/OUT
 	 * @param netSD          IN/OUT
 	 * @return

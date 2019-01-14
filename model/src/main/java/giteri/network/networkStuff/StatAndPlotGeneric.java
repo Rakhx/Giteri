@@ -297,7 +297,10 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	}
 
 	private void fitListAnotherHJ(List<Boolean> activator, List<Double> proba) {
-		// small world? @ 100 noeuds
+
+	    // SCORING 55
+
+        // small world? @ 100 noeuds
 //		proba.addAll(Arrays.asList(0.041,0.618,.155,0.811,0.594,0.582,1.,.446,.557));
 //		activator.addAll(Arrays.asList(true, false, false, true, false, true,true,true,true));
 		// Jazz @ 194 noeud @ bad scoring
@@ -306,20 +309,20 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		// Jazz @ 194 noeud @  scoring 352
 //		proba.addAll(Arrays.asList(0.7759,0.9701,.15157,0.6078,.69379,0.6541,.8387,.100,.8346));
 //		activator.addAll(Arrays.asList(true, false, true, false, false, false,true,true,true));
-
 		// Jazz @ 194 noeud @  scoring 174 20 min iteration marche pas mal
-		proba.addAll(Arrays.asList(0.8361,0.0587,0.,0.1333,.4851,0.35549,.08054,.17551,.24969));
-		activator.addAll(Arrays.asList(true, true, true, false, false, true,false,false,false));
+//		proba.addAll(Arrays.asList(0.8361,0.0587,0.,0.1333,.4851,0.35549,.08054,.17551,.24969));
+//		activator.addAll(Arrays.asList(true, true, true, false, false, true,false,false,false));
 		// Jazz @ 194 noeud @  scoring 174 10h itération
 //		proba.addAll(Arrays.asList(0.36619,0.662239,0.2188339,0.7548696,.5282568,0.55852,.835418,.77056,.045));
 //		activator.addAll(Arrays.asList(false, false, false, 	true, 	 false, 	true,  true, true,  false));
 		// bof @ 1h de simu 3 repet par config
 		//proba.addAll(Arrays.asList(0.36619,0.662239,0.2188339,0.5524068,.5282568,0.9388505,.835418,.77056,.549245149));
 		//activator.addAll(Arrays.asList(false, false, false, 	true, 	 false, 	true,  false, false,  true));
-// Good @ 12h de simu avec
-//		proba.addAll(Arrays.asList(0.537244,0.1521694,0.2188339,0.5524068,.5282568,0.218909,.835418,.77056,.549245149));
-//		activator.addAll(Arrays.asList(true, true, false, 	false, 	 false, 	true,  false, false,  false));
+         //Good @ 12h de simu avec
+ 		proba.addAll(Arrays.asList(0.537244,0.1521694,0.2188339,0.5524068,.5282568,0.218909,.835418,.77056,.549245149));
+		activator.addAll(Arrays.asList(true, true, false, 	false, 	 false, 	true,  false, false,  false));
 
+        // ENDSCORING 55
 	}
 
 		/** Classe factorisée pour les traitements de fitting ou searching.

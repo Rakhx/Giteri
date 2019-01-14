@@ -181,12 +181,14 @@ public class NetworkProperties implements Cloneable{
 		switch (type) {
 			case DENSITY:
 				return density;
-			case AVGCLUST:
-				return avgClust;
 			case DDAVG:
 				return ddAvg;
 			case DDINTERQRT:
 				return ddInterQrt;
+			case DDARRAY:
+				return dd;
+			case AVGCLUST:
+				return avgClust;
 			case NBEDGES:
 				return nbEdges;
 			case NBNODES:
@@ -202,25 +204,6 @@ public class NetworkProperties implements Cloneable{
 		return null;
 	}
 
-	/** Case issue, la flemme pour l'instant.
-	 *
-	 * @param type
-	 * @return
-	 */
-	public Object getValueTest(Configurator.NetworkAttribType type) {
-		Class cls = this.getClass();
-		try {
-			Field field = cls.getDeclaredField(type.toString().toLowerCase());
-			return field.get(this);
-		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
-			return null;
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
 	public void setValue(Configurator.NetworkAttribType type, Object value){
 		switch (type) {
 			case DENSITY:
@@ -231,7 +214,6 @@ public class NetworkProperties implements Cloneable{
 				break;
 			case DDINTERQRT:
 				ddInterQrt = Double.valueOf(""+value);
-//						(double) value;
 				break;
 			case DDARRAY:
 				dd  = (int[]) value;

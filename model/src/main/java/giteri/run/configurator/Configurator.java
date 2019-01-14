@@ -53,7 +53,7 @@ public final class Configurator {
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 
 	// SCORE
-	public static int activationCodeForScore = 55;
+	public static int activationCodeForScore = 143; // 143: APL(128)+avgClust(16)+DDArray(8)+Density(1)
 	public static int activationCodeAllAttrib = 255;
 	// public static int activationCodeActual = 255;
 
@@ -69,7 +69,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static int nbRepetitionbyRun = 2;
 	@toOutput ( yes = true )
-	public static int nbRepetitionForJar = 5;
+	public static int nbRepetitionForJar = 3;
 
 	@toOutput ( yes = true )
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
@@ -123,6 +123,7 @@ public final class Configurator {
 	public static boolean debugEntite = false;
 	public static boolean debugEntiteHandler = false;
 
+
 	public static boolean overallDebug = !jarMode;
 	public static boolean debugHopAway = false;
 	public static boolean debugJarMode = false;
@@ -132,7 +133,7 @@ public final class Configurator {
 	//region ancien boolean, osef, etc
 	// moyen osef
 	public static final boolean lotOfNodes = false;
-	private static int nbNode = lotOfNodes ? 500 : 198;
+	private static int nbNode = lotOfNodes ? 500 : 100;
 	public static int refreshInfoRate = 10;
 	public final static boolean autoRedoActionIfNoAction = false;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
@@ -207,11 +208,11 @@ public final class Configurator {
 	 *
 	 */
 	public enum NetworkAttribType{
-		DENSITY,
-		DDAVG,
-		DDINTERQRT,
-		DDARRAY,
-		AVGCLUST,
+		DENSITY, // Density du réseau
+		DDAVG, //
+		DDINTERQRT, // la distance interquartile du réseau
+		DDARRAY, // le tableau de DD
+		AVGCLUST, // Clustering moyen
 		NBEDGES,
 		NBNODES,
 		APL,

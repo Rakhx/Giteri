@@ -342,8 +342,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		networksSameTurn.add(currentNetProperties);
 
 		// TODO [WayPoint]- Score distance entre deux network
-		currentNetworkScore = getNetworksDistanceDumb(Configurator.activationCodeForScore,
-				targetNetProperties, currentNetProperties);
+		currentNetworkScore = getNetworksDistanceDumb(Configurator.activationCodeForScore, targetNetProperties, currentNetProperties);
 
 		// Ajout a la classe des resultSet un score et propriété d'un réseau
 		resultNetwork.addScore(numeroRun, currentNetworkScore, currentNetProperties);
@@ -840,7 +839,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		return score;
 	}
 
-	/** Methode la plus simple pour trouver la distance entre deux réseaux.
+	/** Methode la plus simple pour calculer la distance entre deux réseaux.
 	 *
 	 * @param activationCode
 	 * @param targetNetworkProperty
@@ -852,6 +851,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		double currentDistance = 0;
 		double totalDistance = 0;
 		NetworkAttribType attribut;
+		int nbAttribActivated = 0;
 
 		// On regarde sur tout les attributs de réseau ceux qui ont été activé
 		// pour le calcul de distance entre deux réseaux
@@ -864,10 +864,12 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 				Object attributValueForTargetNetwork = targetNetworkProperty.getValue(attribut);
 				currentDistance = getAttributDistance(attribut,	attributValueForCurrentNetwork,	attributValueForTargetNetwork);
 				totalDistance += currentDistance;
+				nbAttribActivated++;
 			}
 		}
 
-		return totalDistance;
+		// Normalise par rapport aux nombres d'éléments pris en compte pour renvoyer un pourcentage
+		return totalDistance / nbAttribActivated;
 	}
 
 	/** retourne une distance entre deux attributs
@@ -879,6 +881,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 */
 	private static double getAttributDistance(NetworkAttribType type, Object valueFrom, Object valueTarget){
 		double distance = 0;double valueOne;double valueTwo;
+		int[] ddOne, ddTwo;
 		switch (type) {
 			case DENSITY:
 				valueOne = (double) valueFrom;
@@ -896,21 +899,34 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 				distance = distance(valueOne, valueTwo, Configurator.getNbNode() - 1);
 				break;
 			case DDARRAY:
+				ddOne = (int[]) valueFrom;
+				ddTwo = (int[]) valueTarget;
+				distance = 0;
+				for (int i = 0; i < ((int[]) valueFrom).length; i++) {
+					distance += distance(ddOne[i], ddTwo[i], Configurator.getNbNode() - 1 );
+				}
+
+				distance /= Configurator.getNbNode();
 				break;
 			case AVGCLUST:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
 				distance = distance(valueOne, valueTwo, 1);
 				break;
-
 			case NBEDGES:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
 				distance = distance(valueOne, valueTwo, (Configurator.getNbNode() - 1) * Configurator.getNbNode());
 				break;
 			case NBNODES:
+				valueOne = (double) valueFrom;
+				valueTwo = (double) valueTarget;
+				distance = distance(valueOne, valueTwo, Configurator.getNbNode()-1);
 				break;
 			case APL:
+				valueOne = (double) valueFrom;
+				valueTwo = (double) valueTarget;
+				distance = distance(valueOne, valueTwo, (double)(Configurator.getNbNode()+1)/6);
 				break;
 			case nbEdgesOnNbNodes:
 				valueOne = (double) valueFrom;
@@ -921,10 +937,12 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 				break;
 		}
 
+	//	System.out.println("Score " + type.toString() + ": " + distance);
+
 		return distance;
 	}
 
-	/** Donne la distance entre deux éléments, relative au max des ces éléments
+	/** Donne la distance entre deux éléments ( en pourcentage ), relative au max des ces éléments
 	 *
 	 * @param valueOne
 	 * @param valueTwo
