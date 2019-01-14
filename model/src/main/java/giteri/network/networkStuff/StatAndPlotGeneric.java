@@ -319,8 +319,12 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		//proba.addAll(Arrays.asList(0.36619,0.662239,0.2188339,0.5524068,.5282568,0.9388505,.835418,.77056,.549245149));
 		//activator.addAll(Arrays.asList(false, false, false, 	true, 	 false, 	true,  false, false,  true));
          //Good @ 12h de simu avec
- 		proba.addAll(Arrays.asList(0.537244,0.1521694,0.2188339,0.5524068,.5282568,0.218909,.835418,.77056,.549245149));
-		activator.addAll(Arrays.asList(true, true, false, 	false, 	 false, 	true,  false, false,  false));
+// 		proba.addAll(Arrays.asList(0.537244,0.1521694,0.2188339,0.5524068,.5282568,0.218909,.835418,.77056,.549245149));
+//		activator.addAll(Arrays.asList(true, true, false, 	false, 	 false, 	true,  false, false,  false));
+
+		proba.addAll(Arrays.asList(0.39502254698724504,0.14734812316413426,0.1881433193671096,0.35610837754779356,0.8530818497900912,0.649708309830368,0.9434847536531004,0.5146669894328433,0.6188785584129679));
+		activator.addAll(Arrays.asList(false, true, true, 	false, 	 true, 	true,  true, true, true));
+
 
         // ENDSCORING 55
 	}

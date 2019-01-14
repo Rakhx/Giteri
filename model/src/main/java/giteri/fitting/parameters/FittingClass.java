@@ -881,7 +881,10 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 */
 	private static double getAttributDistance(NetworkAttribType type, Object valueFrom, Object valueTarget){
 		double distance = 0;double valueOne;double valueTwo;
+		int one, two;
 		int[] ddOne, ddTwo;
+		ArrayList<Double> temps = new ArrayList();
+
 		switch (type) {
 			case DENSITY:
 				valueOne = (double) valueFrom;
@@ -899,11 +902,16 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 				distance = distance(valueOne, valueTwo, Configurator.getNbNode() - 1);
 				break;
 			case DDARRAY:
-				ddOne = (int[]) valueFrom;
-				ddTwo = (int[]) valueTarget;
+				one = ((int[]) valueFrom).length;
+				two = ((int[]) valueTarget).length;
+				one = Integer.max(one,two);
+				ddOne = Arrays.copyOf((int[]) valueFrom,one);
+				ddTwo = Arrays.copyOf((int[]) valueTarget,one);
+
 				distance = 0;
 				for (int i = 0; i < ((int[]) valueFrom).length; i++) {
 					distance += distance(ddOne[i], ddTwo[i], Configurator.getNbNode() - 1 );
+					temps.add(distance(ddOne[i], ddTwo[i], Configurator.getNbNode() - 1 ));
 				}
 
 				distance /= Configurator.getNbNode();
@@ -926,7 +934,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			case APL:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, (double)(Configurator.getNbNode()+1)/6);
+				distance = distance(valueOne, valueTwo, (double)(Configurator.getNbNode()-1)/3);
 				break;
 			case nbEdgesOnNbNodes:
 				valueOne = (double) valueFrom;
@@ -937,7 +945,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 				break;
 		}
 
-	//	System.out.println("Score " + type.toString() + ": " + distance);
+		System.out.println("Score " + type.toString() + ": " + distance);
 
 		return distance;
 	}
