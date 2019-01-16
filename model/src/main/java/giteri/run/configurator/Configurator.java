@@ -53,7 +53,7 @@ public final class Configurator {
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 
 	// SCORE
-	public static int activationCodeForScore = 143; // 143: APL(128)+avgClust(16)+DDArray(8)+Density(1)
+	public static int activationCodeForScore = 202; // 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)
 	public static int activationCodeAllAttrib = 255;
 	// public static int activationCodeActual = 255;
 
@@ -69,7 +69,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static int nbRepetitionbyRun = 2;
 	@toOutput ( yes = true )
-	public static int nbRepetitionForJar = 3;
+	public static int nbRepetitionForJar = 1;
 
 	@toOutput ( yes = true )
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
