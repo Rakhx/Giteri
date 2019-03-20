@@ -96,7 +96,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		// Va créer des entitées pour faire une correspondance entitée / noeuds sur le réseau
 		Thread returnThread = new Thread(this);
 		returnThread.setName("NC");
-		drawer.drawThisNetwork(networkInstance);
+		drawer.drawThisNetwork(networkInstance, false);
 		return returnThread;
 	}
 

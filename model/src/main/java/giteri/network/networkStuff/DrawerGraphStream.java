@@ -110,8 +110,20 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 	/** Dessin d'un graphe initial, va aussi regarder les memes possédé par les
 	 * noeuds pour l'initialisation des couleurs.
 	 *
+	 * @param outsideView Défini si on doit afficher le graphe Net dans une nouvelle vue ou non
 	 */
-	public void drawThisNetwork(Network net) {
+	public void drawThisNetwork(Network net, boolean outsideView) {
+		Graph toDisplay;
+		if(outsideView){
+
+		}
+
+
+		else{
+			toDisplay = graph;
+		}
+
+
 		String attrib;
 		for (giteri.network.network.Node node : net.getNodes())
 		{

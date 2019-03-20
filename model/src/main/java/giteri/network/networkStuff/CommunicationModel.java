@@ -117,7 +117,10 @@ public class CommunicationModel implements IModel {
 		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.exhaustive, Optional.empty(), Optional.empty());
 	}
 
-	public void displayPolar(){
+	/** Affichage d'un graphe représentant le fichier donné en input.
+	 *
+	 */
+	public void displayInput(){
 
 	}
 
@@ -167,7 +170,7 @@ public class CommunicationModel implements IModel {
 		eh.generateNetwork(activator);
 		eh.synchronizeNodeConnectionWithEntiteConnection();
 
-		wf.getDrawer().drawThisNetwork(nc.networkInstance);
+		wf.getDrawer().drawThisNetwork(nc.networkInstance, false);
 		eh.giveMemeToEntite(Configurator.methodOfGeneration);
 
 		// Reste en pause après avoir générer les graphes depuis l'interface

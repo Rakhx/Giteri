@@ -22,7 +22,7 @@ public class DrawerStub implements DrawerInterface{
 	}
 
 	@Override
-	public void drawThisNetwork(Network net) {
+	public void drawThisNetwork(Network net, boolean outsideView) {
 		
 	}
 

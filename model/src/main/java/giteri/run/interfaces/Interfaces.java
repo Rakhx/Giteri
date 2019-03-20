@@ -45,18 +45,18 @@ public class Interfaces {
 	 */
 	public interface DrawerInterface extends IBehaviorTransmissionListener {
 
-		public void resetDisplay();
-		public void drawThisNetwork(Network net);
-		public void networkOverview();
-		public void screenshotDisplay(ArrayList<String> rep);
-		
-		public void applyTargetColor(Network net, Integer actingEntite ,Set<Integer> nodeToDesignAsTarget);
-		public void resetGoodColor(Network net);
-		public Color getColorAsColor(int i);
-		
-		public void addEdge(int from, int to);
-		public void addNode(int from);
-		public void removeEdge(int from, int to);
+		void resetDisplay();
+		void drawThisNetwork(Network net, boolean outsideView);
+		void networkOverview();
+		void screenshotDisplay(ArrayList<String> rep);
+
+		void applyTargetColor(Network net, Integer actingEntite ,Set<Integer> nodeToDesignAsTarget);
+		void resetGoodColor(Network net);
+		Color getColorAsColor(int i);
+
+		void addEdge(int from, int to);
+		void addNode(int from);
+		void removeEdge(int from, int to);
 	}
 	
 	/** Interface des classes permettant de calculer les différentes
@@ -106,7 +106,7 @@ public class Interfaces {
 
 		void fittingSpecificConfig();
 		void fittingNetworks();
-		void displayPolar();
+		void displayInput();
 		void fittingNextStep();
 		void fittingOnce();
 		void rdmConfig();

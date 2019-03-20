@@ -209,8 +209,8 @@ public class Controller {
 			model.fittingNetworks();
 		}
 
-		public void displayPolar(){
-			model.displayPolar();
+		public void displayInput(){
+			model.displayInput();
 		}
 
 		public void fittingNextStep(){

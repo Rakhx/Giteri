@@ -132,7 +132,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	public JButton btFile;
 	public JButton btAnalyze;
 	public JButton btFitting;
-	public JButton btPolar;
+	public JButton btDisplayInput;
 	public JButton btNextStep;
 	public JButton bFittingOneStep;
 	public JButton btSpecificConfig;
@@ -646,7 +646,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		btAnalyze = new JButton("Analyze");
 		btFile = new JButton("File...");
 		btFitting = new JButton("Fitting");
-		btPolar = new JButton("Polar");
+		btDisplayInput = new JButton("display In");
 		btNextStep = new JButton("Next Step");
 		bFittingOneStep = new JButton("FittingOnce");
 		btSpecificConfig = new JButton("Specific Config");
@@ -676,7 +676,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 								.addComponent(btFitting,
 										GroupLayout.DEFAULT_SIZE,
 										hauteurComponent, hauteurComponent)
-								.addComponent(btPolar,
+								.addComponent(btDisplayInput,
 										GroupLayout.DEFAULT_SIZE,
 										hauteurComponent, hauteurComponent)
 								.addComponent(btNextStep,
@@ -729,7 +729,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 								.addComponent(btFitting,
 										GroupLayout.DEFAULT_SIZE,
 										largeurButton, largeurButton)
-								.addComponent(btPolar,
+								.addComponent(btDisplayInput,
 										GroupLayout.DEFAULT_SIZE,
 										hauteurComponent, hauteurComponent)
 								.addComponent(btNextStep,
@@ -1313,8 +1313,8 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 			}
 		});
 
-		btPolar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		btDisplayInput.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) { modelController.displayInput();
 			}
 		});
 

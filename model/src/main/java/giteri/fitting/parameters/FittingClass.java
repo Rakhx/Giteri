@@ -934,7 +934,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			case APL:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, (double)(Configurator.getNbNode()-1)/3);
+				distance = distance(valueOne, valueTwo, (double)(Configurator.getNbNode()+1)/3);
 				break;
 			case nbEdgesOnNbNodes:
 				valueOne = (double) valueFrom;

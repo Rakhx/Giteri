@@ -374,7 +374,7 @@ public class ResultSet extends Hashtable<Integer, Result> {
  *
  */
 
-	/*public void displayPolar(){
+	/*public void displayInput(){
 		int activationCode = 23;
 		// choix de ceux qui ont une valeur min/max dans un domaine
 		Hashtable<Integer, Integer> scoreMax = new Hashtable<>();

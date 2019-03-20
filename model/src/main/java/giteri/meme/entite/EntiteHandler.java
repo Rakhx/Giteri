@@ -1396,10 +1396,16 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();
 		agregators.put(0, hopAWay);
 		agregators.put(1, notLinked);
-		agregators.put(2, theMost);
-		agregators.put(3, mineInf);
+//		agregators.put(2, theMost);
+//		agregators.put(3, mineInf);
 		agregators.put(4, random);
 		memeFactory.registerMemeAction("AddØ-Hop", 1, false, true, add,attributs, KVAttributAgregator ,false);
+
+		agregators.clear();
+		agregators.put(0, linked);
+		agregators.put(1, triangle);
+		agregators.put(2, random);
+		memeFactory.registerMemeAction("RmvØ-2hop", .3, false, true, remove, attributs,KVAttributAgregator ,false);
 
 		agregators.clear();
 		agregators.put(0, linked);
@@ -1426,11 +1432,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(2, random);
 		memeFactory.registerMemeAction("Rmv+", 1, false, true, remove, attributs, KVAttributAgregator ,false);
 
-		agregators.clear();
-		agregators.put(0, linked);
-		agregators.put(1, triangle);
-		agregators.put(2, random);
-		memeFactory.registerMemeAction("RmvØ-2hop", .3, false, true, remove, attributs,KVAttributAgregator ,false);
 
 		agregators.clear();
 		memeFactory.registerMemeAction("Puri",.1,false, false, puri, attributs, KVAttributAgregator, false);
