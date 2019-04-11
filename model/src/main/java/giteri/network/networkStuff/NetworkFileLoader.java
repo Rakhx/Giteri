@@ -26,19 +26,18 @@ import giteri.network.network.IInternalNetReprestn.TinyNetworks;
  */
 public class NetworkFileLoader implements IReadNetwork {
 
-	CommunicationModel communicationModel;
-	MemeFactory memeFactory;
-	WriteNRead writeNRead;
-	Hashtable<Integer, ArrayList<Integer>> nodesAndLinks = new Hashtable<>();
-	boolean changed = true;
+	private CommunicationModel communicationModel;
+	private MemeFactory memeFactory;
+	private WriteNRead writeNRead;
+	private Hashtable<Integer, ArrayList<Integer>> nodesAndLinks = new Hashtable<>();
+	private boolean changed = true;
 	private TinyNetworks net;
-	int nombreScreen = 0;
+	private int nombreScreen = 0;
 
 	/** Constructeur sans paramètre.
 	 *
 	 */
 	public NetworkFileLoader( MemeFactory mf, WriteNRead wnr) {
-
 		memeFactory = mf;
 		writeNRead = wnr;
 	}
@@ -84,7 +83,7 @@ public class NetworkFileLoader implements IReadNetwork {
 			changed = false;
 		}
 
-		NetworkProperties netProp  ;
+		NetworkProperties netProp;
 		netProp = net.getNetworkProperties(Optional.empty(),"lu", Configurator.activationCodeAllAttrib);
 		return netProp;
 	}
@@ -151,9 +150,13 @@ public class NetworkFileLoader implements IReadNetwork {
 	}
 
 
+	/** Affichage du graph depuis la structure interne a la classe.
+	 *
+	 * @return
+	 */
 	public Graph getGraphFromDataRead(){
-		JFrame popo = new JFrame("Lu");
-		popo.setVisible(true);
+//		JFrame popo = new JFrame("Lu");
+//		popo.setVisible(true);
 		Graph graph = new SingleGraph("Lu");
 		for (int i = 0; i < nodesAndLinks.keySet().size(); i++) {
 			graph.addNode(""+i);

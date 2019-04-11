@@ -92,6 +92,7 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 			netPropDefault.setNetworkUuidInstance(networkVersion);
 			NetworkProperties netPropResult = toModify.orElse(netPropDefault);
 
+			netPropResult.setActivator(activationCode);
 			netPropResult.nbEdges = nbEdges;
 			netPropResult.nbNodes = nbNodes;
 

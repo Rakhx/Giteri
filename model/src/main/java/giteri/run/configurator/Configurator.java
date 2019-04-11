@@ -11,8 +11,7 @@ import giteri.tool.math.Toolz;
 
 public final class Configurator {
 
-	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
-
+	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
 
 	// region iniitalizer stuff
 	// VALEURS DONNEES A TITRE INDICATIF, set définitif dans l'initializer
@@ -49,14 +48,13 @@ public final class Configurator {
 	public static boolean onlyOneToPropagate = true; // Dans le cas ou une action s'applique sur plusieurs entités
 	public static boolean usePropagationSecondGeneration = false; // transmet un des memes du porteur, pas forcement celui applied
 
-	public static boolean useEntitySuccesProba = false; // Prend en compte la proba porté pour l'entité pour APPLY a meme
+	public static boolean useEntitySuccesProba = false; // Prend en compte la proba porté pour l'entité pour APPLY a meme. Actuellement l'index
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 
 	// SCORE
 	public static int activationCodeForScore = 202; // 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)
 	public static int activationCodeAllAttrib = 255;
 	// public static int activationCodeActual = 255;
-
 
 	// endregion
 

@@ -177,14 +177,14 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	// Séries de donnée pour l'affichage des graphiques
 	XYSeries seriesDegreeDistribution;
 	XYSeries seriesDensity;
-	XYSeries seriesDensityOverProba;
-	ArrayList<XYSeries> seriesAppliances ;
-	XYSeriesCollection datasetDensityOverProba ;
+	XYSeries seriesMemeAppliance; // Les 3 suivantes concernent l'appliance de meme.
+	ArrayList<XYSeries> ArraySeriesMemeAppliances;
+	XYSeriesCollection datasetMemeAppliance;
 
 	// Chart de l'IHM
 	private JFreeChart chart;
 	private JFreeChart chartDensity;
-	private JFreeChart chartDensityOverProba;
+	private JFreeChart chartMemeAppliance;
 	int compteurSerieDensity = 0;
 
 	// Liste des memes disponibles dans le programme / meme sélectionné pour le
@@ -250,7 +250,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		times = new Hashtable<String, JLabel>();
 
-		seriesAppliances = new ArrayList<XYSeries>();
+		ArraySeriesMemeAppliances = new ArrayList<XYSeries>();
 		Init();
 	}
 
@@ -264,13 +264,13 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	public void resetIHM() {
 		resetHashTableKeys();
 		updateInformationDisplay();
-		// seriesDensityOverProba.clear();
-		for (XYSeries serie : seriesAppliances) {
+		// seriesMemeAppliance.clear();
+		for (XYSeries serie : ArraySeriesMemeAppliances) {
 			serie.clear();
 		}
 
-		seriesAppliances.clear();
-		datasetDensityOverProba.removeAllSeries();
+		ArraySeriesMemeAppliances.clear();
+		datasetMemeAppliance.removeAllSeries();
 	}
 
 	/** Reset la chart de densité over proba, utilisée pour
@@ -411,7 +411,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	}
 
 	public JFreeChart getDensityOverProbaChart() {
-		return this.chartDensityOverProba;
+		return this.chartMemeAppliance;
 	}
 
 	//endregion
@@ -588,7 +588,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	 */
 	private JPanel createPaneSimulation() {
 		JPanel paneThree = new JPanel();
-
 		paneThree.setLayout(new BoxLayout(paneThree, BoxLayout.Y_AXIS));
 
 		launchSimu = new JButton("GoW");
@@ -598,10 +597,10 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		paneThree.add(launchSimu);
 
-		seriesDensityOverProba = new XYSeries("Third");
-		datasetDensityOverProba = new XYSeriesCollection();
-		chartDensityOverProba = createChartDensityOverProba(datasetDensityOverProba);
-		final ChartPanel chartPanelDensityOverProba = new ChartPanel(chartDensityOverProba);
+		seriesMemeAppliance = new XYSeries("Third");
+		datasetMemeAppliance = new XYSeriesCollection();
+		chartMemeAppliance = createChartDensityOverProba(datasetMemeAppliance);
+		final ChartPanel chartPanelDensityOverProba = new ChartPanel(chartMemeAppliance);
 		chartPanelDensityOverProba.setPreferredSize(new java.awt.Dimension(500, 270));
 		paneThree.add(chartPanelDensityOverProba);
 
@@ -1387,13 +1386,13 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	 */
 	private void addXYseries(){
 		int numbSerie = 0;
-		seriesAppliances.add(new XYSeries(seriesAppliances.size()));
-		datasetDensityOverProba.removeAllSeries();
+		ArraySeriesMemeAppliances.add(new XYSeries(ArraySeriesMemeAppliances.size()));
+		datasetMemeAppliance.removeAllSeries();
 		Meme memeConcerne;
 		String labelSerie;
 		Color serieColor;
 		// Pour chaque série qu'on veut ajouter
-		for (XYSeries serie : seriesAppliances) {
+		for (XYSeries serie : ArraySeriesMemeAppliances) {
 			// on crée les série dans l'ordre a partir de 0 et regarde le meme associé a cet index dans MemeFactory
 			memeConcerne = memeFactory.getMemeFromIndex(numbSerie);
 			if(memeConcerne != null){
@@ -1408,8 +1407,8 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 			}
 
 			serie.setKey(labelSerie);
-			datasetDensityOverProba.addSeries(serie);
-			chartDensityOverProba.getXYPlot().getRenderer().setSeriesPaint(numbSerie, serieColor);
+			datasetMemeAppliance.addSeries(serie);
+			chartMemeAppliance.getXYPlot().getRenderer().setSeriesPaint(numbSerie, serieColor);
 			numbSerie++;
 		}
 	}
@@ -1430,7 +1429,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	 *
 	 */
 	public void addValueToDensityOverProbaSerie(double x, double y) {
-		seriesDensityOverProba.add(x, y);
+		seriesMemeAppliance.add(x, y);
 	}
 
 	/**
@@ -1438,14 +1437,14 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	 * @param time
 	 */
 	public void addValueToApplianceSerie(double time, Hashtable<Integer, Double> kvIndexValue){
-		int diff = kvIndexValue.size() - datasetDensityOverProba.getSeriesCount();
+		int diff = kvIndexValue.size() - datasetMemeAppliance.getSeriesCount();
 		int cpt = 0;
 		for (int i = 0; i < diff; i++) {
 			addXYseries();
 		}
 
 		for (int indexMeme : kvIndexValue.keySet()) {
-			seriesAppliances.get(indexMeme).add(time, kvIndexValue.get(indexMeme));
+			ArraySeriesMemeAppliances.get(indexMeme).add(time, kvIndexValue.get(indexMeme));
 		}
 
 	}

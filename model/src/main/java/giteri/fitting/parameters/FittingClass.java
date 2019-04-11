@@ -544,6 +544,9 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		oneMoreTurn = readingActionCanContinue(message);
 		if(getNbAction() > nbActionBeforeQuit )
 			oneMoreTurn &= false;
+
+		readingMemeAppliance(false, message);
+
 		return oneMoreTurn;
 
 	}
@@ -922,13 +925,13 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 				distance = distance(valueOne, valueTwo, 1);
 				break;
 			case NBEDGES:
-				valueOne = (double) valueFrom;
-				valueTwo = (double) valueTarget;
+				valueOne = (int) valueFrom;
+				valueTwo = (int) valueTarget;
 				distance = distance(valueOne, valueTwo, (Configurator.getNbNode() - 1) * Configurator.getNbNode());
 				break;
 			case NBNODES:
-				valueOne = (double) valueFrom;
-				valueTwo = (double) valueTarget;
+				valueOne = (int) valueFrom;
+				valueTwo = (int) valueTarget;
 				distance = distance(valueOne, valueTwo, Configurator.getNbNode()-1);
 				break;
 			case APL:

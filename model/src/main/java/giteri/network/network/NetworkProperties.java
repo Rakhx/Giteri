@@ -20,13 +20,14 @@ public class NetworkProperties implements Cloneable{
 	
 	public String name;
 	public double density;
-	public double nbNodes, nbEdges;
+	public int nbNodes, nbEdges;
 	public double ddInterQrt;
 	public double ddAvg;
 	public double avgClust;
 	public double APL;
 	private int[] dd;
 	private Hashtable<Integer, Double> furDurchschnitt;
+
 	private int activator;
 	private Integer networkInstance;
 
@@ -221,10 +222,10 @@ public class NetworkProperties implements Cloneable{
 					furDurchschnitt.put(i,(double)dd[i]);
 				break;
 			case NBEDGES:
-				nbEdges  = (double) value;
+				nbEdges  = (int) value;
 				break;
 			case NBNODES:
-				nbNodes  = (double) value;
+				nbNodes  = (int) value;
 				break;
 			case AVGCLUST:
 				avgClust = (double) value;
@@ -309,6 +310,9 @@ public class NetworkProperties implements Cloneable{
 		return activator;
 	}
 
+	public void setActivator(int activator) {
+		this.activator = activator;
+	}
 	//endregion
 
 	//region useless.

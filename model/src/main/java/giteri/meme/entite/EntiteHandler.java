@@ -1020,52 +1020,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		return actionDone;
 	}
 
-//	/** Mise a jour de la liste des X derniers meme applied ainsi que la liste
-//	 * des memes applied depuis le début du run.
-//	 * Appelé a chaque action réalisée.
-//	 * @param memeApply
-//	 */
-//	private void updateActionCount(Meme memeApply, int entiteIndex, String message){
-//
-//		if (memeApply != null)
-//		{
-//			Meme elementRemoveOfCircular = null;
-//			Toolz.addCountToElementInHashArray(nbActivationByMemes, memeApply, 1);
-//
-//			// partie last twenty
-//			if(lastHundredActionDone.size() == lastHundredActionDone.maxSize())
-//			{
-//				elementRemoveOfCircular = lastHundredActionDone.poll();
-//				Toolz.removeCountToElementInHashArray(countOfLastMemeActivation, elementRemoveOfCircular, 1);
-//			}
-//
-//			lastHundredActionDone.add(memeApply);
-//			Toolz.addCountToElementInHashArray(countOfLastMemeActivation, memeApply, 1);
-//		}
-//
-//		// Dans le cas ou il n'y a pas de meme apply, c'est a dire que l'action d'application du meme a échouée.
-//		else if (Configurator.displayLogRatioLogFailOverFail || Configurator.displayLogRatioLogFailOverSuccess )
-//		{
-//			int nbWin = 0;
-//			if(Configurator.displayLogRatioLogFailOverSuccess)
-//					for (Integer winTimes : nbActivationByMemes.values())
-//						nbWin += winTimes;
-//
-//			if(Configurator.displayLogRatioLogFailOverFail)
-//				if (message.contains("RMLK"))
-//					cptActionRmvFail++;
-//				else if (message.contains("ADLK"))
-//					cptActionAddFail++;
-//
-//			vueController.displayInfo("Action-Echec", Arrays.asList(
-//					"Iteration- "+ cptModulo,
-//					"Ratio Rmv/Add -" + (Configurator.displayLogRatioLogFailOverFail? ((double) cptActionRmvFail / cptActionAddFail) : " NC"),
-//					"Ratio Fail/success -" + (Configurator.displayLogRatioLogFailOverSuccess ? ((double) (cptActionRmvFail + cptActionAddFail) / nbWin) : "NC"),
-//					"Aucune action réalisée par l'entité- " + entiteIndex,
-//					"Message- " + message));
-//		}
-//	}
-
 	//endregion
 
 	//region Meme
@@ -1350,6 +1304,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		ArrayList<AttributType> attributs = new ArrayList<>();
 		Hashtable<AttributType, Hashtable<Integer, AgregatorType>> KVAttributAgregator = new Hashtable<>();
 		Hashtable<Integer, AgregatorType> agregators = new Hashtable<>();
+		int index;
 
 		ActionType add = ActionType.AJOUTLIEN;
 		ActionType remove = ActionType.RETRAITLIEN;
@@ -1370,15 +1325,17 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		attributs.add(degree);
 
 		agregators.clear();
-		agregators.put(0, notLinked);
-		agregators.put(1, random);
+		index= 0;
+		agregators.put(index++, notLinked);
+		agregators.put(index++, random);
 		memeFactory.registerMemeAction("AddØ",0.1, true, true, add, attributs, KVAttributAgregator, false);
-		agregators.put(2, random);
+		agregators.put(index++, random);
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, false, false, add, attributs, KVAttributAgregator, true);
 
-		agregators.put(0, notLinked);
-		agregators.put(1, mineInf);
-		agregators.put(2, random);
+		index= 0;
+		agregators.put(index++, notLinked);
+		agregators.put(index++, mineInf);
+		agregators.put(index++, random);
 		memeFactory.registerMemeAction("Add+", 1, false ,true, add, attributs,KVAttributAgregator, false);
 
 		agregators.clear();
@@ -1398,7 +1355,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(1, notLinked);
 //		agregators.put(2, theMost);
 //		agregators.put(3, mineInf);
-		agregators.put(4, random);
+		agregators.put(2, random);
 		memeFactory.registerMemeAction("AddØ-Hop", 1, false, true, add,attributs, KVAttributAgregator ,false);
 
 		agregators.clear();
