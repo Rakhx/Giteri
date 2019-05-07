@@ -63,7 +63,7 @@ public class Toolz {
 	 * @param list
 	 * @return Un élément de la liste ou null. 
 	 */
-	public static <T extends Object> T getRandomElement(ArrayList<T> list){
+	public static <T extends Object> T getRandomElement(List<T> list){
 		return list.size() > 0 ? list.get(Toolz.getRandomNumber(list.size())) : null; 
 	}
 
