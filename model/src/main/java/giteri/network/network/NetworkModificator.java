@@ -52,11 +52,14 @@ public class NetworkModificator {
             graphUnderWork.addNode("" + i);
         }
 
+        graphUnderWork.display();
+
         // pour un réseau random a densité correct
-        // easyAdd.addLinks(target, graphUnderWork);
+        easyAdd.addLinks(target, graphUnderWork);
 
         // pour un réseau à DDt
-        trveddAdd.addLinks(target, graphUnderWork);
+        addDD.addLinks(target, graphUnderWork);
+
 
     }
 
@@ -74,16 +77,15 @@ public class NetworkModificator {
         /**
          * renvoie true si l'ajout est possible.
          *
-         * @param target
          * @param graph
          * @param from
          * @param to
          * @return
          */
-        boolean canAddLink(TargetStructure target, Graph graph, Node from, Node to);
+        boolean canAddLink(Graph graph, Node from, Node to);
     }
 
-    LinkPredictor predictorDensity = (target, graph, nodeOne, nodeTwo) -> {
+    LinkPredictor predictorDensity = ( graph, nodeOne, nodeTwo) -> {
         if (nodeOne == nodeTwo)
             return false;
         else if (graph.getEdge(nodeOne + ":" + nodeTwo) != null || graph.getEdge(nodeTwo + ":" + nodeOne) != null)
@@ -99,7 +101,7 @@ public class NetworkModificator {
         do {
             nodeOne = graph.getNode(Toolz.getRandomNumber(target.nbNode));
             nodeTwo = graph.getNode(Toolz.getRandomNumber(target.nbNode));
-            if (predictorDensity.canAddLink(target, graph, nodeOne, nodeTwo))
+            if (predictorDensity.canAddLink(graph, nodeOne, nodeTwo))
                 try {
                     graph.addEdge(nodeOne + ":" + nodeTwo, nodeOne, nodeTwo, false);
                     target.nbEdges--;
@@ -108,6 +110,157 @@ public class NetworkModificator {
                 }
         } while (target.nbEdges > 0);
     };
+
+    LinkAdder addDD = (target, graph) -> {
+
+
+        //region Structures utilisées pour savoir ou relinker des edges
+
+        int[] ddwanted, ddActual; // distribution de degrée voulue et actuelle
+        int[] ddDiff; // Difference entre wanted et actual
+        double[] ddDiffRatio = new double[target.nbNode]; // % de diff entre la DD voulu et en construction
+
+        //endregion
+
+        // structures utilisées pour liste de priorité
+        double[] ddTransitionRatioAdd = new double[target.nbNode]; // Priorité des degrés a atteindre
+
+        int degreeBefore, degreeAfter;
+        double rltAddMax;
+
+        // Autres stuctures
+        Map<Integer, Double> kvDdTrRatio = new HashMap<>(); // K:Degree V:Transition ratio
+        Map<Integer, Double> kvDdDiffRatio = new HashMap<>(); // K:Degree V:Transition ratio
+
+        Map<Integer, Double> kvRouletteReceveur = new LinkedHashMap<>(); // K:Degree V:sum(Transition Ratio) - Pour les noeuds qui recoivent
+        Map<Integer, Double> kvRouletteAjouteur = new LinkedHashMap<>(); // K:Degree V:sum(Transition Ratio) - Pour les noeuds qui ajoutent
+
+        Map<Integer, List<Integer>> kvIndexNodes = new HashMap<>(); // K:Degree V:Liste d'index des nodes@this degree
+
+        Map<Integer, Double> kvTopXDdDiffRatio; // K:Degree V:Transition ratio - Top X
+        Map<Integer, Double> kvTopXDdDiffRatioDesc; // K:Degree V:Transition ratio - Top X
+        Map<Integer, Double> kvTopXDdTrRatio; // K:Degree V:Transition ratio - Top X
+
+        Map<Integer, Integer> kvDegreeSumDiff = new LinkedHashMap<>();
+
+        // Variables
+        List<Integer> nodesIndexForRmv;
+//        List<Integer> nodesIndexForAdd;
+        List<Integer> nodesCandidateToAdd = new ArrayList<>();
+        boolean again = true;
+
+        // Variables de fonctionnenemnt
+        double addedRlt;
+        double selectedRlt;
+        int nodeOneIndex;
+        Node nodeActif;
+        Node nodePillier;
+        Node nodeNewAdd = null;
+        Edge edge;
+
+        //region Some initialisation
+        ddwanted = target.DistribDegree;
+        ddActual = new int[target.nbNode];
+        ddDiff = new int[target.nbNode];
+
+        for (Node node  : graphUnderWork.getEachNode()) {
+            ddActual[node.getDegree()]++;
+        }
+        //endregion
+
+        while(again){
+
+            //region re init variable a clear
+            kvRouletteAjouteur.clear();
+            kvRouletteReceveur.clear();
+            kvDdTrRatio.clear();
+            rltAddMax = 0;
+            nodeOneIndex = 0;
+            nodesCandidateToAdd.clear();
+            //endregion
+
+            //region MaJ des valeurs des variables attennantes a l'état du réseau
+            majWeightRelink(target, ddwanted, ddActual, ddDiff, ddDiffRatio,  kvDdDiffRatio, kvDegreeSumDiff, ddTransitionRatioAdd,  kvDdTrRatio);
+            majDegreeNode(graph, kvIndexNodes);
+
+            //Top X des besoins en ajout de noeud
+            kvTopXDdDiffRatio = kvDdDiffRatio.entrySet().stream()
+                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                    .limit(target.nbNode/10)
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+
+            // Top X des besoin en retrait de noeud
+            kvTopXDdDiffRatioDesc = kvDdDiffRatio.entrySet().stream()
+                    .sorted(Map.Entry.comparingByValue(Comparator.naturalOrder()))
+                    .limit(target.nbNode/5)
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+
+            // Top X des sum des diff wanted - actual. Si positif, on manque de noeud au dessus
+            kvTopXDdTrRatio = kvDdTrRatio.entrySet().stream()
+                    .sorted(Map.Entry.comparingByValue(Comparator.naturalOrder()))
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+            // endregion
+
+            //region Choix aléatoire d'un noeud, dont le degré est la cible de diminution
+            for (Integer integ : kvTopXDdDiffRatioDesc.keySet()) {
+                // On prend la liste des noeuds possédant ce degré
+                nodesIndexForRmv = kvIndexNodes.get(integ);
+                // Si aucun noeud n'a ce degré, on passe au suivant
+                if (nodesIndexForRmv == null) {
+                    continue;
+                }
+
+                // on ajoute tous ces index de noeuds de degré integ avec leur importance
+                for (Integer index : nodesIndexForRmv) {
+                    rltAddMax += 100 - kvDdDiffRatio.get(integ); // Si pas envie de recevoir de noeud, valeur à 1
+                    kvRouletteAjouteur.put(index, rltAddMax);
+                }
+            }
+
+            //endregion
+
+            int sltBla = (int)(rltAddMax*10000);
+            selectedRlt = Toolz.getRandomNumber((sltBla)/10000);
+
+            for (Integer integer : kvRouletteAjouteur.keySet()) {
+                if (kvRouletteAjouteur.get(integer) >= selectedRlt) { // bingo loto
+                    nodeOneIndex = integer;
+                    break;
+                }
+            }
+
+            nodeActif = graph.getNode(nodeOneIndex);
+
+            // Selection aléatoire de l'un des edges de ce noeud
+
+            edge = nodeActif.getEdge(Toolz.getRandomNumber(nodeActif.getDegree()));
+            nodePillier = edge.getNode1() == nodeActif? edge.getNode0() : edge.getNode1();
+
+            // On trouve un autre noeud auquel se rattacher
+            for (Integer nodeToAdd : kvTopXDdTrRatio.keySet()) {
+                if(this.graphNotLinked(graphUnderWork, nodePillier.getIndex(), nodeToAdd)) {
+                    nodeNewAdd = graphUnderWork.getNode(nodeToAdd);
+                    break;
+
+                }
+            }
+
+            modifyEdge(graph, nodeActif.getIndex(), nodePillier.getIndex(), ddActual, false);
+            modifyEdge(graph, nodeNewAdd.getIndex(), nodePillier.getIndex(), ddActual, true);
+
+
+
+
+
+        }
+
+
+    };
+
+
 
     LinkAdder trveddAdd = (target, graph) -> {
         // structures utilisées pour liste de priorité
@@ -373,6 +526,78 @@ public class NetworkModificator {
             kvDdTrRatio.put(i, ddTransitionRatio[i]);
             kvDdTrRatioRmv.put(i, ddTransitionRatioRmv[i]);
         }
+    }
+
+    public void majWeightRelink(TargetStructure target, int[] ddwanted, int[] ddActual, int[] ddDiff, double[] ddDiffRatio,
+                                Map<Integer, Double> kvDdDiffRatio, Map<Integer, Integer> kvDegSumDiff,
+                                double[] ddTransitionRatio, Map<Integer, Double> kvDdTrRatio) {
+        /** Si trop de noeud, mettre (en frac?) 5%
+         *  Si manque un noeud frac de 30% + 70% ?
+         *
+         */
+        double pourcent;
+        int diff;
+        int sum = 0;
+        int fracToMany = 1;
+        int fracNeedMore = 30;
+        int fracFine = 15;
+        int[] diffs = new int[target.nbNode];
+        int offsetNotEnought = 100 - fracToMany - fracNeedMore;
+
+        // Liste de pourcentage de manquement pour atteindre le bon # noeud par degré
+        for (int i = 0; i < target.nbNode; i++) {
+            // Si la diff est négative, on a trop de lien. pourcentage "négatif". Si positif, il en manque. Si zero, on en a le bon nombre. Wanted
+            // est à +1 pour pouvoir diviser directement
+            diff = ddwanted[i] - ddActual[i];
+            sum += diff;
+            diffs[i] = sum;
+
+            // Si le noeud a trop de lien
+            if (diff < 0) {
+                pourcent = (-1. / diff ) * fracToMany; // plus la diff est grand plus on arriver vers 0%
+            }
+            // Si le noeud manque de lien
+            else if (diff > 0) {
+                pourcent = ((double) diff / ddwanted[i]) * fracNeedMore + offsetNotEnought; // Ratio a quel point il manque de noeud
+            }
+            // Si on a le bon nombre de noeud
+            else {
+                pourcent = fracFine;
+            }
+
+            ddDiffRatio[i] = pourcent;
+
+            // Tableau de transition
+            // Pour la premiere case, donc les noeuds a degré un, ca sera de tte facon rempli en premier avec le premier ajout
+
+            if (i == 0) { // sera mis a jour a la prochaine itération ( inutile )?
+                ddTransitionRatio[i] = fracFine; // Fine pour l'ajout
+            }
+            else {
+                // on utilise le ratio du degré courant et du suivant pour déterminer le bénéfice d'un ajout de lien
+                // donc en pratique du courant et du précédent pour déterminer la valeur sur le précédent
+                // a quelle point on manque du ratio courant - a quelle point le précédent est réalisé
+                // aucune valeur a 0%
+                pourcent = ((double) (ddDiffRatio[i - 1] + ddDiffRatio[i]) / 2);
+                ddTransitionRatio[i - 1] = pourcent;
+
+
+            }
+            // sur la derniere itération on set aussi le pourcentage courant
+            if (i == target.nbNode - 1) {
+                ddTransitionRatio[i] = fracFine; // Utilisé pour évalué a qui s'ajouter
+                pourcent = ((double) (ddDiffRatio[i - 1] + ddDiffRatio[i]) / 2);
+            }
+        }
+
+        kvDdDiffRatio.clear();
+
+        for (int i = 0; i < ddDiffRatio.length; i++) {
+            kvDdDiffRatio.put(i, ddDiffRatio[i]);
+            kvDdTrRatio.put(i, ddTransitionRatio[i]);
+        }
+
+
     }
 
     /**
