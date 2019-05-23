@@ -1386,6 +1386,30 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		}
 	}
 
+	/** Retire et ajouter X serie d'un coup
+	 *
+	 */
+	private void addXYseriesMemeApplianceWMeme(Set<Meme> memes){
+		datasetMemeAppliance.removeAllSeries();
+		String labelSerie;
+		Color serieColor;
+		int serieIndex;
+		// Pour chaque série qu'on veut ajouter
+		for (Meme meme : memes) {
+			// on crée les série dans l'ordre a partir de 0 et regarde le meme associé a cet index dans MemeFactory
+			XYSeries aSerie = new XYSeries(meme);
+			serieIndex = memeFactory.getIndexFromMeme(meme);
+			// label son petit nom
+			labelSerie = entiteHandler.translateMemeCombinaisonReadable(meme.toFourCharString());
+			// Couleur associé a cet index
+			serieColor = drawerGraphStream.getColorAsColor(serieIndex);
+			chartMemeAppliance.getXYPlot().getRenderer().setSeriesPaint(serieIndex, serieColor);
+			// serie.setKey(labelSerie);
+			datasetMemeAppliance.addSeries(aSerie);
+			ArraySeriesMemeAppliances.add(aSerie);
+		}
+	}
+
 	/**
 	 * toggle les boutons de l'interface
 	 *
@@ -1535,23 +1559,43 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		}
 	}
 
+//	/** TODO Working on meme appliance
+//	 *
+//	 * @param time
+//	 */
+//	public void addValueToApplianceSerie(double time, Map<Integer, Double> kvIndexValue){
+//
+//		if(firstAppliance){
+//			int diff = kvIndexValue.size() - datasetMemeAppliance.getSeriesCount();
+//			int cpt = 0;
+//			for (int i = 0; i < diff; i++) {
+//				addXYseriesMemeAppliance();
+//			}
+//			firstAppliance = false;
+//		}
+//
+//		for (int indexMeme : kvIndexValue.keySet()) {
+//			ArraySeriesMemeAppliances.get(indexMeme).add(time, kvIndexValue.get(indexMeme));
+//		}
+//	}
+
 	/** TODO Working on meme appliance
 	 *
 	 * @param time
 	 */
-	public void addValueToApplianceSerie(double time, Map<Integer, Double> kvIndexValue){
+	public void addValueToApplianceSerie(double time, Map<Meme, Double> kvIndexValue){
+
 
 		if(firstAppliance){
-			int diff = kvIndexValue.size() - datasetMemeAppliance.getSeriesCount();
-			int cpt = 0;
-			for (int i = 0; i < diff; i++) {
-				addXYseriesMemeAppliance();
-			}
+			addXYseriesMemeApplianceWMeme(kvIndexValue.keySet());
 			firstAppliance = false;
 		}
 
-		for (int indexMeme : kvIndexValue.keySet()) {
-			ArraySeriesMemeAppliances.get(indexMeme).add(time, kvIndexValue.get(indexMeme));
+		Meme keyMeme;
+
+		for (XYSeries arraySeriesMemeAppliance : ArraySeriesMemeAppliances) {
+				keyMeme = (Meme)arraySeriesMemeAppliance.getKey();
+				arraySeriesMemeAppliance.add(time, kvIndexValue.get(keyMeme));
 		}
 
 	}

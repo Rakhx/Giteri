@@ -1,5 +1,6 @@
 package giteri.run.displaysStuff;
 
+import giteri.meme.entite.Meme;
 import giteri.run.interfaces.Interfaces;
 import org.jfree.chart.JFreeChart;
 
@@ -52,7 +53,7 @@ public class ConsoleView implements Interfaces.IView {
     }
 
     @Override
-    public void addValueToApplianceSerie(double time, Map<Integer, Double> value) {
+    public void addValueToApplianceSerie(double time, Map<Meme, Double> value) {
 
     }
 

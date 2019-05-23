@@ -1,5 +1,6 @@
 package giteri.run.displaysStuff;
 
+import giteri.meme.entite.Meme;
 import giteri.run.configurator.Configurator;
 import giteri.run.interfaces.Interfaces;
 import giteri.tool.other.WriteNRead;
@@ -116,7 +117,7 @@ public class FileView implements Interfaces.IView {
     }
 
     @Override
-    public void addValueToApplianceSerie(double time, Map<Integer, Double> value) {
+    public void addValueToApplianceSerie(double time, Map<Meme, Double> value) {
 
     }
 

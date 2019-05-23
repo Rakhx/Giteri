@@ -91,7 +91,7 @@ public class Interfaces {
 		void resetDensityOverProbaChart();
 		void toggleEnableInterface();
 		void toggleWkProgress(String message);
-		void addValueToApplianceSerie(double time, Map<Integer, Double>  value);
+		void addValueToApplianceSerie(double time, Map<Meme, Double> kvIndexValue);
 		JFreeChart getDDChart();
 		JFreeChart getDensityChart();
 		JFreeChart getDensityOverProbaChart();

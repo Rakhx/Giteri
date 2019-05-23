@@ -1,5 +1,6 @@
 package giteri.run.displaysStuff;
 
+import giteri.meme.entite.Meme;
 import giteri.run.interfaces.Interfaces.IView;
 
 import java.util.Hashtable;
@@ -45,7 +46,7 @@ public class IHMStub implements IView {
 
 
 	@Override
-	public void addValueToApplianceSerie(double time, Map<Integer, Double> value) {
+	public void addValueToApplianceSerie(double time, Map<Meme, Double> value) {
 		
 	}
 

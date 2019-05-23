@@ -468,14 +468,14 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	//region others
 
 	private void computingMemeAppliance(){
-		// contient les prop. d'application ou l'écart type de l'application d'un meme
-		Hashtable<Meme, Double> kvEcartTypeOrPropMemeAppliance = new Hashtable<Meme, Double>();
-
-		// Affichage dans la fenetre de l'évolution des meme appliances
-		Hashtable<Integer, Double>  kvMemeValue = new Hashtable<>() ;
-		for (Meme meme : kvEcartTypeOrPropMemeAppliance.keySet())
-			kvMemeValue.put(memeFactory.getIndexFromMeme(meme), kvEcartTypeOrPropMemeAppliance.get(meme));
-		communicationModel.view.addValueToApplianceSerie(getNbAction(), kvMemeValue);
+//		// contient les prop. d'application ou l'écart type de l'application d'un meme
+//		Hashtable<Meme, Double> kvEcartTypeOrPropMemeAppliance = new Hashtable<Meme, Double>();
+//
+//		// Affichage dans la fenetre de l'évolution des meme appliances
+//		Hashtable<Integer, Double>  kvMemeValue = new Hashtable<>() ;
+//		for (Meme meme : kvEcartTypeOrPropMemeAppliance.keySet())
+//			kvMemeValue.put(memeFactory.getIndexFromMeme(meme), kvEcartTypeOrPropMemeAppliance.get(meme));
+//		communicationModel.view.addValueToApplianceSerie(getNbAction(), kvMemeValue);
 	}
 
 	/** avg;dispersion

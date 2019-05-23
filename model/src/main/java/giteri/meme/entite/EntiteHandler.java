@@ -67,7 +67,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private double lastDensity;
 	private int sumFailAction;
 	private ObjectRef<Integer> nbFail = new ObjectRef<>(0);
-	private Map<Integer, Double> kvMemeCodeNbEntities;
+	private Map<Meme, Double> kvMemeCodeNbEntities;
 
 	/** Constructeur sans param.
 	 *
@@ -173,7 +173,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			if(Configurator.displayMemePossessionEvolution){
 				kvMemeCodeNbEntities.clear();
 				for (Meme meme : memeProperties.countOfEntitiesHavingMeme.keySet()) {
-					kvMemeCodeNbEntities.put(memeFactory.getIndexFromMeme(meme),
+					kvMemeCodeNbEntities.put(meme,
 							(double)memeProperties.countOfEntitiesHavingMeme.get(meme) / entites.size());
 				}
 

@@ -762,9 +762,9 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		}
 
 		// Affichage dans la fenetre de l'évolution des meme appliances
-		Hashtable<Integer, Double>  kvMemeValue = new Hashtable<>() ;
+		Hashtable<Meme, Double>  kvMemeValue = new Hashtable<>() ;
 		for (Meme meme : kvEcartTypeOrPropMemeAppliance.keySet())
-			kvMemeValue.put(memeFactory.getIndexFromMeme(meme), kvEcartTypeOrPropMemeAppliance.get(meme));
+			kvMemeValue.put(meme, kvEcartTypeOrPropMemeAppliance.get(meme));
 		com.view.addValueToApplianceSerie(nbCallContinuOnThisConfig, kvMemeValue);
 
 		message.setValue(message.getValue() + resume);

@@ -97,7 +97,7 @@ public class Controller {
 		 * @param time
 		 * @param values
 		 */
-		public void addValueToApplianceSerie(double time, Map<Integer, Double>  values){
+		public void addValueToApplianceSerie(double time, Map<Meme, Double> values){
 			for (Interfaces.IView vue:  vues) {
 				vue.addValueToApplianceSerie(time, values);
 			}
