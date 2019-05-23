@@ -68,7 +68,9 @@ public class Controller {
 		 * @param countOfLastMemeActivation ?
 		 * @param lastHundredActionDone une fenetre glissante des 100 dernier meme appliqué
 		 */
-		public void displayMemeUsage(int nbAction, Map<Meme, Integer> nbActivationByMemes, Map<Meme, Integer> countOfLastMemeActivation, CircularFifoQueue<Meme> lastHundredActionDone ){
+		public void displayMemeUsage(int nbAction, Map<Meme, Integer> nbActivationByMemes,
+									 Map<Meme, Integer> countOfLastMemeActivation,
+									 CircularFifoQueue<Meme> lastHundredActionDone ){
 			Map<String, Integer> nbActiByMeme = new Hashtable<>();
 			Map<String, Integer> nbLastActivByMeme = new Hashtable<>();
 			List<String> lastHundred = new ArrayList<>();
@@ -85,26 +87,17 @@ public class Controller {
 			for (Interfaces.IView vue: vues) {
 				vue.displayXLastAction(nbAction, nbActiByMeme,  nbLastActivByMeme, lastHundred);
 			}
+
+
 		}
 
-		/** Ajoute une valeur dans la chart de density over proba.
-		 *
-		 * @param x
-		 * @param y
-		 */
-		public void addDensityOverProbaValue(double x, double y)
-		{
-			for (Interfaces.IView vue: vues) {
-				vue.addValueToDensityOverProbaSerie(x,y);
-			}
-		}
 
 		/** ajoute une série de valeur pour le time T
 		 *
 		 * @param time
 		 * @param values
 		 */
-		public void addValueToApplianceSerie(double time, Hashtable<Integer, Double>  values){
+		public void addValueToApplianceSerie(double time, Map<Integer, Double>  values){
 			for (Interfaces.IView vue:  vues) {
 				vue.addValueToApplianceSerie(time, values);
 			}

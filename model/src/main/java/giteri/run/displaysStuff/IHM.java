@@ -77,7 +77,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 	//<editor-fold desc="Properties">
 
-
 	// action , attribut, aggrgator factory
 	MemeFactory memeFactory;
 
@@ -85,7 +84,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	EntiteHandler entiteHandler;
 
 	// Huml, devrait passer par communicationModel
-	Interfaces.DrawerInterface drawerGraphStream;
+	Interfaces.DrawerNetworkInterface drawerGraphStream;
 
 	WriteNRead writeNRead;
 
@@ -177,9 +176,11 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	// Séries de donnée pour l'affichage des graphiques
 	XYSeries seriesDegreeDistribution;
 	XYSeries seriesDensity;
-	XYSeries seriesMemeAppliance; // Les 3 suivantes concernent l'appliance de meme.
 	ArrayList<XYSeries> ArraySeriesMemeAppliances;
 	XYSeriesCollection datasetMemeAppliance;
+
+	boolean firstAppliance = true;
+
 
 	// Chart de l'IHM
 	private JFreeChart chart;
@@ -194,8 +195,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 	// à voir avec le reste
 	private ModelController modelController;
-	int compteurAction;
-
 	private DecimalFormatSymbols otherSymbols;
 
 	private DecimalFormat decimal;
@@ -208,7 +207,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	public IHM(ModelController modelParam,
 			   MemeFactory memeFactory,
 			   EntiteHandler entiteHandler,
-			   Interfaces.DrawerInterface drawerGraphStream,
+			   Interfaces.DrawerNetworkInterface drawerGraphStream,
 			   WriteNRead wnr) {
 
 		super("-");
@@ -237,7 +236,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		memesTitle = new Hashtable<String, Meme>();
 		this.setSelectedMeme(existingMeme);
-		compteurAction = 0;
 		densityMaxValue = 0.0;
 		otherSymbols = new DecimalFormatSymbols(Locale.US);
 		decimal = new DecimalFormat("",otherSymbols);
@@ -254,32 +252,9 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		Init();
 	}
 
-	//region de fonction public, diverses
 
-	/**
-	 * Réinitilise l'interface aux valeurs de base, entre les steps de
-	 * simulation par exemple.
-	 *
-	 */
-	public void resetIHM() {
-		resetHashTableKeys();
-		updateInformationDisplay();
-		// seriesMemeAppliance.clear();
-		for (XYSeries serie : ArraySeriesMemeAppliances) {
-			serie.clear();
-		}
+	//<editor-fold desc="fonction public, diverses">
 
-		ArraySeriesMemeAppliances.clear();
-		datasetMemeAppliance.removeAllSeries();
-	}
-
-	/** Reset la chart de densité over proba, utilisée pour
-	 * l'ancienne simu.
-	 *
-	 */
-	public void resetDensityOverProbaChart(){
-		seriesDensity.clear();
-	}
 
 	/**
 	 * Met en place la liste des memes qui seront utilisés lors de la
@@ -414,11 +389,10 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		return this.chartMemeAppliance;
 	}
 
-	//endregion
-
-	//endregion
+	//</editor-fold>
 
 	//<editor-fold desc="Création des éléments de IHM">
+
 	/**
 	 * Initialisation des champs et de la fenetre openGL
 	 *
@@ -512,7 +486,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	 * @return
 	 */
 	private JPanel createPaneStat() {
-		/* JPanel */jpPaneTwo = new JPanel();
+		jpPaneTwo = new JPanel();
 		jpPaneTwo.setLayout(new BoxLayout(jpPaneTwo, BoxLayout.Y_AXIS));
 
 		// Series
@@ -597,12 +571,11 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		paneThree.add(launchSimu);
 
-		seriesMemeAppliance = new XYSeries("Third");
 		datasetMemeAppliance = new XYSeriesCollection();
-		chartMemeAppliance = createChartDensityOverProba(datasetMemeAppliance);
-		final ChartPanel chartPanelDensityOverProba = new ChartPanel(chartMemeAppliance);
-		chartPanelDensityOverProba.setPreferredSize(new java.awt.Dimension(500, 270));
-		paneThree.add(chartPanelDensityOverProba);
+		chartMemeAppliance = createChartMemeAppliance(datasetMemeAppliance);
+		final ChartPanel chartPanelMemeAppliance = new ChartPanel(chartMemeAppliance);
+		chartPanelMemeAppliance.setPreferredSize(new java.awt.Dimension(500, 270));
+		paneThree.add(chartPanelMemeAppliance);
 
 		return paneThree;
 	}
@@ -1115,7 +1088,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	 * @param dataset
 	 * @return
 	 */
-	private JFreeChart createChartDensityOverProba(final XYDataset dataset) {
+	private JFreeChart createChartMemeAppliance(final XYDataset dataset) {
 		// create the chart...
 		final JFreeChart chart = ChartFactory.createXYLineChart(
 				"Meme appliance in volume of direct", // chart title
@@ -1384,7 +1357,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	/** Retire et ajouter X serie d'un coup
 	 *
 	 */
-	private void addXYseries(){
+	private void addXYseriesMemeAppliance(){
 		int numbSerie = 0;
 		ArraySeriesMemeAppliances.add(new XYSeries(ArraySeriesMemeAppliances.size()));
 		datasetMemeAppliance.removeAllSeries();
@@ -1421,52 +1394,10 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		jpPaneTwo.setEnabled(jpPaneTwo.isEnabled());
 		btReset.setEnabled(btReset.isEnabled());
 	}
+
 	//</editor-fold>
 
-	//region concernant la mise a jour des informations de l'interface
-
-	/** Plot dans la série "Density Over Proba". DEPRECATED.
-	 *
-	 */
-	public void addValueToDensityOverProbaSerie(double x, double y) {
-		seriesMemeAppliance.add(x, y);
-	}
-
-	/**
-	 *
-	 * @param time
-	 */
-	public void addValueToApplianceSerie(double time, Hashtable<Integer, Double> kvIndexValue){
-		int diff = kvIndexValue.size() - datasetMemeAppliance.getSeriesCount();
-		int cpt = 0;
-		for (int i = 0; i < diff; i++) {
-			addXYseries();
-		}
-
-		for (int indexMeme : kvIndexValue.keySet()) {
-			ArraySeriesMemeAppliances.get(indexMeme).add(time, kvIndexValue.get(indexMeme));
-		}
-
-	}
-
-	/**
-	 * Met a jour les entrées des clefs des hashtable en fonction des meme
-	 * choisi pour la simulation
-	 *
-	 */
-	private void resetHashTableKeys() {
-
-		lastHundredActionDone.clear();
-		nbActivationByMemes.clear();
-		countOfLastMemeActivation.clear();
-		nodesHavingXoxoMemes.clear();
-
-		for (Meme meme : selectedMemeOnSimulation) {
-			nodesHavingXoxoMemes.put(meme.toString(), new ArrayList<Integer>());
-			nbActivationByMemes.put(meme.toString(), 0);
-			countOfLastMemeActivation.put(meme.toString(), 0);
-		}
-	}
+	//<editor-fold desc="mise a jour des informations de l'interface">
 
 	/** Mise a jour des données d'affichage concernant les memes et action Fait
 	 * le lien entre les données contenues dans les hashtable et l'affichage de
@@ -1485,6 +1416,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 				int nbAppel;
 				String memeRef = "";
 				boolean refreshDDArray = (compteurSerieDensity % 10 == 0);
+				boolean refreshMemeAppliance = refreshDDArray;
 				// densité seul
 				int activator = 1;
 				Color associatedColor;
@@ -1512,7 +1444,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 					else
 					{
 						int nbNodesWithThisMeme = 0;
-						
+
 						nbNodesWithThisMeme = nodesHavingXoxoMemes.get(meme.toString()) == null? 0 :
 							nodesHavingXoxoMemes.get(meme.toString()).size();
 						toPut += nbNodesWithThisMeme;
@@ -1603,11 +1535,77 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		}
 	}
 
-	//endregion
+	/** TODO Working on meme appliance
+	 *
+	 * @param time
+	 */
+	public void addValueToApplianceSerie(double time, Map<Integer, Double> kvIndexValue){
 
-	//endregion
+		if(firstAppliance){
+			int diff = kvIndexValue.size() - datasetMemeAppliance.getSeriesCount();
+			int cpt = 0;
+			for (int i = 0; i < diff; i++) {
+				addXYseriesMemeAppliance();
+			}
+			firstAppliance = false;
+		}
 
-	//region Autres CLASSE
+		for (int indexMeme : kvIndexValue.keySet()) {
+			ArraySeriesMemeAppliances.get(indexMeme).add(time, kvIndexValue.get(indexMeme));
+		}
+
+	}
+
+	/**
+	 * Met a jour les entrées des clefs des hashtable en fonction des meme
+	 * choisi pour la simulation
+	 *
+	 */
+	private void resetHashTableKeys() {
+
+		lastHundredActionDone.clear();
+		nbActivationByMemes.clear();
+		countOfLastMemeActivation.clear();
+		nodesHavingXoxoMemes.clear();
+
+		for (Meme meme : selectedMemeOnSimulation) {
+			nodesHavingXoxoMemes.put(meme.toString(), new ArrayList<Integer>());
+			nbActivationByMemes.put(meme.toString(), 0);
+			countOfLastMemeActivation.put(meme.toString(), 0);
+		}
+	}
+
+	/**
+	 * Réinitilise l'interface aux valeurs de base, entre les steps de
+	 * simulation par exemple.
+	 *
+	 */
+	public void resetIHM() {
+		resetHashTableKeys();
+		updateInformationDisplay();
+		// seriesMemeAppliance.clear();
+		for (XYSeries serie : ArraySeriesMemeAppliances) {
+			serie.clear();
+		}
+
+		firstAppliance = true;
+
+		ArraySeriesMemeAppliances.clear();
+		datasetMemeAppliance.removeAllSeries();
+	}
+
+	/** Reset la chart de densité over proba, utilisée pour
+	 * l'ancienne simu.
+	 *
+	 */
+	public void resetDensityOverProbaChart(){
+		seriesDensity.clear();
+	}
+
+	//</editor-fold>
+
+	//<editor-fold desc="fonction public, diverses">
+
 	/** Action de faire avancer step par step.
 	 *
 	 */
@@ -1654,7 +1652,8 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		return x;
 	}
 
-	//endregion
+	//</editor-fold>
+
 	/** Vitesse des tics de la simulation.
 	 *
 	 *

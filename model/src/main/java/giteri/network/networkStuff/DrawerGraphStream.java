@@ -1,6 +1,6 @@
 package giteri.network.networkStuff;
 
-import giteri.run.interfaces.Interfaces.DrawerInterface;
+import giteri.run.interfaces.Interfaces;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -29,7 +29,7 @@ import giteri.meme.event.BehavTransmEvent;
 /** Classe de dessin pour graphStream
  *
  */
-public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInterface {
+public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.DrawerNetworkInterface {
 
 	/** Constructeur sans paramètre.
 	 *
@@ -73,6 +73,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 	 *
 	 */
 	public void handlerBehavTransm(BehavTransmEvent e) {
+		if(Configurator.displayMemePossessionEvolution)
 		// A priori inutile de parler du cas de remplacement car la classe de node écrase
 		// la précédente. A revoir si des memes peuvent etre spontanement perdu.
 		if(e.message == Configurator.MemeActivityPossibility.AjoutMeme.toString()){
@@ -105,7 +106,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 
 	//endregion
 
-	//region Interface DrawerInterface
+	//region Interface DrawerNetworkInterface
 
 	/** Dessin d'un graphe initial, va aussi regarder les memes possédé par les
 	 * noeuds pour l'initialisation des couleurs.
@@ -253,7 +254,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements DrawerInter
 		graph.removeEdge(from, to);
 	}
 
-	//endregion interface DrawerInterface
+	//endregion interface DrawerNetworkInterface
 
 	//region Fonction propre à ce moteur graphique
 

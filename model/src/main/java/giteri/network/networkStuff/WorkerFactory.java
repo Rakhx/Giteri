@@ -1,12 +1,8 @@
 package giteri.network.networkStuff;
 
-import giteri.run.interfaces.Interfaces.DrawerInterface;
+import giteri.run.interfaces.Interfaces.DrawerNetworkInterface;
 import giteri.run.interfaces.Interfaces.StatAndPlotInterface;
 import giteri.run.jarVersion.StatAndPlotJarVersion;
-import giteri.run.jarVersion.WorkerFactoryJarVersion;
-import giteri.network.network.Network;
-import giteri.run.configurator.Configurator;
-
 
 
 /** Classe permettant d'accéder aux classes de dessin et de calcul
@@ -15,14 +11,14 @@ import giteri.run.configurator.Configurator;
 public class WorkerFactory {
 
 	protected StatAndPlotInterface calculator;
-	protected DrawerInterface drawer;
+	protected DrawerNetworkInterface drawer;
 	public final Object waitingForReset = new Object();
 
 	public WorkerFactory(){
 
 	}
 
-	public void setNecessary(StatAndPlotInterface statAnd, DrawerInterface dra ){
+	public void setNecessary(StatAndPlotInterface statAnd, DrawerNetworkInterface dra ){
 		calculator = statAnd;
 		drawer = dra;
 	}
@@ -44,7 +40,7 @@ public class WorkerFactory {
 		return calculator;
 	}
 
-	public DrawerInterface getDrawer(){
+	public DrawerNetworkInterface getDrawer(){
 		return drawer;
 	}
 

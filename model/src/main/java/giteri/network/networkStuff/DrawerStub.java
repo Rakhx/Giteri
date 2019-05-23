@@ -4,7 +4,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Set;
 
-import giteri.run.interfaces.Interfaces.DrawerInterface;
+import giteri.run.interfaces.Interfaces.DrawerNetworkInterface;
 import giteri.network.network.Network;
 import giteri.meme.event.BehavTransmEvent;
 
@@ -14,7 +14,7 @@ import giteri.meme.event.BehavTransmEvent;
  * 
  *
  */
-public class DrawerStub implements DrawerInterface{
+public class DrawerStub implements DrawerNetworkInterface {
 
 	@Override
 	public void handlerBehavTransm(BehavTransmEvent e) {

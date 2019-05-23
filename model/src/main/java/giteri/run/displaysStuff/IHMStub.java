@@ -43,13 +43,9 @@ public class IHMStub implements IView {
 		
 	}
 
-	@Override
-	public void addValueToDensityOverProbaSerie(double x, double y) {
-		
-	}
 
 	@Override
-	public void addValueToApplianceSerie(double time, Hashtable<Integer, Double> value) {
+	public void addValueToApplianceSerie(double time, Map<Integer, Double> value) {
 		
 	}
 

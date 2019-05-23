@@ -22,15 +22,15 @@ import giteri.tool.math.Toolz;
 import giteri.tool.objects.ObjectRef;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Classe qui gère les entités du réseau.
  *
  */
-public class EntiteHandler extends ThreadHandler implements INbNodeChangedListener {
+public class EntiteHandler extends ThreadHandler implements INbNodeChangedListener,IBehaviorTransmissionListener {
 
 	//region properties & constructeur
-
 	private VueController vueController;
 	private NetworkConstructor networkConstruct;
 	private MemeFactory memeFactory;
@@ -46,7 +46,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private boolean allTransmitted = false;
 	private boolean allAddTransmitted = false;
 	private boolean allrmvTransmitted = false;
-
 
 	public MemeProperties memeProperties;
 
@@ -68,6 +67,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private double lastDensity;
 	private int sumFailAction;
 	private ObjectRef<Integer> nbFail = new ObjectRef<>(0);
+	private Map<Integer, Double> kvMemeCodeNbEntities;
 
 	/** Constructeur sans param.
 	 *
@@ -85,12 +85,15 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		memeTranslationReadable = new Hashtable<>();
 		toDisplayForRatio = new ArrayList<>();
 		memeProperties = new MemeProperties();
+
+		if(Configurator.displayMemePossessionEvolution)
+			kvMemeCodeNbEntities = new HashMap<>();
+		this.addMemeListener(this);
 	}
 
 	public void initialisation(){
 		generateMemeAvailableForMap();
 		bindNodeWithEntite(networkConstruct.getNetwork());
-		//giveMemeToEntite(Configurator.methodOfGeneration);
 	}
 
 	public void updateMemeAvailableForProperties(){
@@ -100,7 +103,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		Hashtable<ActionType, ArrayList<Meme>> memesByCategory = new Hashtable<>();
 		for (Meme meme: this.memeFittingApplied)
 			Toolz.addElementInHashArray(memesByCategory,meme.getAction().getActionType(),meme);
-		//memeCombinaisonFittingAvailable = this.getMemeAvailable(FittingBehavior.simpleAndComplex,Optional.of(memesByCategory));
 
 		memeProperties.memeCombinaisonFittingAvailable =
 				this.getMemeAvailable(FittingBehavior.simpleAndComplex, Optional.of(memesByCategory));
@@ -130,6 +132,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 	/** Run pour la création de lien, passage de meme, etc.
 	 *
+	 kvMemeCodeNbEntities = new HashMap<>();
 	 */
 	public void doRun() {
 		try
@@ -165,6 +168,17 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 						memeProperties.getNbActivationByMemes(),
 						memeProperties.countOfLastMemeActivation,
 						memeProperties.lastHundredActionDone); }
+
+
+			if(Configurator.displayMemePossessionEvolution){
+				kvMemeCodeNbEntities.clear();
+				for (Meme meme : memeProperties.countOfEntitiesHavingMeme.keySet()) {
+					kvMemeCodeNbEntities.put(memeFactory.getIndexFromMeme(meme),
+							(double)memeProperties.countOfEntitiesHavingMeme.get(meme) / entites.size());
+				}
+
+				vueController.addValueToApplianceSerie(cptModulo, kvMemeCodeNbEntities);
+			}
 
 			if (Configurator.displayLogAvgDegreeByMeme)
 				vueController.displayInfo("AvgDgrByMeme", Arrays.asList(checkPropertiesByMemePossession()));
@@ -368,6 +382,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	public void eventMemeChanged(Entite entiteConcernee, Meme ajoutOrR, String message) {
 
+		// Devrait se trouver dans le handler de cet event, de la meme classe.
 	    if(!Configurator.rebranchementAction || entiteConcernee.getMyMemes().size() > 1)
             synchronized (entitesActive) {
                 if(!entitesActive.contains(entiteConcernee))
@@ -1544,6 +1559,21 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		return returnValue;
 	}
 
+	@Override
+	public void handlerNbNodeChanged(NbNodeChangedEvent e) {
+		entites.clear();
+		bindNodeWithEntite(networkConstruct.getNetwork());
+	}
+
+	@Override
+	public void handlerBehavTransm(BehavTransmEvent e) {
+		if(e.message.compareToIgnoreCase(Configurator.MemeActivityPossibility.RetraitMeme.toString()) == 0){
+			memeProperties.updateMemePossession(e.meme,false);
+		}else if(e.message.compareToIgnoreCase(MemeActivityPossibility.AjoutMeme.toString()) == 0){
+			memeProperties.updateMemePossession(e.meme,true);
+		}
+	}
+
 	//endregion
 
 	//region getter//Setter
@@ -1585,11 +1615,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 	}
 
-	@Override
-	public void handlerNbNodeChanged(NbNodeChangedEvent e) {
-		entites.clear();
-		bindNodeWithEntite(networkConstruct.getNetwork());
-	}
 
 	public class memeComparatorAscending implements Comparator<Meme> {
 		@Override

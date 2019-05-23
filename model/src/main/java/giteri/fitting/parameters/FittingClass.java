@@ -67,7 +67,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public int nbActionBeforeQuit = Configurator.fixedNbAction ? 100000 :
 			Configurator.multiplicatorNbAction * Configurator.getNbNode();
 
-
 	// VARIABLES DE FONCTIONNEMENT
 
 	// numero du run en cours
@@ -512,31 +511,26 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		return oneMoreTurn;
 	}
 
-	/** Continu fitting version simple - c'est a dire en nombre de step
-	 *
-	 * @return
-	 */
-	public boolean continuFittingSimpleVersion(){
-		//boolean debug = Configurator.debugFittingClass && !Configurator.jarMode;
-		//boolean fastDebug = Configurator.debugFittingClassFast && !Configurator.jarMode;
-		// boolean canStillApplyAction;
-		//String resume = "";
-		//double scoreEcartDensite = 100;
-		boolean oneMoreTurn = true;
-		ObjectRef<String> message = new ObjectRef<>("");
-
-		if(nbCallContinuOnThisConfig % nbActionThreshRising == 0)
-			riseThresholdValue(nbCallContinuOnThisConfig);
-
-		// On vérifie s'il est tjrs possible de faire des actions.
-		oneMoreTurn = readingActionCanContinue(message);
-
-		nbCallContinuOnThisConfig++;
-		if(nbCallContinuOnThisConfig / nbActionThreshRising > 4)
-			oneMoreTurn &= false;
-
-		return oneMoreTurn;
-	}
+//	/** Continu fitting version simple - c'est a dire en nombre de step
+//	 *
+//	 * @return
+//	 */
+//	public boolean continuFittingSimpleVersion(){
+//		boolean oneMoreTurn = true;
+//		ObjectRef<String> message = new ObjectRef<>("");
+//
+//		if(nbCallContinuOnThisConfig % nbActionThreshRising == 0)
+//			riseThresholdValue(nbCallContinuOnThisConfig);
+//
+//		// On vérifie s'il est tjrs possible de faire des actions.
+//		oneMoreTurn = readingActionCanContinue(message);
+//
+//		nbCallContinuOnThisConfig++;
+//		if(nbCallContinuOnThisConfig / nbActionThreshRising > 4)
+//			oneMoreTurn &= false;
+//
+//		return oneMoreTurn;
+//	}
 
 	public boolean continuFittingSimpliestVersion(){
 		boolean oneMoreTurn = true;
@@ -545,7 +539,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		if(getNbAction() > nbActionBeforeQuit )
 			oneMoreTurn &= false;
 
-		readingMemeAppliance(false, message);
+		// readingMemeAppliance(false, message);
 
 		return oneMoreTurn;
 
@@ -666,7 +660,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 * Fonction écrite pour pouvoir utiliser les proportions d'applications OU l'écart type d'application d'un meme
 	 * sur les X derniers appels. Aucune fonction de score pour l'utilisation de nombre de meme appliqué
 	 * Entre chaque appel de cette fonction 500 actions sont lancé dans le fitting ( pas necessairement
-	 * sucessful )
+	 * sucessful ) TODO WORKING ON MEME APPLIANCE
 	 * @param displayEcartTypeOnGraph si true display l'écart type, sinon display les proportions d'application par meme
 	 * @param message
 	 * @return
@@ -768,7 +762,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		}
 
 		// Affichage dans la fenetre de l'évolution des meme appliances
-		Hashtable<Integer, Double>  kvMemeValue = new Hashtable<Integer, Double>() ;
+		Hashtable<Integer, Double>  kvMemeValue = new Hashtable<>() ;
 		for (Meme meme : kvEcartTypeOrPropMemeAppliance.keySet())
 			kvMemeValue.put(memeFactory.getIndexFromMeme(meme), kvEcartTypeOrPropMemeAppliance.get(meme));
 		com.view.addValueToApplianceSerie(nbCallContinuOnThisConfig, kvMemeValue);

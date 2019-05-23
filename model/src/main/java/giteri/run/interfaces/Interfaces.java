@@ -43,7 +43,7 @@ public class Interfaces {
 	/** Interface des classes qui s'occupe de rendre le giteri.network.
 	 *
 	 */
-	public interface DrawerInterface extends IBehaviorTransmissionListener {
+	public interface DrawerNetworkInterface extends IBehaviorTransmissionListener {
 
 		void resetDisplay();
 		void drawThisNetwork(Network net, boolean outsideView);
@@ -91,8 +91,7 @@ public class Interfaces {
 		void resetDensityOverProbaChart();
 		void toggleEnableInterface();
 		void toggleWkProgress(String message);
-		void addValueToDensityOverProbaSerie(double x, double y);
-		void addValueToApplianceSerie(double time,Hashtable<Integer, Double>  value);
+		void addValueToApplianceSerie(double time, Map<Integer, Double>  value);
 		JFreeChart getDDChart();
 		JFreeChart getDensityChart();
 		JFreeChart getDensityOverProbaChart();

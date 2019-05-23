@@ -5,7 +5,7 @@ import giteri.meme.entite.Meme;
 import java.util.List;
 
 /** Evènement d'ajout ou de retrait d'un meme disponible sur la map
- *
+ * Lors du fitting, lorsqu'on change la liste des memes sur la map
  */
 public class MemeAvailableEvent extends MemeListEvent {
     private static final long serialVersionUID = 1L;

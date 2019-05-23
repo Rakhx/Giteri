@@ -28,6 +28,9 @@ public class MemeProperties{
 
     public Map<Meme, Integer> countOfLastMemeActivation;
 
+    // k:meme v:nb entity with this meme
+    public Map<Meme, Integer> countOfEntitiesHavingMeme;
+
     // Sur les 100 dernières actions, quel meme a été appelé
     public CircularFifoQueue<Meme> lastHundredActionDone;
     public int sizeOfCircularQueue = 100;
@@ -42,15 +45,16 @@ public class MemeProperties{
     public MemeProperties(){
         nbActivationByMemes = new Hashtable<>();
         countOfLastMemeActivation = new Hashtable<>();
+        countOfEntitiesHavingMeme = new Hashtable<>();
         lastHundredActionDone = new CircularFifoQueue<>(sizeOfCircularQueue);
         lastFailActionTried = new ArrayList<>();
-
     }
 
     public void clear(){
         nbActivationByMemes.clear();
         countOfLastMemeActivation.clear();
         lastHundredActionDone.clear();
+        countOfEntitiesHavingMeme.clear();
     }
 
     //endregion
@@ -122,6 +126,18 @@ public class MemeProperties{
         int sumOfFail = lastFailActionTried.stream().reduce(0,Integer::sum);
         lastFailActionTried.clear();
         return sumOfFail;
+    }
+
+    /** Mise a jour de la table du nombre de possession par meme.
+     *
+     * @param meme Le meme qui a recu ou perdu une entité associée
+     * @param added Si true, une entité a recu le mail, sinon elle l'a perdu
+     */
+    public void updateMemePossession(Meme meme, boolean added ){
+        if(added)
+            Toolz.addCountToElementInHashArray(countOfEntitiesHavingMeme,meme,1);
+        else
+            Toolz.removeCountToElementInHashArray(countOfEntitiesHavingMeme,meme,1);
     }
 
     // region Ecriture dans fichier

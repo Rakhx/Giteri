@@ -2,7 +2,7 @@ package giteri.network.networkStuff;
 
 import giteri.network.event.INbNodeChangedListener;
 import giteri.network.event.NbNodeChangedEvent;
-import giteri.run.interfaces.Interfaces.DrawerInterface;
+import giteri.run.interfaces.Interfaces;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import giteri.run.configurator.Configurator;
 public class NetworkConstructor extends ThreadHandler implements INbNodeChangedListener {
 
 	//region Properties
-	DrawerInterface drawer;
+	Interfaces.DrawerNetworkInterface drawer;
 	final Network networkInstance;
 	IInternalNetReprestn networkRepresentation;
 	NetworkProperties networkInstanceProperties;
@@ -51,7 +51,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		networkRepresentation = new TinyNetworks();
 	}
 
-	public void setDrawer(DrawerInterface drawer){
+	public void setDrawer(Interfaces.DrawerNetworkInterface drawer){
 		this.drawer = drawer;
 	}
 	//region public methods

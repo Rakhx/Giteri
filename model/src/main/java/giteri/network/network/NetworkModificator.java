@@ -118,43 +118,52 @@ public class NetworkModificator {
 
         int[] ddwanted, ddActual; // distribution de degrée voulue et actuelle
         int[] ddDiff; // Difference entre wanted et actual
-        double[] ddDiffRatio = new double[target.nbNode]; // % de diff entre la DD voulu et en construction
-
+        Map<Integer, Integer> kvDegreeDiff = new LinkedHashMap<>(target.nbNode); // k:degree v:diff de wanted
+        Map<Integer, Integer> kvDegreeSumDiffAsc = new LinkedHashMap<>(target.nbNode); // k:degree v:sum des diff ascendante
+        Map<Integer, Integer> kvNodeDecay = new HashMap<>(target.nbNode);
         //endregion
 
         // structures utilisées pour liste de priorité
-        double[] ddTransitionRatioAdd = new double[target.nbNode]; // Priorité des degrés a atteindre
 
-        int degreeBefore, degreeAfter;
+        // double[] ddTransitionRatioAdd = new double[target.nbNode]; // Priorité des degrés a atteindre
+        // double[] ddDiffRatio = new double[target.nbNode]; // % de diff entre la DD voulu et en construction
+        //       Map<Integer, Double> kvDdTrRatio = new HashMap<>(); // K:Degree V:Transition ratio
+//        Map<Integer, Double> kvDdDiffRatio = new HashMap<>(); // K:Degree V:Transition ratio
+
         double rltAddMax;
 
         // Autres stuctures
-        Map<Integer, Double> kvDdTrRatio = new HashMap<>(); // K:Degree V:Transition ratio
-        Map<Integer, Double> kvDdDiffRatio = new HashMap<>(); // K:Degree V:Transition ratio
 
         Map<Integer, Double> kvRouletteReceveur = new LinkedHashMap<>(); // K:Degree V:sum(Transition Ratio) - Pour les noeuds qui recoivent
         Map<Integer, Double> kvRouletteAjouteur = new LinkedHashMap<>(); // K:Degree V:sum(Transition Ratio) - Pour les noeuds qui ajoutent
 
         Map<Integer, List<Integer>> kvIndexNodes = new HashMap<>(); // K:Degree V:Liste d'index des nodes@this degree
 
-        Map<Integer, Double> kvTopXDdDiffRatio; // K:Degree V:Transition ratio - Top X
-        Map<Integer, Double> kvTopXDdDiffRatioDesc; // K:Degree V:Transition ratio - Top X
-        Map<Integer, Double> kvTopXDdTrRatio; // K:Degree V:Transition ratio - Top X
+        Map<Integer, Integer> kvTopXA; // K:Degree V:Transition ratio - Top X
+        Map<Integer, Double> kvTopXB; // K:Degree V:Transition ratio - Top X
+        Map<Integer, Double> kvTopXC; // K:Degree V:Transition ratio - Top X
 
-        Map<Integer, Integer> kvDegreeSumDiff = new LinkedHashMap<>();
 
         // Variables
         List<Integer> nodesIndexForRmv;
 //        List<Integer> nodesIndexForAdd;
         List<Integer> nodesCandidateToAdd = new ArrayList<>();
+
+
         boolean again = true;
+        boolean supFind = false;
+
 
         // Variables de fonctionnenemnt
         double addedRlt;
         double selectedRlt;
+
         int nodeOneIndex;
+        int degreeDiff;
+
         Node nodeActif;
-        Node nodePillier;
+        Node nodeTournant;
+        Node nodeToRmvEdge;
         Node nodeNewAdd = null;
         Edge edge;
 
@@ -173,85 +182,94 @@ public class NetworkModificator {
             //region re init variable a clear
             kvRouletteAjouteur.clear();
             kvRouletteReceveur.clear();
-            kvDdTrRatio.clear();
+           // kvDdTrRatio.clear();
             rltAddMax = 0;
             nodeOneIndex = 0;
             nodesCandidateToAdd.clear();
             //endregion
 
             //region MaJ des valeurs des variables attennantes a l'état du réseau
-            majWeightRelink(target, ddwanted, ddActual, ddDiff, ddDiffRatio,  kvDdDiffRatio, kvDegreeSumDiff, ddTransitionRatioAdd,  kvDdTrRatio);
+            majWeightRelink(target, ddwanted, ddActual, ddDiff,  kvDegreeDiff, kvDegreeSumDiffAsc);
             majDegreeNode(graph, kvIndexNodes);
 
             //Top X des besoins en ajout de noeud
-            kvTopXDdDiffRatio = kvDdDiffRatio.entrySet().stream()
-                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                    .limit(target.nbNode/10)
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-
-            // Top X des besoin en retrait de noeud
-            kvTopXDdDiffRatioDesc = kvDdDiffRatio.entrySet().stream()
+            kvTopXA = kvDegreeDiff.entrySet().stream()
                     .sorted(Map.Entry.comparingByValue(Comparator.naturalOrder()))
-                    .limit(target.nbNode/5)
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-
-            // Top X des sum des diff wanted - actual. Si positif, on manque de noeud au dessus
-            kvTopXDdTrRatio = kvDdTrRatio.entrySet().stream()
-                    .sorted(Map.Entry.comparingByValue(Comparator.naturalOrder()))
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+                   // .limit(target.nbNode/10)
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+//
+//            // Top X des besoin en retrait de noeud
+//            kvTopXB = kvDdDiffRatio.entrySet().stream()
+//                    .sorted(Map.Entry.comparingByValue(Comparator.naturalOrder()))
+//                    .limit(target.nbNode/5)
+//                    .collect(Collectors.toMap(
+//                            Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+//
+//            // Top X des sum des diff wanted - actual. Si positif, on manque de noeud au dessus
+//            kvTopXC = kvDdTrRatio.entrySet().stream()
+//                    .sorted(Map.Entry.comparingByValue(Comparator.naturalOrder()))
+//                    .collect(Collectors.toMap(
+//                            Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
             // endregion
 
-            //region Choix aléatoire d'un noeud, dont le degré est la cible de diminution
-            for (Integer integ : kvTopXDdDiffRatioDesc.keySet()) {
-                // On prend la liste des noeuds possédant ce degré
-                nodesIndexForRmv = kvIndexNodes.get(integ);
-                // Si aucun noeud n'a ce degré, on passe au suivant
-                if (nodesIndexForRmv == null) {
-                    continue;
+            // On prend la valeur la plus basse, c a d celle qui a besoin de perdre en lien
+            int degreeToChange = kvTopXA.keySet().iterator().next();
+            // On prend la liste des noeuds possédants ce degrée
+            List<Integer> nodesWithDegree = kvIndexNodes.get(degreeToChange);
+
+            int nbChangement = ddDiff[degreeToChange];
+            int nbDown = kvDegreeSumDiffAsc.get(degreeToChange);
+            int nbUp = nbChangement - nbDown;
+
+            nodesCandidateToAdd.clear();
+            supFind = false;
+            nodeToRmvEdge = null;
+
+            // on va élaguer ce niveau de degrée pour le mettre a ce qu'il faudrait
+            for (Integer integer : nodesWithDegree) {
+                nodeActif = graphUnderWork.getNode(integer);
+                // ON VA RELINKER DEPUIS CE NOEUD VERS UN NOEUD QUI EN A BESOIN
+
+                // Si la sum des éléments précédents est inférieur 0 il faut ajouter un lien a l'actif depuis un degré inf
+                if(nbDown < 0){
+                    // On collecte l'ensemble des noeuds au degré inférieur qui veulent relinker vers l'actif
+                    for (int i = 0; i < nodeActif.getDegree(); i++) {
+                        nodesCandidateToAdd.addAll(kvIndexNodes.get(i));
+                    }
+                    for (Integer nodeIndexEnDessous : nodesCandidateToAdd) {
+                        nodeTournant = graphUnderWork.getNode(nodeIndexEnDessous);
+                        // On regarde si le degree de ce noeud a besoin d'un ajout
+                        degreeDiff = kvDegreeDiff.get(nodeTournant.getDegree());
+                        // if(degreeDiff )
+                    }
+
+
                 }
 
-                // on ajoute tous ces index de noeuds de degré integ avec leur importance
-                for (Integer index : nodesIndexForRmv) {
-                    rltAddMax += 100 - kvDdDiffRatio.get(integ); // Si pas envie de recevoir de noeud, valeur à 1
-                    kvRouletteAjouteur.put(index, rltAddMax);
+
+
+                // on regarde a qui il est connecté
+                for (Edge edge1 : nodeActif.getEachEdge()) {
+                    nodeTournant = edge1.getNode1() == nodeActif? edge1.getNode0() : edge1.getNode1();
+
+
+
+
+
+
+                    // Dans le cas ou on a un degré qui a besoin d'etre diminuer, on peut supprimer ce lien
+//                    if(degreeDiff < 0){
+//                        supFind = true;
+//                        nodeToRmvEdge = nodeTournant;
+//                        break;
+//                    }
                 }
-            }
 
-            //endregion
-
-            int sltBla = (int)(rltAddMax*10000);
-            selectedRlt = Toolz.getRandomNumber((sltBla)/10000);
-
-            for (Integer integer : kvRouletteAjouteur.keySet()) {
-                if (kvRouletteAjouteur.get(integer) >= selectedRlt) { // bingo loto
-                    nodeOneIndex = integer;
-                    break;
-                }
-            }
-
-            nodeActif = graph.getNode(nodeOneIndex);
-
-            // Selection aléatoire de l'un des edges de ce noeud
-
-            edge = nodeActif.getEdge(Toolz.getRandomNumber(nodeActif.getDegree()));
-            nodePillier = edge.getNode1() == nodeActif? edge.getNode0() : edge.getNode1();
-
-            // On trouve un autre noeud auquel se rattacher
-            for (Integer nodeToAdd : kvTopXDdTrRatio.keySet()) {
-                if(this.graphNotLinked(graphUnderWork, nodePillier.getIndex(), nodeToAdd)) {
-                    nodeNewAdd = graphUnderWork.getNode(nodeToAdd);
-                    break;
+                // si on a trouvé parmi les noeuds associés a ce noeud [de plus haut degré de diff] une suppr. possible
+                if(supFind){
 
                 }
-            }
-
-            modifyEdge(graph, nodeActif.getIndex(), nodePillier.getIndex(), ddActual, false);
-            modifyEdge(graph, nodeNewAdd.getIndex(), nodePillier.getIndex(), ddActual, true);
-
-
+  }
 
 
 
@@ -460,7 +478,7 @@ public class NetworkModificator {
         }
     };
 
-    public void majWeight(TargetStructure target, Graph graph, int[] ddwanted, int[] ddActual, double[] ddDiffRatio, double[] ddTransitionRatio, Map<Integer, Double> kvDdTrRatio,
+    public void majWeight(TargetStructure target, Graph graph, int[] ddwanted, int[] ddActual, double[] ddDiff, double[] ddTransitionRatio, Map<Integer, Double> kvDdTrRatio,
                           double[] ddTransitionRatioRmv, Map<Integer,Double> kvDdTrRatioRmv) {
         /** Si trop de noeud, mettre (en frac?) 5%
          *  Si manque un noeud frac de 30% + 70% ?
@@ -492,7 +510,7 @@ public class NetworkModificator {
                 pourcent = fracFine;
             }
 
-            ddDiffRatio[i] = pourcent;
+            ddDiff[i] = pourcent;
 
             // Tableau de transition
             // Pour la premiere case, donc les noeuds a degré un, ca sera de tte facon rempli en premier avec le premier ajout
@@ -506,7 +524,7 @@ public class NetworkModificator {
                 // donc en pratique du courant et du précédent pour déterminer la valeur sur le précédent
                 // a quelle point on manque du ratio courant - a quelle point le précédent est réalisé
                 // aucune valeur a 0%
-                pourcent = ((double) (ddDiffRatio[i - 1] + ddDiffRatio[i]) / 2);
+                pourcent = ((double) (ddDiff[i - 1] + ddDiff[i]) / 2);
                 ddTransitionRatio[i - 1] = pourcent;
                 ddTransitionRatioRmv[i] = pourcent;
 
@@ -515,7 +533,7 @@ public class NetworkModificator {
             // sur la derniere itération on set aussi le pourcentage courant
             if (i == target.nbNode - 1) {
                 ddTransitionRatio[i] = fracFine; // Utilisé pour évalué a qui s'ajouter
-                pourcent = ((double) (ddDiffRatio[i - 1] + ddDiffRatio[i]) / 2);
+                pourcent = ((double) (ddDiff[i - 1] + ddDiff[i]) / 2);
                 ddTransitionRatioRmv[i] = pourcent;
             }
         }
@@ -528,9 +546,8 @@ public class NetworkModificator {
         }
     }
 
-    public void majWeightRelink(TargetStructure target, int[] ddwanted, int[] ddActual, int[] ddDiff, double[] ddDiffRatio,
-                                Map<Integer, Double> kvDdDiffRatio, Map<Integer, Integer> kvDegSumDiff,
-                                double[] ddTransitionRatio, Map<Integer, Double> kvDdTrRatio) {
+    public void majWeightRelink(TargetStructure target, int[] ddwanted, int[] ddActual, int[] ddDiff,
+                                Map<Integer, Integer> kvDegreeDiff, Map<Integer, Integer> kvDegreeSumDiffAsc) {
         /** Si trop de noeud, mettre (en frac?) 5%
          *  Si manque un noeud frac de 30% + 70% ?
          *
@@ -538,63 +555,22 @@ public class NetworkModificator {
         double pourcent;
         int diff;
         int sum = 0;
-        int fracToMany = 1;
-        int fracNeedMore = 30;
-        int fracFine = 15;
-        int[] diffs = new int[target.nbNode];
-        int offsetNotEnought = 100 - fracToMany - fracNeedMore;
+       // int fracToMany = 1;
+      //  int fracNeedMore = 30;
+      //  int fracFine = 15;
+
+       // int offsetNotEnought = 100 - fracToMany - fracNeedMore;
 
         // Liste de pourcentage de manquement pour atteindre le bon # noeud par degré
         for (int i = 0; i < target.nbNode; i++) {
             // Si la diff est négative, on a trop de lien. pourcentage "négatif". Si positif, il en manque. Si zero, on en a le bon nombre. Wanted
             // est à +1 pour pouvoir diviser directement
             diff = ddwanted[i] - ddActual[i];
+            ddDiff[i] = diff;
             sum += diff;
-            diffs[i] = sum;
 
-            // Si le noeud a trop de lien
-            if (diff < 0) {
-                pourcent = (-1. / diff ) * fracToMany; // plus la diff est grand plus on arriver vers 0%
-            }
-            // Si le noeud manque de lien
-            else if (diff > 0) {
-                pourcent = ((double) diff / ddwanted[i]) * fracNeedMore + offsetNotEnought; // Ratio a quel point il manque de noeud
-            }
-            // Si on a le bon nombre de noeud
-            else {
-                pourcent = fracFine;
-            }
-
-            ddDiffRatio[i] = pourcent;
-
-            // Tableau de transition
-            // Pour la premiere case, donc les noeuds a degré un, ca sera de tte facon rempli en premier avec le premier ajout
-
-            if (i == 0) { // sera mis a jour a la prochaine itération ( inutile )?
-                ddTransitionRatio[i] = fracFine; // Fine pour l'ajout
-            }
-            else {
-                // on utilise le ratio du degré courant et du suivant pour déterminer le bénéfice d'un ajout de lien
-                // donc en pratique du courant et du précédent pour déterminer la valeur sur le précédent
-                // a quelle point on manque du ratio courant - a quelle point le précédent est réalisé
-                // aucune valeur a 0%
-                pourcent = ((double) (ddDiffRatio[i - 1] + ddDiffRatio[i]) / 2);
-                ddTransitionRatio[i - 1] = pourcent;
-
-
-            }
-            // sur la derniere itération on set aussi le pourcentage courant
-            if (i == target.nbNode - 1) {
-                ddTransitionRatio[i] = fracFine; // Utilisé pour évalué a qui s'ajouter
-                pourcent = ((double) (ddDiffRatio[i - 1] + ddDiffRatio[i]) / 2);
-            }
-        }
-
-        kvDdDiffRatio.clear();
-
-        for (int i = 0; i < ddDiffRatio.length; i++) {
-            kvDdDiffRatio.put(i, ddDiffRatio[i]);
-            kvDdTrRatio.put(i, ddTransitionRatio[i]);
+            kvDegreeDiff.put(i, diff);
+            kvDegreeSumDiffAsc.put(i, sum);
         }
 
 
