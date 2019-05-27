@@ -74,7 +74,8 @@ public class Interfaces {
 		 void incrementNbAction();
 	}
 	
-	/** Interface qui définit les actions possibles sur l'IHM
+	/** Interface qui définit les actions possibles sur l'IHM ou autre
+	 * type de vue. ( fichier, console, IHM )
 	 *
 	 */
 	public interface IView {

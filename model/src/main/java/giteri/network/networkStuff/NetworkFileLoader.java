@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Optional;
-import javax.swing.JFrame;
 import giteri.tool.math.Toolz;
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.network.NetworkProperties;

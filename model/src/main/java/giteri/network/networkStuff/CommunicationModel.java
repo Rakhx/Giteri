@@ -2,6 +2,7 @@ package giteri.network.networkStuff;
 
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
+import giteri.network.network.Network;
 import giteri.network.network.NetworkProperties;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.FittingBehavior;
@@ -10,7 +11,10 @@ import giteri.run.controller.Controller.VueController;
 import giteri.run.interfaces.Interfaces.IModel;
 import giteri.run.interfaces.Interfaces.IReadNetwork;
 import giteri.run.interfaces.Interfaces.StatAndPlotInterface;
+import giteri.tool.other.WriteNRead;
+import org.graphstream.graph.Graph;
 
+import java.io.IOException;
 import java.util.*;
 
 /** Classe de représentation du modèle proposé via un controller
@@ -32,6 +36,7 @@ public class CommunicationModel implements IModel {
 	 */
 	public CommunicationModel(EntiteHandler eh,
 							  NetworkConstructor nc,
+							  // TODO pas propre la facon dont la lecture d'un file est réalisée
 							  NetworkFileLoader ln,
 							  WorkerFactory wf,
 							  StatAndPlotInterface calculator ) {
@@ -122,6 +127,14 @@ public class CommunicationModel implements IModel {
 	 */
 	public void displayInput(){
 
+
+		WriteNRead wr = new WriteNRead();
+		try {
+			wr.readAndCreateNetwork(Configurator.defaultPathForReadingNetwork,nl," ","#");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		nl.getGraphFromDataRead();
 	}
 
 	public void rdmConfig(){
