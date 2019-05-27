@@ -756,14 +756,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			if (Configurator.semiStepProgression)
 			{
 				giveEntiteBaseColor();
-				System.out.println("Remise a zero des couleurs");
 				if (filterOnSemiAuto(null, null))
 					pauseStepInSemiAutoAction();
 			}
 		}
-
-//		vueController.displayInfo("Density", Arrays.asList(""+networkConstruct.updatePreciseNetworkProperties
-//				(Configurator.getIndicateur(NetworkAttribType.DENSITY)).getDensity() ));
 
 		workerFactory.getCalculator().incrementNbAction();
 		return rez.stream().reduce(String::concat).toString();

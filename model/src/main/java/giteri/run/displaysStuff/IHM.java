@@ -403,11 +403,10 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		JTabbedPane jTabPane = createMainFrame();
-		jTabPane.addTab("Stat", createPaneStat());
-		// TODO ici pour la pan simulation
-		jTabPane.addTab("Simulation", createPaneSimulation());
-		jTabPane.addTab("Comparaison", createPaneNetworkFitting());
-		jTabPane.addTab("Network Generator", createPaneNetworkGenerator());
+		jTabPane.addTab("Général", createPaneStat());
+		jTabPane.addTab("Répartition des complexe-actions (%)", createPaneSimulation());
+		jTabPane.addTab("Comparaison de réseaux", createPaneNetworkFitting());
+		jTabPane.addTab("Générateur de réseaux", createPaneNetworkGenerator());
 
 		associateKeyBinding(jTabPane);
 		associateComportementToButton();
@@ -441,7 +440,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		btStep = new JButton("STEP");
 		btDisplayDD = new JButton("DisplayDD");
 		btScreenshot = new JButton("screenshot");
-		btReset = new JButton("RESET");
+		btReset = new JButton("Disponible");
 
 		// Réunion des éléments dans le layout principale
 		int totalWidth = 1300;
@@ -491,11 +490,11 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		jpPaneTwo.setLayout(new BoxLayout(jpPaneTwo, BoxLayout.Y_AXIS));
 
 		// Series
-		seriesDegreeDistribution = new XYSeries("First");
+		seriesDegreeDistribution = new XYSeries("Nombre de noeuds@degré");
 		final XYSeriesCollection dataset = new XYSeriesCollection();
 		dataset.addSeries(seriesDegreeDistribution);
 
-		seriesDensity = new XYSeries("Second");
+		seriesDensity = new XYSeries("Densité du réseau@time");
 		final XYSeriesCollection datasetDensity = new XYSeriesCollection();
 		datasetDensity.addSeries(seriesDensity);
 
@@ -565,7 +564,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		JPanel paneThree = new JPanel();
 		paneThree.setLayout(new BoxLayout(paneThree, BoxLayout.Y_AXIS));
 
-		launchSimu = new JButton("GoW");
+		launchSimu = new JButton("Disponible");
 		intervalDef = new JTextField();
 		regexRule = new JLabel("0.xx ou [0.Y1]:O.X1;[0.Y2]:0.X2");
 		regexCor = new JLabel("Correct");
@@ -1092,9 +1091,9 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	private JFreeChart createChartMemeAppliance(final XYDataset dataset) {
 		// create the chart...
 		final JFreeChart chart = ChartFactory.createXYLineChart(
-				"Meme appliance in volume of direct", // chart title
-				"evaporation", // x axis label
-				"Density", // y axis label
+				"% de possession des complexe-actions", // chart title
+				"temps", // x axis label
+				"% de possession", // y axis label
 				dataset, // data
 				PlotOrientation.VERTICAL, true, // include legend
 				true, // tooltips
@@ -1137,9 +1136,9 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		// create the chart...
 		final JFreeChart chart = ChartFactory.createXYLineChart(
-				"Density over time", // chart title
-				"time", // x axis label
-				"Density", // y axis label
+				"Evolution de la densité", // chart title
+				"Temps de mesure", // x axis label
+				"Densité", // y axis label
 				dataset, // data
 				PlotOrientation.VERTICAL, true, // include legend
 				true, // tooltips
@@ -1182,9 +1181,9 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		// create the chart...
 		final JFreeChart chart = ChartFactory.createXYLineChart(
-				"Degree Distribution", // chart title
-				"Degree", // x axis label
-				"Nb of nodes", // y axis label
+				"Distribution de degré", // chart title
+				"Degré", // x axis label
+				"#Noeuds", // y axis label
 				dataset, // data
 				PlotOrientation.VERTICAL, true, // include legend
 				true, // tooltips
@@ -1531,9 +1530,11 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		}
 	}
 
-	/** TODO Working on meme appliance
+	/** Ajoute une timestep au plotting de meme possession. Si c'est une nouvelle configuration, ajoute
+	 * d'abord la série a la chart.
 	 *
-	 * @param time
+	 * @param time timestamp d'affichage
+	 * @param kvIndexValue k: meme, v: pourcentage de possession sur la map. mise à jour dans l'entité handler.OneStep()
 	 */
 	public void addValueToApplianceSerie(double time, Map<Meme, Double> kvIndexValue){
 		if(firstAppliance){
@@ -1543,6 +1544,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		String keyMeme;
 
+		// Pour chaque meme, on trouve la traduction en langage lisible, et on cherche la série correspondante.
 		for (Meme meme : kvIndexValue.keySet()) {
 			keyMeme = entiteHandler.translateMemeCombinaisonReadable((meme.toFourCharString()));
 			for (XYSeries arraySeriesMemeAppliance : ArraySeriesMemeAppliances) {
