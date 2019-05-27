@@ -92,7 +92,8 @@ public class Controller {
 		}
 
 
-		/** ajoute une série de valeur pour le time T
+		/** ajoute une série de valeur pour le time T -
+		 * si les séries n'existent pas elles sont crées
 		 *
 		 * @param time
 		 * @param values

@@ -81,7 +81,7 @@ public final class Configurator {
 	public static boolean displayFittingProviderApplied = fullSilent ? false : true;	// affiche dans la console apprlications des params:
 	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
-	public static int activationCodeForView = fullSilent? 0 : 6;
+	public static int activationCodeForView = fullSilent? 0 : 5;
 
 	public static boolean displayMemePossessionEvolution = true && !fullSilent; // !fullSilent;
 

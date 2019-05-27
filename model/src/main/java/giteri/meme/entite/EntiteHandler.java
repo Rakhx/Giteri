@@ -60,6 +60,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private static int indexOfMemesCombinaisonRecursion;
 	private long atmLastTime;
 	private int cptModulo;
+	private int cptMemePossession;
 	private int cptActionAddTried = 1, cptActionRmvTried = 1,cptActionAddFail = 1, cptActionRmvFail = 1;
 	private ActionType lastAction = ActionType.RETRAITLIEN;
 	private int nbActionBySecond;
@@ -173,11 +174,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			if(Configurator.displayMemePossessionEvolution){
 				kvMemeCodeNbEntities.clear();
 				for (Meme meme : memeProperties.countOfEntitiesHavingMeme.keySet()) {
-					kvMemeCodeNbEntities.put(meme,
-							(double)memeProperties.countOfEntitiesHavingMeme.get(meme) / entites.size());
+					kvMemeCodeNbEntities.put(meme, (double)memeProperties.countOfEntitiesHavingMeme.get(meme) / entites.size());
 				}
 
-				vueController.addValueToApplianceSerie(cptModulo, kvMemeCodeNbEntities);
+				vueController.addValueToApplianceSerie(++cptMemePossession, kvMemeCodeNbEntities);
 			}
 
 			if (Configurator.displayLogAvgDegreeByMeme)
@@ -657,103 +657,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		return resultat;
 	}
-
-//	/**
-//	 *
-//	 * @param param
-//	 * @param forRepetition si pour répetition, valeur de la répétition, sinon, celui des répétitions du runs
-//	 * @return
-//	 */
-//	public String getStringHeaderMemeDetail(List<IModelParameter<?>> param, boolean forRepetition){
-//		String header = "Run-Rep";
-//		for (IModelParameter<?> model :param)
-//			header += ";" + model.nameString();
-//
-//		// CALCUL DES INDICATEURS A ECRIRE
-//
-//		// La liste des memes courant devrait etre a jour, apply fait avant dans la fitting classe
-//		for (Meme meme:memeFittingApplied) {
-//			header += ";Meme[";
-//			header += meme.toFourCharString() +":";
-//			header += "]-nbEntiteOwning";
-//			if(forRepetition)
-//				header += ";SD";
-//			header += ";last X appli."; // Nombre / X + pourcentage
-//			if(forRepetition)
-//				header += ";SD";
-//		}
-//
-//		return header;
-//	}
-
-//	public String getStringHeaderCombinaison(List<IModelParameter<?>> param, boolean forRepetition){
-//		String header = "Run-Rep";
-//		for (IModelParameter<?> model :param)
-//			header += ";" + model.nameString();
-//
-//		// combinaison de meme présent sur le run, classé par type d'action
-//		Hashtable<ActionType, ArrayList<Meme>> memesByCategory = new Hashtable<>();
-//		for (Meme meme: this.memeFittingApplied)
-//			Toolz.addElementInHashArray(memesByCategory,meme.getAction().getActionType(),meme);
-//		memeCombinaisonFittingAvailable = this.getMemeAvailable(FittingBehavior.simpleAndComplex,Optional.of(memesByCategory));
-//
-//		// La liste des memes courant devrait etre a jour, apply fait avant dans la fitting classe
-//		for (Integer i:memeCombinaisonFittingAvailable.keySet()) {
-//			header += ";Meme[";
-//			for (Meme meme:memeCombinaisonFittingAvailable.get(i)) {
-//				header += meme.toFourCharString() +":";
-//			}
-//
-//			header += "]-nbEntiteOwning";
-//			if(forRepetition)
-//				header += ";SD";
-//			header += ";last X appli."; // Nombre / X + pourcentage
-//
-//		}
-//
-//		return header;
-//	}
-//
-//	public String getStringToWriteMemeDetails(File rep, int numeroRun, int numeroRep, IExplorationMethod explorator){
-//		String toWrite ="";
-//		toWrite += numeroRun + "-" + numeroRep;
-//
-//		// Config du fitting
-//		for (IModelParameter<?> model : explorator.getModelParameterSet())
-//			toWrite += ";" + model.valueString();
-//
-//		// detail sur les memes
-//		List<Meme> combinaisonLookedAt;
-//		int nbEntitesOwning;
-//		for (Integer i: memeCombinaisonFittingAvailable.keySet()){
-//			nbEntitesOwning = 0;
-//			combinaisonLookedAt = memeCombinaisonFittingAvailable.get(i);
-//			for (Entite entite: entitesActive) {
-//				if(entite.getMyMemes().containsAll(combinaisonLookedAt)){
-//					nbEntitesOwning++;
-//				}
-//			}
-//
-//			toWrite += ";Meme[";
-//			for (Meme meme:memeCombinaisonFittingAvailable.get(i)) {
-//				toWrite += meme.toFourCharString() +":";
-//			}
-//
-//			toWrite += "]-" + nbEntitesOwning;
-//		}
-//
-//		return toWrite;
-//	}
-//
-//	public String getStringToWriteMemeCombinaison(int numeroRun, int numeroRep,  IExplorationMethod explorator){
-//
-//	}
-//	// les entités du réseau
-//	protected Set<Entite> entites;
-//	// Entite possedant des actions
-//	private ArrayList<Entite> entitesActive;
-
-//	private Hashtable<String, String> memeTranslationReadable;
 
 	//endregion
 

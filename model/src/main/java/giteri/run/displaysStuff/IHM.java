@@ -78,15 +78,15 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	//<editor-fold desc="Properties">
 
 	// action , attribut, aggrgator factory
-	MemeFactory memeFactory;
+	private MemeFactory memeFactory;
 
 	// networkConstructor, memeFactory, WorkerFactory
-	EntiteHandler entiteHandler;
+	private EntiteHandler entiteHandler;
 
 	// Huml, devrait passer par communicationModel
-	Interfaces.DrawerNetworkInterface drawerGraphStream;
+	private Interfaces.DrawerNetworkInterface drawerGraphStream;
 
-	WriteNRead writeNRead;
+	private WriteNRead writeNRead;
 
 	// à voir avec les éléments d'interface
 	private static final int IFW = JComponent.WHEN_IN_FOCUSED_WINDOW;
@@ -94,92 +94,93 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 	// -- Panel un
 	private static final long serialVersionUID = 1L;
-	public JButton btPause;
-	public JButton btStep;
-	public JButton btDisplayDD;
-	public JButton btScreenshot;
-	public JButton btReset;
+	private JButton btPause;
+	private JButton btStep;
+	private JButton btDisplayDD;
+	private JButton btScreenshot;
+	private JButton btReset;
 
 	// -- Panel Stat
 	JPanel jpPaneTwo;
-	public JLabel jlDensityLabel;
-	public JLabel jlDensityMaxLabel;
-	public JLabel jlDensitySD;
-	public double densityMaxValue;
-	public double sdDensity;
+	private JLabel jlDensityLabel;
+	private JLabel jlDensityMaxLabel;
+	private JLabel jlDensitySD;
+	private double densityMaxValue;
+	private double sdDensity;
 	private ArrayList<Double> densityValues;
 	private double densityValue;
 	private double temp = 0.;
 
-	public Hashtable<String, JLabel> times;
-	public JLabel time1, time2, time3, time4, time5;
-	public JLabel nbActionBySecond;
-	public JFormattedTextField probaEvap;
-	public JLabel validated;
-	public Icon ok;
-	public Icon nope;
+	private Hashtable<String, JLabel> times;
+	private JLabel time1, time2, time3, time4, time5;
+	private JLabel nbActionBySecond;
+	private JFormattedTextField probaEvap;
+	private JLabel validated;
+	private Icon ok;
+	private Icon nope;
 
 	// -- Panel simulation
-	public JButton launchSimu;
-	public JTextField intervalDef;
-	public JLabel regexRule;
-	public JLabel regexCor;
+	private JButton launchSimu;
+	private JTextField intervalDef;
+	private JLabel regexRule;
+	private JLabel regexCor;
 
 	// -- Panel lecture de réseau
-	public JPanel plNetworkPlaying;
-	public JPanel plNetworkRead;
-	public JButton btFile;
-	public JButton btAnalyze;
-	public JButton btFitting;
-	public JButton btDisplayInput;
-	public JButton btNextStep;
-	public JButton bFittingOneStep;
-	public JButton btSpecificConfig;
-	public JButton btSemiAutomaticStep;
+	private JPanel plNetworkPlaying;
+	private JPanel plNetworkRead;
+	private JButton btFile;
+	private JButton btAnalyze;
+	private JButton btFitting;
+	private JButton btDisplayInput;
+	private JButton btNextStep;
+	private JButton bFittingOneStep;
+	private JButton btSpecificConfig;
+	private JButton btSemiAutomaticStep;
 
-	public JTextField tfPath;
-	public JLabel jlWorkInProgress;
+	private JTextField tfPath;
+	private JLabel jlWorkInProgress;
 
-	public JLabel jlScore;
+	private JLabel jlScore;
 
 	// -- Panel génération de réseau
-	public JButton btGenerateEmptyNetwork;
-	public JButton btGenerateFiftyNetwork;
-	public JButton btGenerateFullNetwork;
-	public JButton btGenerateScaleFreeNetwork;
-	public JButton btGenerateSmallWorldNetwork;
-	public JButton btGenerateCompleteNetwork;
-	public JButton btPurgeLinks;
+	private JButton btGenerateEmptyNetwork;
+	private JButton btGenerateFiftyNetwork;
+	private JButton btGenerateFullNetwork;
+	private JButton btGenerateScaleFreeNetwork;
+	private JButton btGenerateSmallWorldNetwork;
+	private JButton btGenerateCompleteNetwork;
+	private JButton btPurgeLinks;
 
 	// Les labels qui affichent les informations sur les nodes possédant les
 	// memes,
 	// le nombre d'activation d'un meme, et les X dernières activation en terme
 	// de meme
-	public Hashtable<String, JLabel> nodesHavingXoxoMemesLabel;
-	public Hashtable<String, JLabel> nbActivationByMemesLabel;
-	public Hashtable<String, JLabel> nbLastActivationByMemesLabel;
-	public Hashtable<String, Meme> memesTitle;
-	public JLabel lastActionRatioLabel;
+	private Hashtable<String, JLabel> nodesHavingXoxoMemesLabel;
+	private Hashtable<String, JLabel> nbActivationByMemesLabel;
+	private Hashtable<String, JLabel> nbLastActivationByMemesLabel;
+	private Hashtable<String, Meme> memesTitle;
+	private JLabel lastActionRatioLabel;
 
 	// a voir avec les structures de données
 
 	// Correspondance entre un meme et les memes le possédant
-	public Hashtable<String, ArrayList<Integer>> nodesHavingXoxoMemes;
+	private Hashtable<String, ArrayList<Integer>> nodesHavingXoxoMemes;
 	// Nombre de fois ou le meme a été appelé
-	public Map<String, Integer> nbActivationByMemes;
+	private Map<String, Integer> nbActivationByMemes;
 	// Nombre de fois ou le meme a été appelé sur les 20 dernieres actions
-	public Map<String, Integer> countOfLastMemeActivation;
+	private Map<String, Integer> countOfLastMemeActivation;
 	// Sur les 100 dernières actions, quel meme a été appelé
-	public List<String> lastHundredActionDone;
-	public int sizeOfCircularQueue = 100;
+	private List<String> lastHundredActionDone;
+	private int sizeOfCircularQueue = 100;
 
 	// Séries de donnée pour l'affichage des graphiques
-	XYSeries seriesDegreeDistribution;
-	XYSeries seriesDensity;
-	ArrayList<XYSeries> ArraySeriesMemeAppliances;
-	XYSeriesCollection datasetMemeAppliance;
+	private XYSeries seriesDegreeDistribution;
+	private XYSeries seriesDensity;
+	private ArrayList<XYSeries> ArraySeriesMemeAppliances;
+	private XYSeriesCollection datasetMemeAppliance;
 
-	boolean firstAppliance = true;
+	// Lorsque c'est la 1er fois qu'une fonction d'écriture est appelée, création des séries.
+	private boolean firstAppliance = true;
 
 
 	// Chart de l'IHM
@@ -1357,56 +1358,27 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	/** Retire et ajouter X serie d'un coup
 	 *
 	 */
-	private void addXYseriesMemeAppliance(){
-		int numbSerie = 0;
-		ArraySeriesMemeAppliances.add(new XYSeries(ArraySeriesMemeAppliances.size()));
-		datasetMemeAppliance.removeAllSeries();
-		Meme memeConcerne;
-		String labelSerie;
-		Color serieColor;
-		// Pour chaque série qu'on veut ajouter
-		for (XYSeries serie : ArraySeriesMemeAppliances) {
-			// on crée les série dans l'ordre a partir de 0 et regarde le meme associé a cet index dans MemeFactory
-			memeConcerne = memeFactory.getMemeFromIndex(numbSerie);
-			if(memeConcerne != null){
-				// label son petit nom
-				labelSerie = entiteHandler.translateMemeCombinaisonReadable(memeConcerne.toFourCharString());
-				// Couleur associé a cet index
-				serieColor = drawerGraphStream.getColorAsColor(numbSerie);
-			}
-			else{
-				labelSerie = numbSerie+"";
-				serieColor = new Color(0, 0, 0);
-			}
-
-			serie.setKey(labelSerie);
-			datasetMemeAppliance.addSeries(serie);
-			chartMemeAppliance.getXYPlot().getRenderer().setSeriesPaint(numbSerie, serieColor);
-			numbSerie++;
-		}
-	}
-
-	/** Retire et ajouter X serie d'un coup
-	 *
-	 */
 	private void addXYseriesMemeApplianceWMeme(Set<Meme> memes){
 		datasetMemeAppliance.removeAllSeries();
 		String labelSerie;
 		Color serieColor;
 		int serieIndex;
+
 		// Pour chaque série qu'on veut ajouter
 		for (Meme meme : memes) {
+			labelSerie = entiteHandler.translateMemeCombinaisonReadable(meme.toFourCharString());
+
 			// on crée les série dans l'ordre a partir de 0 et regarde le meme associé a cet index dans MemeFactory
-			XYSeries aSerie = new XYSeries(meme);
+			XYSeries aSerie = new XYSeries(labelSerie);
 			serieIndex = memeFactory.getIndexFromMeme(meme);
 			// label son petit nom
-			labelSerie = entiteHandler.translateMemeCombinaisonReadable(meme.toFourCharString());
 			// Couleur associé a cet index
 			serieColor = drawerGraphStream.getColorAsColor(serieIndex);
 			chartMemeAppliance.getXYPlot().getRenderer().setSeriesPaint(serieIndex, serieColor);
 			// serie.setKey(labelSerie);
 			datasetMemeAppliance.addSeries(aSerie);
 			ArraySeriesMemeAppliances.add(aSerie);
+
 		}
 	}
 
@@ -1559,45 +1531,25 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		}
 	}
 
-//	/** TODO Working on meme appliance
-//	 *
-//	 * @param time
-//	 */
-//	public void addValueToApplianceSerie(double time, Map<Integer, Double> kvIndexValue){
-//
-//		if(firstAppliance){
-//			int diff = kvIndexValue.size() - datasetMemeAppliance.getSeriesCount();
-//			int cpt = 0;
-//			for (int i = 0; i < diff; i++) {
-//				addXYseriesMemeAppliance();
-//			}
-//			firstAppliance = false;
-//		}
-//
-//		for (int indexMeme : kvIndexValue.keySet()) {
-//			ArraySeriesMemeAppliances.get(indexMeme).add(time, kvIndexValue.get(indexMeme));
-//		}
-//	}
-
 	/** TODO Working on meme appliance
 	 *
 	 * @param time
 	 */
 	public void addValueToApplianceSerie(double time, Map<Meme, Double> kvIndexValue){
-
-
 		if(firstAppliance){
 			addXYseriesMemeApplianceWMeme(kvIndexValue.keySet());
 			firstAppliance = false;
 		}
 
-		Meme keyMeme;
+		String keyMeme;
 
-		for (XYSeries arraySeriesMemeAppliance : ArraySeriesMemeAppliances) {
-				keyMeme = (Meme)arraySeriesMemeAppliance.getKey();
-				arraySeriesMemeAppliance.add(time, kvIndexValue.get(keyMeme));
+		for (Meme meme : kvIndexValue.keySet()) {
+			keyMeme = entiteHandler.translateMemeCombinaisonReadable((meme.toFourCharString()));
+			for (XYSeries arraySeriesMemeAppliance : ArraySeriesMemeAppliances) {
+				if(keyMeme.compareToIgnoreCase((String)arraySeriesMemeAppliance.getKey()) == 0)
+					arraySeriesMemeAppliance.add(time, kvIndexValue.get(meme));
+			}
 		}
-
 	}
 
 	/**
