@@ -1,0 +1,23 @@
+// A lancer depuis le folder model pour compiler
+sbt osgiBundle
+// => $ [info] Packaging C:\Users\John\IdeaProjects\Giteri\model\target\scala-2.12\giteri_2.12-1.0-SNAPSHOT.jar ...
+
+
+//exemple de param pour lancer les trucs
+".\.\src\main\resources\default.txt" 1 1 1 1 1 1 1 1 1 .0 .1 .2 .3 .4 .5 .6 .7 .8
+ java -cp giteri_2.12-1.0-SNAPSHOT.jar giteri.run.jarVersion.JarVersion ".\.\src\main\resources\default.txt" 1 1 1 1 1 1 1 1 1 .0 .1 .2 .3 .4 .5 .6 .7 .8
+ java -cp giteri_2.12-1.0-SNAPSHOT.jar giteri.run.jarVersion.JarVersion "../../default.txt" 1 1 1 1 1 1 1 1 1 .0 .1 .2 .3 .4 .5 .6 .7 .8
+ 
+//Lancement d'open avec le jar en plugin
+ openmole -p C:\Users\John\IdeaProjects\Giteri\model\target\scala-2.12\giteri_2.12-1.0-SNAPSHOT.jar
+ 
+ 
+// Clean du jar et des résultats écrits depuis le jar
+rm -rf C:\Users\John\IdeaProjects\Giteri\Stability C:\Users\John\IdeaProjects\Giteri\model\target
+
+// Quel complexe action // position dans la liste d'activation et proba de propagation
+[;.AddØ-Hop-0.0;.Add+-0.1;.Add--0.2;.Add∞-0.3;.AddØ-0.4;.RmvØ-2hop-0.5;.RmvØ-0.6;.Rmv+-0.7;.Rmv--0.8]
+       1			2		3			4			5		6				7		8			9
+
+	   
+	   Scoring

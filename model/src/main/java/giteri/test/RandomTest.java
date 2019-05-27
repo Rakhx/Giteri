@@ -1,14 +1,26 @@
 package giteri.test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class RandomTest {
     public static void main(String[] args)  {
 
-        Double kiki = 4.;
-        if(true)
-            kiki = lolade();
-        System.out.println(kiki);
+        List<Number> listNombre;
+
+        listNombre = new ArrayList<>();
+        Double aDouble = 2.;
+        listNombre.add((Number)aDouble);
+
+        System.out.println(listNombre.get(0) instanceof Double ? ((Number) listNombre.get(0)) : "non");
+
+
+//        // ref vs valeur
+//        Double kiki = 4.;
+//        if(true)
+//            kiki = lolade();
+//        System.out.println(kiki);
 
 
 //        int rez1, rez2, rez3, succes = 0;

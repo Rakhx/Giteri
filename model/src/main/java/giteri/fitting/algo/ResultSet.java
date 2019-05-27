@@ -188,7 +188,7 @@ public class ResultSet extends Hashtable<Integer, Result> {
 		netSD.createStub();
 
 		NetworkAttribType attribut;
-		ArrayList<Double> netPropValues = new ArrayList<>();
+		ArrayList<Number> netPropValues = new ArrayList<>();
 
 		// On regarde sur tous les attributs de réseau ceux qui ont été activé
 		// pour le calcul de distance entre deux réseaux
@@ -204,7 +204,7 @@ public class ResultSet extends Hashtable<Integer, Result> {
 				// On regarde tous les réseaux en param
 				for (NetworkProperties netProp : networksToRead)
 					// Ajout de ces valeurs dans une liste
-					netPropValues.add((Double) netProp.getValue(attribut));
+					netPropValues.add( (Number) netProp.getValue(attribut));
 
 				// calcul des moyennes et écart type sur les valeurs données dans la liste
 				Double[] avgNSd = Toolz.getMeanAndSd(netPropValues);
