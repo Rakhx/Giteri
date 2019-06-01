@@ -25,6 +25,7 @@ import giteri.run.configurator.Configurator.NetworkAttribType;
 import giteri.run.configurator.Configurator.MemeList;
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import static giteri.run.configurator.Configurator.debugJarMode;
 
@@ -56,6 +57,9 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	boolean debug = Configurator.debugStatAndPlot;
 
 	//region structure de données
+
+	private int nbEltCirDensity = 100;
+	private CircularFifoQueue<Double> cfqDensityOnFitting = new CircularFifoQueue<>(nbEltCirDensity);
 
 	//endregion
 
@@ -323,6 +327,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			for (int i = 0; i < config.nbRepetitionByConfig; i++)
 			{
 				config.newRepetition();
+				cfqDensityOnFitting.clear();
 				do
 				{
 					config.com.view.displayMessageOnFitPanel("Work In Progress");
@@ -338,12 +343,13 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 						}while(nbActionPassee <= config.nbActionByStep);
 
 						NetworkProperties np = networkConstructor.updatePreciseNetworkProperties(Configurator.getIndicateur(NetworkAttribType.DENSITY));
-						config.addDensity(np.getDensity());
+						cfqDensityOnFitting.add(np.getDensity());
 						config.computeMemeAppliance();
 						resetNbAction();
 					}
 
-					debugBeforeSkip = config.continuFittingSimpliestVersion();
+//					debugBeforeSkip = config.continuFittingSimpliestVersion();
+					debugBeforeSkip =config.continuFitting(cfqDensityOnFitting);
 
 					if(!debugBeforeSkip){
 						if(debug) System.out.println("Voudrait passer au step suivant");

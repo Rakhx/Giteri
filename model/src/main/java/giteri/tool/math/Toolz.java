@@ -405,18 +405,18 @@ public class Toolz {
 		Double avg = 0., sd = 0.;
 		double sumFreq = 0;
 		for (T value : entry)
-			sumFreq += (Double)value;
-		
+			sumFreq += new Double(value.toString());
+
 		avg = sumFreq / entry.size();
 				
 		for (T value : entry) 
-			sd +=  Math.pow( (Double)value - avg, 2);
+			sd +=  Math.pow( new Double(value.toString()) - avg, 2);
 		
 		sd /= entry.size();
 		sd = Math.sqrt(sd);
 		return new Double[]{avg, sd};
 	}
-	
+
 	/** Obtenir l'écart type des valeurs autour de la moyenne, fourni en paramètre ou non.
 	 * @param entry key = un nombre value = sa fréquence
 	 * @param avg

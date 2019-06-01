@@ -43,6 +43,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private ArrayList<Entite> entitesActive;
 	private Hashtable<String, String> memeTranslationReadable;
 	private List<Meme> memeFittingApplied;
+
 	private boolean allTransmitted = false;
 	private boolean allAddTransmitted = false;
 	private boolean allrmvTransmitted = false;
@@ -170,36 +171,36 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 						memeProperties.countOfLastMemeActivation,
 						memeProperties.lastHundredActionDone); }
 
+			if (cptModulo % (Configurator.refreshInfoRate * 200) == 0)
+				if(Configurator.displayMemePossessionEvolution){
+					kvMemeCodeNbEntities.clear();
+					for (Meme meme : memeProperties.countOfEntitiesHavingMeme.keySet()) {
+						kvMemeCodeNbEntities.put(meme, (double)memeProperties.countOfEntitiesHavingMeme.get(meme) / entites.size());
+					}
 
-			if(Configurator.displayMemePossessionEvolution){
-				kvMemeCodeNbEntities.clear();
-				for (Meme meme : memeProperties.countOfEntitiesHavingMeme.keySet()) {
-					kvMemeCodeNbEntities.put(meme, (double)memeProperties.countOfEntitiesHavingMeme.get(meme) / entites.size());
+					vueController.addValueToApplianceSerie(++cptMemePossession, kvMemeCodeNbEntities);
 				}
 
-				vueController.addValueToApplianceSerie(++cptMemePossession, kvMemeCodeNbEntities);
-			}
-
 			if (Configurator.displayLogAvgDegreeByMeme)
-				vueController.displayInfo("AvgDgrByMeme", Arrays.asList(checkPropertiesByMemePossession()));
+				vueController.displayInfo(viewMessageType.AVGDGRBYMEME.toString(), Arrays.asList(checkPropertiesByMemePossession()));
 		}
 
 		// Verification de la propagation totale des memes initiaux
 		if(!allTransmitted && Configurator.checkWhenFullPropagate && cptModulo % Configurator.checkFullProRefreshRate == 0) {
 			if(areAllMemeTransmitted()) {
                 allTransmitted = true;
-                vueController.displayInfo("Propagation", Arrays.asList("ALL TRANSMISTED IN ;" + cptModulo));
+                vueController.displayInfo(viewMessageType.PROPAGATION.toString(), Arrays.asList("ALL TRANSMISTED IN ;" + cptModulo));
 			}
 
 			int resDetail = areAllMemeTransmittedDetails();
 			if ((resDetail & 1) == 1){
 				System.out.println("all add transmitted");
-				vueController.displayInfo("Propagation", Arrays.asList("ALL ADD TRANSMISTED IN ;" + cptModulo));
+				vueController.displayInfo(viewMessageType.PROPAGATION.toString(), Arrays.asList("ALL ADD TRANSMISTED IN ;" + cptModulo));
 				allAddTransmitted =true;
 			}
 			if((resDetail & 2) == 2) {
 				System.out.println("all rmv transmitted");
-				vueController.displayInfo("Propagation", Arrays.asList("ALL RMV TRANSMISTED IN ;" + cptModulo));
+				vueController.displayInfo(viewMessageType.PROPAGATION.toString(), Arrays.asList("ALL RMV TRANSMISTED IN ;" + cptModulo));
 				allrmvTransmitted = true;
 			}
 			if((resDetail & 3) == 3){
@@ -224,25 +225,23 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	}
 
 	/**
-	 * fonction qui va forcer chaque entité a essayer chacune des actions de son
+	 * fonction qui va forcer chaque entité à essayer chacune des actions de son
 	 * panel. La fonction s'arrête si une action est effectivement réalisée. Si
-	 * aucune action n'a pu effectivement etre réalisée, la fonction renvoi
+	 * aucune action n'a pu effectivement etre réalisée, la fonction renvoie
 	 * false. Permet de débloquer des situations. l'ordre d'appel des agents est
 	 * volontairement aléatoire.
 	 *
 	 */
 	public boolean forceAction() {
 		boolean actionDone = false;
-		ArrayList<Integer> nodeIndex = new ArrayList<Integer>();
-		for (int i = 0; i < entites.size(); i++)
-			nodeIndex.add(i);
-		Toolz.unsortArray(nodeIndex);
-		Entite acting;
+		ArrayList<Entite> nodes = new ArrayList<>();
+		nodes.addAll(entites);
+		Toolz.unsortArray(nodes);
 		String resultat;
-
 		List<Meme> myMemes ;
 
-		for (Entite entite : entites) {
+		// Version random dans l'ordre des entités.
+		for (Entite entite : nodes) {
 			// copie la liste pour éviter des deadlocks avec la fonction redefineProba
 			// si on arrive a forcer une action et cette action se transmettre.
 			myMemes = entite.getMyMemes();
@@ -256,6 +255,23 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 
 		return actionDone;
+
+
+		// Version not random.
+//		for (Entite entite : entites) {
+//			// copie la liste pour éviter des deadlocks avec la fonction redefineProba
+//			// si on arrive a forcer une action et cette action se transmettre.
+//			myMemes = entite.getMyMemes();
+//			for (Meme action : myMemes) {
+//				resultat = doAction(entite, action);
+//				if (!resultat.contains("Nope") && !resultat.contains("NOACTION")) {
+//					actionDone = true;
+//					return actionDone;
+//				}
+//			}
+//		}
+//
+//		return actionDone;
 	}
 
 	// TODO REFACTORING A voir pour le positionnement de l'appel à cette fonction.
@@ -658,6 +674,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		return resultat;
 	}
 
+	public boolean memeAllTransmitted() {
+		return allTransmitted;
+	}
+
 	//endregion
 
 	//region PRIVATE
@@ -742,7 +762,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 						//vueController.displayInfo("FAILSTUFF", Arrays.asList("" + sumFailAction));
 
 						if(Configurator.writeFailDensityLink)
-							vueController.displayInfo("failXDensity", getFailXDensity( nbFail.getValue(),
+							vueController.displayInfo(viewMessageType.FAILXDENSITY.toString(), getFailXDensity( nbFail.getValue(),
 									networkConstruct.updatePreciseNetworkProperties
 											(Configurator.getIndicateur(NetworkAttribType.DENSITY)).getDensity(),sumFailAction));
 					}
@@ -750,7 +770,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			}
 
 			if(!toDisplayForRatio.isEmpty())
-				vueController.displayInfo("Echecs", toDisplayForRatio);
+				vueController.displayInfo(viewMessageType.ECHECS.toString(), toDisplayForRatio);
 
 			// Dans le cas ou on veut les filtres en semi step, remis a zero des couleurs.
 			if (Configurator.semiStepProgression)
@@ -929,7 +949,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 
 		if (Configurator.displayLogMemeApplication)
-			vueController.displayInfo("memeApplication", Arrays.asList("MemeApplied- " + memeApply,"ActionDone- " +  actionDone));
+			vueController.displayInfo(viewMessageType.MEMEAPPLICATION.toString(), Arrays.asList("MemeApplied- " + memeApply,"ActionDone- " +  actionDone));
 
 		return actionDone;
 	}

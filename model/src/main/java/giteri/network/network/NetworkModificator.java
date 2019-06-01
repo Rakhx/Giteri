@@ -41,8 +41,8 @@ public class NetworkModificator {
         density = Configurator.isAttribActived(targetedProperties.getActivator(), Configurator.NetworkAttribType.DENSITY);
         degreeDistrib = Configurator.isAttribActived(targetedProperties.getActivator(), Configurator.NetworkAttribType.DDARRAY);
         clustCoeff = Configurator.isAttribActived(targetedProperties.getActivator(), Configurator.NetworkAttribType.AVGCLUST);
-        int nbNode = targetedProperties.nbNodes;
-        int nbEdge = targetedProperties.nbEdges;
+        int nbNode =  (int)targetedProperties.nbNodes;
+        int nbEdge = (int)targetedProperties.nbEdges;
         TargetStructure target = new TargetStructure();
         target.nbEdges = nbEdge;
         target.nbNode = nbNode;

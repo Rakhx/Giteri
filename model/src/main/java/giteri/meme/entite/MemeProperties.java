@@ -33,7 +33,7 @@ public class MemeProperties{
 
     // Sur les 100 dernières actions, quel meme a été appelé
     public CircularFifoQueue<Meme> lastHundredActionDone;
-    public int sizeOfCircularQueue = 100;
+    public int sizeOfCircularQueue = Configurator.sizeOfCircularForLastActionDone;
 
     public List<Integer> lastFailActionTried;
 

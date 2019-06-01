@@ -7,13 +7,23 @@ import java.util.Optional;
 public class RandomTest {
     public static void main(String[] args)  {
 
-        List<Number> listNombre;
 
-        listNombre = new ArrayList<>();
-        Double aDouble = 2.;
-        listNombre.add((Number)aDouble);
 
-        System.out.println(listNombre.get(0) instanceof Double ? ((Number) listNombre.get(0)) : "non");
+        Number myNumber ;
+        myNumber = new Double(2.1);
+        myNumber = 1.2;
+        double lol = 1.;
+
+//        myNumber += lol;
+        myNumber = myNumber.doubleValue() + lol;
+
+
+//        // Double mis dans un number
+//        List<Number> listNombre;
+//        listNombre = new ArrayList<>();
+//        Double aDouble = 2.;
+//        listNombre.add((Number)aDouble);
+//        System.out.println(listNombre.get(0) instanceof Double ? ((Number) listNombre.get(0)) : "non");
 
 
 //        // ref vs valeur

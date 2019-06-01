@@ -146,6 +146,9 @@ public final class Configurator {
 	public static Integer baseSleepTimeMulti = 0;
 	private static Integer threadSleepMultiplicateur = baseSleepTimeMulti;
 
+
+	public static int sizeOfCircularForLastActionDone = 100;
+
 	// Construction aléatoire du réseau ou non // systeme en pause au lancement
 	private static Object lockOnPause = new Object();
 
@@ -266,6 +269,29 @@ public final class Configurator {
 		EXISTING,
 		ONMAP,
 		FITTING;
+	}
+
+	public enum viewMessageType{
+		PROPAGATION,
+		AVGDGRBYMEME,
+		FAILXDENSITY,
+		ECHECS,
+		FITTINGSKIP,
+		MEMEAPPLICATION
+
+	}
+
+	public static String getViewMessage(viewMessageType type){
+		switch(type) {
+			case PROPAGATION:
+				return "PROPAGATION";
+			case AVGDGRBYMEME:
+				return "AVGDGRBYMEME";
+
+			default:
+				return "NIET";
+
+		}
 	}
 
 	//endregion

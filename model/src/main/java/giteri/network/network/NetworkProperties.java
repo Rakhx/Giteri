@@ -20,7 +20,7 @@ public class NetworkProperties implements Cloneable{
 	
 	public String name;
 	public double density;
-	public int nbNodes, nbEdges;
+	public double nbNodes, nbEdges;
 	public double ddInterQrt;
 	public double ddAvg;
 	public double avgClust;
@@ -222,10 +222,10 @@ public class NetworkProperties implements Cloneable{
 					furDurchschnitt.put(i,(double)dd[i]);
 				break;
 			case NBEDGES:
-				nbEdges  = (int) value;
+				nbEdges  = (double) value;
 				break;
 			case NBNODES:
-				nbNodes  = (int) value;
+				nbNodes  = (double) value;
 				break;
 			case AVGCLUST:
 				avgClust = (double) value;

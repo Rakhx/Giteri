@@ -54,6 +54,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	public void setDrawer(Interfaces.DrawerNetworkInterface drawer){
 		this.drawer = drawer;
 	}
+
 	//region public methods
 
 	/** Toutes les x secondes, lancement du thread. Si 1er lancement, création d'un réseau

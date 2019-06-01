@@ -98,21 +98,15 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	private CircularFifoQueue<Hashtable<Meme, Integer>> cfqMemeApplianceNumberOnFitting;
 	private int nbEltCircularQFitting = 15;
 
+
+
 	private ArrayList<Meme> memesAvailables;
 	private int nbCallContinuOnThisConfig = 0;
-
-	private double threshSeDensity, threshSeCoeff, threshSeAppliance;
-	private double threshHeDensity, threshHeAppliance;
-
-	// every nbActionThreshrising rise threshold of risingPourcentage
-	private double risingPourcentage = .4;
-	private int nbActionThreshRising = 7;
 
 	// RESULTATS DE SIMULATION
 
 	// relevés des différentes densité pour une meme configuration
-	public ArrayList<NetworkProperties> networksSameTurn = new ArrayList<NetworkProperties>();
-	public CircularFifoQueue<Double> cfqDensityValuesOnOneRun;
+	public ArrayList<NetworkProperties> networksSameTurn = new ArrayList<>();
 
 	NetworkProperties targetNetProperties;
 	NetworkProperties currentNetProperties = new NetworkProperties();
@@ -161,8 +155,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 */
 	private void setDefaultValue(){
 		nbRepetitionByConfig = Configurator.nbRepetitionbyRun;
-		nbActionByStep = 50;
-		cfqDensityValuesOnOneRun = new CircularFifoQueue<>(boucleExterneSize);
+		nbActionByStep = Configurator.getNbNode() * 10;
+
 		cqLastXActionDone = new CircularFifoQueue<>(circularSize);
 		kvLastActionDone = new Hashtable<>();
 		kvOverallProportionActionDone = new Hashtable<>();
@@ -273,11 +267,9 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 *
 	 */
 	public void newRepetition(){
-		resetSeuilValue();
 		resetAction();
 		numeroRepetitionAsString = "Repetition#" + ++numeroRepetition;
 		repertoires.add(numeroRepetitionAsString);
-		// com.suspend();
 		synchronized(workerFactory.waitingForReset)
 		{
 			com.resetStuff();
@@ -288,7 +280,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 		com.generateGraph(Configurator.initialNetworkForFitting);
 		explorator.apply();
-		// com.generateGraph(Configurator.initialNetworkForFitting);
 
 		entiteHandler.updateMemeAvailableForProperties();
 
@@ -314,7 +305,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		cfqMemeAppliancePropOnFitting.clear();
 		cfqMemeApplianceNumberOnFitting.clear();
 
-		cfqDensityValuesOnOneRun.clear();
 		kvOverallProportionActionDone.clear();
 		kvOverallNumberOfActionDone.clear();
 
@@ -386,6 +376,11 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		return res;
 	}
 
+	/** Condition d'arrêt pour une itération d'une configuration.
+	 * En nombre d'action, sans autre paramètre...
+	 *
+	 * @return
+	 */
 	public boolean continuFittingSimpliestVersion(){
 		boolean oneMoreTurn = true;
 		ObjectRef<String> message = new ObjectRef<>("");
@@ -394,11 +389,62 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			oneMoreTurn &= false;
 		return oneMoreTurn;
 
+
 	}
+
+	/** Fonction qui va déterminer si on doit continuer ou arrêter une itération de fitting.
+	 *
+	 * On veut passer rapidement les situations réseaux pleins ou vides.
+	 * @return
+	 */
+	public boolean continuFitting(CircularFifoQueue<Double> densites){
+
+		// Verif. de la valeur de densité.
+		Double[] avgNSqrt;
+		List<Double> bla = new ArrayList<>(densites);
+		avgNSqrt = Toolz.getMeanAndSd(bla);
+		if (avgNSqrt[0] > .9 && avgNSqrt[1] < .001) {
+			com.view.displayInfo(Configurator.viewMessageType.FITTINGSKIP.toString(), new ArrayList<String>(Arrays.asList("Full Network")));
+			return false;
+		}
+		if (avgNSqrt[0] < .001 && avgNSqrt[1] < .0001) {
+			com.view.displayInfo(Configurator.viewMessageType.FITTINGSKIP.toString(), new ArrayList<String>(Arrays.asList("Empty Network")));
+			return false;
+		}
+
+
+		// Si full transmission, vérification de:
+		if(entiteHandler.memeAllTransmitted()){
+
+		}
+
+		return continuFittingSimpliestVersion();
+	}
+
 
 	//endregion
 
 	//region Fitting hardstuff
+
+	/** Si la densité du network est quasiment au max avec peu de variation.
+	 *
+	 * @return
+	 */
+	private boolean heuristNetFull(){
+		boolean isFull = false;
+
+		return isFull;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	private boolean heuristNetEmpty(){
+		boolean isEmpty = false;
+
+		return isEmpty;
+	}
 
 	/** Verification de la possibilité de jouer des actions valeur pas relevé de
 	 *  facon synchronisé, le but étant de savoir si une action est encore possible ou si le systeme est bloqué.
@@ -423,26 +469,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 		message.setValue(message.getValue() + resume);
 		return resultat;
-	}
-
-	/** utilise l'écart type sur la moyenne a la densité comme indicateur.
-	 *
-	 * @param densities
-	 * @param message
-	 * @return
-	 */
-	private double readingDensityVariation(ArrayList<Double> densities,	ObjectRef<String> message){
-		String resume = "\n [ReadingDensityVariation]- ";
-
-		// Calcul de la moyenne des densités de de l'écart type à la moyenne
-		double variationOnDensity = Toolz.getDeviation(densities, Optional.ofNullable(null));
-
-		resume += "\n [Density] - Density ecart type " + variationOnDensity + " sur les values suivantes \n";
-		resume += densities;
-
-		message.setValue(message.getValue() + resume );
-		// Le score max. sur l'écart type a la densité est .5. on veut un score sur 100.
-		return variationOnDensity * 200;
 	}
 
 	/** utilisation de la variation des coefficients directeurs sur des plages de données
@@ -532,46 +558,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		kvLastActionDone.clear();
 	}
 
-	/** Ajout d'une densité à l'issu d'un relevé. C'est avec l'ensemble des densités
-	 * récoltés ici qu'on définit la stabilité d'un réseau ou non.
-	 *
-	 * @param density
-	 */
-	public void addDensity(double density){
-		cfqDensityValuesOnOneRun.add(density);
-	}
-
-	/** Renvoi un indice d'évolution d'un coefficient directeur dont le départ se fait sur la moyenne des
-	 * @pourcentageFirstTerm premiers éléments de la série.
-	 *
-	 * @param listValue
-	 * @param pourcentageFirstTerm pourcentage, borné a 50%
-	 * @return 0 si la courbe est également réparti de part et d'autre de la moyenne des x premiers points
-	 * un abs(score) qui augmente si la courbe monte ou descend par rapport a sa moyenne. Score peu etre négatif.
-	 */
-	private double getIndiceEvolutionForMemeAppliance(ArrayList<Double> listValue, double pourcentageFirstTerm){
-		double score = 4;
-		if(listValue.size() > 3){
-			score = 0;
-			int indexBorne;
-			double mean = 0;
-			if(pourcentageFirstTerm > .5)
-				pourcentageFirstTerm = .5;
-
-			indexBorne = (int)(listValue.size() * pourcentageFirstTerm);
-			for (int i = 0; i < indexBorne; i++) {
-				mean += listValue.get(i);
-			}
-
-			mean /= (indexBorne);
-
-			for (Double value : listValue) {
-				score += value - mean;
-			}
-		}
-		return score;
-	}
-
 	/** Methode la plus simple pour calculer la distance entre deux réseaux.
 	 *
 	 * @param activationCode
@@ -655,13 +641,13 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 				distance = distance(valueOne, valueTwo, 1);
 				break;
 			case NBEDGES:
-				valueOne = (int) valueFrom;
-				valueTwo = (int) valueTarget;
+				valueOne = (double) valueFrom;
+				valueTwo = (double) valueTarget;
 				distance = distance(valueOne, valueTwo, (Configurator.getNbNode() - 1) * Configurator.getNbNode());
 				break;
 			case NBNODES:
-				valueOne = (int) valueFrom;
-				valueTwo = (int) valueTarget;
+				valueOne = (double) valueFrom;
+				valueTwo = (double) valueTarget;
 				distance = distance(valueOne, valueTwo, Configurator.getNbNode()-1);
 				break;
 			case APL:
@@ -692,29 +678,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 */
 	private static double distance(double valueOne, double valueTwo, double max){
 		return (Math.abs(valueOne - valueTwo) * 100) / max;
-	}
-
-	/** Reset des seuils qui définissent la fin d'un round de fitting
-	 *
-	 */
-	private void resetSeuilValue(){
-		threshSeDensity = 0.5 ;
-		threshHeDensity = 0.005;
-		threshSeCoeff = 0.01;
-		threshSeAppliance = 0.3;
-		threshHeAppliance = 0.1;
-	}
-
-	/** Augmente le treshold des valeurs pour les soft et hard fin de run
-	 *
-	 */
-	private void riseThresholdValue(int nbStepDoneInSameRun){
-		threshSeDensity *= (1 + risingPourcentage) ;
-		threshHeDensity *= (1 + risingPourcentage) ;
-		threshSeCoeff *= (1 + risingPourcentage) ;
-		threshSeAppliance *= (1 + risingPourcentage) ;
-		threshHeAppliance *= (1 + risingPourcentage) ;
-		if(debug) System.out.println("Rise des threshold");
 	}
 
 	//endregion
