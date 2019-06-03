@@ -1,8 +1,6 @@
 package giteri.run;
 
 import giteri.fitting.parameters.FittingClass;
-import giteri.network.network.IInternalNetReprestn;
-import giteri.network.network.IInternalNetReprestn.TinyNetworks;
 import giteri.network.network.NetworkModificator;
 import giteri.network.network.NetworkProperties;
 import giteri.network.networkStuff.NetworkFileLoader;
@@ -23,7 +21,7 @@ public class Cmdline {
 
     public static void main(String[] args) {
         switch (args[0]) {
-            //region Scoring
+             //region Scoring manuel
             case "1":
                 String net1 = "network1.txt";
                 String net2 = "network2.txt";
@@ -70,7 +68,6 @@ public class Cmdline {
                 Graph graphMade = new SingleGraph("Generated");
                 NetworkModificator netgen = new NetworkModificator(graphMade, properties, fixedProperties);
                 netgen.generate();
-
 
                 break;
 

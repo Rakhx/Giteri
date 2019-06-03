@@ -67,7 +67,7 @@ public class Toolz {
 		return list.size() > 0 ? list.get(Toolz.getRandomNumber(list.size())) : null; 
 	}
 
-	public static <T extends Object> T getRandomElement(Set<T> set){
+	public static <T extends Object> T getRandomElement(Collection<T> set){
 		int randomNumber = Toolz.getRandomNumber(set.size());
 //		T resultat = null;
 
@@ -92,7 +92,22 @@ public class Toolz {
 		list.add(selectedElement);
 		return list;
 	}
-	
+
+	public static <T extends Object> T getRandomObjectWeighed(Map<T,Double> map){
+		int sltBla = (int)(map.values().stream().reduce(0.,Double::sum)*10000);
+		int selectedRlt = Toolz.getRandomNumber((sltBla))/10000;
+		double sum = 0;
+
+		for (T obj : map.keySet()) {
+			sum+= map.get(obj);
+			if (sum >= selectedRlt) { // bingo loto
+				return obj;
+			}
+		}
+		return null;
+	}
+
+
 	/** [0;1] retourne un entier entre 0 et 1 avec une précision de
 	 * la valeur du champs précision de la giteri.meme classe Toolz.
 	 * 

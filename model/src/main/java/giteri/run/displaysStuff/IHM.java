@@ -171,7 +171,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	private Map<String, Integer> countOfLastMemeActivation;
 	// Sur les 100 dernières actions, quel meme a été appelé
 	private List<String> lastHundredActionDone;
-	private int sizeOfCircularQueue = 100;
+	private int sizeOfCircularQueue = Configurator.sizeOfCircularForLastActionDone;
 
 	// Séries de donnée pour l'affichage des graphiques
 	private XYSeries seriesDegreeDistribution;
@@ -1452,8 +1452,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 						// NOMBRE D'APPEL DES MEMES DEPUIS LE DEBUT DE LA SIMULATION
 						// Savoir combien de fois le meme a été appelé depuis le début de la simulation
-						nbAppel = nbActivationByMemes.
-								get(meme.toString());
+						nbAppel = nbActivationByMemes.get(meme.toString());
 						// LABEL générique
 						nbActivationByMemesLabel.get(meme.toString()).setText(memeRef + ":" + nbAppel );
 						nbActivationByMemesLabel.get(meme.toString()).setForeground(associatedColor);
@@ -1464,7 +1463,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 						// Partie last 100 compte du nombre
 						nbLastActivationByMemesLabel.get(meme.toString()).setText(memeRef + ": "
 								+ countOfLastMemeActivation.get(meme.toString()) + "("
-								+ countOfLastMemeActivation.get(meme.toString()) * 100 / Configurator.getNbNode()
+								+ countOfLastMemeActivation.get(meme.toString()) * 100 / sizeOfCircularQueue
 								+"%)");
 						nbLastActivationByMemesLabel.get(meme.toString()).setForeground(associatedColor);
 					}
