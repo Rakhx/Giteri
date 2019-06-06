@@ -177,7 +177,6 @@ public class NetworkModificator {
                 // de transition
                 for (Integer index : nodesIndex)
                     kvRouletteHavingToMany.put(index, 1.);
-
             }
 
             // Nombre de retrait pour le meme lien

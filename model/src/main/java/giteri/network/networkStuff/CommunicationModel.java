@@ -102,7 +102,6 @@ public class CommunicationModel implements IModel {
 	 */
 	public void fittingSpecificConfig() {
 		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.specific, Optional.empty(), Optional.empty());
-
 	}
 
 	/** Plus de fonctionnalité
@@ -121,6 +120,11 @@ public class CommunicationModel implements IModel {
 	public void fittingNetworks(){
 		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.exhaustive, Optional.empty(), Optional.empty());
 	}
+
+	public void exploFitting(){
+		this.calculator.exploFitting();
+	}
+
 
 	/** Affichage d'un graphe représentant le fichier donné en input.
 	 *

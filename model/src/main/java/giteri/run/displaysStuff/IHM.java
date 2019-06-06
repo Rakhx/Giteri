@@ -136,6 +136,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	private JButton bFittingOneStep;
 	private JButton btSpecificConfig;
 	private JButton btSemiAutomaticStep;
+	private JButton btExplo;
 
 	private JTextField tfPath;
 	private JLabel jlWorkInProgress;
@@ -234,7 +235,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		jlScore = new JLabel();
 		densityValues = new ArrayList<>();
 
-
 		memesTitle = new Hashtable<String, Meme>();
 		this.setSelectedMeme(existingMeme);
 		densityMaxValue = 0.0;
@@ -253,9 +253,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		Init();
 	}
 
-
 	//<editor-fold desc="fonction public, diverses">
-
 
 	/**
 	 * Met en place la liste des memes qui seront utilisés lors de la
@@ -267,7 +265,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	public void setSelectedMeme(ArrayList<Meme> selectedMeme) {
 		this.selectedMemeOnSimulation = selectedMeme;
 		resetHashTableKeys();
-		// createLabelMemeInformation(); WTF
 	}
 
 	/**
@@ -276,49 +273,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	 *
 	 */
 	public void handlerActionApply(ActionApplyEvent e) {
-/*
-		if(Configurator.displayMemePosessionDuringSimulation){
-			// MISE A JOUR DES DONNEES
-			if (e.memeApply != null) {
-				String elementRemoveOfCircular ="";
-				Toolz.addCountToElementInHashArray(nbActivationByMemes, e.memeApply.toString(), 1);
-
-				// partie last twenty
-				if(lastHundredActionDone.size() == lastHundredActionDone.maxSize())
-				{
-					elementRemoveOfCircular = lastHundredActionDone.poll();
-					Toolz.removeCountToElementInHashArray(countOfLastMemeActivation, elementRemoveOfCircular, 1);
-				}
-
-				lastHundredActionDone.add(e.memeApply.toString());
-				Toolz.addCountToElementInHashArray(countOfLastMemeActivation, e.memeApply.toString(), 1);
-			}
-
-			// Dans le cas ou il n'y a pas de meme apply, c'est a dire que l'action d'application du meme a échouée.
-			else if (Configurator.displayLogRatioLogFailOverFail ||Configurator.displayLogRatioLogFailOverSuccess )
-			{
-				System.out.println("Aucune action réalisé par l'entité " + e.entite.getIndex() + " :: message " + e.message);
-				if (e.message.contains("RMLK"))
-					rmv++;
-				else if (e.message.contains("ADLK"))
-					add++;
-
-				if(Configurator.displayLogRatioLogFailOverFail)
-					System.out.println("ratio fail (rmvFail/addFail): " + (double) rmv / add);
-				if(Configurator.displayLogRatioLogFailOverSuccess){
-					int nbWin = 0;
-					for (Integer winTimes : nbActivationByMemes.values())
-						nbWin += winTimes;
-					System.out.println("Ratio Fail / sucess: " + (double) (rmv + add) / nbWin);
-				}
-			}
-
-			// Compteur de tour
-			if (++compteurAction % Configurator.refreshInfoRate == 0) {
-				compteurAction = 0;
-				updateInformationDisplay();
-			}
-		}*/
 	}
 
 	/** On change au niveau des memes possédées par les entités.
@@ -371,7 +325,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	 */
 	public void toggleWkProgress(String message) {
 		if (jlWorkInProgress.getText().compareTo(message) == 0) {
-//			jlWorkInProgress.setVisible(!jlWorkInProgress.isVisible());
+			jlWorkInProgress.setVisible(!jlWorkInProgress.isVisible());
 		} else {
 			jlWorkInProgress.setText(message);
 			jlWorkInProgress.setVisible(true);
@@ -623,6 +577,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		bFittingOneStep = new JButton("FittingOnce");
 		btSpecificConfig = new JButton("Specific Config");
 		btSemiAutomaticStep= new JButton("ToggleSemiautoAction");
+		btExplo = new JButton("Explo");
 
 		plNetworkPlaying = new JPanel();
 		plNetworkRead = new JPanel();
@@ -661,6 +616,9 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 										GroupLayout.DEFAULT_SIZE,
 										hauteurComponent, hauteurComponent)
 								.addComponent(btSemiAutomaticStep,
+										GroupLayout.DEFAULT_SIZE,
+										hauteurComponent, hauteurComponent)
+								.addComponent(btExplo,
 										GroupLayout.DEFAULT_SIZE,
 										hauteurComponent, hauteurComponent)
 								.addComponent(jlWorkInProgress,
@@ -714,6 +672,9 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 										GroupLayout.DEFAULT_SIZE,
 										hauteurComponent, hauteurComponent)
 								.addComponent(btSemiAutomaticStep,
+										GroupLayout.DEFAULT_SIZE,
+										hauteurComponent, hauteurComponent)
+								.addComponent(btExplo,
 										GroupLayout.DEFAULT_SIZE,
 										hauteurComponent, hauteurComponent)
 								.addComponent(jlWorkInProgress,
@@ -1279,7 +1240,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		btFitting.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-//				Configurator.methodOfGeneration = Configurator.MemeDistributionType.FollowingFitting;
 				toggleEnableInterface();
 				modelController.fittingNetworks();
 			}
@@ -1298,9 +1258,11 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		bFittingOneStep.addActionListener(e -> modelController.fittingOnce());
 
-		btSpecificConfig.addActionListener(e ->modelController.stabilityResearch());
+		btSpecificConfig.addActionListener(e ->modelController.fittingSpecificConf());
 
 		btSemiAutomaticStep.addActionListener(e -> modelController.toggleActionSemiAuto());
+
+		btExplo.addActionListener(e -> modelController.toggleActionSemiAuto());
 
 		btGenerateEmptyNetwork.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

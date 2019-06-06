@@ -19,7 +19,7 @@ public final class Configurator {
 	// depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent
 	// cette configuration initiale
 	public static boolean withGraphicalDisplay = true;
-	public static boolean jarMode = true;
+	public static boolean jarMode = true; // Si vrai, affiche le score resultat de simu
 	public static boolean systemPaused = false;
 	public static boolean writeNetworkResultOnFitting = !fullSilent; // Screenshot, network.csv...
 	public static boolean writeMemeResultOnFitting = writeNetworkResultOnFitting; // NetworkDetails.csv

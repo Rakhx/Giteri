@@ -68,9 +68,8 @@ public class Interfaces {
 		 String getDDInfos();
 		 Double fitNetwork(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
 								 Optional<List<Boolean>> memeActivation, Optional<List<Double>> memeProba);
-//		 void searchStability();
 		 void fitNextStep();
-		 void testStability();
+		 void exploFitting();
 		 void incrementNbAction();
 	}
 	
@@ -109,6 +108,7 @@ public class Interfaces {
 		void displayInput();
 		void fittingNextStep();
 		void fittingOnce();
+		void exploFitting();
 		void rdmConfig();
 		void takeSnapshot(long seed, Optional<ArrayList<String>> simulationPath);
 		void comparaisonScreenS();

@@ -195,7 +195,7 @@ public class Controller {
 
 		//region calcul pour la mise à jour d'éléments de l'interface
 
-		public void stabilityResearch(){
+		public void fittingSpecificConf(){
 			model.fittingSpecificConfig();
 		}
 
@@ -221,6 +221,10 @@ public class Controller {
 
 		public void toggleActionSemiAuto(){
 			Configurator.semiStepProgression = !Configurator.semiStepProgression;
+		}
+
+		public void exploFitting(){
+			model.exploFitting();
 		}
 
 		//endregion

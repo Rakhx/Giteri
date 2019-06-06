@@ -141,6 +141,13 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		}
 	}
 
+	/** Quadriller une plage de donnnée pour étudier les réseaux obtenus.
+	 *
+	 */
+	public void exploFitting(){
+
+	}
+
 	//endregion
 
 	//region renvoie d'une exploration method
@@ -228,7 +235,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	}
 
 	/** Retourne une liste spécifique a explorer.
-	 *
+	 * TODO [WayPoint]- Bouton Specific Config
 	 * @return
 	 */
 	private IExplorationMethod callSpecificParam(){
@@ -433,6 +440,12 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 	}
 
+	/**
+	 * TODO [WayPoint]- Bouton Fitting Once
+	 *
+	 * @param activator
+	 * @param proba
+	 */
 	private void fitListAnotherHJ(List<Boolean> activator, List<Double> proba) {
 
 	    // SCORING 55
