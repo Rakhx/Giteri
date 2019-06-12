@@ -192,7 +192,8 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 	// Liste des memes disponibles dans le programme / meme sélectionné pour le
 	// run
-	private ArrayList<Meme> existingMeme;
+	// private ArrayList<Meme> existingMeme;
+
 	private ArrayList<Meme> selectedMemeOnSimulation;
 
 	// à voir avec le reste
@@ -222,7 +223,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		this.drawerGraphStream= drawerGraphStream ;
 		this.writeNRead = wnr;
 
-		existingMeme = memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING);
 		lastHundredActionDone = new ArrayList<>(sizeOfCircularQueue);
 		nbActivationByMemes = new Hashtable<String, Integer>();
 		countOfLastMemeActivation = new Hashtable<String, Integer>();
@@ -236,7 +236,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		densityValues = new ArrayList<>();
 
 		memesTitle = new Hashtable<String, Meme>();
-		this.setSelectedMeme(existingMeme);
+		this.setSelectedMeme(memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING));
 		densityMaxValue = 0.0;
 		otherSymbols = new DecimalFormatSymbols(Locale.US);
 		decimal = new DecimalFormat("",otherSymbols);
@@ -290,10 +290,8 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	//region INTERFACE IVIEW
 
 	@Override
-	public void displayInfo(String type, List<String> info) {
-		// méthode crasseuse
-		if(type == "FAILSTUFF")
-			time1.setText(info.stream().reduce("", String::concat));
+	public void displayInfo(Configurator.ViewMessageType type, List<String> info) {
+
 	}
 
 	/** Affichage des éléments concernants les memes qui sont joués sur la map
@@ -782,31 +780,31 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		return paneFour;
 	}
 
-	/**
-	 * Génération du selecteur de meme. Regarde les meme disponibles dans le
-	 * code et les proposes pour l'initialisation dans la simulation.
-	 *
-	 * @return
-	 */
-	private JPanel createComponentMemeSelector() {
-		JPanel allMemeSelector = new JPanel();
-		allMemeSelector.setLayout(new BoxLayout(allMemeSelector,
-				BoxLayout.Y_AXIS));
-
-		for (Meme meme : existingMeme) {
-			JPanel oneLineSelector = new JPanel();
-			JCheckBox cb = new JCheckBox();
-			JLabel memeLabel = new JLabel();
-			JSpinner spiPourcen = new JSpinner();
-
-			oneLineSelector.add(cb);
-			oneLineSelector.add(memeLabel);
-			oneLineSelector.add(spiPourcen);
-			allMemeSelector.add(oneLineSelector);
-		}
-
-		return allMemeSelector;
-	}
+//	/**
+//	 * Génération du selecteur de meme. Regarde les meme disponibles dans le
+//	 * code et les proposes pour l'initialisation dans la simulation.
+//	 *
+//	 * @return
+//	 */
+//	private JPanel createComponentMemeSelector() {
+//		JPanel allMemeSelector = new JPanel();
+//		allMemeSelector.setLayout(new BoxLayout(allMemeSelector,
+//				BoxLayout.Y_AXIS));
+//
+//		for (Meme meme : existingMeme) {
+//			JPanel oneLineSelector = new JPanel();
+//			JCheckBox cb = new JCheckBox();
+//			JLabel memeLabel = new JLabel();
+//			JSpinner spiPourcen = new JSpinner();
+//
+//			oneLineSelector.add(cb);
+//			oneLineSelector.add(memeLabel);
+//			oneLineSelector.add(spiPourcen);
+//			allMemeSelector.add(oneLineSelector);
+//		}
+//
+//		return allMemeSelector;
+//	}
 
 	/** génération du panneau contenant les informations sur les nodes.
 	 *
@@ -1327,7 +1325,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		// Pour chaque série qu'on veut ajouter
 		for (Meme meme : memes) {
-			labelSerie = entiteHandler.translateMemeCombinaisonReadable(meme.toFourCharString());
+			labelSerie = memeFactory.translateMemeCombinaisonReadable(meme.toFourCharString());
 
 			// on crée les série dans l'ordre a partir de 0 et regarde le meme associé a cet index dans MemeFactory
 			XYSeries aSerie = new XYSeries(labelSerie);
@@ -1390,7 +1388,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 					// Savoir quel noeud possède quel meme;
 					JLabel lbl = nodesHavingXoxoMemesLabel.get(meme.toString());
 					// Nom sous forme "add+"
-					memeRef = entiteHandler.translateMemeCombinaisonReadable(meme.toString()) ;
+					memeRef = memeFactory.translateMemeCombinaisonReadable(meme.toString()) ;
 					String toPut = memeRef + ": [";
 					// Si tout les noeuds possede ce meme
 					if (nodesHavingXoxoMemes.get(meme.toString()) != null
@@ -1507,7 +1505,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		// Pour chaque meme, on trouve la traduction en langage lisible, et on cherche la série correspondante.
 		for (Meme meme : kvIndexValue.keySet()) {
-			keyMeme = entiteHandler.translateMemeCombinaisonReadable((meme.toFourCharString()));
+			keyMeme = memeFactory.translateMemeCombinaisonReadable((meme.toFourCharString()));
 			for (XYSeries arraySeriesMemeAppliance : ArraySeriesMemeAppliances) {
 				if(keyMeme.compareToIgnoreCase((String)arraySeriesMemeAppliance.getKey()) == 0)
 					arraySeriesMemeAppliance.add(time, kvIndexValue.get(meme));
@@ -1540,6 +1538,8 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	 *
 	 */
 	public void resetIHM() {
+
+		this.setSelectedMeme(memeFactory.getMemes(Configurator.MemeList.FITTING, Configurator.ActionType.ANYTHING));
 		resetHashTableKeys();
 		updateInformationDisplay();
 		// seriesMemeAppliance.clear();

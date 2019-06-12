@@ -7,8 +7,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-import giteri.tool.math.Toolz;
-
 public final class Configurator {
 
 	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
@@ -83,7 +81,7 @@ public final class Configurator {
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
 	public static int activationCodeForView = fullSilent? 0 : 5;
 
-	public static boolean displayMemePossessionEvolution = true && !fullSilent; // !fullSilent;
+	public static boolean displayMemePossessionEvolution = false && !fullSilent; // Affiche dans l'IHM la possession des meme au fur et a mesure
 
 	public static boolean displayPlotWhileSimulation = true && !fullSilent; // Affichage des DD et densité
 	public static boolean displayMemePosessionDuringSimulation = true && !fullSilent; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
@@ -271,27 +269,16 @@ public final class Configurator {
 		FITTING;
 	}
 
-	public enum viewMessageType{
+	public enum ViewMessageType {
 		PROPAGATION,
 		AVGDGRBYMEME,
 		FAILXDENSITY,
 		ECHECS,
 		FITTINGSKIP,
-		MEMEAPPLICATION
+		MEMEAPPLICATION,
+		NBACTIVBYMEME,
+		LASTMEMEACTIF
 
-	}
-
-	public static String getViewMessage(viewMessageType type){
-		switch(type) {
-			case PROPAGATION:
-				return "PROPAGATION";
-			case AVGDGRBYMEME:
-				return "AVGDGRBYMEME";
-
-			default:
-				return "NIET";
-
-		}
 	}
 
 	//endregion

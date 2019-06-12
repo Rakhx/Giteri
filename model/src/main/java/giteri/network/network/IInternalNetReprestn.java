@@ -218,7 +218,7 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 			return netPropResult;
 		}
 
-		/** TODO [Waypoint]- Calcul des propriétés du réseau courant.
+		/** hummmm
 		 *
 		 */
 //		@Override

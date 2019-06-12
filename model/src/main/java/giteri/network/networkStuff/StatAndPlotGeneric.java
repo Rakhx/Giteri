@@ -152,7 +152,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 	//region renvoie d'une exploration method
 	/** lorsque le programme est appelé depuis java - et que l'on souhaite utiliser les modelParameter pour cycler.
-	 *
+	 * TODO [WayPoint]- Appel fitting depuis IHM avec explo = Exhaustive
 	 *
 	 * @return
 	 */
@@ -167,15 +167,14 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		MemeAvailability memeProvider = new MemeAvailability(memeDispo);
 		memeProvider.setEntiteHandler(entiteHandler);
-		// providers.put(1,memeProvider);
+		// providers.put(1,memeProvider); // Détermine si on va aussi cycler sur l'existence des memes sur la map
 
 		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING),
-				new GenericDoubleParameter(.1,.1,1.,.1));
+				new GenericDoubleParameter(.0,.0,1.,.1));
 		memeDiffu.setEntiteHandler(entiteHandler);
 		providers.put(0,memeDiffu);
 
 		memeProvider.addMemeListListener(memeDiffu);
-
 		return ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
 	}
 
@@ -205,7 +204,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 				if(selectedMeme != null) {
 					memeAndProba.put(selectedMeme, new GenericDoubleParameter(proba.get(i)));
 					if (debugJarMode)
-						memesSelectionnes.add(";" + entiteHandler.translateMemeCombinaisonReadable(selectedMeme.toString()) + "-" + proba.get(i));
+						memesSelectionnes.add(";" + memeFactory.translateMemeCombinaisonReadable(selectedMeme.toString()) + "-" + proba.get(i));
 				}else {
 					System.err.println("[StatAndPlotGeneric.CallFromJar]- Pas assez de meme dans la liste de fitting pour le nombre de param appelé");
 

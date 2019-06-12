@@ -192,7 +192,7 @@ public class Initializer {
             if (Configurator.withGraphicalDisplay) {
                 Graph graph = new SingleGraph("Embedded");
                 drawerGraphStream.setGraph(graph);
-                Viewer lol = graph.display();
+                graph.display();
             }
 
             Interfaces.IReadNetwork nl = mControl.getReader();

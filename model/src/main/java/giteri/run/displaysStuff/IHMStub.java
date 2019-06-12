@@ -1,6 +1,7 @@
 package giteri.run.displaysStuff;
 
 import giteri.meme.entite.Meme;
+import giteri.run.configurator.Configurator;
 import giteri.run.interfaces.Interfaces.IView;
 
 import java.util.Hashtable;
@@ -12,7 +13,7 @@ import org.jfree.chart.JFreeChart;
 public class IHMStub implements IView {
 
 	@Override
-	public void displayInfo(String type, List<String> info) {
+	public void displayInfo(Configurator.ViewMessageType type, List<String> info) {
 
 	}
 	public void displayXLastAction(int nbAction,Map<String, Integer> nbActivByMeme, Map<String,Integer> nbLastActivByMeme, List<String> lastXMemeApplied){

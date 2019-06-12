@@ -140,7 +140,7 @@ public interface IModelParameter<T> {
 		}
 
 		public List<String> getPossibleValue(){
-			return new ArrayList<String>(Arrays.asList("true", "false"));
+			return new ArrayList<>(Arrays.asList("true", "false"));
 		}
 
 		public void setPossibleValue(String valu){
@@ -536,7 +536,7 @@ public interface IModelParameter<T> {
 			}
 		}
 
-		/** Pour lancer les évènements de type action réalisée.
+		/** Pour lancer les évènements de type meme dispo changz .
 		 *
 		 */
 		private void memesAvailablesChange(List<Meme> listAvailableMemes, String message) {

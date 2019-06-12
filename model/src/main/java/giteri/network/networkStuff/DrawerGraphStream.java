@@ -73,7 +73,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 	 *
 	 */
 	public void handlerBehavTransm(BehavTransmEvent e) {
-		if(Configurator.displayMemePossessionEvolution)
+		if(Configurator.displayMemePosessionDuringSimulation)
 		// A priori inutile de parler du cas de remplacement car la classe de node écrase
 		// la précédente. A revoir si des memes peuvent etre spontanement perdu.
 		if(e.message == Configurator.MemeActivityPossibility.AjoutMeme.toString()){
@@ -291,7 +291,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 
 			attribut += "node. "+combi+" {fill-color: "+ colorPieAsString.get(aAppliquer)+";}";
 			if(Configurator.DisplayLogBehaviorColors){
-				System.out.println(entiteHandler.translateMemeCombinaisonReadable(combi) + ":" + colorPieAsString.get(aAppliquer));
+				System.out.println(memeFactory.translateMemeCombinaisonReadable(combi) + ":" + colorPieAsString.get(aAppliquer));
 			}
 		}
 

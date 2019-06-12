@@ -31,6 +31,8 @@ public class MemeFactory {
 	// association meme & index, pour coloration ET fitting
 	private Hashtable<Meme, Integer> kvMemeIndex;
 
+	private Hashtable<String, String> memeTranslationReadable;
+
 	private Integer lastIndexUsed = -1;
 
 	private ActionFactory actionFactory;
@@ -43,13 +45,14 @@ public class MemeFactory {
 
 	//region  Constructor & Co
 	public MemeFactory(ActionFactory actionFac, FilterFactory agregatorFac, AttributFactory attributFac ){
-		memeExisting = new ArrayList<Meme>();
-		memeFitting = new ArrayList<Meme>();
+		memeExisting = new ArrayList<>();
+		memeFitting = new ArrayList<>();
 		memeOnMap = new ArrayList<>();
-		kvMemeIndex = new Hashtable<Meme, Integer>();
+		kvMemeIndex = new Hashtable<>();
 		actionFactory = actionFac;
 		filterFactory = agregatorFac;
 		attributFactory = attributFac;
+		memeTranslationReadable = new Hashtable<>();
 	}
 
 	//endregion
@@ -105,6 +108,9 @@ public class MemeFactory {
 			memeOnMap.add(toReturn);
 
 		kvMemeIndex.put(toReturn, ++lastIndexUsed);
+
+		memeTranslationReadable.put(toReturn.toFourCharString(),toReturn.getName());
+
 		return toReturn;
 	}
 
@@ -224,6 +230,26 @@ public class MemeFactory {
 		return null;
 
 	}
+
+	/** Transforme les adlkminesup en add+;
+	 * TODO [WayPoint]- traduction .add+ <= ADLKMTNTSPMN etc
+	 * @param memeCombinaison
+	 * @return un truc plus clair a lire.
+	 */
+	public String translateMemeCombinaisonReadable(String memeCombinaison) {
+		String compo = "";
+		String[] combinaison = memeCombinaison.contains(".")? memeCombinaison.split("\\."):new String[]{memeCombinaison};
+		for (String oneName:
+				memeTranslationReadable.keySet()) {
+			for (String combi:combinaison) {
+				if(combi.compareToIgnoreCase(oneName) == 0)
+					compo += "." + memeTranslationReadable.get(oneName);
+			}
+		}
+
+		return compo;
+	}
+
 
 	//region index stuff
 

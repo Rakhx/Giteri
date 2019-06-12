@@ -16,13 +16,11 @@ import giteri.network.networkStuff.WorkerFactory;
 import giteri.run.ThreadHandler;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.*;
-import giteri.run.controller.Controller;
 import giteri.run.controller.Controller.VueController;
 import giteri.tool.math.Toolz;
 import giteri.tool.objects.ObjectRef;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Classe qui gère les entités du réseau.
@@ -41,7 +39,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 	// Entite possedant des actions
 	private ArrayList<Entite> entitesActive;
-	private Hashtable<String, String> memeTranslationReadable;
 	private List<Meme> memeFittingApplied;
 
 	private boolean allTransmitted = false;
@@ -84,7 +81,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		entitesActive = new ArrayList<>();
 		entityListeners = new ArrayList<>();
 		memeListeners = new ArrayList<>();
-		memeTranslationReadable = new Hashtable<>();
 		toDisplayForRatio = new ArrayList<>();
 		memeProperties = new MemeProperties();
 
@@ -109,7 +105,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		memeProperties.memeCombinaisonFittingAvailable =
 				this.getMemeAvailable(FittingBehavior.simpleAndComplex, Optional.of(memesByCategory));
 	}
-
 
 	//endregion
 
@@ -182,25 +177,25 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				}
 
 			if (Configurator.displayLogAvgDegreeByMeme)
-				vueController.displayInfo(viewMessageType.AVGDGRBYMEME.toString(), Arrays.asList(checkPropertiesByMemePossession()));
+				vueController.displayInfo(ViewMessageType.AVGDGRBYMEME, Arrays.asList(checkPropertiesByMemePossession()));
 		}
 
 		// Verification de la propagation totale des memes initiaux
 		if(!allTransmitted && Configurator.checkWhenFullPropagate && cptModulo % Configurator.checkFullProRefreshRate == 0) {
 			if(areAllMemeTransmitted()) {
                 allTransmitted = true;
-                vueController.displayInfo(viewMessageType.PROPAGATION.toString(), Arrays.asList("ALL TRANSMISTED IN ;" + cptModulo));
+                vueController.displayInfo(ViewMessageType.PROPAGATION, Arrays.asList("ALL TRANSMISTED IN ;" + cptModulo));
 			}
 
 			int resDetail = areAllMemeTransmittedDetails();
 			if ((resDetail & 1) == 1){
 				System.out.println("all add transmitted");
-				vueController.displayInfo(viewMessageType.PROPAGATION.toString(), Arrays.asList("ALL ADD TRANSMISTED IN ;" + cptModulo));
+				vueController.displayInfo(ViewMessageType.PROPAGATION, Arrays.asList("ALL ADD TRANSMISTED IN ;" + cptModulo));
 				allAddTransmitted =true;
 			}
 			if((resDetail & 2) == 2) {
 				System.out.println("all rmv transmitted");
-				vueController.displayInfo(viewMessageType.PROPAGATION.toString(), Arrays.asList("ALL RMV TRANSMISTED IN ;" + cptModulo));
+				vueController.displayInfo(ViewMessageType.PROPAGATION, Arrays.asList("ALL RMV TRANSMISTED IN ;" + cptModulo));
 				allrmvTransmitted = true;
 			}
 			if((resDetail & 3) == 3){
@@ -593,23 +588,14 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		return memesAsString;
 	}
 
-	/** Transforme les adlkminesup en add+;
-	 * TODO [WayPoint]- traduction .add+ <= ADLKMTNTSPMN etc
+
+	/** la flemme de changer IModelParameter pour y mettre un factory
+	 *
 	 * @param memeCombinaison
-	 * @return un truc plus clair a lire.
+	 * @return
 	 */
 	public String translateMemeCombinaisonReadable(String memeCombinaison) {
-		String compo = "";
-		String[] combinaison = memeCombinaison.contains(".")? memeCombinaison.split("\\."):new String[]{memeCombinaison};
-		for (String oneName:
-			 memeTranslationReadable.keySet()) {
-			for (String combi:combinaison) {
-				if(combi.compareToIgnoreCase(oneName) == 0)
-					compo += "." + memeTranslationReadable.get(oneName);
-			}
-		}
-
-		return compo;
+		return memeFactory.translateMemeCombinaisonReadable(memeCombinaison);
 	}
 
 	/** Regarde le propriété des éléments du réseau, en fonction de la
@@ -648,8 +634,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			for (Entite entite : entiteByMemePossession.get(memeCombinaison)) {
 
 				SelfDegrees.add(entite.getDegree());
-				for (Integer nodeIndex : networkConstruct
-						.getConnectedNodes(entite.getIndex())) {
+				for (Integer nodeIndex : networkConstruct.getConnectedNodes(entite.getIndex())) {
 					nodeConnected = this.getEntityCorresponding(nodeIndex);
 					if (nodeConnected != null)
 						othersDegrees.add(nodeConnected.getDegree());
@@ -661,11 +646,11 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			resultat += "("
 					+ entiteByMemePossession.get(memeCombinaison).size()
 					+ ") - "
-					+ "Degree moyen pour la combinaison de meme "
-					+ translateMemeCombinaisonReadable(memeCombinaison)
+					+ "Degree for nodes1@"
+					+ memeFactory.translateMemeCombinaisonReadable(memeCombinaison)
 					+ ": "
 					+ Toolz.getAvg(SelfDegrees)
-					+ " values: "
+					+ " Degree for nodes connected to nodes1 : "
 					+ Toolz.getNumberCutToPrecision(
 					Toolz.getAvg(othersDegrees), 2);
 			resultat += "\n";
@@ -762,7 +747,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 						//vueController.displayInfo("FAILSTUFF", Arrays.asList("" + sumFailAction));
 
 						if(Configurator.writeFailDensityLink)
-							vueController.displayInfo(viewMessageType.FAILXDENSITY.toString(), getFailXDensity( nbFail.getValue(),
+							vueController.displayInfo(ViewMessageType.FAILXDENSITY, getFailXDensity( nbFail.getValue(),
 									networkConstruct.updatePreciseNetworkProperties
 											(Configurator.getIndicateur(NetworkAttribType.DENSITY)).getDensity(),sumFailAction));
 					}
@@ -770,7 +755,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			}
 
 			if(!toDisplayForRatio.isEmpty())
-				vueController.displayInfo(viewMessageType.ECHECS.toString(), toDisplayForRatio);
+				vueController.displayInfo(ViewMessageType.ECHECS, toDisplayForRatio);
 
 			// Dans le cas ou on veut les filtres en semi step, remis a zero des couleurs.
 			if (Configurator.semiStepProgression)
@@ -949,7 +934,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 
 		if (Configurator.displayLogMemeApplication)
-			vueController.displayInfo(viewMessageType.MEMEAPPLICATION.toString(), Arrays.asList("MemeApplied- " + memeApply,"ActionDone- " +  actionDone));
+			vueController.displayInfo(ViewMessageType.MEMEAPPLICATION, Arrays.asList("MemeApplied- " + memeApply,"ActionDone- " +  actionDone));
 
 		return actionDone;
 	}
@@ -1262,7 +1247,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		index= 0;
 		agregators.put(index++, notLinked);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("AddØ",0.1, true, true, add, attributs, KVAttributAgregator, false);
+		memeFactory.registerMemeAction("AddØ",0.1, true, false, add, attributs, KVAttributAgregator, false);
 		agregators.put(index++, random);
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, false, false, add, attributs, KVAttributAgregator, true);
 
@@ -1270,13 +1255,13 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, notLinked);
 		agregators.put(index++, mineInf);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("Add+", 1, false ,true, add, attributs,KVAttributAgregator, false);
+		memeFactory.registerMemeAction("Add+", 1, true ,true, add, attributs,KVAttributAgregator, false);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add-",1, false ,true, add, attributs,KVAttributAgregator, false);
+		memeFactory.registerMemeAction("Add-",1, true ,true, add, attributs,KVAttributAgregator, false);
 
 		agregators.clear();
 		// agregators.put(0, notLinked);
@@ -1301,7 +1286,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();
 		agregators.put(0, linked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("RmvØ",1, true, true, remove,  attributs, KVAttributAgregator, false);
+		memeFactory.registerMemeAction("RmvØ",1, true, false, remove,  attributs, KVAttributAgregator, false);
 		agregators.put(2, random);
 		removeRandom = memeFactory.registerMemeAction("RmvØ-neutral",0, false, false, remove,  attributs, KVAttributAgregator, true);
 
@@ -1327,9 +1312,9 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();
 		memeFactory.registerMemeAction("Puri",.1,false, false, puri, attributs, KVAttributAgregator, false);
 
-		for (Meme memeDispo : memeFactory.getMemes(Configurator.MemeList.EXISTING,Configurator.ActionType.ANYTHING)) {
-			memeTranslationReadable.put(memeDispo.toFourCharString(),memeDispo.getName());
-		}
+//		for (Meme memeDispo : memeFactory.getMemes(Configurator.MemeList.EXISTING,Configurator.ActionType.ANYTHING)) {
+//			memeTranslationReadable.put(memeDispo.toFourCharString(),memeDispo.getName());
+//		}
 	}
 
 	/**

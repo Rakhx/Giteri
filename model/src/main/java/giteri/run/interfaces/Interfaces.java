@@ -15,6 +15,8 @@ import giteri.meme.entite.Meme;
 import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.IBehaviorTransmissionListener;
 
+import giteri.run.configurator.Configurator.ViewMessageType;
+
 /** Ensemble des interfaces utilisées dans le programme.
  * 
  *
@@ -83,8 +85,7 @@ public class Interfaces {
 		 * @param type Le
 		 * @param info
 		 */
-		void displayInfo(String type, List<String> info);
-
+		void displayInfo(ViewMessageType type, List<String> info);
 		void displayXLastAction(int nbAction, Map<String, Integer> nbActivByMeme, Map<String,Integer> nbLastActivByMeme, List<String> lastXMemeApplied);
 		void setDisplayNbAction(String message);
 		void resetIHM();

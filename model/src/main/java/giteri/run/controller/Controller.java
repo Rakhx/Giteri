@@ -43,7 +43,7 @@ public class Controller {
 
 		//region iview part
 
-		public void displayInfo(String type, List<String> info) {
+		public void displayInfo(Configurator.ViewMessageType type, List<String> info) {
 			for (Interfaces.IView vue:  vues) {
 				vue.displayInfo(type, info);
 			}
@@ -87,7 +87,6 @@ public class Controller {
 			for (Interfaces.IView vue: vues) {
 				vue.displayXLastAction(nbAction, nbActiByMeme,  nbLastActivByMeme, lastHundred);
 			}
-
 
 		}
 

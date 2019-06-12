@@ -68,10 +68,10 @@ public class FileView implements Interfaces.IView {
     // region implémentation d'interface
 
     @Override
-    public void displayInfo(String type, List<String> info) {
+    public void displayInfo(Configurator.ViewMessageType type, List<String> info) {
         if (!oneFilePerSubject)
-            info.add(0, type);
-        addLine(type, info);
+            info.add(0, type.toString());
+        addLine(type.toString(), info);
     }
 
     public void displayXLastAction(int nbAction, Map<String, Integer> nbActivByMeme, Map<String,Integer> nbLastActivByMeme, List<String> lastXMemeApplied){
