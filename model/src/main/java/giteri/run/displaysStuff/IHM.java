@@ -236,7 +236,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		densityValues = new ArrayList<>();
 
 		memesTitle = new Hashtable<String, Meme>();
-		this.setSelectedMeme(memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING));
+		this.setSelectedMeme(memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING));
 		densityMaxValue = 0.0;
 		otherSymbols = new DecimalFormatSymbols(Locale.US);
 		decimal = new DecimalFormat("",otherSymbols);

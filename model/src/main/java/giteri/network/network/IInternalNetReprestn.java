@@ -24,8 +24,8 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 	 */
 	public class TinyNetworks implements IInternalNetReprestn {
 		public int networkVersion;
-		public Map<Integer, ArrayList<Integer>> nodesAndConnections;
-		private Object syncOnNodes;
+		private Map<Integer, List<Integer>> nodesAndConnections;
+		private final Object syncOnNodes;
 		public int nbNodes, nbEdges;
 		private Graph graphForApl;
 
@@ -64,10 +64,6 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 			networkVersion = toCopy.getUpdateId();
 		}
 
-		public Map<Integer, ArrayList<Integer>> getNetwork(){
-			return nodesAndConnections;
-		}
-
 		/** TODO [Waypoint]- Calcul des propriétés du réseau courant.
 		 *
 		 */
@@ -103,9 +99,6 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 			}
 			// degré moyen sur les nodes
 			if (Configurator.isAttribActived(activationCode, NetworkAttribType.DDAVG)){
-
-
-
 				avgDegre = (double)nbEdges / (nbNodes);
 				netPropResult.setValue(NetworkAttribType.DDAVG,avgDegre);
 			}
@@ -120,7 +113,7 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 					clustByNode = new Hashtable<Integer, Double>();
 
 				synchronized (syncOnNodes) {
-					for (ArrayList<Integer> connections : nodesAndConnections.values()) {
+					for (List<Integer> connections : nodesAndConnections.values()) {
 						distrib[connections.size()] = ++(distrib[connections.size()]);
 					}
 
@@ -281,7 +274,7 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 					clustByNode = new Hashtable<Integer, Double>();
 
 				synchronized (syncOnNodes) {
-					for (ArrayList<Integer> connections : nodesAndConnections.values()) {
+					for (List<Integer> connections : nodesAndConnections.values()) {
 						distrib[connections.size()] = ++(distrib[connections.size()]);
 					}
 
@@ -379,17 +372,6 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 			return netPropResult;
 		}
 
-		/**
-		 *
-		 * @return
-		 */
-		public Map<Integer, ArrayList<Integer>> getNodesAndConnections() {
-			synchronized (nodesAndConnections) {
-				return nodesAndConnections;
-			}
-		}
-
-
 		/** Obtient l'id du réseau représenté
 		 * 
 		 */
@@ -402,27 +384,34 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 			nbNodes = -1; 
 			nbEdges = -1;
 			networkVersion = -1;
-			nodesAndConnections = new Hashtable<Integer, ArrayList<Integer>>();
+			nodesAndConnections = new Hashtable<Integer, List<Integer>>();
 		}
-		
+
 		@Override
-		public synchronized ArrayList<String> getNetworkEdges(){
-			ArrayList<String> edges = new ArrayList<>();
-			ArrayList<Integer> nodesIndex = new ArrayList<>();
-			ArrayList<Integer> nodeLinks  = new ArrayList<>();
-			nodesIndex.addAll(nodesAndConnections.keySet());
-			nodesIndex.sort(null);
-			
-			for (Integer index : nodesIndex) {
-	    		nodeLinks.clear();
-	    		nodeLinks = nodesAndConnections.get(index);
-	    		nodeLinks.sort(null);
-	    		for (Integer integer : nodeLinks) {
-	    			edges.add(index + " " + integer);
-				}
-				
+		public void addNodeWithEdge(int nodeIndex, List<Integer> edgesIndexes) {
+			synchronized (syncOnNodes){
+				nodesAndConnections.put(nodeIndex, edgesIndexes);
 			}
-			
+		}
+
+		@Override
+		public ArrayList<String> getNetworkEdges(){
+			ArrayList<String> edges = new ArrayList<>();
+			List<Integer> nodesIndex = new ArrayList<>();
+			List<Integer> nodeLinks  = new ArrayList<>();
+
+			synchronized (syncOnNodes) {
+				nodesIndex.addAll(nodesAndConnections.keySet());
+				nodesIndex.sort(null);
+				for (Integer index : nodesIndex) {
+					nodeLinks.clear();
+					nodeLinks = nodesAndConnections.get(index);
+					nodeLinks.sort(null);
+					for (Integer integer : nodeLinks) {
+						edges.add(index + " " + integer);
+					}
+				}
+			}
 			return edges;
 		}
 	}
@@ -458,6 +447,17 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 		public void resetRepresentation() {
 			matrix = null;
 			
+		}
+
+		/**
+		 * Ajout d'un noeud et de son set de lien a la représentation du réseau
+		 *
+		 * @param nodeIndex
+		 * @param edgesIndexes
+		 */
+		@Override
+		public void addNodeWithEdge(int nodeIndex, List<Integer> edgesIndexes) {
+
 		}
 
 		@Override

@@ -139,28 +139,37 @@ public class Interfaces {
 		 * 
 		 * @param toCopy Le réseau a copier. 
 		 */
-		public void ConvertNetwork(Network toCopy);
+		 void ConvertNetwork(Network toCopy);
 		/** Obtenir les propriétés issu de la représentation obtenue, avec un activator
 		 * définissant quel type de propriété on souhaite obtenir. 
 		 * 
 		 * @param activator
 		 */
-		public NetworkProperties getNetworkProperties(Optional<NetworkProperties> toModify,String netName,int activator);
+		 NetworkProperties getNetworkProperties(Optional<NetworkProperties> toModify,String netName,int activator);
 		/** Obtenir l'UUID du giteri.network que la représentation copie.
 		 * {@inheritDoc}
 		 * @return
 		 */
-		public int getRepresentationUUID();
+		 int getRepresentationUUID();
 		/** Reset des propriétés de la copie du réseau
 		 * 
 		 */
-		public void resetRepresentation();
-		/** Obtient la liste des edges du giteri.network sous la forme
+		 void resetRepresentation();
+
+		/** Ajout d'un noeud et de son set de lien a la représentation du réseau
+		 *
+		 * @param nodeIndex
+		 * @param edgesIndexes
+		 */
+		 void addNodeWithEdge(int nodeIndex, List<Integer> edgesIndexes);
+
+
+		 /** Obtient la liste des edges du giteri.network sous la forme
 		 * IndexNode espace IndexNode, classé en ordre croissant. 
 		 *  TODO Si volonté de faire apparaitre les noeuds seuls, modifier l'implémentation de cette fonction.
 		 * @return
 		 */
-		public ArrayList<String> getNetworkEdges();
+		 ArrayList<String> getNetworkEdges();
 	}
 
 }

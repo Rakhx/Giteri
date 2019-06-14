@@ -140,7 +140,7 @@ public class NetworkFileLoader implements IReadNetwork {
 				edges.add(integer);
 				nbEdges++;
 			}
-			net.nodesAndConnections.put(nodeIndex, edges);
+			net.addNodeWithEdge(nodeIndex, edges);
 		}
 
 		net.nbNodes = nodesAndLinks.keySet().size();

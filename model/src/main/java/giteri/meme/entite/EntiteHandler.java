@@ -59,7 +59,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private long atmLastTime;
 	private int cptModulo;
 	private int cptMemePossession;
-	private int cptActionAddTried = 1, cptActionRmvTried = 1,cptActionAddFail = 1, cptActionRmvFail = 1;
+	private int cptActionAddTried = 1, cptActionRmvTried = 1;
 	private ActionType lastAction = ActionType.RETRAITLIEN;
 	private int nbActionBySecond;
 	private List<String> toDisplayForRatio; // String pour affichage en utilisant la vueManager
@@ -374,8 +374,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		cptModulo = 0;
 		cptActionAddTried = 1;
 		cptActionRmvTried = 1;
-		cptActionAddFail = 1;
-		cptActionRmvFail = 1;
 		allTransmitted = false;
 		allAddTransmitted = false;
 		allrmvTransmitted = false;
