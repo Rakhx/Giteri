@@ -25,8 +25,9 @@ public class NetworkProperties implements Cloneable{
 	public double ddAvg;
 	public double avgClust;
 	public double APL;
+	public double thirdMoment;
 	private int[] dd;
-	private Hashtable<Integer, Double> furDurchschnitt;
+	private Map<Integer, Double> furDurchschnitt;
 
 	private int activator;
 	private Integer networkInstance;
@@ -62,7 +63,7 @@ public class NetworkProperties implements Cloneable{
 		dd[0] = dd[1] = dd[2] = 0;
 		activator = 0;
 		networkInstance = -2;
-		APL = -1;
+		APL = -1; thirdMoment=19;
 	}
 
 	//endregion
@@ -198,6 +199,8 @@ public class NetworkProperties implements Cloneable{
 				return this.APL;
 			case nbEdgesOnNbNodes:
 				return (double)nbEdges / nbNodes;
+			case thirdMoment:
+				return thirdMoment;
 			default:
 				break;
 		}
@@ -232,6 +235,8 @@ public class NetworkProperties implements Cloneable{
 				break;
 			case APL:
 				this.APL = (double) value;
+			case thirdMoment:
+				this.thirdMoment = (double) value;
 			default:
 				break;
 		}
@@ -262,7 +267,8 @@ public class NetworkProperties implements Cloneable{
 		//rez += "Nombre de noeud et d'edge "+ nbNodes + "|"+ nbEdges;
 		rez += "◊id: "+ networkInstance.toString();
 		rez += " ◊Densite: "+ Toolz.getNumberCutToPrecision(density,4) + " ◊ddAvg "+ ddAvg +
-				" ◊DDinterQuart: "+ ddInterQrt + " ◊clust moyen: "+ Toolz.getNumberCutToPrecision(avgClust,4);
+				" ◊DDinterQuart: "+ ddInterQrt + " ◊clust moyen: "+ Toolz.getNumberCutToPrecision(avgClust,4) +
+		"◊3° moment: "+ Toolz.getNumberCutToPrecision(thirdMoment,4);
 		return rez;
 	}
 
@@ -304,6 +310,10 @@ public class NetworkProperties implements Cloneable{
 
 	public double getAvgClust() {
 		return avgClust;
+	}
+
+	public double getThirdMoment(){
+		return thirdMoment;
 	}
 
 	public int getActivator() {

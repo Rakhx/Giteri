@@ -373,12 +373,14 @@ public class Toolz {
 	 * @param entry
 	 * @return
 	 */
-	public static <T extends Number> Double getAvg(Hashtable<Integer,T> entry){
+	public static <T extends Number> Double getAvg(Map<Integer,T> entry){
 		double resultat = 0.0;
 		double sumDesFrequences = 0;
+		double aDouble;
 		for (Integer index : entry.keySet()) {
-			sumDesFrequences += (Double) entry.get(index);
-			resultat += index * (Double) entry.get(index);
+			aDouble = Double.parseDouble(""+entry.get(index));
+			sumDesFrequences += aDouble;
+			resultat += index * aDouble;
 //			System.out.println(index + ":" + (double)(T)entry.get(index));
 		}
 		
@@ -406,7 +408,7 @@ public class Toolz {
 	 * @param avg OUT
 	 * @param sd OUT
 	 */
-	public static <T extends Number> Double[] getDeviation(Hashtable<Integer,T> entry, Double avg, double sd ){
+	public static <T extends Number> Double[] getDeviation(Map<Integer,T> entry, Double avg, double sd ){
 		return getMeanAndSd(new ArrayList<T>(entry.values()));
 	}
 
@@ -437,32 +439,8 @@ public class Toolz {
 	 * @param avg
 	 * @return
 	 */
-	public static <T extends Number> Double getDeviation(Hashtable<Integer,T> entry, Optional<Double> avg ){
-		
+	public static <T extends Number> Double getDeviation(Map<Integer,T> entry, Optional<Double> avg ){
 		return getDeviation(new ArrayList<T>(entry.values()), avg);
-
-	}
-	
-	/** Obtenir l'écart type des valeurs autour de la moyenne, fourni en paramètre ou non.
-	 * 
-	 * @param entry
-	 * @param avg
-	 * @return
-	 */
-	public static <T extends Number> Double getDeviation(ArrayList<T> entry, Optional<Double> avg ){
-		Double avgValue;
-		Double deviation = .0;
-		if (!avg.isPresent())
-			avgValue = getAvg(entry);
-		else
-			avgValue = avg.get();
-		
-		
-		for (Number number : entry) {			
-			deviation += Math.pow(/*(Double)number*/Double.parseDouble(""+number) - avgValue, 2);
-		}
-		 
-		return Math.sqrt(deviation / entry.size());
 	}
 
 	/** Obtenir l'écart type des valeurs autour de la moyenne, fourni en paramètre ou non.
@@ -507,7 +485,7 @@ public class Toolz {
 	 * @param entry
 	 * @return
 	 */
-	public static <T extends Number> String getInfoOnSerie(Hashtable<Integer,T> entry){
+	public static <T extends Number> String getInfoOnSerie(Map<Integer,T> entry){
 		String donnees = "";
 		double firstQ, thirdQ;
 		double nbValues = 0;

@@ -112,21 +112,6 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		networkInstanceProperties.createStub();
 	}
 
-	/** Met à jour l'ensemble des propriétés du réseau dans l'instance
-	 * networkInstanceProperties dans le cas ou la source du calcul de ces valeurs, le tinyNetwork,
-	 * a subit des modifications
-	 *
-	 */
-//	public void updateAllNetworkProperties(){
-//		if(!isNetPropUpToDate()){
-//			synchronized (networkInstance) {
-//				networkRepresentation.ConvertNetwork(networkInstance);
-//			}
-//
-//			networkInstanceProperties = networkRepresentation.getNetworkProperties(Configurator.activationCodeAllAttribExceptDD);
-//		}
-//	}
-
 	/** Dans le cas ou on ne les veux pas tous, on ne met pas a jour la valeur de tinynetwork changed.
 	 * On recalcule ainsi que la valeur que l'on souhaite sans empecher la mise a jour des autres valeurs
 	 * en changeant le boolean marqueur de calcul de tte les propriétés

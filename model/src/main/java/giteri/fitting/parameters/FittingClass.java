@@ -33,8 +33,7 @@ import giteri.meme.event.BehavTransmEvent;
 import giteri.meme.event.IBehaviorTransmissionListener;
 
 
-/** Classe de configuration pour lancer un fitting
- * ou autre recherche de stabilité.
+/** Classe de fonctionnement pour lancer un fitting ou autre recherche de stabilité.
  *
  * Run: Lancement d'un simulation en partant de zero niveau
  * meme, état du réseau, etc
@@ -125,7 +124,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public FittingClass(){
 	}
 
-	/** Besoin de la référence de la fitting avant puor les listeners...
+	/**
+	 * Besoin de la référence de la fitting avant pour les listeners...
 	 *
 	 * @param wnr
 	 * @param com
@@ -150,7 +150,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		setDefaultValue();
 	}
 
-	/** Mise en place des valeurs par défault pour les variables d'utilisation
+	/**
+	 * Mise en place des valeurs par défault pour les variables d'utilisation
 	 *
 	 */
 	private void setDefaultValue(){
@@ -171,7 +172,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 	//region Fitting turn & run
 
-	/** Initialisation des variables nécessaire a un fitting.
+	/**
+	 * Initialisation des variables nécessaire a un fitting.
 	 * Ecriture dans les fichiers, ouverture des répertoires.
 	 *
 	 */
@@ -249,7 +251,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
         }
 	}
 
-	/** Nouveau tour. C a d nouvelle série de Run dans une configuration du modèle donnée.
+	/**
+	 * Nouveau tour. C a d nouvelle série de Run dans une configuration du modèle donnée.
 	 *
 	 */
 	public void newRun(){
@@ -262,7 +265,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		resultNetwork.put(numeroRun, new Result(explorator.getModelParameterSet()));
 	}
 
-	/** Nouvelle répétition d'une configuration donnée.
+	/**
+	 * Nouvelle répétition d'une configuration donnée.
 	 *
 	 *
 	 */
@@ -353,7 +357,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 	}
 
-	/** Fin du tour, enregistre les variances sur les résultats des différents run sur meme config,
+	/**
+	 * Fin du tour, enregistre les variances sur les résultats des différents run sur meme config,
 	 *
 	 *
 	 */
@@ -368,7 +373,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		com.view.resetPlotDensity();
 	}
 
-	/** Fin de la simulation, affiche le résultat final.
+	/**
+	 * Fin de la simulation, affiche le résultat final.
 	 *
 	 */
 	public double endSimu(){
@@ -392,7 +398,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 	}
 
-	/** Fonction qui va déterminer si on doit continuer ou arrêter une itération de fitting.
+	/**
+	 * Fonction qui va déterminer si on doit continuer ou arrêter une itération de fitting.
 	 *
 	 * On veut passer rapidement les situations réseaux pleins ou vides.
 	 * @return
@@ -426,7 +433,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 	//region Fitting hardstuff
 
-	/** Si la densité du network est quasiment au max avec peu de variation.
+	/**
+	 * Si la densité du network est quasiment au max avec peu de variation.
 	 *
 	 * @return
 	 */
@@ -471,7 +479,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		return resultat;
 	}
 
-	/** utilisation de la variation des coefficients directeurs sur des plages de données
+	/**
+	 * utilisation de la variation des coefficients directeurs sur des plages de données
 	 *
 	 * @param densities
 	 * @param message
@@ -558,7 +567,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		kvLastActionDone.clear();
 	}
 
-	/** Methode la plus simple pour calculer la distance entre deux réseaux.
+	/**
+	 * Methode la plus simple pour calculer la distance entre deux réseaux.
 	 *
 	 * @param activationCode
 	 * @param targetNetworkProperty
@@ -660,6 +670,12 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 				valueTwo = (double) valueTarget;
 				distance = distance(valueOne, valueTwo, 1);
 				break;
+			case thirdMoment:
+				valueOne = (double) valueFrom;
+				valueTwo = (double) valueTarget;
+				distance = distance(valueOne, valueTwo, 1);
+				break;
+
 			default:
 				break;
 		}
@@ -669,7 +685,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		return distance;
 	}
 
-	/** Donne la distance entre deux éléments ( en pourcentage ), relative au max des ces éléments
+	/**
+	 * Donne la distance entre deux éléments ( en pourcentage ), relative au max des ces éléments
 	 *
 	 * @param valueOne
 	 * @param valueTwo

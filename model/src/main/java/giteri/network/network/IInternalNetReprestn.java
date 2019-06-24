@@ -6,6 +6,7 @@ import java.util.*;
 
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.NetworkAttribType;
+import giteri.tool.math.Toolz;
 import org.graphstream.algorithm.APSP;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
@@ -74,6 +75,7 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 			double apl = -1;
 			int[] distrib = new int[0];
 			int ddInterQrt = -1;
+			double thirdMoment;
 			@SuppressWarnings("unused")
 			double avgClustering = 0;
 			// Pas de passage par le gc pour "libérer" une variable simple, plus performant que d'appeler plusieurs fois le configurator.isattribActivated
@@ -105,180 +107,41 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 			// region DD
 			if(	Configurator.isAttribActived(activationCode, NetworkAttribType.DDINTERQRT) ||
 				Configurator.isAttribActived(activationCode, NetworkAttribType.DDARRAY) ||
-				Configurator.isAttribActived(activationCode, NetworkAttribType.AVGCLUST) ) {
+				Configurator.isAttribActived(activationCode, NetworkAttribType.AVGCLUST) ||
+					Configurator.isAttribActived(activationCode, NetworkAttribType.thirdMoment)) {
 				
 				distrib = new int[nbNodes];
 				
 				if(avgClust) 
-					clustByNode = new Hashtable<Integer, Double>();
+					clustByNode = new Hashtable<>();
 
 				synchronized (syncOnNodes) {
+
 					for (List<Integer> connections : nodesAndConnections.values()) {
 						distrib[connections.size()] = ++(distrib[connections.size()]);
 					}
 
 					netPropResult.setDd(distrib);
-					// Si espace interquartile
-					if (Configurator.isAttribActived(activationCode, NetworkAttribType.DDINTERQRT)) {
-						// Ecart inter quartile
-						parcouru = 0;
-						index = -1;
-						double temp = nbNodes * .25f;
-						do {
-							index++;
-							parcouru += distrib[index];
-						} while (parcouru < temp);
+					// si moment d'ordre 3
+					if (Configurator.isAttribActived(activationCode, NetworkAttribType.thirdMoment)){
+						double sum = .0, avgDD;
+						Map<Integer, Integer> ddMap  = new Hashtable<>(nbNodes);
 
-						firstQ = index;
-
-						// 3er quartile
-						parcouru = 0;
-						index = -1;
-						temp = nbNodes * .75f;
-						do {
-							index++;
-							parcouru += distrib[index];
-						} while (parcouru < temp);
-
-						thirdQ = index;
-						ddInterQrt = thirdQ - firstQ;
-						netPropResult.setValue(NetworkAttribType.DDINTERQRT,ddInterQrt);
-					}
-
-					//si avgClustering
-					if (avgClust) {
-						for (Integer nodeCentral : nodesAndConnections.keySet()) {
-							nodeClustering = 0;
-							for (Integer neigthboor : nodesAndConnections.get(nodeCentral)) {
-								for (Integer neightOfNeight : nodesAndConnections.get(neigthboor)) {
-									if (nodesAndConnections.get(nodeCentral).contains(neightOfNeight))
-										nodeClustering++;
-								}
-							}
-
-							nodeClustering /= nodesAndConnections.get(nodeCentral).size() * (nodesAndConnections.get(nodeCentral).size() - 1);
-							clustByNode.put(nodeCentral, nodeClustering);
+						for (int i = 0; i < distrib.length; i++) {
+							ddMap.put(i,distrib[i]);
 						}
 
-						// on retire les cas ou les noeuds n'ont aucune connexion.
-						for (Double clust : clustByNode.values())
-							if (!clust.isNaN())
-								networkClustering += clust;
+						avgDD = Toolz.getAvg(ddMap);
 
-						networkClustering /= clustByNode.values().size();
-						netPropResult.setValue(NetworkAttribType.AVGCLUST, networkClustering);
-					}
-				}
-			} // endregion
-
-			// region APL
-			if (Configurator.isAttribActived(activationCode, NetworkAttribType.APL)) {
-				graphForApl.clear();
-				synchronized (syncOnNodes) {
-					for (Integer nodeIndex : this.nodesAndConnections.keySet()) {
-						graphForApl.addNode("" + nodeIndex);
-					}
-
-					for (Integer nodeIndex : this.nodesAndConnections.keySet()) {
-						allrdyDoneNodes.add(nodeIndex);
-						for (Integer connectedNodeIndex : this.nodesAndConnections.get(nodeIndex)) {
-							if(!allrdyDoneNodes.contains(connectedNodeIndex))
-								graphForApl.addEdge(nodeIndex + "-" + connectedNodeIndex, nodeIndex, connectedNodeIndex, false);
+						for (int i = 0; i < distrib.length; i++) {
+							sum += Math.pow(avgDD-distrib[i],3);
 						}
-					}
-				}
 
-				APSP apsp = new APSP();
-				apsp.init(graphForApl);
-				apsp.setDirected(false);
-				apsp.compute();
-				APSP.APSPInfo info;// = graphForApl.getNode("10").getAttribute(APSP.APSPInfo.ATTRIBUTE_NAME);
-				double total = 0;
-				int nbValue = 0;
-				for (int i = 0; i < graphForApl.getNodeCount(); i++) {
-					info =  graphForApl.getNode(""+i).getAttribute(APSP.APSPInfo.ATTRIBUTE_NAME);
-					for (String string : info.targets.keySet()) {
-						total += info.targets.get(string).distance;
-						nbValue++;
-					}
-				}
-
-				apl = (double)total / nbValue;
-				netPropResult.setValue(NetworkAttribType.APL,(double)total / nbValue);
-			}
-			// endregion
-
-			return netPropResult;
-		}
-
-		/** hummmm
-		 *
-		 */
-//		@Override
-		public NetworkProperties getNetworkPropertiesV2(Optional<NetworkProperties> toModify, String networkName, int activationCode) {
-			boolean densityActivated = Configurator.isAttribActived(activationCode, NetworkAttribType.DENSITY);
-			boolean ddAVGActivated = Configurator.isAttribActived(activationCode, NetworkAttribType.DDAVG);
-			boolean ddInterQurtActivated = Configurator.isAttribActived(activationCode, NetworkAttribType.DDINTERQRT);
-			boolean ddArrayActivated = Configurator.isAttribActived(activationCode, NetworkAttribType.DDARRAY);
-			boolean avgClustActivated = Configurator.isAttribActived(activationCode, NetworkAttribType.AVGCLUST);
-			boolean nbEdgeActivated = Configurator.isAttribActived(activationCode, NetworkAttribType.NBEDGES);
-			boolean nbNodeActivated = Configurator.isAttribActived(activationCode, NetworkAttribType.NBNODES);
-			boolean aplActivated = Configurator.isAttribActived(activationCode, NetworkAttribType.APL);
-			boolean nbEdgeOnNodeActivated = Configurator.isAttribActived(activationCode, NetworkAttribType.nbEdgesOnNbNodes);
-
-
-
-			int parcouru, index,firstQ, thirdQ;
-			double density = -1, avgDegre = -1 ;
-			double apl = -1;
-			int[] distrib = new int[0];
-			int ddInterQrt = -1;
-			@SuppressWarnings("unused")
-			double avgClustering = 0;
-			// Pas de passage par le gc pour "libérer" une variable simple, plus performant que d'appeler plusieurs fois le configurator.isattribActivated
-			boolean avgClust = Configurator.isAttribActived(activationCode, NetworkAttribType.AVGCLUST);
-			//RP: Concernant le calcul pour les clustering moyen
-			Hashtable<Integer, Double> clustByNode = null;
-			double nodeClustering = 0;
-			double networkClustering = 0;
-			Set<Integer> allrdyDoneNodes = new HashSet<>(nbNodes);
-			NetworkProperties netPropDefault = new NetworkProperties(networkName);
-			netPropDefault.createStub();
-			netPropDefault.setNetworkUuidInstance(networkVersion);
-			NetworkProperties netPropResult = toModify.orElse(netPropDefault);
-
-			netPropResult.nbEdges = nbEdges;
-			netPropResult.nbNodes = nbNodes;
-
-			// Calcul de la densité
-			if (Configurator.isAttribActived(activationCode, NetworkAttribType.DENSITY)) {
-				density = (double) nbEdges / ( nbNodes * (nbNodes -1  ));
-				netPropResult.setValue(NetworkAttribType.DENSITY,density);
-			}
-			// degré moyen sur les nodes
-			if (Configurator.isAttribActived(activationCode, NetworkAttribType.DDAVG)){
-
-
-
-				avgDegre = (double)nbEdges / (nbNodes);
-				netPropResult.setValue(NetworkAttribType.DDAVG,avgDegre);
-			}
-			// region DD
-			if(	Configurator.isAttribActived(activationCode, NetworkAttribType.DDINTERQRT) ||
-				Configurator.isAttribActived(activationCode, NetworkAttribType.DDARRAY) ||
-				Configurator.isAttribActived(activationCode, NetworkAttribType.AVGCLUST) ) {
-
-				distrib = new int[nbNodes];
-
-				if(avgClust)
-					clustByNode = new Hashtable<Integer, Double>();
-
-				synchronized (syncOnNodes) {
-					for (List<Integer> connections : nodesAndConnections.values()) {
-						distrib[connections.size()] = ++(distrib[connections.size()]);
+						sum /= Math.pow(nbNodes,3);
+						thirdMoment = sum;
+						netPropResult.setValue(NetworkAttribType.thirdMoment, thirdMoment);
 					}
 
-					netPropResult.setDd(distrib);
 					// Si espace interquartile
 					if (Configurator.isAttribActived(activationCode, NetworkAttribType.DDINTERQRT)) {
 						// Ecart inter quartile
@@ -384,7 +247,7 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 			nbNodes = -1; 
 			nbEdges = -1;
 			networkVersion = -1;
-			nodesAndConnections = new Hashtable<Integer, List<Integer>>();
+			nodesAndConnections = new Hashtable<>();
 		}
 
 		@Override

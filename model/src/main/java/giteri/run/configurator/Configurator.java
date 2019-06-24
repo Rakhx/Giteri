@@ -50,8 +50,10 @@ public final class Configurator {
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 
 	// SCORE
-	public static int activationCodeForScore = 202; // 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)
-	public static int activationCodeAllAttrib = 255;
+	public static int activationCodeForScore = 202+512; // 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
+	// 16 + 512 Clust + third
+
+	public static int activationCodeAllAttrib = 255 + 512;
 	// public static int activationCodeActual = 255;
 
 	// endregion
@@ -209,15 +211,16 @@ public final class Configurator {
 	 *
 	 */
 	public enum NetworkAttribType{
-		DENSITY, // Density du réseau
-		DDAVG, //
-		DDINTERQRT, // la distance interquartile du réseau
-		DDARRAY, // le tableau de DD
-		AVGCLUST, // Clustering moyen
-		NBEDGES,
-		NBNODES,
-		APL,
-		nbEdgesOnNbNodes;
+		DENSITY, // 1 - Density du réseau
+		DDAVG, // 2
+		DDINTERQRT, // 4 - la distance interquartile du réseau
+		DDARRAY, // 8 - le tableau de DD
+		AVGCLUST, // 16 - Clustering moyen
+		NBEDGES, // 32
+		NBNODES, // 64
+		APL, // 128
+		nbEdgesOnNbNodes, // 256
+		thirdMoment; // 512
 	}
 
 
@@ -327,6 +330,8 @@ public final class Configurator {
 				return 8;
 			case nbEdgesOnNbNodes:
 				return 9;
+			case thirdMoment:
+				return 10;
 			default:
 				return -1;
 		}

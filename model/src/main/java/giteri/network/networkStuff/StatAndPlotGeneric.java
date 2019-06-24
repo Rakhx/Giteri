@@ -86,7 +86,8 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 	//region Interface stat&plot
 
-	/** Lancement de thread qui va comparer un réseau lu et le réseau en cours.
+	/**
+	 * Lancement de thread qui va comparer un réseau lu et le réseau en cours.
 	 *
 	 */
 	public Double fitNetwork(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
@@ -105,7 +106,8 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		}
 	}
 
-	/** Passage de force au step suivant en ce qui
+	/**
+	 * Passage de force au step suivant en ce qui
 	 * concerne le fitting.
 	 *
 	 */
@@ -114,7 +116,8 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		autoPauseIfNexted = false;
 	}
 
-	/** avg;dispersion
+	/**
+	 * avg;dispersion
 	 *
 	 */
 	public String getDDInfos(){
@@ -268,7 +271,9 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	//endregion
 
 	//region fitting
-	/** Refact. Fonction commune à tous les appels, premiere de la série.
+
+	/**
+	 * Refact. Fonction commune à tous les appels, premiere de la série.
 	 *
 	 */
 	public double fittingLauncherVersionClean(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
@@ -318,44 +323,44 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 	/** Classe factorisée pour les traitements de fitting ou searching.
 	 *
-	 * @param config
-	 * @return le score de la config testé
+	 * @param fittingConfig
+	 * @return le score de la fittingConfig testé
 	 */
-	private double factorisation(FittingClass config){
-		config.init();
+	private double factorisation(FittingClass fittingConfig){
+		fittingConfig.init();
 		int nbActionPassee;
 
-		// boucle changement de config RUN++
+		// boucle changement de fittingConfig RUN++
 		do {
-			config.newRun();
+			fittingConfig.newRun();
 
 			// On fait nbRunByConfig mesures par configuration pour étudier la variance des résultats REPETITION++
-			for (int i = 0; i < config.nbRepetitionByConfig; i++)
+			for (int i = 0; i < fittingConfig.nbRepetitionByConfig; i++)
 			{
-				config.newRepetition();
+				fittingConfig.newRepetition();
 				cfqDensityOnFitting.clear();
 				do
 				{
-					config.com.view.displayMessageOnFitPanel("Work In Progress");
+					fittingConfig.com.view.displayMessageOnFitPanel("Work In Progress");
 
 					// TODO a voir pour rendre le truc un peu plus flexible sur la circular queue
 					// qui prend boucleExterneSize en taille mais qui n'est reset que dans newRepetition().
 
 					// On répète x fois
-					for (int x = 0; x < config.boucleExterneSize; x++)
+					for (int x = 0; x < fittingConfig.boucleExterneSize; x++)
 					{
 						do{
 							nbActionPassee  = getNbAction();
-						}while(nbActionPassee <= config.nbActionByStep);
+						}while(nbActionPassee <= fittingConfig.nbActionByStep);
 
 						NetworkProperties np = networkConstructor.updatePreciseNetworkProperties(Configurator.getIndicateur(NetworkAttribType.DENSITY));
 						cfqDensityOnFitting.add(np.getDensity());
-						config.computeMemeAppliance();
+						fittingConfig.computeMemeAppliance();
 						resetNbAction();
 					}
 
-//					debugBeforeSkip = config.continuFittingSimpliestVersion();
-					debugBeforeSkip =config.continuFitting(cfqDensityOnFitting);
+//					debugBeforeSkip = fittingConfig.continuFittingSimpliestVersion();
+					debugBeforeSkip =fittingConfig.continuFitting(cfqDensityOnFitting);
 
 					if(!debugBeforeSkip){
 						if(debug) System.out.println("Voudrait passer au step suivant");
@@ -379,13 +384,13 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 					communicationModel.resume();
 				}
 
-				config.endRepetition();
+				fittingConfig.endRepetition();
 			}
 
-			config.endRun();
+			fittingConfig.endRun();
 
 			// Configuration distribution suivante
-		} while(config.explorator.gotoNext());
+		} while(fittingConfig.explorator.gotoNext());
 
 		if(!Configurator.jarMode)
 			System.out.println(" - Fin de l'exploration - ");
@@ -394,7 +399,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			networkConstructor.stop();
 			networkConstructor.resume();
 		}
-		return config.endSimu();
+		return fittingConfig.endSimu();
 	}
 
 	/** prends les listes vides en entrée et les remplis pour les faire correspondre a une

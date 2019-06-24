@@ -32,6 +32,9 @@ public class Result {
 
     /** Constructeur qui prend en param les providers contenant la configuration courante
      *
+     * Proba Diffusion -> ADLKDGRDMNTLKHA=0.1:ADLKDGRDMMT=0.0:ADLKDGRDMMNSPNTLK=0.0:RMLKDGRDMMNSPLK=0.0:
+     * ADLKDGRDMMNIFNTLK=0.0:RMLKDGRDMGLLK=0.0:RMLKDGRDMMNIFLK=0.0:
+     *
      * @param providers de la configuration courante.
      */
     public Result(Collection<IModelParameter<?>> providers){
