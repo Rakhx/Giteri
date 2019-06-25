@@ -50,7 +50,10 @@ public final class Configurator {
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 
 	// SCORE
-	public static int activationCodeForScore = 202+512; // 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
+
+	public static boolean exploreSpecialNetworks = true; // Si on cherche les networks non moyen plutot que faire un score de distance
+    // Si true, passe par la méthode getNetworkScoreExplo qui ne prend en compte que CC et 3moment.
+	public static int activationCodeForScore = 202+512; // 202+512 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
 	// 16 + 512 Clust + third
 
 	public static int activationCodeAllAttrib = 255 + 512;

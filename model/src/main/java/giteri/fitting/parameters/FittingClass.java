@@ -33,10 +33,12 @@ import giteri.meme.event.BehavTransmEvent;
 import giteri.meme.event.IBehaviorTransmissionListener;
 
 
-/** Classe de fonctionnement pour lancer un fitting ou autre recherche de stabilité.
- *
+/**
+ * Classe de fonctionnement pour lancer un fitting ou autre recherche de stabilité.
+ * Simu, composé de Run aux configurations changeante, composé de repétition sur un set de parametre fixe.
  * Run: Lancement d'un simulation en partant de zero niveau
  * meme, état du réseau, etc
+ * Repetition
  * Step: Pendant un run, interval de temps entre deux mesures
  * Config // set de parametre : valeur des paramètres de configuration
  * de la simulation. Ne change pas pendant un run.
@@ -92,12 +94,10 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	private Hashtable<Meme, Double> kvOverallProportionActionDone;
 	private Hashtable<Meme, Integer> kvOverallNumberOfActionDone;
 
-	// Liste qui sont utlisées pour définir si on s'arrete de fitter sur une configuration ou non
+	// Liste qui sont utilisées pour définir si on s'arrete de fitter sur une configuration ou non
 	private CircularFifoQueue<Hashtable<Meme, Double>> cfqMemeAppliancePropOnFitting;
 	private CircularFifoQueue<Hashtable<Meme, Integer>> cfqMemeApplianceNumberOnFitting;
 	private int nbEltCircularQFitting = 15;
-
-
 
 	private ArrayList<Meme> memesAvailables;
 	private int nbCallContinuOnThisConfig = 0;
@@ -335,7 +335,10 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		networksSameTurn.add(currentNetProperties);
 
 		// TODO [WayPoint]- Score distance entre deux network
-		currentNetworkScore = getNetworksDistanceDumb(Configurator.activationCodeForScore, targetNetProperties, currentNetProperties);
+		currentNetworkScore = Configurator.exploreSpecialNetworks?
+			getNetworkScoreExplo(currentNetProperties)
+			:getNetworksDistanceDumb(Configurator.activationCodeForScore, targetNetProperties, currentNetProperties);
+		System.out.println(currentNetworkScore);
 
 		// Ajout a la classe des resultSet un score et propriété d'un réseau
 		resultNetwork.addScore(numeroRun, currentNetworkScore, currentNetProperties);
@@ -427,7 +430,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 		return continuFittingSimpliestVersion();
 	}
-
 
 	//endregion
 
@@ -601,6 +603,22 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		return totalDistance / nbAttribActivated;
 	}
 
+	/**
+	 * Méthode qui se concentre sur trouver des réseaux particulier, non moyen.
+	 * @param currentNetProperties
+	 * @return
+	 */
+	public static double getNetworkScoreExplo(NetworkProperties currentNetProperties){
+		double score = 0;
+		double third, cc;
+		third = currentNetProperties.getThirdMoment();
+		cc = currentNetProperties.getAvgClust();
+
+		score = Math.abs(third)  + (1-cc);
+
+		return score;
+	}
+
 	/** retourne une distance entre deux attributs
 	 * Comprise entre 0 et 100
 	 * @param type
@@ -680,6 +698,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 				break;
 		}
 
+		// TODO[checkPoint]-  Full silent ?
 		System.out.println("Score " + type.toString() + ": " + distance);
 
 		return distance;

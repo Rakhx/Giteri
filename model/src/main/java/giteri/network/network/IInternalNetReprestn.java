@@ -124,18 +124,22 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 					netPropResult.setDd(distrib);
 					// si moment d'ordre 3
 					if (Configurator.isAttribActived(activationCode, NetworkAttribType.thirdMoment)){
-						double sum = .0, avgDD;
+						double sum = .0;
+						double[] ddNSd;
 						Map<Integer, Integer> ddMap  = new Hashtable<>(nbNodes);
 
 						for (int i = 0; i < distrib.length; i++) {
 							ddMap.put(i,distrib[i]);
 						}
 
-						avgDD = Toolz.getAvg(ddMap);
-
-						for (int i = 0; i < distrib.length; i++) {
-							sum += Math.pow(avgDD-distrib[i],3);
-						}
+						ddNSd = Toolz.getAvgNsd(ddMap);
+						// on centre réduit et eleve au cube pour le moment d'ordre 3. ( une fois centré la moyenne = 0 )
+						if(ddNSd[1] != 0)
+							for (int i = 0; i < distrib.length; i++) {
+								sum += Math.pow((ddNSd[0] - distrib[i])/ddNSd[1], 3);
+							}
+						else
+							sum=0;
 
 						sum /= Math.pow(nbNodes,3);
 						thirdMoment = sum;

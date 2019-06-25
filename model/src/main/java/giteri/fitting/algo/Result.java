@@ -70,7 +70,6 @@ public class Result {
         List<String> result= new ArrayList<>();
         for (String s : kvProviderValues.keySet())
             result.add("Provider: " + s + "Values :" + kvProviderValues.get(s));
-
         return result;
     }
 

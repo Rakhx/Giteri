@@ -83,7 +83,6 @@ public class ResultSet extends Hashtable<Integer, Result> {
 		result.addProperties(properties.toString());
 	}
 
-
 	/**
 	 * Ecriture dans le fichier détaillé des propriétés du dernier network.
 	 * Ecrit ttes les propriétés, et laisse un espace pour leur SD qui sera écrit a la fin de

@@ -401,15 +401,31 @@ public class Toolz {
 		return resultat;
 	}
 
-	/** calcul la déviation et la moyenne de la série de donnée en entrée, et donne ces valeurs en pseudo référence
-	 * aux variables 0 -> avg et 1 -> sd.
+	/**
+	 * calcul la déviation et la moyenne de la série de donnée en entrée,
+	 * et donne ces valeurs en pseudo référence aux variables 0 -> avg et 1 -> sd.
 	 * 
-	 * @param entry IN
+	 * @param input IN Key = Valeur Value = nombre d'élément avec cette valeur
 	 * @param avg OUT
 	 * @param sd OUT
 	 */
-	public static <T extends Number> Double[] getDeviation(Map<Integer,T> entry, Double avg, double sd ){
-		return getMeanAndSd(new ArrayList<T>(entry.values()));
+	public static <T extends Number> double[] getAvgNsd(Map<T,Integer> input){
+		double avg = 0, sd = 0, sum = 0, nbElement = 0;
+		T test;
+		for (Map.Entry<T, Integer> entry: input.entrySet()){
+			sum = Double.parseDouble(""+entry.getKey()) * entry.getValue();
+			nbElement += entry.getValue();
+		}
+
+		avg = sum / nbElement;
+		sum = 0;
+		for (Map.Entry<T, Integer> entry: input.entrySet()){
+			sum = Math.pow(Double.parseDouble(""+entry.getKey())- avg, 2) * entry.getValue();
+		}
+
+		sd = Math.sqrt(sum);
+		double[] lol = {avg,sd};
+		return lol;
 	}
 
 	/**

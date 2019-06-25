@@ -12,37 +12,38 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 import java.io.File;
 import java.util.*;
 
-/** Classe qui va résumer l'état en terme de meme d'une simulation.
+/**
+ * Classe qui va résumer l'état en terme de meme d'une simulation.
  * Mise à jour par l'entité handler
  *
  */
-public class MemeProperties{
+public class MemeProperties {
 
     //region properties & constructeur
 
     // Meme actif sur la map
-    public List<Meme> memeOnMap;
+    List<Meme> memeOnMap;
 
     // Nombre d'appel depuis le début de la simu
-    public Map<Meme, Integer> nbActivationByMemes;
+    Map<Meme, Integer> nbActivationByMemes;
 
-    public Map<Meme, Integer> countOfLastMemeActivation;
+    Map<Meme, Integer> countOfLastMemeActivation;
 
     // k:meme v:nb entity with this meme
-    public Map<Meme, Integer> countOfEntitiesHavingMeme;
+    Map<Meme, Integer> countOfEntitiesHavingMeme;
 
     // Sur les 100 dernières actions, quel meme a été appelé
-    public CircularFifoQueue<Meme> lastHundredActionDone;
-    public int sizeOfCircularQueue = Configurator.sizeOfCircularForLastActionDone;
+    final CircularFifoQueue<Meme> lastHundredActionDone;
+    int sizeOfCircularQueue = Configurator.sizeOfCircularForLastActionDone;
 
-    public List<Integer> lastFailActionTried;
+    List<Integer> lastFailActionTried;
 
     // Combinaison de meme disponible
-    public Map<Integer, ArrayList<Meme>> memeCombinaisonFittingAvailable;
+    Map<Integer, ArrayList<Meme>> memeCombinaisonFittingAvailable;
 
-    public int cptActionRmvFail = 0, cptActionAddFail = 0;
+    int cptActionRmvFail = 0, cptActionAddFail = 0;
 
-    public MemeProperties(){
+     MemeProperties(){
         nbActivationByMemes = new Hashtable<>();
         countOfLastMemeActivation = new Hashtable<>();
         countOfEntitiesHavingMeme = new Hashtable<>();
@@ -70,7 +71,7 @@ public class MemeProperties{
      * @param cptModulo
      * @return
      */
-    public List<String> updateActionCount(Meme memeApply, int entiteIndex, String message, int cptModulo){
+    List<String> updateActionCount(Meme memeApply, int entiteIndex, String message, int cptModulo){
         // SUCCES: En cas de réussite de l'action
         if (memeApply != null && !message.contains("Nope"))
         {
@@ -121,7 +122,7 @@ public class MemeProperties{
      *
      * @return la somme des derniers fail, rmv étant -1, add +1
      */
-    public int lastFailAction(ObjectRef<Integer> nbAction){
+    int lastFailAction(ObjectRef<Integer> nbAction){
         nbAction.setValue(lastFailActionTried.size());
         int sumOfFail = lastFailActionTried.stream().reduce(0,Integer::sum);
         lastFailActionTried.clear();
@@ -133,7 +134,7 @@ public class MemeProperties{
      * @param meme Le meme qui a recu ou perdu une entité associée
      * @param added Si true, une entité a recu le mail, sinon elle l'a perdu
      */
-    public void updateMemePossession(Meme meme, boolean added ){
+    void updateMemePossession(Meme meme, boolean added ){
         if(added)
             Toolz.addCountToElementInHashArray(countOfEntitiesHavingMeme,meme,1);
         else
@@ -234,7 +235,7 @@ public class MemeProperties{
     }
 
 
-    public Map<Meme, Integer> getNbActivationByMemes() {
+    Map<Meme, Integer> getNbActivationByMemes() {
         return nbActivationByMemes;
     }
 

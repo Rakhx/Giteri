@@ -1,31 +1,29 @@
 package giteri.network.networkStuff;
 
 import giteri.fitting.algo.IExplorationMethod;
-import giteri.meme.event.BehavTransmEvent;
-import giteri.run.interfaces.Interfaces.StatAndPlotInterface;
-
-import java.io.File;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import giteri.tool.math.Toolz;
-import giteri.tool.other.WriteNRead;
-import giteri.meme.mecanisme.MemeFactory;
-import giteri.network.network.NetworkProperties;
+import giteri.fitting.algo.IExplorationMethod.ExplorationMethod;
 import giteri.fitting.parameters.FittingClass;
 import giteri.fitting.parameters.IModelParameter;
 import giteri.fitting.parameters.IModelParameter.GenericBooleanParameter;
 import giteri.fitting.parameters.IModelParameter.GenericDoubleParameter;
 import giteri.fitting.parameters.IModelParameter.MemeAvailability;
 import giteri.fitting.parameters.IModelParameter.MemeDiffusionProba;
-import giteri.fitting.algo.IExplorationMethod.ExplorationMethod;
-import giteri.run.configurator.Configurator;
-import giteri.run.configurator.Configurator.EnumExplorationMethod;
-import giteri.run.configurator.Configurator.NetworkAttribType;
-import giteri.run.configurator.Configurator.MemeList;
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
+import giteri.meme.mecanisme.MemeFactory;
+import giteri.network.network.NetworkProperties;
+import giteri.run.configurator.Configurator;
+import giteri.run.configurator.Configurator.EnumExplorationMethod;
+import giteri.run.configurator.Configurator.MemeList;
+import giteri.run.configurator.Configurator.NetworkAttribType;
+import giteri.run.interfaces.Interfaces.StatAndPlotInterface;
+import giteri.tool.math.Toolz;
+import giteri.tool.other.WriteNRead;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
+
+import java.io.File;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static giteri.run.configurator.Configurator.debugJarMode;
 
@@ -360,7 +358,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 					}
 
 //					debugBeforeSkip = fittingConfig.continuFittingSimpliestVersion();
-					debugBeforeSkip =fittingConfig.continuFitting(cfqDensityOnFitting);
+					debugBeforeSkip = fittingConfig.continuFitting(cfqDensityOnFitting);
 
 					if(!debugBeforeSkip){
 						if(debug) System.out.println("Voudrait passer au step suivant");
