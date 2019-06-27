@@ -338,7 +338,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		currentNetworkScore = Configurator.exploreSpecialNetworks?
 			getNetworkScoreExplo(currentNetProperties)
 			:getNetworksDistanceDumb(Configurator.activationCodeForScore, targetNetProperties, currentNetProperties);
-		System.out.println(currentNetworkScore);
 
 		// Ajout a la classe des resultSet un score et propriété d'un réseau
 		resultNetwork.addScore(numeroRun, currentNetworkScore, currentNetProperties);
@@ -610,11 +609,25 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 */
 	public static double getNetworkScoreExplo(NetworkProperties currentNetProperties){
 		double score = 0;
-		double third, cc;
+		double third, cc, density;
+		double pallierInf = .02, pallierSup = .1;
+
+		// on veut la plus grande skeness possible
 		third = currentNetProperties.getThirdMoment();
+
+		// avec haut clustering
 		cc = currentNetProperties.getAvgClust();
 
-		score = Math.abs(third)  + (1-cc);
+		// mais éloigné des réseaux pleins. ( et vide )
+		density = currentNetProperties.getDensity();
+		if(density < pallierInf){
+			score = pallierInf -  (density / pallierInf ) * 100;
+		}
+		if(density > pallierSup){
+			score = (density / (1-pallierSup)) * 100 ;
+		}
+
+		score += (2 - Math.abs(third))*100  + (1.-cc)*100;
 
 		return score;
 	}

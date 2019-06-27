@@ -230,23 +230,9 @@ public class MemeProperties {
         return toWrite;
     }
 
-    public String getStringToWriteMemeCombinaison(int numeroRun, int numeroRep,  IExplorationMethod explorator){
-        return null;
-    }
-
-
     Map<Meme, Integer> getNbActivationByMemes() {
         return nbActivationByMemes;
     }
-
-    public Map<Meme, Integer> getCountOfLastMemeActivation() {
-        return countOfLastMemeActivation;
-    }
-
-    public CircularFifoQueue<Meme> getLastHundredActionDone() {
-        return lastHundredActionDone;
-    }
-
 
     // endregion
 }
