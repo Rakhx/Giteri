@@ -30,7 +30,7 @@ public final class Configurator {
 	public static boolean manuelNextStep = false; // NO-AUTOSKIP pas de passage au run suivant, il faut appuyer sur next
 	public static boolean autoPauseIfNexted = false; // AUTOPAUSE mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	@toOutput ( yes = true )
-	public static boolean initializeDefaultBehavior = true	;	// ----FLUIDITE----
+	public static boolean initializeDefaultBehavior = false	;	// ----FLUIDITE----
 	@toOutput ( yes = true )
 	public static boolean rebranchementAction = false; // REWIRE Faire l'ajout et le retrait dans le meme temps
 
@@ -86,7 +86,7 @@ public final class Configurator {
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
 	public static int activationCodeForView = fullSilent? 0 : 5;
 
-	public static boolean displayMemePossessionEvolution = false && !fullSilent; // Affiche dans l'IHM la possession des meme au fur et a mesure
+	public static boolean displayMemePossessionEvolution = true && !fullSilent; // Affiche dans l'IHM la possession des meme au fur et a mesure
 
 	public static boolean displayPlotWhileSimulation = true && !fullSilent; // Affichage des DD et densité
 	public static boolean displayMemePosessionDuringSimulation = true && !fullSilent; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
@@ -135,7 +135,7 @@ public final class Configurator {
 
 	//region ancien boolean, osef, etc
 	// moyen osef
-	public static final boolean lotOfNodes = false;
+	public static final boolean lotOfNodes = true;
 	private static int nbNode = lotOfNodes ? 500 : 100;
 	public static int refreshInfoRate = 10;
 	public final static boolean autoRedoActionIfNoAction = false;
