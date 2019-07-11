@@ -246,13 +246,13 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		for (int i = 0; i < existingMeme.size(); i++) {
 			if(existingMeme.get(i).getName().compareToIgnoreCase("ADDØ") == 0 ){
-				memeAndProba.put(existingMeme.get(i),new GenericDoubleParameter(.04,.04,.2,.04));
-			}
-			else if(existingMeme.get(i).getName().compareToIgnoreCase("RMVØ") == 0 ){
 				memeAndProba.put(existingMeme.get(i),new GenericDoubleParameter(1.,1.,1.,1.));
 			}
-			else if(existingMeme.get(i).getName().compareToIgnoreCase("AddØ-Hop") == 0 ){
-				memeAndProba.put(existingMeme.get(i),new GenericDoubleParameter(1.,1.,1.,1.));
+			else if(existingMeme.get(i).getName().compareToIgnoreCase("RMV+") == 0 ){
+				memeAndProba.put(existingMeme.get(i),new GenericDoubleParameter(.2,.2,1.,.2));
+			}
+			else if(existingMeme.get(i).getName().compareToIgnoreCase("RMV-") == 0 ){
+				memeAndProba.put(existingMeme.get(i),new GenericDoubleParameter(.2,.2,1.,.2));
 			}
 		}
 
@@ -261,7 +261,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		providers.put(0,memeDiffu);
 
 		IModelParameter.ModelParamNbNode nodesChanging = new IModelParameter.ModelParamNbNode(100, 2100, 400);
-		providers.put(1, nodesChanging);
+		// providers.put(1, nodesChanging);
 
 		return ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
 	}

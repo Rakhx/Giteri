@@ -51,6 +51,7 @@ public class Initializer {
             Configurator.systemPaused = false;
             Configurator.writeNetworkResultOnFitting = !fullSilent;
             Configurator.nbRepetitionbyRun = Configurator.nbRepetitionForJar;
+            Configurator.isFitting = true;
         }
 
         else if(launcher == Configurator.EnumLauncher.ihm){
@@ -61,6 +62,7 @@ public class Initializer {
             Configurator.systemPaused = true;
             Configurator.writeNetworkResultOnFitting = !fullSilent;
             Configurator.explorator = Configurator.EnumExplorationMethod.exhaustive;
+            Configurator.isFitting = false;
         }
 
         else if(launcher == Configurator.EnumLauncher.testProvider){

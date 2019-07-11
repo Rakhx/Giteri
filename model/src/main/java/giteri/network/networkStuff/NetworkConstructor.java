@@ -32,11 +32,8 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	IInternalNetReprestn networkRepresentation;
 	NetworkProperties networkInstanceProperties;
 
-
 	boolean onceOneStep = true;
 	int nbNodeInit = Configurator.getNbNode();
-	int cmp = 0;
-	int activator;
 
 	//endregion
 
@@ -49,6 +46,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		networkInstanceProperties = new NetworkProperties("Courant");
 		networkInstanceProperties.createStub();
 		networkRepresentation = new TinyNetworks();
+		generateNetwork(2);
 	}
 
 	public void setDrawer(Interfaces.DrawerNetworkInterface drawer){

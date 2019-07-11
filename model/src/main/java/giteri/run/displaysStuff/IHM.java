@@ -1539,7 +1539,10 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	 */
 	public void resetIHM() {
 
-		this.setSelectedMeme(memeFactory.getMemes(Configurator.MemeList.FITTING, Configurator.ActionType.ANYTHING));
+		if(Configurator.isFitting)
+			this.setSelectedMeme(memeFactory.getMemes(Configurator.MemeList.FITTING, Configurator.ActionType.ANYTHING));
+		else
+			this.setSelectedMeme(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.ActionType.ANYTHING));
 		resetHashTableKeys();
 		updateInformationDisplay();
 		// seriesMemeAppliance.clear();

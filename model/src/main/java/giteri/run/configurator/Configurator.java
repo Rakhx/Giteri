@@ -16,7 +16,7 @@ public final class Configurator {
 	// La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
 	// depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent
 	// cette configuration initiale
-	public static boolean withGraphicalDisplay = true;
+	public static boolean withGraphicalDisplay = false;
 	public static boolean jarMode = true; // Si vrai, affiche le score resultat de simu
 	public static boolean systemPaused = false;
 	public static boolean writeNetworkResultOnFitting = !fullSilent; // Screenshot, network.csv...
@@ -30,13 +30,14 @@ public final class Configurator {
 	public static boolean manuelNextStep = false; // NO-AUTOSKIP pas de passage au run suivant, il faut appuyer sur next
 	public static boolean autoPauseIfNexted = false; // AUTOPAUSE mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	@toOutput ( yes = true )
-	public static boolean initializeDefaultBehavior = false	;	// ----FLUIDITE----
+	public static boolean initializeDefaultBehavior = false;	// ----FLUIDITE----
 	@toOutput ( yes = true )
 	public static boolean rebranchementAction = false; // REWIRE Faire l'ajout et le retrait dans le meme temps
+	public static boolean isFitting = false; // Pour la liste des memes présents sur la map / fitting
 
 	// MEME
 	@toOutput ( yes = true )
-	public static boolean strictEqualityInComparaison = true; // FALSE : >= || TRUE : >
+	public static boolean strictEqualityInComparaison = false; // FALSE : >= || TRUE : >
 
 	// PROPAGATION
 	public static boolean usePropagation = true; // utilisation de la propagation
@@ -51,8 +52,9 @@ public final class Configurator {
 
 	// SCORE
 
-	public static boolean exploreSpecialNetworks = true; // Si on cherche les networks non moyen plutot que faire un score de distance
+	public static boolean exploreSpecialNetworks = false; // Si on cherche les networks non moyen plutot que faire un score de distance
     // Si true, passe par la méthode getNetworkScoreExplo qui ne prend en compte que CC et 3moment.
+	@toOutput ( yes = true )
 	public static int activationCodeForScore = 202+512; // 202+512 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
 	// 16 + 512 Clust + third
 
@@ -66,9 +68,10 @@ public final class Configurator {
 	public static EnumExplorationMethod explorator = EnumExplorationMethod.exhaustive; // Type d'exploration de fitting
 	public static MemeList typeOfMemeUseForFitting = MemeList.FITTING; // Peut etre ONMAP, EXISTING, FITTING
 
+	@toOutput ( yes = true )
 	public static int initialNetworkForFitting = 0; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
 	@toOutput ( yes = true )
-	public static int nbRepetitionbyRun = 1;
+	public static int nbRepetitionbyRun = 20;
 	@toOutput ( yes = true )
 	public static int nbRepetitionForJar = 1;
 
@@ -84,10 +87,9 @@ public final class Configurator {
 	public static boolean displayFittingProviderApplied = fullSilent ? false : true;	// affiche dans la console apprlications des params:
 	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
-	public static int activationCodeForView = fullSilent? 0 : 5;
+	public static int activationCodeForView = fullSilent? 0 : 4;
 
-	public static boolean displayMemePossessionEvolution = true && !fullSilent; // Affiche dans l'IHM la possession des meme au fur et a mesure
-
+	public static boolean displayMemePossessionEvolution = false && !fullSilent; // Affiche dans l'IHM la possession des meme au fur et a mesure
 	public static boolean displayPlotWhileSimulation = true && !fullSilent; // Affichage des DD et densité
 	public static boolean displayMemePosessionDuringSimulation = true && !fullSilent; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
 	public static boolean writeNbActionPerSec = false; // pas de fichier nbline
@@ -114,7 +116,7 @@ public final class Configurator {
 	public static boolean displayLogRatioLogFailOverSuccess = faster;
 	public static boolean displayLogRatioTryAddOverTryRmv = faster;
 
-	public static boolean checkWhenFullPropagate = false; 	// All action spread? affiche en combien d'action
+	public static boolean checkWhenFullPropagate = true; 	// All action spread? affiche en combien d'action
 	public static int checkFullProRefreshRate = 75; // every X step vérification du full propagate
 
 	//endregion

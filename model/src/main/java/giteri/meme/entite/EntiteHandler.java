@@ -181,7 +181,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 
 		// Verification de la propagation totale des memes initiaux
-		if(!allTransmitted && Configurator.checkWhenFullPropagate && cptModulo % Configurator.checkFullProRefreshRate == 0) {
+		if(Configurator.checkWhenFullPropagate && !allTransmitted &&  cptModulo % Configurator.checkFullProRefreshRate == 0) {
 			if(areAllMemeTransmitted()) {
                 allTransmitted = true;
                 vueController.displayInfo(ViewMessageType.PROPAGATION, Arrays.asList("ALL TRANSMISTED IN ;" + cptModulo));
@@ -1245,7 +1245,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		index= 0;
 		agregators.put(index++, notLinked);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("AddØ",0.1, true, true, add, attributs, KVAttributAgregator, false);
+		memeFactory.registerMemeAction("AddØ",0.1, false, true, add, attributs, KVAttributAgregator, false);
 		agregators.put(index++, random);
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, false, false, add, attributs, KVAttributAgregator, true);
 
@@ -1253,7 +1253,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, notLinked);
 		agregators.put(index++, mineInf);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("Add+", 1, false ,true, add, attributs,KVAttributAgregator, false);
+		memeFactory.registerMemeAction("Add+", 1, true ,true, add, attributs,KVAttributAgregator, false);
 
 		agregators.clear();
 		agregators.put(0, notLinked);
