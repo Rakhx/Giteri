@@ -562,18 +562,22 @@ public class Toolz {
 	 * @return
 	 */
 	public static double getNumberCutToPrecision(Double input, int precision){
-		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.getDefault());
-		otherSymbols.setDecimalSeparator('.');
-		// otherSymbols.setGroupingSeparator(',');
-		DecimalFormat decimal = new DecimalFormat("", otherSymbols);
-		decimal.setMaximumFractionDigits(precision); // arrondi à 2 chiffres apres la virgules
-		decimal.setMinimumFractionDigits(0);
-		try{
-		return Double.parseDouble(decimal.format(input));
-		}catch( Exception e){
-			if(meLikeDebug) System.err.println("Erreur de conversion");
-			return 0;
-		}
+
+		return org.apache.commons.math3.util.Precision.round(input, precision);
+
+		// Voila voila...
+//		DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.getDefault());
+//		otherSymbols.setDecimalSeparator('.');
+//		// otherSymbols.setGroupingSeparator(',');
+//		DecimalFormat decimal = new DecimalFormat("", otherSymbols);
+//		decimal.setMaximumFractionDigits(precision); // arrondi à 2 chiffres apres la virgules
+//		decimal.setMinimumFractionDigits(0);
+//		try{
+//		return Double.parseDouble(decimal.format(input));
+//		}catch( Exception e){
+//			if(meLikeDebug) System.err.println("Erreur de conversion");
+//			return 0;
+//		}
 	}
 	
 	/** Renvoi une arrayList<Key> trié par Sort() appliqué au value associée.

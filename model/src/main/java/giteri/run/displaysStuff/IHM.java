@@ -937,6 +937,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 			}
 			//endregion
 
+			// c pa propre ca
 			try {
 				pair = new JLabel(properties + ": "
 						+ Toolz.getNumberCutToPrecision((Double) value, 4));

@@ -16,7 +16,7 @@ public final class Configurator {
 	// La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
 	// depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent
 	// cette configuration initiale
-	public static boolean withGraphicalDisplay = false;
+	public static boolean withGraphicalDisplay = true;
 	public static boolean jarMode = true; // Si vrai, affiche le score resultat de simu
 	public static boolean systemPaused = false;
 	public static boolean writeNetworkResultOnFitting = !fullSilent; // Screenshot, network.csv...
@@ -61,6 +61,9 @@ public final class Configurator {
 	public static int activationCodeAllAttrib = 255 + 512;
 	// public static int activationCodeActual = 255;
 
+	//
+	public static int initialnetworkForBase = 0; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 4-SW
+
 	// endregion
 
 	// region Fitting
@@ -89,7 +92,7 @@ public final class Configurator {
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
 	public static int activationCodeForView = fullSilent? 0 : 4;
 
-	public static boolean displayMemePossessionEvolution = false && !fullSilent; // Affiche dans l'IHM la possession des meme au fur et a mesure
+	public static boolean displayMemePossessionEvolution = true && !fullSilent; // Affiche dans l'IHM la possession des meme au fur et a mesure
 	public static boolean displayPlotWhileSimulation = true && !fullSilent; // Affichage des DD et densité
 	public static boolean displayMemePosessionDuringSimulation = true && !fullSilent; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
 	public static boolean writeNbActionPerSec = false; // pas de fichier nbline

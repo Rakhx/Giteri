@@ -46,7 +46,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		networkInstanceProperties = new NetworkProperties("Courant");
 		networkInstanceProperties.createStub();
 		networkRepresentation = new TinyNetworks();
-		generateNetwork(2);
+		generateNetwork(Configurator.initialnetworkForBase);
 	}
 
 	public void setDrawer(Interfaces.DrawerNetworkInterface drawer){
@@ -135,7 +135,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 
 	/** Méthode qui génère un réseau d'un certains type.
 	 * Va générer les liens, mais les noeuds doivent déjà etre présent.
-	 * 0 empty,1 4%,  2 30%, 3 scalefree, 4 smallworld, 5 complet
+	 * 0 empty,1 4%,  2 30%, 3 scalefree, 4 smallworld, 5 complet, 6 custom random
 	 * @param activator
 	 */
 	public void generateNetwork(int activator){
@@ -149,9 +149,10 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 
 		// Soit 1 a 4% soit 2 a 30(50?) %
 		int nbEdgeToAddByNode = activator == 1 ? (nbNodeInit * pourcentageLow/200) : (nbNodeInit * pourcentageMiddle/200);
+        if(activator == 6)
+            nbEdgeToAddByNode = 5614/500;
 
-		// Scale free
-		if(activator == 3)
+		if(activator == 3) // SCALE FREE
 		{
 			for (int i = 0; i < nbNodeInit; i++)
 			{
@@ -171,24 +172,22 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 				}
 			}
 		}
-		// Réseau complet
-		else if (activator == 5){
+		else if (activator == 5){ // RESEAU COMPLET
 			for (int i = 0; i < nbNodeInit; i++)
 				for (int j = 0; j < nbNodeInit; j++)
 					if(i != j && !networkInstance.getNode(j).getConnectedNodes().contains(i) )
 						networkInstance.addEdgeToNodes(i, j, false);
 
 		}
-
-		// Small world
-		else if (activator == 4){
-			double probaRelink = .1;
+		else if (activator == 4){ // SMALL WORLD
+			double probaRelink = .01;
 			int newTarget;
+			int nbNodeLattice = 11;
 
 			// pour chaque noeud le connecter au deux suivants modulo
 			for (int i = 0; i < nbNodeInit; i++) {
 				// Ajout de deux link
-				for (int j = 1; j < 3; j++) {
+				for (int j = 1; j < 1+nbNodeLattice; j++) {
 					// Ca peut etre redirigé de suite
 					if(Toolz.rollDice(probaRelink)){
 						do
@@ -218,7 +217,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 
 				// Ajoute X noeuds
 				nbEdgeToAdd = 0;
-				if(activator == 1 || activator == 2)
+				if(activator == 1 || activator == 2 || activator == 6)
 					nbEdgeToAdd = nbEdgeToAddByNode;
 //				if(activator == 5)
 //					nbEdgeToAdd = Toolz.getRandomNumber(nbNodeInit / 2);
