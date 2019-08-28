@@ -5,10 +5,7 @@ import giteri.network.event.NbNodeChangedEvent;
 import giteri.run.interfaces.Interfaces;
 
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import giteri.tool.math.Toolz;
 import giteri.network.network.Edge;
@@ -135,25 +132,25 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 
 	/** Méthode qui génère un réseau d'un certains type.
 	 * Va générer les liens, mais les noeuds doivent déjà etre présent.
-	 * 0 empty,1 4%,  2 30%, 3 scalefree, 4 smallworld, 5 complet, 6 custom random
+	 * 0 empty,1 4%,  2 30%, 3 scalefree, 4 smallworld, 5 complet, 6 custom random, 7 forest fire
 	 * @param activator
 	 */
 	public void generateNetwork(int activator){
 		int nbEdgeToAdd, choosenNodeToAdd;
-		ArrayList<Integer> availableNodes = new ArrayList<Integer>();
+		ArrayList<Integer> availableNodes = new ArrayList<>();
 		Hashtable<Integer,Double> KVNodeDegree = new Hashtable<>();
 		Integer target;
 		// 4% et 30% respectivement.
 		int pourcentageLow = 2;
 		int pourcentageMiddle = 50;
+		double firePropa = .15;
 
 		// Soit 1 a 4% soit 2 a 30(50?) %
 		int nbEdgeToAddByNode = activator == 1 ? (nbNodeInit * pourcentageLow/200) : (nbNodeInit * pourcentageMiddle/200);
         if(activator == 6)
             nbEdgeToAddByNode = 5614/500;
 
-		if(activator == 3) // SCALE FREE
-		{
+		if(activator == 3){ // SCALE FREE
 			for (int i = 0; i < nbNodeInit; i++)
 			{
 				availableNodes.clear();
@@ -203,9 +200,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 				}
 			}
 		}
-
-		else
-		{
+		else if ( activator != 7) {
 			// ajout des liens entre les noeuds
 			for (int i = 0; i < nbNodeInit; i++)
 			{
@@ -234,7 +229,38 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 				}
 			}
 		}
+		else if (activator == 7){ // Forest fire
+			int choosed;
+			List<Integer> linkWannaBeIn = new ArrayList<>();
+			List<Integer> linkIn = new ArrayList<>();
+			for (int i = 1; i < nbNodeInit; i++) {
+				linkIn.clear();
+				linkWannaBeIn.clear();
+				choosed = Toolz.getRandomNumber(i);
+				linkIn.add(choosed);
+				linkWannaBeIn.addAll(networkInstance.getConnectedNodes(choosed));
+				recursiveFF(linkIn,linkWannaBeIn, firePropa);
+				System.out.println(linkIn.size());
+				for (Integer integer : linkIn) {
+					if(!networkInstance.areNodesConnected(i, integer))
+						networkInstance.addEdgeToNodes(i, integer, false);
+				}
+
+			}
+		}
 	}
+
+	private void recursiveFF(List<Integer> listToLink, List<Integer> listWannaBeIn, double addProba){
+//		List<Integer> mayBeInclude = new ArrayList<>();
+		listWannaBeIn.removeAll(listToLink);
+		for (Integer integer : listWannaBeIn) {
+			if(Toolz.rollDice(addProba)) {
+				listToLink.add(integer);
+				recursiveFF(listToLink, networkInstance.getConnectedNodes(integer), addProba);
+			}
+		}
+	}
+
 
 	/** NETWORK MODIFICATIONS. Ajout d'un noeud.
 	 *

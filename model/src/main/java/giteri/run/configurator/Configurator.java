@@ -62,7 +62,7 @@ public final class Configurator {
 	// public static int activationCodeActual = 255;
 
 	//
-	public static int initialnetworkForBase = 0; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 4-SW
+	public static int initialnetworkForBase = 7; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 4-SW
 
 	// endregion
 
