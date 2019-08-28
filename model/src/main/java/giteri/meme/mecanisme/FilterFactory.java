@@ -29,10 +29,6 @@ public class FilterFactory {
 				return new TheMost();
 			case THELEAST:
 				return new TheLeast();
-//			case THEMOSTLINKED:
-//				return new TheMostLinked(entiteHandler);
-//			case THELEASTLINKED:
-//				return new TheLeastLinked(entiteHandler);
 			case MINESUP:
 				return new MineSup();
 			case MINEINF:
@@ -53,6 +49,8 @@ public class FilterFactory {
 				return new Triangle();
 			case THEIRSUP:
 				return new TheirSup();
+			case THEIREQUAL:
+				return new TheirEqual();
 			default:
 				return null;
 		}
@@ -78,7 +76,8 @@ public class FilterFactory {
 
 	}
 
-	/** Classe fournissant des méthodes de bases
+	/** Classe fournissant des méthodes de bases pour certaines des implémentations de l'interface. Non intégré a tte les classes
+	 * de filtre.
 	 *
 	 */
 	public abstract class Filter {
@@ -105,7 +104,6 @@ public class FilterFactory {
 			Set<Entite> entitesLinked = new HashSet<>(entites);
 			this.getLinked(asker, entitesLinked);
 			entites.removeAll(entitesLinked);
-//			entites.removeAll(this.getLinked(asker, entites));
 		}
 	}
 
@@ -264,10 +262,12 @@ public class FilterFactory {
 		}
 	}
 
+	/** Prise en compte de la valeur d'attribut de la cible sans le comparer a l'attribut de l'acting.
+	 *
+	 */
 	public class TheirSup implements IFilter {
 
 		int valueAttribut = 2;
-
 
 		@Override
 		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
@@ -292,6 +292,38 @@ public class FilterFactory {
 
 		public String getFourCharName() {
 			return "TRSP";
+		}
+	}
+
+	/** Prise en compte de la valeur d'attribut de la cible sans le comparer a l'attribut de l'acting.
+	 *
+	 */
+	public class TheirEqual implements IFilter {
+
+		int valueAttribut = 2;
+
+		@Override
+		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+			ArrayList<Entite> resultat = new ArrayList<Entite>();
+			for (Entite entite : entites) {
+				if(entite.getDegree() == valueAttribut)
+					resultat.add(entite);
+			}
+
+			entites.clear();
+			entites.addAll(resultat);
+		}
+
+		public AgregatorType getEnumType() {
+			return AgregatorType.THEIREQUAL;
+		}
+
+		public String toString(){
+			return "TheirEqual";
+		}
+
+		public String getFourCharName() {
+			return "TREQ";
 		}
 	}
 
@@ -366,7 +398,7 @@ public class FilterFactory {
 	public class MineEgal implements IFilter {
 		@Override
 		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
-			ArrayList<Entite> resultat = new ArrayList<Entite>();
+			ArrayList<Entite> resultat = new ArrayList<>();
 			for (Entite entite : entites) {
 				if(attribut.getAttributValue(entite.getNode()).compareTo(attribut.getAttributValue(asker.getNode())) == 0){
 					resultat.add(entite);

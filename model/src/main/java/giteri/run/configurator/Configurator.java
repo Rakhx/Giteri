@@ -249,7 +249,8 @@ public final class Configurator {
 		RANDOM,
 		HOPAWAY,
 		TRIANGLE,
-		THEIRSUP
+		THEIRSUP,
+		THEIREQUAL
 	}
 
 	/** Ajout lien...
