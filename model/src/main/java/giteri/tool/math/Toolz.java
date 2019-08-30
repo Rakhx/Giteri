@@ -46,6 +46,10 @@ public class Toolz {
 	public static int getRandomNumber(int max){
 		return rand.nextInt(max);
 	}
+
+	public static int jureDistrib(double proba){
+		return 1 + (int)((Math.log(1.- Toolz.getProba()))/(Math.log(1.-proba)));
+	}
 	
 	/** Renvoi un élément d'une liste choisi aléatoirement, après l'avoir
 	 *  retiré de la liste qui été donné en paramètre

@@ -143,7 +143,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		// 4% et 30% respectivement.
 		int pourcentageLow = 2;
 		int pourcentageMiddle = 50;
-		double firePropa = .15;
+		double firePropa = .2;
 
 		// Soit 1 a 4% soit 2 a 30(50?) %
 		int nbEdgeToAddByNode = activator == 1 ? (nbNodeInit * pourcentageLow/200) : (nbNodeInit * pourcentageMiddle/200);
@@ -230,32 +230,36 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 			}
 		}
 		else if (activator == 7){ // Forest fire
+
+
 			int choosed;
+			int nbToAdd;
 			List<Integer> linkWannaBeIn = new ArrayList<>();
 			List<Integer> linkIn = new ArrayList<>();
-			for (int i = 1; i < nbNodeInit; i++) {
+			for (int i = 1; i < nbNodeInit; i++) { // pour chaque noeud du réseau pris un par un
 				linkIn.clear();
 				linkWannaBeIn.clear();
-				choosed = Toolz.getRandomNumber(i);
+				choosed = Toolz.getRandomNumber(i); // on en choisit un d'index inférieur
 				linkIn.add(choosed);
-				linkWannaBeIn.addAll(networkInstance.getConnectedNodes(choosed));
+				linkWannaBeIn.addAll(networkInstance.getConnectedNodes(choosed)); // et on va regarder ses voisins
 				recursiveFF(linkIn,linkWannaBeIn, firePropa);
-				System.out.println(linkIn.size());
+				//System.out.println(linkIn.size());
 				for (Integer integer : linkIn) {
 					if(!networkInstance.areNodesConnected(i, integer))
 						networkInstance.addEdgeToNodes(i, integer, false);
 				}
-
 			}
 		}
 	}
 
 	private void recursiveFF(List<Integer> listToLink, List<Integer> listWannaBeIn, double addProba){
-//		List<Integer> mayBeInclude = new ArrayList<>();
 		listWannaBeIn.removeAll(listToLink);
+		int nbToAdd = Toolz.jureDistrib(addProba)- 1 ;
 		for (Integer integer : listWannaBeIn) {
+			if(nbToAdd > 0)
 			if(Toolz.rollDice(addProba)) {
 				listToLink.add(integer);
+				nbToAdd--;
 				recursiveFF(listToLink, networkInstance.getConnectedNodes(integer), addProba);
 			}
 		}

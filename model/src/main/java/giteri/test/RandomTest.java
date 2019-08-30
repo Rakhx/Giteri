@@ -1,5 +1,7 @@
 package giteri.test;
 
+import giteri.tool.math.Toolz;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -8,14 +10,10 @@ public class RandomTest {
     public static void main(String[] args)  {
 
 
+        for (int i = 0; i < 100; i++) {
+            System.out.println(VOILA(.5));
+        }
 
-        Number myNumber ;
-        myNumber = new Double(2.1);
-        myNumber = 1.2;
-        double lol = 1.;
-
-//        myNumber += lol;
-        myNumber = myNumber.doubleValue() + lol;
 
 
 //        // Double mis dans un number
@@ -83,9 +81,13 @@ public class RandomTest {
 //        System.out.println(randomized2);
     }
 
+    static public int VOILA(double proba){
+        return 1 + (int)((Math.log(1.- Toolz.getProba()))/(Math.log(1.-proba)));
+    }
+
+
     static public Double lolade(){
         return  new Double(10.0);
-
     }
 
     static void changeRef(Optional<Double> changera){
