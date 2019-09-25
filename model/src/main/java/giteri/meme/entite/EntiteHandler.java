@@ -4,6 +4,7 @@ import giteri.meme.event.ActionApplyEvent;
 import giteri.meme.event.BehavTransmEvent;
 import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.IBehaviorTransmissionListener;
+import giteri.meme.mecanisme.ActionFactory;
 import giteri.meme.mecanisme.FilterFactory.IFilter;
 import giteri.meme.mecanisme.AttributFactory.IAttribut;
 import giteri.meme.mecanisme.MemeFactory;
@@ -1016,6 +1017,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		if(Configurator.initializeDefaultBehavior){
 			others.removeAll(entiteContente);
 			giveFluideMeme(others);
+			giveFluideMemeBreeder(entiteContente);
 		}
 	}
 
@@ -1147,6 +1149,23 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 	}
 
+	/** Donne au breeder la fluidité qu'ils leur manque
+	 *
+	 * @param breederToBeApplied
+	 */
+	private void giveFluideMemeBreeder(List<Entite> breederToBeApplied) {
+		for (Entite entite : breederToBeApplied) {
+
+			if (entite.getMyMemes().stream().allMatch(e -> e.action.getActionType() == ActionType.AJOUTLIEN)) {
+				if (removeRandom != null)
+					eventMemeChanged(entite, entite.addMeme(removeRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
+			} else if (entite.getMyMemes().stream().allMatch(e -> e.action.getActionType() == ActionType.RETRAITLIEN)) {
+				if (addRandom != null)
+					eventMemeChanged(entite, entite.addMeme(addRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
+			}
+		}
+	}
+
 	/**
 	 * Fait le lien entre les agents et les noeuds du réseaux A appeler une fois
 	 * avant de commencer les routines de simulation
@@ -1216,6 +1235,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * TODO [WayPoint] - Génération des memes disponibles sur la map
 	 *
 	 */
+	@SuppressWarnings("UnusedAssignment")
 	private void generateMemeAvailableForMap() {
 
 		ArrayList<AttributType> attributs = new ArrayList<>();
@@ -1235,84 +1255,98 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		AgregatorType mineSup = AgregatorType.MINESUP;
 		AgregatorType random = AgregatorType.RANDOM;
 		AgregatorType hopAWay = AgregatorType.HOPAWAY;
+		AgregatorType hopAWay3 = AgregatorType.HOPAWAY3;
 		AgregatorType triangle = AgregatorType.TRIANGLE;
 		AgregatorType theirSup = AgregatorType.THEIRSUP;
+		AgregatorType theirSupSix = AgregatorType.THEIRSUPSIX;
 		AgregatorType theirEqual = AgregatorType.THEIREQUAL;
 		AgregatorType theMost = AgregatorType.THEMOST;
+		AgregatorType selfSup = AgregatorType.SELFSUP;
 		KVAttributAgregator.put(degree, agregators);
 		attributs.add(degree);
 
-		agregators.clear();
-		index= 0;
+		agregators.clear();index= 0;
 		agregators.put(index++, notLinked);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("AddØ",1, true, true, add, attributs, KVAttributAgregator, false);
+		memeFactory.registerMemeAction("AddØ",0.0, false, true, add, attributs, KVAttributAgregator, false);
 		agregators.put(index++, random);
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, false, false, add, attributs, KVAttributAgregator, true);
 
-		index= 0;
+		agregators.clear();index= 0;
 		agregators.put(index++, notLinked);
 		agregators.put(index++, mineInf);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("Add+", 1, false,true, add, attributs,KVAttributAgregator, false);
+		memeFactory.registerMemeAction("Add+", 1, true,true, add, attributs,KVAttributAgregator, false);
 
-		agregators.clear();
+		agregators.clear();index = 0;
 		agregators.put(0, notLinked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add-",1, false ,true, add, attributs,KVAttributAgregator, false);
+		memeFactory.registerMemeAction("Add-",1, false,true, add, attributs,KVAttributAgregator, false);
 
-		agregators.clear();
-		// agregators.put(0, notLinked);
-		agregators.put(0, theMost);
-		agregators.put(1, random);
+
+		agregators.clear(); index = 0;
+		// agregators.put(index++, notLinked);
+		agregators.put(index++, theMost);
+		agregators.put(index++, random);
 		memeFactory.registerMemeAction("Add∞", 1, false, true, add, attributs, KVAttributAgregator,false);
 
-		agregators.clear();
-		agregators.put(0, hopAWay);
-		agregators.put(1, notLinked);
-//		agregators.put(2, theMost);
-//		agregators.put(3, mineInf);
-		agregators.put(2, random);
+		agregators.clear(); index = 0;
+		agregators.put(index++, hopAWay);
+		agregators.put(index++, notLinked);
+		agregators.put(index++, random);
 		memeFactory.registerMemeAction("AddØ-Hop", 1, false, true, add,attributs, KVAttributAgregator ,false);
 
-		agregators.clear();
+		agregators.clear(); index = 0;
+		agregators.put(index++, hopAWay3);
+		agregators.put(index++, notLinked);
+		agregators.put(index++, random);
+		memeFactory.registerMemeAction("AddØ-3Hop", 1, false, true, add,attributs, KVAttributAgregator ,false);
+
+		agregators.clear();index = 0;
 		agregators.put(0, notLinked);
 		agregators.put(1, theirEqual);
 		agregators.put(2, random);
 		memeFactory.registerMemeAction("AddLol",1, false, false, add,  attributs, KVAttributAgregator, false);
 
 
-		agregators.clear();
+		agregators.clear();index = 0;
 		agregators.put(0, linked);
 		agregators.put(1, random);
-		memeFactory.registerMemeAction("RmvØ",1, false, true, remove,  attributs, KVAttributAgregator, false);
+		memeFactory.registerMemeAction("RmvØ",.4, true, true, remove,  attributs, KVAttributAgregator, false);
 		agregators.put(2, random);
 		removeRandom = memeFactory.registerMemeAction("RmvØ-neutral",0, false, false, remove,  attributs, KVAttributAgregator, true);
 
-		agregators.clear();
+		agregators.clear();index = 0;
 		agregators.put(0, linked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv-", .4, true, true, remove, attributs, KVAttributAgregator ,false);
+		memeFactory.registerMemeAction("Rmv-", .4, false, true, remove, attributs, KVAttributAgregator ,false);
 
-		agregators.clear();
+		agregators.clear();index = 0;
 		agregators.put(0, linked);
 		agregators.put(1, mineInf);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv+", .8, true, true, remove, attributs, KVAttributAgregator ,false);
+		memeFactory.registerMemeAction("Rmv+", .8, false, true, remove, attributs, KVAttributAgregator ,false);
 
-		agregators.clear();
-		agregators.put(0, linked);
-		agregators.put(1, triangle);
-		agregators.put(2, random);
+		agregators.clear(); index = 0;
+		agregators.put(index++, linked);
+		agregators.put(index++, triangle);
+		agregators.put(index++, random);
 		memeFactory.registerMemeAction("RmvØ-2hop", .3, false, true, remove, attributs,KVAttributAgregator ,false);
 
+		agregators.clear(); index = 0;
+		agregators.put(index++, selfSup);
+		agregators.put(index++, linked);
+		agregators.put(index++, theirSup);
+		agregators.put(index++, random);
+		memeFactory.registerMemeAction("Rmv2",.5, false, false, remove,  attributs, KVAttributAgregator, false);
+
 		agregators.clear();
 		agregators.put(0, linked);
-		agregators.put(1, theirSup);
+		agregators.put(1, theirSupSix);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv2",.5, false, false, remove,  attributs, KVAttributAgregator, false);
+		memeFactory.registerMemeAction("Rmv3",.5, false, false, remove,  attributs, KVAttributAgregator, false);
 
 		agregators.clear();
 		memeFactory.registerMemeAction("Puri",.1,false, false, puri, attributs, KVAttributAgregator, false);

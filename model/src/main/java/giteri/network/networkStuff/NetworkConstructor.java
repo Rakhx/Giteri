@@ -144,6 +144,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		int pourcentageLow = 2;
 		int pourcentageMiddle = 50;
 		double firePropa = .2;
+		int m = 3; // Parametre du nombre de connection pour un scale free
 
 		// Soit 1 a 4% soit 2 a 30(50?) %
 		int nbEdgeToAddByNode = activator == 1 ? (nbNodeInit * pourcentageLow/200) : (nbNodeInit * pourcentageMiddle/200);
@@ -151,21 +152,23 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
             nbEdgeToAddByNode = 5614/500;
 
 		if(activator == 3){ // SCALE FREE
-			for (int i = 0; i < nbNodeInit; i++)
+			// modification lazy sous opti pour prendre en compte le m dans la génération
+
+			for (int i = 0; i < nbNodeInit; i++) // pour chaque noeud i
 			{
 				availableNodes.clear();
-				for (int j = 0; j < i; j++)
-					if(i != j && !networkInstance.getNode(j).getConnectedNodes().contains(i))
-						availableNodes.add(j);
-
-				for (Integer integer : availableNodes) {
-					KVNodeDegree.put(integer,
-							Double.parseDouble("" + networkInstance.getNode(integer).getConnectedNodes().size()));
+				for (int j = 0; j < i; j++) // // pour chaque noeud j
+					if (i != j && !networkInstance.getNode(j).getConnectedNodes().contains(i))
+						availableNodes.add(j); // Si i et j non connectés
+				for (Integer integer : availableNodes) { // on trouve le degré des noeuds disponibles
+					KVNodeDegree.put(integer, Double.parseDouble("" + networkInstance.getNode(integer).getConnectedNodes().size()));
 				}
-
-				if(KVNodeDegree.size() > 0){
-					target = Toolz.getElementByUniformProba(KVNodeDegree);
-					networkInstance.addEdgeToNodes(i, target, false);
+				for(int k = 0; k < m;k++) {
+					if (KVNodeDegree.size() > 0) {
+						target = Toolz.getElementByUniformProba(KVNodeDegree);
+						networkInstance.addEdgeToNodes(i, target, false);
+						KVNodeDegree.remove(target);
+					}
 				}
 			}
 		}

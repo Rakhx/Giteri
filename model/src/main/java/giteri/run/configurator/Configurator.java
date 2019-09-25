@@ -45,7 +45,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static boolean autoMemeForBreeder = false;	// Les breeder ont associé un meme complémement, rmd ajout ou retrait.
 	public static boolean onlyOneToPropagate = true; // Dans le cas ou une action s'applique sur plusieurs entités
-	public static boolean usePropagationSecondGeneration = false; // transmet un des memes du porteur, pas forcement celui applied
+	public static boolean usePropagationSecondGeneration = true; // transmet un des memes du porteur, pas forcement celui applied
 
 	public static boolean useEntitySuccesProba = false; // Prend en compte la proba porté pour l'entité pour APPLY a meme. Actuellement l'index
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
@@ -62,7 +62,7 @@ public final class Configurator {
 	// public static int activationCodeActual = 255;
 
 	//
-	public static int initialnetworkForBase = 0; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 4-SW
+	public static int initialnetworkForBase = 0; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 3- SF 4-SW
 
 	// endregion
 
@@ -140,7 +140,7 @@ public final class Configurator {
 
 	//region ancien boolean, osef, etc
 	// moyen osef
-	public static final boolean lotOfNodes = true;
+	public static final boolean lotOfNodes = false;
 	private static int nbNode = lotOfNodes ? 500 : 100;
 	public static int refreshInfoRate = 10;
 	public final static boolean autoRedoActionIfNoAction = false;
@@ -248,9 +248,12 @@ public final class Configurator {
 		LINKED,
 		RANDOM,
 		HOPAWAY,
+		HOPAWAY3,
 		TRIANGLE,
 		THEIRSUP,
-		THEIREQUAL
+		THEIRSUPSIX,
+		THEIREQUAL,
+		SELFSUP
 	}
 
 	/** Ajout lien...

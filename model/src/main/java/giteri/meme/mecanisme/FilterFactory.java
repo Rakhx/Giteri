@@ -45,12 +45,18 @@ public class FilterFactory {
 				return new random();
 			case HOPAWAY:
 				return new HopWay();
+			case HOPAWAY3:
+				return new HopWay3();
 			case TRIANGLE:
 				return new Triangle();
 			case THEIRSUP:
-				return new TheirSup();
+				return new TheirSupParam(2);
+				case THEIRSUPSIX:
+				return new TheirSupParam(6);
 			case THEIREQUAL:
 				return new TheirEqual();
+			case SELFSUP:
+				return new SelfSup();
 			default:
 				return null;
 		}
@@ -265,8 +271,7 @@ public class FilterFactory {
 	/** Prise en compte de la valeur d'attribut de la cible sans le comparer a l'attribut de l'acting.
 	 *
 	 */
-	public class TheirSup implements IFilter {
-
+	public class TheirSupTwo implements IFilter {
 		int valueAttribut = 2;
 
 		@Override
@@ -287,11 +292,43 @@ public class FilterFactory {
 		}
 
 		public String toString(){
-			return "TheirSup";
+			return "TheirSup2";
 		}
 
 		public String getFourCharName() {
-			return "TRSP";
+			return "TRSP2";
+		}
+	}
+	public class TheirSupParam implements IFilter {
+		int valueAttribut = 6;
+
+		public TheirSupParam(int param){
+			valueAttribut = param;
+		}
+
+		@Override
+		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+			ArrayList<Entite> resultat = new ArrayList<Entite>();
+			for (Entite entite : entites) {
+				if(entite.getDegree() >= valueAttribut)
+					resultat.add(entite);
+			}
+
+
+			entites.clear();
+			entites.addAll(resultat);
+		}
+
+		public AgregatorType getEnumType() {
+			return AgregatorType.THEIRSUPSIX;
+		}
+
+		public String toString(){
+			return "TheirSup6";
+		}
+
+		public String getFourCharName() {
+			return "TRSP6";
 		}
 	}
 
@@ -606,6 +643,85 @@ public class FilterFactory {
 
 	}
 
+	/** Renvoi les noeuds liés a une distance de @reach
+	 *
+	 */
+	public class HopWay3 extends Filter implements IFilter {
+
+		public int reach = 3;
+
+		@Override
+		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+
+			Set<Entite> entiteResult = new HashSet<>();
+
+			if(Configurator.debugHopAway){
+				String result = "before Entites";
+
+				for (Entite entite : entites) {
+					result +=":" + entite.getIndex();
+				}
+				System.out.println(result); // l'ensemble des entites pré filtrage
+			}
+
+			getNeightboor(entiteResult, entites, asker, reach);
+
+			if(Configurator.debugHopAway){
+				String result = "after Entites:";
+				for (Entite entite : entiteResult) {
+					result +=":" + entite.getIndex();
+				}
+				System.out.println(result);
+			}
+
+			entites.clear();
+			entites.addAll(entiteResult);
+		}
+
+		public String toString(){
+			return "Hopaway3";
+		}
+
+		@Override
+		public AgregatorType getEnumType() {
+			return AgregatorType.HOPAWAY3;
+		}
+
+		@Override
+		public String getFourCharName() {
+			return "HA3";
+		}
+
+		/** Fonction récursive qui va chercher les noeuds liés a la @target à une distance de @deepToGo initial.
+		 * 1er appel : on regarde les voisins de @target et les rajoute dans une liste @entiteSearchSpace.
+		 *  l @deepToGo est décrementé, si égal 0 on arrete l'appel récursif.
+		 * @param entiteToReturn
+		 * @param entiteSearchSpace
+		 * @param target
+		 * @param deepToGo
+		 */
+		private void getNeightboor(Set<Entite> entiteToReturn, Set<Entite> entiteSearchSpace, Entite target, int deepToGo){
+			deepToGo --;
+			Set<Entite> entiteAccepted = new HashSet<>();
+			// pout chaque voisin connecté a la cible,
+			for (Entite neighboor : target.getConnectedEntite()) {
+				// On regarde si le voisin en question est dans la liste des éléments a regarder
+				if(entiteSearchSpace.contains(neighboor)){
+					entiteAccepted.add(neighboor);
+					// on le retire de la liste des éléments que l'on regarde pour éviter les doublons retour
+					entiteSearchSpace.remove(neighboor);
+				}
+			}
+
+			if(deepToGo == 0)
+				entiteToReturn.addAll(entiteAccepted);
+			else if(deepToGo > 0)
+				for (Entite entite : entiteAccepted)
+					getNeightboor(entiteToReturn, entiteSearchSpace, entite, deepToGo);
+		}
+
+	}
+
 	/** retourne les noeuds liés entre eux de ceux pris en param.
 	 * Plus optimal si une réduction a déja été appelé avant
 	 */
@@ -637,6 +753,40 @@ public class FilterFactory {
 
 		public String toString(){
 			return "Triangle";
+		}
+
+	}
+
+	/** ne dépend pas des autres
+	 *
+	 */
+	public class SelfSup extends Filter implements IFilter {
+		int attributValue = 1;
+
+
+		@Override
+		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+			Set<Entite> resultat = new HashSet<>();
+			if(asker.getDegree() > attributValue){
+			}else {
+				entites.clear();
+			}
+
+
+		}
+
+		@Override
+		public AgregatorType getEnumType() {
+			return AgregatorType.SELFSUP;
+		}
+
+		@Override
+		public String getFourCharName() {
+			return "SFSP";
+		}
+
+		public String toString(){
+			return "SelfSup";
 		}
 
 	}
