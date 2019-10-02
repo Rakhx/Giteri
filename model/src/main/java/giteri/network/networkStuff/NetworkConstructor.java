@@ -180,7 +180,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 
 		}
 		else if (activator == 4){ // SMALL WORLD
-			double probaRelink = .01;
+			double probaRelink = .1;
 			int newTarget;
 			int nbNodeLattice = 11;
 
@@ -193,7 +193,8 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 						do
 						{
 							newTarget = Toolz.getRandomNumber(nbNodeInit);
-						} while(newTarget == i || networkInstance.areNodesConnected(i,newTarget) );//newTarget == (i+j) % nbNodeInit );
+						} while(newTarget == i || networkInstance.areNodesConnected(i,newTarget)
+								|| networkInstance.areNodesConnected(newTarget,i));//newTarget == (i+j) % nbNodeInit );
 
 						networkInstance.addEdgeToNodes(i, newTarget, false);
 					}

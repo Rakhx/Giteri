@@ -5,9 +5,8 @@ import giteri.run.interfaces.Interfaces.IReadNetwork;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Optional;
+import java.util.*;
+
 import giteri.tool.math.Toolz;
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.network.NetworkProperties;
@@ -158,7 +157,14 @@ public class NetworkFileLoader implements IReadNetwork {
 //		JFrame popo = new JFrame("Lu");
 //		popo.setVisible(true);
 		Graph graph = new SingleGraph("Lu");
-		for (int i = 0; i < nodesAndLinks.keySet().size(); i++) {
+		Integer maxNodes = nodesAndLinks.keySet().stream().max(Comparator.comparing(Integer::valueOf)).get();
+		//Integer maxNode = nodesAndLinks.keySet().stream().max(Comparator.comparingInt(value -> value)).get();
+		//Integer maxNodeValues =
+			//	nodesAndLinks.values().stream().flatMap(value -> value.stream()).max(Comparator.comparingInt(value->value)).get();
+		//.max(Comparator.comparingInt(value -> value)).get();
+
+
+		for (int i = 0; i < maxNodes+1; i++) {
 			graph.addNode(""+i);
 		}
 

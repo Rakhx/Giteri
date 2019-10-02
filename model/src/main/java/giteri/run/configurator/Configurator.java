@@ -31,6 +31,7 @@ public final class Configurator {
 	public static boolean autoPauseIfNexted = false; // AUTOPAUSE mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	@toOutput ( yes = true )
 	public static boolean initializeDefaultBehavior = true;	// ----FLUIDITE----
+	public static boolean initializeDefaultBehaviorToBreeder = true;	// ----FLUIDITE BREEDER----
 	@toOutput ( yes = true )
 	public static boolean rebranchementAction = false; // REWIRE Faire l'ajout et le retrait dans le meme temps
 	public static boolean isFitting = false; // Pour la liste des memes présents sur la map / fitting
