@@ -142,9 +142,9 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		Integer target;
 		// 4% et 30% respectivement.
 		int pourcentageLow = 2;
-		int pourcentageMiddle = 50;
+		int pourcentageMiddle = 30;
 		double firePropa = .2;
-		int m = 3; // Parametre du nombre de connection pour un scale free
+		int m = 2; // Parametre du nombre de connection pour un scale free
 
 		// Soit 1 a 4% soit 2 a 30(50?) %
 		int nbEdgeToAddByNode = activator == 1 ? (nbNodeInit * pourcentageLow/200) : (nbNodeInit * pourcentageMiddle/200);
@@ -180,7 +180,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 
 		}
 		else if (activator == 4){ // SMALL WORLD
-			double probaRelink = .1;
+			double probaRelink = 0;//.1;
 			int newTarget;
 			int nbNodeLattice = 11;
 
