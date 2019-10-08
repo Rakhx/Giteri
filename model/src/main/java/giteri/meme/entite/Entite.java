@@ -24,28 +24,18 @@ public class Entite implements Comparable<Entite>{
 	int index;
 	Node associatedNode;
 	double probaLearning;
-
-	Meme ajoutRandomFlemme;
-	Meme retraitRandomFlemme;
-
-	public double getProbaAppliying() {
-		return probaAppliying;
-	}
-
 	double probaAppliying;
 
 	// Liste de memes
 	private ArrayList<Meme> myMemes;
 	// répartie sur 0 -> 1, réévalué a chaque ajout ou (retrait de meme)
 	Hashtable<Meme, Double> intervalOfSelection;
-//	Hashtable<Entite, Integer> connectedTimeNodes;
+	//	Hashtable<Entite, Integer> connectedTimeNodes;
 	Set<Entite> connectedNodes;
-
 	// défini sur quels memes l'entité fourni le réseau
 	Set<IAction> breederOn;
 
 	//endregion
-
 	/** Constructeur d'entite.
 	 *
 	 */
@@ -108,6 +98,10 @@ public class Entite implements Comparable<Entite>{
 		for (Meme possededMeme : getMyMemes())
 			if(memeToAdd.getAction().getActionType() == possededMeme.getAction().getActionType())
 			{
+				if(memeToAdd.compareTo(possededMeme) == 0) {
+					okToBeAdded = false;
+					break;
+				}
 				// si oui, il faudra que la configuration l'autorise pour remplacer l'ancien meme.
 				memeReplaced = possededMeme;
 				needToBeReplaced = true;
@@ -145,7 +139,6 @@ public class Entite implements Comparable<Entite>{
 		}
 
 		return needToBeReplaced ? memeReplaced : memeToAdd;
-
 	}
 
 
@@ -294,8 +287,8 @@ public class Entite implements Comparable<Entite>{
 		return succes;
 	}
 
-	//region Getter/Setter
 
+	//region Getter/Setter
 	/** Vérifie que les memes possédés par l'entité sont des memes propagés,
 	 * et non slot vide // meme fluidité de bootstrap.
 	 *
@@ -385,6 +378,10 @@ public class Entite implements Comparable<Entite>{
 		return associatedNode.getConnectedNodes();
 	}
 
+	public double getProbaAppliying() {
+		return probaAppliying;
+	}
+
 	/** Obtient la liste des entités connectés depuis la hash de 
 	 * temps de connection entre les noeuds. 
 	 *
@@ -415,11 +412,6 @@ public class Entite implements Comparable<Entite>{
 	public Meme addMeme(Meme e, boolean fixed){
 		if(fixed) {
 			breederOn.add(addMeme(e).getAction());
-			if(Configurator.autoMemeForBreeder)
-				if(e.getAction().getActionType() == ActionType.AJOUTLIEN )
-					addMeme(retraitRandomFlemme);
-				else
-					addMeme(ajoutRandomFlemme);
 		}
 		else
 			addMeme(e);

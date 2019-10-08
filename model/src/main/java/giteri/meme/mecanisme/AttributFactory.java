@@ -9,7 +9,6 @@ import giteri.meme.entite.EntiteHandler;
  *
  */
 public class AttributFactory {
-	private static AttributFactory instance = null;
 	public AttributFactory(){
 	}
 

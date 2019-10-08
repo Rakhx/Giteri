@@ -30,8 +30,9 @@ public final class Configurator {
 	public static boolean manuelNextStep = false; // NO-AUTOSKIP pas de passage au run suivant, il faut appuyer sur next
 	public static boolean autoPauseIfNexted = false; // AUTOPAUSE mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	@toOutput ( yes = true )
-	public static boolean initializeDefaultBehavior = true;	// ----FLUIDITE----
-	public static boolean initializeDefaultBehaviorToBreeder = true;	// ----FLUIDITE BREEDER----
+	public static boolean initializeDefaultBehavior = false;	// ----FLUIDITE----
+	@toOutput ( yes = true )
+	public static boolean initializeDefaultBehaviorToBreeder = false;	// ----FLUIDITE BREEDER----
 	@toOutput ( yes = true )
 	public static boolean rebranchementAction = false; // REWIRE Faire l'ajout et le retrait dans le meme temps
 	public static boolean isFitting = false; // Pour la liste des memes présents sur la map / fitting
@@ -43,8 +44,8 @@ public final class Configurator {
 	// PROPAGATION
 	public static boolean usePropagation = true; // utilisation de la propagation
 	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
-	@toOutput ( yes = true )
-	public static boolean autoMemeForBreeder = false;	// Les breeder ont associé un meme complémement, rmd ajout ou retrait.
+
+
 	public static boolean onlyOneToPropagate = true; // Dans le cas ou une action s'applique sur plusieurs entités
 	public static boolean usePropagationSecondGeneration = true; // transmet un des memes du porteur, pas forcement celui applied
 

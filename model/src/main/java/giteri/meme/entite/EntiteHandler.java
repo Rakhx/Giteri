@@ -5,6 +5,8 @@ import giteri.meme.event.BehavTransmEvent;
 import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.IBehaviorTransmissionListener;
 import giteri.meme.mecanisme.ActionFactory;
+import giteri.meme.mecanisme.AttributFactory;
+import giteri.meme.mecanisme.FilterFactory;
 import giteri.meme.mecanisme.FilterFactory.IFilter;
 import giteri.meme.mecanisme.AttributFactory.IAttribut;
 import giteri.meme.mecanisme.MemeFactory;
@@ -434,7 +436,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	public void addEntityListener(IActionApplyListener myListener) {
 		synchronized (entityListeners) {
-
 			if (!entityListeners.contains(myListener)) {
 				entityListeners.add(myListener);
 			}
@@ -709,7 +710,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				}
 			}
 
-			// AFFICHAGE ET DEBUGGUAGE
+			//region AFFICHAGE ET DEBUGGUAGE
 			if (Configurator.displayLogRatioTryAddOverTryRmv) {
 				for (Meme memeAction : memeActions) {
 					if (memeAction != null) {
@@ -763,6 +764,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			}
 		}
 
+		//endregion
+
 		workerFactory.getCalculator().incrementNbAction();
 		return rez.stream().reduce(String::concat).toString();
 	}
@@ -812,63 +815,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			if (cibles.size() == 1 || memeAction.getAction().getFourCharName() == "PURI") {
 				actionDone += memeAction.getAction().applyAction(movingOne, cibles);
 
-
 				// region PROPAGATION du meme
 				if (Configurator.usePropagation) {
-					propagationDirect(cibles,movingOne,memeAction);
-
-
-//					// Si on a appliquer à plus d'une entité l'action, mais qu'on ne veut qu'une seule propagation
-//					if(cibles.size() > 1 && Configurator.onlyOneToPropagate) {
-//						ite = cibles.iterator();
-//						for (int i = 0; i < Toolz.getRandomNumber(cibles.size()); i++) {
-//							ite.next();
-//						}
-//
-//						one = ite.next();
-//						cibles.clear();
-//						cibles.add(one);
-//					}
-//
-//					for (Entite entite : cibles) {
-//						// region Transmission de l'un de behavior possédé par l'acting.
-//						if (Configurator.usePropagationSecondGeneration) {
-//							Meme selectedMeme = movingOne.chooseAction();
-//							if (selectedMeme == null) {
-//								if (Configurator.debugEntiteHandler)
-//									System.out.println("Meme joué par " + movingOne.toString() + " disparu");
-//							}
-//							memeReturned = entite.receiveMeme(selectedMeme);
-//							// Si retour du meme a a jouter
-//							if (memeReturned == selectedMeme)
-//								eventMemeChanged(entite, selectedMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-//
-//							// alors il y a eu remplacement
-//							if (memeReturned != null && memeReturned != selectedMeme) {
-//								// un retrait
-//								eventMemeChanged(entite, memeReturned, Configurator.MemeActivityPossibility.RetraitMeme.toString());
-//								// et un ajout
-//								eventMemeChanged(entite, selectedMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-//							}
-//						}
-//						// endregion
-//
-//						// ou transmission du behavior appliqué
-//						else {
-//							memeReturned = entite.receiveMeme(memeAction);
-//							// Si retour du meme a a jouter
-//							if (memeReturned == memeAction)
-//								eventMemeChanged(entite, memeAction, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-//
-//							// alors il y a eu remplacement
-//							if (memeReturned != null && memeReturned != memeAction) {
-//								// un retrait
-//								eventMemeChanged(entite, memeReturned, Configurator.MemeActivityPossibility.RetraitMeme.toString());
-//								// et un ajout
-//								eventMemeChanged(entite, memeAction, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-//							}
-//						}
-//					}
+					propagationCaste(movingOne);
+					//propagationDirect(cibles,movingOne,memeAction);
 				}
 				// endregion
 
@@ -919,6 +869,61 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			return actionSelectionControlledVersion(movingOne);
 	}
 
+	/**
+	 *
+	 * @param movingOne
+	 */
+	private void propagationCaste(Entite movingOne){
+		// A RESSORTIR
+		FilterFactory ff = new FilterFactory();
+		Meme memeReturned;
+		// FULL OF SHIT
+		IFilter currentFilter;
+		Set<Entite> availables = new HashSet<>(entites);
+		Hashtable<String, Hashtable<Integer , FilterFactory.IFilter>> KVAttribAgreg = new Hashtable<>();
+
+		Hashtable<Integer , FilterFactory.IFilter> listAgregator = new Hashtable<>();
+		IAttribut<Integer> degreeAtrib = new AttributFactory().new Degree();
+
+		// CREATION DU FILTRE EN LUI MEME
+		Hashtable<Integer, AgregatorType> agregators = new Hashtable<>();
+		AgregatorType mineEgal = AgregatorType.MINEEQUAL;
+
+		agregators.put(0,mineEgal);
+		KVAttribAgreg.put(degreeAtrib.toString(), listAgregator);
+
+		for (int i = 0; i < agregators.size(); i++) {
+			listAgregator.put(i, ff.getFilter(agregators.get(i)) );
+		}
+
+		// TENTATIVE DE FILTRER MANUELLEMENT
+		// Pour chaque filtre appliqué a un attribut
+		for (int order = 0; order < listAgregator.size(); order++) {
+			currentFilter = listAgregator.get(order);
+			currentFilter.applyFilter(movingOne, availables, degreeAtrib);
+		}
+
+		// On ajoute a chacun d'entre eux la pair d'action
+		for (Meme myMeme : movingOne.getMyMemes()) {
+			for (Entite available : availables) {
+				memeReturned = available.addOrReplaceFast(myMeme);
+				// Si il y a eu effectivement un remplacement
+				if(memeReturned != myMeme && memeReturned != null){
+					// un retrait
+					eventMemeChanged(available, memeReturned, Configurator.MemeActivityPossibility.RetraitMeme.toString());
+					// et un ajout
+					eventMemeChanged(available, myMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
+				}
+			}
+		}
+	}
+
+	/** Propagation direct a l'entité qui subit l'action
+	 *
+	 * @param cibles les cibles qui ont subi l'action, souvent unitaire
+	 * @param movingOne L'entité agissante
+	 * @param memeAction L'action appliquée
+	 */
 	private void propagationDirect(Set<Entite> cibles, Entite movingOne, Meme memeAction){
 		Iterator<Entite> ite; Entite one; Meme memeReturned;
 		// Si on a appliquer à plus d'une entité l'action, mais qu'on ne veut qu'une seule propagation
@@ -933,7 +938,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			cibles.add(one);
 		}
 
-
 		for (Entite entite : cibles)
 		{
 			// region Transmission de l'un de behavior possédé par l'acting.
@@ -944,7 +948,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 					if(Configurator.debugEntiteHandler) System.out.println("Meme joué par " + movingOne.toString() + " disparu");
 				}
 				memeReturned = entite.receiveMeme(selectedMeme);
-				// Si retour du meme a a jouter
+				// Si retour du meme a ajouter
 				if(memeReturned == selectedMeme)
 					eventMemeChanged(entite, selectedMeme,Configurator.MemeActivityPossibility.AjoutMeme.toString());
 
@@ -1219,10 +1223,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			toBindToNode = new Entite();
 			toBindToNode.setNode(node);
 			entites.add(toBindToNode);
-			if(Configurator.autoMemeForBreeder) {
-				toBindToNode.ajoutRandomFlemme = addRandom;
-				toBindToNode.retraitRandomFlemme = removeRandom;
-			}
+
 		}
 
 		for (Entite entite : entites) {
