@@ -1,5 +1,6 @@
 package giteri.network.networkStuff;
 
+import giteri.meme.entite.CoupleMeme;
 import giteri.run.interfaces.Interfaces;
 
 import java.awt.Color;
@@ -45,7 +46,6 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 		fs.setLayoutPolicy(LayoutPolicy.COMPUTED_FULLY_AT_NEW_IMAGE);
 	}
 
-
 	// Graphe associé
 	private Graph graph;
 	// x3
@@ -79,7 +79,10 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 		if(e.message == Configurator.MemeActivityPossibility.AjoutMeme.toString()){
 			// On cherche le noeud concerné
 			Node noeud = graph.getNode(""+e.entite.getIndex());
-			setNodeClass(noeud, e.entite.getGraphStreamClass());
+//			setNodeClass(noeud, e.entite.getGraphStreamClass());
+			setNodeClass(noeud, memeFactory.getCoupleMemeFromIndex(e.entite.getCoupleMemeIndex()).getColorClass());
+
+
 			if(Configurator.displayLogMemeTransmission)
 				System.out.println(noeud+" "+e.meme.getName());
 		}
@@ -116,15 +119,10 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 	public void drawThisNetwork(Network net, boolean outsideView) {
 		Graph toDisplay;
 		if(outsideView){
-
 		}
-
-
 		else{
 			toDisplay = graph;
 		}
-
-
 		String attrib;
 		for (giteri.network.network.Node node : net.getNodes())
 		{
@@ -144,7 +142,8 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 		}
 	}
 
-	/** Associe aux noeuds du réseau des classes qui permettront de changer leur couleurs d'affichage.
+	/** Semi progression stuff.
+	 * Associe aux noeuds du réseau des classes qui permettront de changer leur couleurs d'affichage.
 	 * Prend un network et des noeuds sur lesquels il faut appliquer la couleur propore au target
 	 * Sur les autres noeuds, les passer en noirs. Le noeud qui fait l'action rester dans sa couleur
 	 * d'origine.
@@ -181,7 +180,8 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 		}
 	}
 
-	/** Rend aux noeuds du réseau les classes de couleurs correspondant a leur comportements.
+	/** Semi progression stuff.
+	 * Rend aux noeuds du réseau les classes de couleurs correspondant a leur comportements.
 	 *
 	 * @param net
 	 */
@@ -275,23 +275,15 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 	private void defineGraphAttributes(Graph graph){
 
 		String attribut = "";
-//		int index = -1;
-		Integer officialIndex;
-		int nbMemeSolo = memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING).size();
-		nbMemeSolo--;
-		int aAppliquer;
+		int officialIndex;
+		String combi;
+		for (CoupleMeme couple : memeFactory.getCoupleMemes()) {
+			combi = couple.getColorClass();
+			officialIndex = couple.getIndex();
 
-		for (String combi : entiteHandler.getMemeAvailableAsString(Configurator.FittingBehavior.simpleAndComplex)) {
-			officialIndex = memeFactory.getIndexFromMemeFourChar(combi);
-
-			if(officialIndex != null)
-				aAppliquer = officialIndex;
-			else
-				aAppliquer = ++nbMemeSolo;
-
-			attribut += "node. "+combi+" {fill-color: "+ colorPieAsString.get(aAppliquer)+";}";
+			attribut += "node."+combi+" {fill-color: "+ colorPieAsString.get(officialIndex)+";}";
 			if(Configurator.DisplayLogBehaviorColors){
-				System.out.println(memeFactory.translateMemeCombinaisonReadable(combi) + ":" + colorPieAsString.get(aAppliquer));
+				System.out.println(couple.getName() + ":" + colorPieAsString.get(officialIndex));
 			}
 		}
 
@@ -300,9 +292,11 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 		attribut += "node.NONTARGET {fill-color: "+ colorPieAsString.get(101)+";}";
 
 		graph.addAttribute("ui.stylesheet", attribut);
-
 	}
-
+	public void giveColorIndex(int nodeIndex, int color){
+		Node noeud = graph.getNode(""+ nodeIndex);
+//		setNodeClass(noeud, e.entite.getGraphStreamClass());
+	}
 	/** Retourne la couleur correspondant a l'index en param
 	 *
 	 * @param index

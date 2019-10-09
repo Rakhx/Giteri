@@ -39,12 +39,11 @@ public final class Configurator {
 
 	// MEME
 	@toOutput ( yes = true )
-	public static boolean strictEqualityInComparaison = true; // FALSE : >= || TRUE : >
+	public static boolean strictEqualityInComparaison = false; // FALSE : >= || TRUE : >
 
 	// PROPAGATION
 	public static boolean usePropagation = true; // utilisation de la propagation
 	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
-
 
 	public static boolean onlyOneToPropagate = true; // Dans le cas ou une action s'applique sur plusieurs entités
 	public static boolean usePropagationSecondGeneration = true; // transmet un des memes du porteur, pas forcement celui applied
@@ -110,7 +109,7 @@ public final class Configurator {
 	// endregion
 
 	// region Affichage log
-	public static boolean DisplayLogBehaviorColors = false; // correspondance meme <=> code couleur
+	public static boolean DisplayLogBehaviorColors = true; // correspondance meme <=> code couleur
 
 	public static boolean displayLogMemeApplication = false; // Chaque application de meme
 	public static boolean displayLogAvgDegreeByMeme = false; // combinaisons de meme et leur degré + derniere application + application from start
@@ -142,7 +141,7 @@ public final class Configurator {
 
 	//region ancien boolean, osef, etc
 	// moyen osef
-	public static final boolean lotOfNodes = true;
+	public static final boolean lotOfNodes = false;
 	private static int nbNode = lotOfNodes ? 500 : 100;
 	public static int refreshInfoRate = 10;
 	public final static boolean autoRedoActionIfNoAction = false;
@@ -255,7 +254,8 @@ public final class Configurator {
 		THEIRSUP,
 		THEIRSUPSIX,
 		THEIREQUAL,
-		SELFSUP
+		SELFSUP,
+		BLANK
 	}
 
 	/** Ajout lien...

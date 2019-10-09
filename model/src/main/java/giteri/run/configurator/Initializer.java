@@ -55,7 +55,9 @@ public class Initializer {
         }
 
         else if(launcher == Configurator.EnumLauncher.ihm){
-            Configurator.methodOfGeneration = Configurator.MemeDistributionType.SingleBasic;
+           // Configurator.methodOfGeneration = Configurator.MemeDistributionType.SingleBasic;
+            Configurator.methodOfGeneration = Configurator.MemeDistributionType.specificDistrib;
+
             Configurator.displayPlotWhileSimulation = true;
             // Configurator.withGraphicalDisplay = true; // On le laisse a la valeur donné dans le configurator
             Configurator.jarMode = false;

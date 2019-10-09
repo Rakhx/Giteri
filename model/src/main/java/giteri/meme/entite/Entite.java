@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
 
+import giteri.meme.mecanisme.MemeFactory;
 import giteri.tool.math.Toolz;
 import giteri.meme.mecanisme.ActionFactory;
 import giteri.meme.mecanisme.ActionFactory.IAction;
@@ -28,6 +29,10 @@ public class Entite implements Comparable<Entite>{
 
 	// Liste de memes
 	private ArrayList<Meme> myMemes;
+	// Index du couple associé
+	private int coupleMemeIndex;
+	private boolean breederOnCouple = false;
+
 	// répartie sur 0 -> 1, réévalué a chaque ajout ou (retrait de meme)
 	Hashtable<Meme, Double> intervalOfSelection;
 	//	Hashtable<Entite, Integer> connectedTimeNodes;
@@ -350,7 +355,7 @@ public class Entite implements Comparable<Entite>{
 	 */
 	public String getGraphStreamClass(){
 		String classe = "";
-		ArrayList<String> classes = new ArrayList<String>();
+		ArrayList<String> classes = new ArrayList<>();
 		for (Meme meme : getMyMemes()) {
 			classes.add(meme.toFourCharString());
 		}
@@ -359,6 +364,9 @@ public class Entite implements Comparable<Entite>{
 		for (String string : classes) {
 			classe +=  string;
 		}
+
+
+
 
 		return classe;
 	}
@@ -382,8 +390,8 @@ public class Entite implements Comparable<Entite>{
 		return probaAppliying;
 	}
 
-	/** Obtient la liste des entités connectés depuis la hash de 
-	 * temps de connection entre les noeuds. 
+	/** Obtient la liste des entités connectés depuis la hash de
+	 * temps de connection entre les noeuds.
 	 *
 	 * @return
 	 */
@@ -444,6 +452,22 @@ public class Entite implements Comparable<Entite>{
 	 */
 	public int compareTo(Entite o) {
 		return Integer.compare(this.index, o.index);
+	}
+
+	public int getCoupleMemeIndex() {
+		return coupleMemeIndex;
+	}
+
+	public void setCoupleMemeIndex(int coupleMemeIndex) {
+		this.coupleMemeIndex = coupleMemeIndex;
+	}
+
+	public boolean isBreederOnCouple() {
+		return breederOnCouple;
+	}
+
+	public void setBreederOnCouple(boolean breederOnCouple) {
+		this.breederOnCouple = breederOnCouple;
 	}
 
 	//endregion

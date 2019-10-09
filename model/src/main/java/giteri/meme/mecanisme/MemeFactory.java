@@ -1,8 +1,8 @@
 package giteri.meme.mecanisme;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.*;
 
+import giteri.meme.entite.CoupleMeme;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.ActionType;
 import giteri.run.configurator.Configurator.AgregatorType;
@@ -17,30 +17,26 @@ import giteri.run.configurator.Configurator.MemeList;
 public class MemeFactory {
 
 	//region Properties
-
-	// Singleton
-	// Liste de meme qui existe. Pas nécessairement utilisé.
-	private ArrayList<Meme> memeOnMap;
-
-	// Liste des memes disponibles sur la map
-	private ArrayList<Meme> memeExisting;
-
-	// Liste des memes dispo sur la map et qui seront utlisé pour le fitting
-	private ArrayList<Meme> memeFitting;
-
-	// association meme & index, pour coloration ET fitting
-	private Hashtable<Meme, Integer> kvMemeIndex;
-
-	private Hashtable<String, String> memeTranslationReadable;
-
-	private Integer lastIndexUsed = -1;
-
 	private ActionFactory actionFactory;
 	private FilterFactory filterFactory;
 	private AttributFactory attributFactory;
 
-	private boolean hasBeenSorted = false;
+	// Liste de meme qui sont instancié de abse sur la map. Pas nécessairement utilisé.
+	private ArrayList<Meme> memeOnMap;
+	// Liste des memes existant dans la simulation
+	private ArrayList<Meme> memeExisting;
+	// Liste des memes existant et qui seront utlisé pour le fitting
+	private ArrayList<Meme> memeFitting;
+	// association meme & index, pour coloration ET fitting
+	private Hashtable<Meme, Integer> kvMemeIndex;
+	// KV  fourCahr :: name
+	private Hashtable<String, String> memeTranslationReadable;
 
+	// Concernant les couples d'actions et leur probabilité de propagation
+	private Map<Integer, CoupleMeme> coupleAction;
+
+	private Integer lastMemeIndexUsed = -1;
+	private boolean hasBeenSorted = false;
 	//endregion
 
 	//region  Constructor & Co
@@ -53,17 +49,22 @@ public class MemeFactory {
 		filterFactory = agregatorFac;
 		attributFactory = attributFac;
 		memeTranslationReadable = new Hashtable<>();
+		coupleAction = new HashMap<>();
 	}
 
 	//endregion
 
 	/** Permet de créer un meme et de l'ajouter à la liste des memes dispos sur la map.
 	 *
-	 * @param name
-	 * @param actionAsked
-	 * @param attributs
-	 * @param KVAttributAgregator
-	 * @return
+	 * @param name Son nom
+	 * @param probaOfPropa Proba de propagation sur application si utilisée dans le model
+	 * @param addForMap Ajout a la liste des memes disponibles sur la map
+	 * @param addForFitting Ajout a la liste pour le fitting
+	 * @param actionAsked Le type d'action associée
+	 * @param attributs attributs concerné
+	 * @param KVAttributAgregator liste de filtre
+	 * @param fluidite meme considéré comme fluidité ~~
+	 * @return Le meme nouvellement créé
 	 */
 	public Meme registerMemeAction(String name, double probaOfPropa, boolean addForMap, boolean addForFitting, ActionType actionAsked,
 								   ArrayList<AttributType> attributs,
@@ -107,11 +108,37 @@ public class MemeFactory {
 		if(addForMap)
 			memeOnMap.add(toReturn);
 
-		kvMemeIndex.put(toReturn, ++lastIndexUsed);
-
+		kvMemeIndex.put(toReturn, ++lastMemeIndexUsed);
 		memeTranslationReadable.put(toReturn.toFourCharString(),toReturn.getName());
-
 		return toReturn;
+	}
+
+	/**
+	 *
+	 * @param add
+	 * @param rmv
+	 * @param proba
+	 * @return
+	 */
+	public CoupleMeme registerCoupleMeme(int index,Meme add, Meme rmv, double proba){
+		CoupleMeme cm = new CoupleMeme(index, add, rmv, proba);
+		this.coupleAction.put(index, cm);
+		return cm;
+	}
+
+	public CoupleMeme extractAndAddCoupleMeme(int index, String addName, String rmvName, double proba){
+		Meme add, rmv;
+		add = this.getMemeFromName(addName);
+		rmv = this.getMemeFromName(rmvName);
+		return this.registerCoupleMeme(index, add, rmv, proba);
+	}
+
+	public CoupleMeme getCoupleMemeFromIndex(int index){
+		return coupleAction.get(index);
+	}
+
+	public ArrayList<CoupleMeme> getCoupleMemes(){
+		return new ArrayList<>(coupleAction.values());
 	}
 
 	/** pas opti mais plus rapide. ( espérons ).
@@ -169,6 +196,10 @@ public class MemeFactory {
 
 	}
 
+	public Collection<CoupleMeme> getCouple(){
+		return new ArrayList<>(coupleAction.values());
+	}
+
 	/**
 	 *
 	 * @param typeMeme
@@ -222,13 +253,27 @@ public class MemeFactory {
 	 * @return
 	 */
 	public Meme getMemeFromFourString(String foursizeName){
-		for (Meme meme: getMemes(MemeList.EXISTING, ActionType.ANYTHING )) {
+		for (Meme meme: getMemes(MemeList.EXISTING, ActionType.ANYTHING)) {
 			if(meme.toFourCharString().compareTo(foursizeName)==0)
 				return meme;
 		}
 
 		return null;
+	}
 
+	/** Recherche dans la list memeTranslationReadable une entrée ayant pour value le name (add+),
+	 * prend sa clef (ADLKMNSPNTLK) et renvoie le meme associé
+	 *
+	 * @param name
+	 * @return
+	 */
+	public Meme getMemeFromName(String name){
+		for (Map.Entry<String, String> ssEntry : memeTranslationReadable.entrySet()) {
+			if(ssEntry.getValue().compareToIgnoreCase(name) == 0)
+				return getMemeFromFourString(ssEntry.getKey());
+		}
+
+		return null;
 	}
 
 	/** Transforme les adlkminesup en add+;
@@ -249,7 +294,6 @@ public class MemeFactory {
 
 		return compo;
 	}
-
 
 	//region index stuff
 

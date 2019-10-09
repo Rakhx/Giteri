@@ -20,7 +20,7 @@ public class Meme implements Serializable, Comparable<Meme>{
 	ArrayList<IAttribut> attributs;
 	private Hashtable<String, Hashtable<Integer, IFilter>> KVAttributLAgregator;
 	private double probaOfPropagation;
-	String name;
+	private String name;
 
 	public boolean isFluide() {
 		return fluide;

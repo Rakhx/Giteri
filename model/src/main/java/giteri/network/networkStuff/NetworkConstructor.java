@@ -325,6 +325,11 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		networkInstance.setColorToEdge(from, to, color);
 	}
 
+	/** Semi progression stuff.
+	 *
+	 * @param actingEntite
+	 * @param nodeToDesignAsTarget
+	 */
 	public void changeColorClass( Integer actingEntite , Set<Integer> nodeToDesignAsTarget){
 		drawer.applyTargetColor(networkInstance, actingEntite, nodeToDesignAsTarget);
 	}

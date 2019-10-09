@@ -57,6 +57,8 @@ public class FilterFactory {
 				return new TheirEqual();
 			case SELFSUP:
 				return new SelfSup();
+			case BLANK:
+				return new Blank();
 			default:
 				return null;
 		}
@@ -787,6 +789,34 @@ public class FilterFactory {
 
 		public String toString(){
 			return "SelfSup";
+		}
+
+	}
+
+	/** Retourne tjrs vide.
+	 *
+	 */
+	public class Blank extends Filter implements IFilter {
+
+
+		@Override
+		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
+			entites.clear();
+
+		}
+
+		@Override
+		public AgregatorType getEnumType() {
+			return AgregatorType.BLANK;
+		}
+
+		@Override
+		public String getFourCharName() {
+			return "BK";
+		}
+
+		public String toString(){
+			return "Blank";
 		}
 
 	}
