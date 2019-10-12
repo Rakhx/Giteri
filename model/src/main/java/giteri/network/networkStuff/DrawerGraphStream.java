@@ -79,9 +79,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 		if(e.message == Configurator.MemeActivityPossibility.AjoutMeme.toString()){
 			// On cherche le noeud concerné
 			Node noeud = graph.getNode(""+e.entite.getIndex());
-//			setNodeClass(noeud, e.entite.getGraphStreamClass());
 			setNodeClass(noeud, memeFactory.getCoupleMemeFromIndex(e.entite.getCoupleMemeIndex()).getColorClass());
-
 
 			if(Configurator.displayLogMemeTransmission)
 				System.out.println(noeud+" "+e.meme.getName());

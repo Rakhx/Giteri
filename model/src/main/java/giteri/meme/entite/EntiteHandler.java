@@ -4,7 +4,6 @@ import giteri.meme.event.ActionApplyEvent;
 import giteri.meme.event.BehavTransmEvent;
 import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.IBehaviorTransmissionListener;
-import giteri.meme.mecanisme.ActionFactory;
 import giteri.meme.mecanisme.AttributFactory;
 import giteri.meme.mecanisme.FilterFactory;
 import giteri.meme.mecanisme.FilterFactory.IFilter;
@@ -36,6 +35,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private NetworkConstructor networkConstruct;
 	private MemeFactory memeFactory;
 	private WorkerFactory workerFactory;
+	private FilterFactory filterFactory;
 
 	// les entités du réseau
 	protected Set<Entite> entites;
@@ -79,6 +79,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		networkConstruct = networkC;
 		memeFactory = memeF;
 		workerFactory = workF;
+		filterFactory = new FilterFactory();
 
 		entites = new HashSet<>();
 		entitesActive = new ArrayList<>();
@@ -875,8 +876,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @param movingOne entité qui vient d'appliquer une action
 	 */
 	private void propagationCaste(Entite movingOne){
-		// A RESSORTIR
-		FilterFactory ff = new FilterFactory();
 		Meme memeReturned;
 		int indexCouple;
 		// FULL OF SHIT
@@ -892,7 +891,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(0,mineEgal);
 		KVAttribAgreg.put(degreeAtrib.toString(), listAgregator);
 		for (int i = 0; i < agregators.size(); i++) {
-			listAgregator.put(i, ff.getFilter(agregators.get(i)) );
+			listAgregator.put(i, filterFactory.getFilter(agregators.get(i)) );
 		}
 
 		// TENTATIVE DE FILTRER MANUELLEMENT
@@ -1348,7 +1347,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, random);
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, false, false, add, attributs, KVAttributAgregator, true);
 
-
 		agregators.clear();index= 0;
 		agregators.put(index++, notLinked);
 		agregators.put(index++, mineInf);
@@ -1366,7 +1364,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, theMost);
 		agregators.put(index++, random);
 		currentMeme = memeFactory.registerMemeAction("Add∞", 1, false, true, add, attributs, KVAttributAgregator,false);
-
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, hopAWay);
@@ -1428,8 +1425,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(0, blank);
 		currentMeme = memeFactory.registerMemeAction("Rmv0",.5, false, false, remove,  attributs, KVAttributAgregator, false);
 
-
-
 		agregators.clear();
 		memeFactory.registerMemeAction("Puri",.1,false, false, puri, attributs, KVAttributAgregator, false);
 
@@ -1437,6 +1432,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		memeFactory.extractAndAddCoupleMeme(0,"Add+","Rmv-",1);
 		memeFactory.extractAndAddCoupleMeme(1,"AddØ-Hop","Rmv0",1);
 		memeFactory.extractAndAddCoupleMeme(2,"Add∞","RmvØ",1);
+		memeFactory.extractAndAddCoupleMeme(3,"AddØ","RmvØ",0);
 	}
 
 	/**

@@ -10,12 +10,12 @@ import giteri.meme.entite.EntiteHandler;
 
 public class FilterFactory {
 
-	EntiteHandler entiteHandler;
+	// EntiteHandler entiteHandler;
 	public FilterFactory(){
 	}
 
 	public void setEntiteHandler(EntiteHandler eh){
-		entiteHandler = eh;
+	//	entiteHandler = eh;
 	}
 
 	/** FACTORY Renvoi un agregator depuis l'enum du configurator.
@@ -798,11 +798,9 @@ public class FilterFactory {
 	 */
 	public class Blank extends Filter implements IFilter {
 
-
 		@Override
 		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			entites.clear();
-
 		}
 
 		@Override
