@@ -819,7 +819,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				// region PROPAGATION du meme
 				if (Configurator.usePropagation) {
 
-					propagationCaste(movingOne);
+					propagationCasteNew(movingOne);
 					//propagationDirect(cibles,movingOne,memeAction);
 				}
 				// endregion
@@ -871,43 +871,25 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			return actionSelectionControlledVersion(movingOne);
 	}
 
-	/**
-	 *
-	 * @param movingOne entité qui vient d'appliquer une action
-	 */
-	private void propagationCaste(Entite movingOne){
+	private void propagationCasteNew(Entite movingOne){
 		Meme memeReturned;
 		int indexCouple;
-		// FULL OF SHIT
-		IFilter currentFilter;
+
 		Set<Entite> availables = new HashSet<>(entites);
-		Hashtable<String, Hashtable<Integer , FilterFactory.IFilter>> KVAttribAgreg = new Hashtable<>();
-		Hashtable<Integer , FilterFactory.IFilter> listAgregator = new Hashtable<>();
-		IAttribut<Integer> degreeAtrib = new AttributFactory().new Degree();
-
-		// CREATION DU FILTRE EN LUI MEME
-		Hashtable<Integer, AgregatorType> agregators = new Hashtable<>();
-		AgregatorType mineEgal = AgregatorType.MINEEQUAL;
-		agregators.put(0,mineEgal);
-		KVAttribAgreg.put(degreeAtrib.toString(), listAgregator);
-		for (int i = 0; i < agregators.size(); i++) {
-			listAgregator.put(i, filterFactory.getFilter(agregators.get(i)) );
-		}
-
-		// TENTATIVE DE FILTRER MANUELLEMENT
-		// Pour chaque filtre appliqué a un attribut
-		for (int order = 0; order < listAgregator.size(); order++) {
-			currentFilter = listAgregator.get(order);
-			currentFilter.applyFilter(movingOne, availables, degreeAtrib);
-		}
-
 		availables.remove(movingOne);
-		indexCouple = movingOne.getCoupleMemeIndex();
 
+		// Test d'une prédéfinition de la possibilité de propagation
+		if(Toolz.rollDice(movingOne.getCoupleMeme().getProbaPropagation()))
 		// On ajoute a chacun d'entre eux la pair d'action
 		for (Entite available : availables) {
 			// Si, apres vérification de la proba du couple d'action que porte l'entité, c'est okay
-			if(!available.isBreederOnCouple() && Toolz.rollDice(memeFactory.getCoupleMemeFromIndex(indexCouple).getProbaPropagation())){
+			if( available.getCoupleMeme() == null ||!available.isBreederOnCouple()&&
+					movingOne.getCoupleMemeIndex() != available.getCoupleMemeIndex()
+					&& Toolz.rollDice(probaPropaCoupleVersion(Math.abs(movingOne.getDegree()-available.getDegree()),
+					movingOne.getCoupleMeme().getProbaPropagation())))
+			{
+
+				available.setCoupleMeme(movingOne.getCoupleMeme());
 				// On ajoute les memes un par un
 				for (Meme myMeme : movingOne.getMyMemes()) {
 					memeReturned = available.addOrReplaceFast(myMeme);
@@ -923,11 +905,9 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 						eventMemeChanged(available, myMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
 					}
 				}
+				break;
 
-				// Et on met a jour l'information sur le couple possédé par l'entité qui vient de recevoir
-				available.setCoupleMemeIndex(indexCouple);
 			}
-
 		}
 	}
 
@@ -992,6 +972,13 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			}
 		}
 	}
+
+	private double probaPropaCoupleVersion(double distance, double paramCouple){
+		// return 1;
+		return Math.min(1, 1 / (1*distance)) * paramCouple;
+
+	}
+
 	//endregion
 
 	//region Meme
@@ -1162,7 +1149,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		for (CoupleMeme coupleMeme : memeFactory.getCouple()) {
 			currentEnti = iteEnti.next();
 			currentEnti.setBreederOnCouple(true);
-			currentEnti.setCoupleMemeIndex(coupleMeme.getIndex());
+			currentEnti.setCoupleMeme(coupleMeme);
 			iteMemeCouple = coupleMeme.iterator();
 			while(iteMemeCouple.hasNext()) {
 				currentMeme = iteMemeCouple.next();
@@ -1170,46 +1157,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				eventMemeChanged(currentEnti, currentMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			}
 		}
-
 	}
-
-
-		/*
-		int i = 0;
-		Entite entiteReceptrice;
-		ArrayList<Double> swParamSet3 = new ArrayList<>(Arrays.asList(0.907489970963927,0.363546615459677,0.458976194767827,0.247873953220028,0.984710568248182));
-		ArrayList<Double> currentParamSet = swParamSet3;
-		Iterator<Entite> entitees = entites.iterator();
-		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.EXISTING,Configurator.ActionType.ANYTHING)) {
-			entiteReceptrice = entitees.next();
-			if(meme.getName().compareTo("Add∞") == 0){
-				meme.setProbaOfPropagation(currentParamSet.get(i));
-				entiteReceptrice.addMeme(meme, true);
-				eventMemeChanged(entiteReceptrice, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-			}
-			if(meme.getName().compareTo("AddØ-Hop") == 0){
-				meme.setProbaOfPropagation(currentParamSet.get(i));
-				entiteReceptrice.addMeme(meme, true);
-				eventMemeChanged(entiteReceptrice, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-			}
-			if(meme.getName().compareTo("Rmv-") == 0){
-				meme.setProbaOfPropagation(currentParamSet.get(i));
-				entiteReceptrice.addMeme(meme, true);
-				eventMemeChanged(entiteReceptrice, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-			}
-			if(meme.getName().compareTo("Rmv+") == 0){
-				meme.setProbaOfPropagation(currentParamSet.get(i));
-				entiteReceptrice.addMeme(meme, true);
-				eventMemeChanged(entiteReceptrice, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-			}
-			if(meme.getName().compareTo("RmvØ-2hop") == 0){
-				meme.setProbaOfPropagation(currentParamSet.get(i));
-				entiteReceptrice.addMeme(meme, true);
-				eventMemeChanged(entiteReceptrice, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-			}
-			i++;
-		}*/
-
 
 	// TODO REFACTORING Prendre les memes a appliquer a tous en parametre plutot qu'avoir des variables statics
 	/** Dote les entités qui n'ont pas encore d'action des actions Add et remove de base.
@@ -1257,7 +1205,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			toBindToNode = new Entite();
 			toBindToNode.setNode(node);
 			entites.add(toBindToNode);
-
 		}
 
 		for (Entite entite : entites) {
@@ -1383,6 +1330,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(2, random);
 		currentMeme = memeFactory.registerMemeAction("AddLol",1, false, false, add,  attributs, KVAttributAgregator, false);
 
+		agregators.clear();
+		agregators.put(0, blank);
+		currentMeme = memeFactory.registerMemeAction("Add0",.5, false, false, add,  attributs, KVAttributAgregator, false);
+
 		agregators.clear();index = 0;
 		agregators.put(0, linked);
 		agregators.put(1, random);
@@ -1428,11 +1379,13 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();
 		memeFactory.registerMemeAction("Puri",.1,false, false, puri, attributs, KVAttributAgregator, false);
 
+		index = 0;
 		// Creation des couples d'actions
-		memeFactory.extractAndAddCoupleMeme(0,"Add+","Rmv-",1);
-		memeFactory.extractAndAddCoupleMeme(1,"AddØ-Hop","Rmv0",1);
-		memeFactory.extractAndAddCoupleMeme(2,"Add∞","RmvØ",1);
-		memeFactory.extractAndAddCoupleMeme(3,"AddØ","RmvØ",0);
+//		memeFactory.extractAndAddCoupleMeme(index++,"AddØ","Rmv0",.5);
+		memeFactory.extractAndAddCoupleMeme(index++,"AddØ","Rmv0",0);
+		memeFactory.extractAndAddCoupleMeme(index++,"AddØ-Hop","Rmv0",1);
+		memeFactory.extractAndAddCoupleMeme(index++,"Add0","Rmv3",1);
+//
 	}
 
 	/**

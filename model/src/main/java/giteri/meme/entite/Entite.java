@@ -30,7 +30,7 @@ public class Entite implements Comparable<Entite>{
 	// Liste de memes
 	private ArrayList<Meme> myMemes;
 	// Index du couple associé
-	private int coupleMemeIndex;
+	private CoupleMeme coupleMeme;
 	private boolean breederOnCouple = false;
 
 	// répartie sur 0 -> 1, réévalué a chaque ajout ou (retrait de meme)
@@ -455,11 +455,14 @@ public class Entite implements Comparable<Entite>{
 	}
 
 	public int getCoupleMemeIndex() {
-		return coupleMemeIndex;
+		return coupleMeme.getIndex();
 	}
 
-	public void setCoupleMemeIndex(int coupleMemeIndex) {
-		this.coupleMemeIndex = coupleMemeIndex;
+	public CoupleMeme getCoupleMeme() {
+		return coupleMeme;
+	}
+	public void setCoupleMeme(CoupleMeme coupleMeme) {
+		this.coupleMeme = coupleMeme;
 	}
 
 	public boolean isBreederOnCouple() {

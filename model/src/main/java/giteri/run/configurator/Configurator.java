@@ -51,6 +51,7 @@ public final class Configurator {
 	public static boolean useEntitySuccesProba = false; // Prend en compte la proba porté pour l'entité pour APPLY a meme. Actuellement l'index
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 
+
 	// SCORE
 
 	public static boolean exploreSpecialNetworks = false; // Si on cherche les networks non moyen plutot que faire un score de distance
@@ -62,7 +63,6 @@ public final class Configurator {
 	public static int activationCodeAllAttrib = 255 + 512;
 	// public static int activationCodeActual = 255;
 
-	//
 	public static int initialnetworkForBase = 0; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 3- SF 4-SW
 
 	// endregion
@@ -142,7 +142,7 @@ public final class Configurator {
 	//region ancien boolean, osef, etc
 	// moyen osef
 	public static final boolean lotOfNodes = true;
-	private static int nbNode = lotOfNodes ? 1000 : 100;
+	private static int nbNode = lotOfNodes ? 200 : 100;
 	public static int refreshInfoRate = 10;
 	public final static boolean autoRedoActionIfNoAction = false;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour

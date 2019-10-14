@@ -301,6 +301,10 @@ public class FilterFactory {
 			return "TRSP2";
 		}
 	}
+
+	/**
+	 *
+	 */
 	public class TheirSupParam implements IFilter {
 		int valueAttribut = 6;
 
