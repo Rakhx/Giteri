@@ -30,16 +30,16 @@ public final class Configurator {
 	public static boolean manuelNextStep = false; // NO-AUTOSKIP pas de passage au run suivant, il faut appuyer sur next
 	public static boolean autoPauseIfNexted = false; // AUTOPAUSE mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	@toOutput ( yes = true )
-	public static boolean initializeDefaultBehavior = false;	// ----FLUIDITE----
+	public static boolean initializeDefaultBehavior = true;	// ----FLUIDITE----
 	@toOutput ( yes = true )
 	public static boolean initializeDefaultBehaviorToBreeder = false;	// ----FLUIDITE BREEDER----
 	@toOutput ( yes = true )
-	public static boolean rebranchementAction = false; // REWIRE Faire l'ajout et le retrait dans le meme temps
+	public static boolean rebranchementAction = true; // REWIRE Faire l'ajout et le retrait dans le meme temps
 	public static boolean isFitting = false; // Pour la liste des memes présents sur la map / fitting
 
 	// MEME
 	@toOutput ( yes = true )
-	public static boolean strictEqualityInComparaison = false; // FALSE : >= || TRUE : >
+	public static boolean strictEqualityInComparaison = true; // FALSE : >= || TRUE : >
 
 	// PROPAGATION
 	public static boolean usePropagation = true; // utilisation de la propagation
@@ -142,7 +142,7 @@ public final class Configurator {
 	//region ancien boolean, osef, etc
 	// moyen osef
 	public static final boolean lotOfNodes = true;
-	private static int nbNode = lotOfNodes ? 200 : 100;
+	private static int nbNode = lotOfNodes ? 250 : 100;
 	public static int refreshInfoRate = 10;
 	public final static boolean autoRedoActionIfNoAction = false;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour

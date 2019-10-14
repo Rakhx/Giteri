@@ -120,12 +120,21 @@ public class MemeFactory {
 	 * @param proba
 	 * @return
 	 */
-	public CoupleMeme registerCoupleMeme(int index,Meme add, Meme rmv, double proba){
+	private CoupleMeme registerCoupleMeme(int index,Meme add, Meme rmv, double proba){
 		CoupleMeme cm = new CoupleMeme(index, add, rmv, proba);
-		this.coupleAction.put(index, cm);
+		if(index >= 0)
+			this.coupleAction.put(index, cm);
 		return cm;
 	}
 
+	/** depuis le nom des memes d'jaout//retrait, associé a un index et une proba de T
+	 *
+	 * @param index
+	 * @param addName
+	 * @param rmvName
+	 * @param proba
+	 * @return
+	 */
 	public CoupleMeme extractAndAddCoupleMeme(int index, String addName, String rmvName, double proba){
 		Meme add, rmv;
 		add = this.getMemeFromName(addName);

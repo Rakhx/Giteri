@@ -4,7 +4,6 @@ import giteri.meme.event.ActionApplyEvent;
 import giteri.meme.event.BehavTransmEvent;
 import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.IBehaviorTransmissionListener;
-import giteri.meme.mecanisme.AttributFactory;
 import giteri.meme.mecanisme.FilterFactory;
 import giteri.meme.mecanisme.FilterFactory.IFilter;
 import giteri.meme.mecanisme.AttributFactory.IAttribut;
@@ -56,6 +55,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private ArrayList<IBehaviorTransmissionListener> memeListeners;
 
 	private Meme addRandom = null, removeRandom = null;
+	private CoupleMeme doubleRandom = null;
 
 	// Variable d'utilisation
 	private static int indexOfMemesCombinaisonRecursion;
@@ -506,7 +506,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				giveMemeBasicAllNodes();
 				break;
 			case specificDistrib:
-				giveMemeToEntiteSpecific();
+				giveMemeToEntiteCouple();
 				break;
 			default:
 				break;
@@ -1139,12 +1139,13 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	/** donne les couples défini dans cette meme classe (EH) aux breeders
 	 *
 	 */
-	private void giveMemeToEntiteSpecific() {
+	private void giveMemeToEntiteCouple() {
 
 		Iterator<Entite> iteEnti = entites.iterator();
 		Iterator<Meme> iteMemeCouple;
 		Entite currentEnti;
 		Meme currentMeme;
+		ArrayList<Entite> forFluid = new ArrayList<>();
 
 		for (CoupleMeme coupleMeme : memeFactory.getCouple()) {
 			currentEnti = iteEnti.next();
@@ -1157,6 +1158,27 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				eventMemeChanged(currentEnti, currentMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			}
 		}
+
+		while(iteEnti.hasNext()){
+//			currentEnti=iteEnti.next();
+			forFluid.add(iteEnti.next());
+		}
+		if(Configurator.initializeDefaultBehavior) {
+			giveFluideCouple(forFluid);
+		}
+	}
+
+	private void giveFluideCouple(ArrayList<Entite> entitesToBeApplied){
+		for (Entite entite : entitesToBeApplied) {
+			entite.setCoupleMeme(doubleRandom);
+			entite.setBreederOnCouple(false);
+			for (Meme meme : doubleRandom) {
+				entite.addMeme(meme);
+			}
+		}
+
+		this.entitesActive.addAll(entitesToBeApplied);
+
 	}
 
 	// TODO REFACTORING Prendre les memes a appliquer a tous en parametre plutot qu'avoir des variables statics
@@ -1328,7 +1350,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(0, notLinked);
 		agregators.put(1, theirEqual);
 		agregators.put(2, random);
-		currentMeme = memeFactory.registerMemeAction("AddLol",1, false, false, add,  attributs, KVAttributAgregator, false);
+		currentMeme = memeFactory.registerMemeAction("AddEq",1, false, false, add,  attributs, KVAttributAgregator, false);
 
 		agregators.clear();
 		agregators.put(0, blank);
@@ -1381,10 +1403,15 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		index = 0;
 		// Creation des couples d'actions
-//		memeFactory.extractAndAddCoupleMeme(index++,"AddØ","Rmv0",.5);
-		memeFactory.extractAndAddCoupleMeme(index++,"AddØ","Rmv0",0);
-		memeFactory.extractAndAddCoupleMeme(index++,"AddØ-Hop","Rmv0",1);
-		memeFactory.extractAndAddCoupleMeme(index++,"Add0","Rmv3",1);
+		this.doubleRandom = memeFactory.extractAndAddCoupleMeme(-1,"AddØ","RmvØ",0);
+
+
+
+	//	memeFactory.extractAndAddCoupleMeme(index++,"Add0","Rmv+",.1);
+		// memeFactory.extractAndAddCoupleMeme(index++,"AddEq","rmv+",.50);
+
+
+		memeFactory.extractAndAddCoupleMeme(index++,"AddØ-hop","rmv+",1);
 //
 	}
 
