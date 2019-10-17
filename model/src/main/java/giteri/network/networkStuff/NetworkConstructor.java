@@ -180,7 +180,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 
 		}
 		else if (activator == 4){ // SMALL WORLD
-			double probaRelink = 0;//.1;
+			double probaRelink = 0.01;//.1;
 			int newTarget;
 			int nbNodeLattice = 11;
 
