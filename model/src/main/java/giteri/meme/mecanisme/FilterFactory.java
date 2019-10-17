@@ -353,6 +353,7 @@ public class FilterFactory {
 
 			entites.clear();
 			entites.addAll(resultat);
+
 		}
 
 		public AgregatorType getEnumType() {
