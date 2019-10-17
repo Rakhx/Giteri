@@ -10,12 +10,12 @@ import giteri.meme.entite.EntiteHandler;
 
 public class FilterFactory {
 
-	EntiteHandler entiteHandler;
+	// EntiteHandler entiteHandler;
 	public FilterFactory(){
 	}
 
 	public void setEntiteHandler(EntiteHandler eh){
-		entiteHandler = eh;
+	//	entiteHandler = eh;
 	}
 
 	/** FACTORY Renvoi un agregator depuis l'enum du configurator.
@@ -299,6 +299,10 @@ public class FilterFactory {
 			return "TRSP2";
 		}
 	}
+
+	/**
+	 *
+	 */
 	public class TheirSupParam implements IFilter {
 		int valueAttribut = 6;
 
@@ -337,18 +341,17 @@ public class FilterFactory {
 	 */
 	public class TheirEqual implements IFilter {
 
-		int valueAttribut = 2;
-
 		@Override
 		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			ArrayList<Entite> resultat = new ArrayList<Entite>();
 			for (Entite entite : entites) {
-				if(entite.getDegree() == valueAttribut)
+				if(entite.getDegree() == asker.getDegree())
 					resultat.add(entite);
 			}
 
 			entites.clear();
 			entites.addAll(resultat);
+
 		}
 
 		public AgregatorType getEnumType() {

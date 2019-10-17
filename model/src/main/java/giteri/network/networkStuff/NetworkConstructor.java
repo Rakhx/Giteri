@@ -145,13 +145,19 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		int pourcentageMiddle = 30;
 		double firePropa = .2;
 		int m = 2; // Parametre du nombre de connection pour un scale free
+		int nbEdgeToAddByNode;
 
-		// Soit 1 a 4% soit 2 a 30(50?) %
-		int nbEdgeToAddByNode = activator == 1 ? (nbNodeInit * pourcentageLow/200) : (nbNodeInit * pourcentageMiddle/200);
-        if(activator == 6)
-            nbEdgeToAddByNode = 5614/500;
 
-		if(activator == 3){ // SCALE FREE
+		if(activator == 0){ // EMPTY
+
+		}
+		else if(activator == 1){ // 4%
+			nbEdgeToAddByNode = (nbNodeInit * pourcentageLow/200);
+		}
+		else if(activator == 2){ // 30%
+			nbEdgeToAddByNode = nbNodeInit * pourcentageMiddle/200;
+		}
+		else if(activator == 3){ // SCALE FREE
 			// modification lazy sous opti pour prendre en compte le m dans la génération
 
 			for (int i = 0; i < nbNodeInit; i++) // pour chaque noeud i
@@ -171,15 +177,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 					}
 				}
 			}
-		}
-		else if (activator == 5){ // RESEAU COMPLET
-			for (int i = 0; i < nbNodeInit; i++)
-				for (int j = 0; j < nbNodeInit; j++)
-					if(i != j && !networkInstance.getNode(j).getConnectedNodes().contains(i) )
-						networkInstance.addEdgeToNodes(i, j, false);
-
-		}
-		else if (activator == 4){ // SMALL WORLD
+		}else if(activator == 4){ // SMALL WORLD
 			double probaRelink = 0;//.1;
 			int newTarget;
 			int nbNodeLattice = 11;
@@ -204,6 +202,38 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 				}
 			}
 		}
+		else if(activator == 5){ // COMPLET
+			for (int i = 0; i < nbNodeInit; i++)
+				for (int j = 0; j < nbNodeInit; j++)
+					if(i != j && !networkInstance.getNode(j).getConnectedNodes().contains(i) )
+						networkInstance.addEdgeToNodes(i, j, false);
+		}
+		else if(activator == 6){ // CUSTOM RANDOM
+			nbEdgeToAddByNode = 5614/500;
+		}
+		else if(activator == 7){ // FOREST FIRE
+			int choosed;
+			int nbToAdd;
+			List<Integer> linkWannaBeIn = new ArrayList<>();
+			List<Integer> linkIn = new ArrayList<>();
+			for (int i = 1; i < nbNodeInit; i++) { // pour chaque noeud du réseau pris un par un
+				linkIn.clear();
+				linkWannaBeIn.clear();
+				choosed = Toolz.getRandomNumber(i); // on en choisit un d'index inférieur
+				linkIn.add(choosed);
+				linkWannaBeIn.addAll(networkInstance.getConnectedNodes(choosed)); // et on va regarder ses voisins
+				recursiveFF(linkIn,linkWannaBeIn, firePropa);
+				//System.out.println(linkIn.size());
+				for (Integer integer : linkIn) {
+					if(!networkInstance.areNodesConnected(i, integer))
+						networkInstance.addEdgeToNodes(i, integer, false);
+				}
+			}
+		}
+
+
+
+
 		else if ( activator != 7) {
 			// ajout des liens entre les noeuds
 			for (int i = 0; i < nbNodeInit; i++)
@@ -230,27 +260,6 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 							networkInstance.addEdgeToNodes(i, choosenNodeToAdd, false);
 						}
 					}while (--nbEdgeToAdd > 0);
-				}
-			}
-		}
-		else if (activator == 7){ // Forest fire
-
-
-			int choosed;
-			int nbToAdd;
-			List<Integer> linkWannaBeIn = new ArrayList<>();
-			List<Integer> linkIn = new ArrayList<>();
-			for (int i = 1; i < nbNodeInit; i++) { // pour chaque noeud du réseau pris un par un
-				linkIn.clear();
-				linkWannaBeIn.clear();
-				choosed = Toolz.getRandomNumber(i); // on en choisit un d'index inférieur
-				linkIn.add(choosed);
-				linkWannaBeIn.addAll(networkInstance.getConnectedNodes(choosed)); // et on va regarder ses voisins
-				recursiveFF(linkIn,linkWannaBeIn, firePropa);
-				//System.out.println(linkIn.size());
-				for (Integer integer : linkIn) {
-					if(!networkInstance.areNodesConnected(i, integer))
-						networkInstance.addEdgeToNodes(i, integer, false);
 				}
 			}
 		}

@@ -16,7 +16,7 @@ public final class Configurator {
 	// La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
 	// depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent
 	// cette configuration initiale
-	public static boolean withGraphicalDisplay = true;
+	public static boolean withGraphicalDisplay = false;
 	public static boolean jarMode = true; // Si vrai, affiche le score resultat de simu
 	public static boolean systemPaused = false;
 	public static boolean writeNetworkResultOnFitting = !fullSilent; // Screenshot, network.csv...
@@ -142,7 +142,7 @@ public final class Configurator {
 	//region ancien boolean, osef, etc
 	// moyen osef
 	public static final boolean lotOfNodes = true;
-	private static int nbNode = lotOfNodes ? 500 : 100;
+	private static int nbNode = lotOfNodes ? 4000 : 100;
 	public static int refreshInfoRate = 10;
 	public final static boolean autoRedoActionIfNoAction = false;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
