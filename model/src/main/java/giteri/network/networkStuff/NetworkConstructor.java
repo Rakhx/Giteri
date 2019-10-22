@@ -145,7 +145,8 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		int pourcentageMiddle = 30;
 		double firePropa = .2;
 		int m = 2; // Parametre du nombre de connection pour un scale free
-		int nbEdgeToAddByNode;
+		int nbEdgeToAddByNode = 0;
+		boolean makeMe = false;
 
 
 		if(activator == 0){ // EMPTY
@@ -153,13 +154,14 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		}
 		else if(activator == 1){ // 4%
 			nbEdgeToAddByNode = (nbNodeInit * pourcentageLow/200);
+			makeMe = true;
 		}
 		else if(activator == 2){ // 30%
 			nbEdgeToAddByNode = nbNodeInit * pourcentageMiddle/200;
+			makeMe = true;
 		}
 		else if(activator == 3){ // SCALE FREE
 			// modification lazy sous opti pour prendre en compte le m dans la génération
-
 			for (int i = 0; i < nbNodeInit; i++) // pour chaque noeud i
 			{
 				availableNodes.clear();
@@ -177,8 +179,9 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 					}
 				}
 			}
-		}else if(activator == 4){ // SMALL WORLD
-			double probaRelink = 0;//.1;
+		}
+		else if(activator == 4){ // SMALL WORLD
+			double probaRelink = 0.1;//.1;
 			int newTarget;
 			int nbNodeLattice = 11;
 
@@ -210,6 +213,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		}
 		else if(activator == 6){ // CUSTOM RANDOM
 			nbEdgeToAddByNode = 5614/500;
+			makeMe = true;
 		}
 		else if(activator == 7){ // FOREST FIRE
 			int choosed;
@@ -231,10 +235,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 			}
 		}
 
-
-
-
-		else if ( activator != 7) {
+		if (  makeMe ) {
 			// ajout des liens entre les noeuds
 			for (int i = 0; i < nbNodeInit; i++)
 			{
@@ -243,24 +244,15 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 				for (int j = 0; j < nbNodeInit; j++)
 					if(i != j && !networkInstance.getNode(j).getConnectedNodes().contains(i))
 						availableNodes.add(j);
-
-				// Ajoute X noeuds
-				nbEdgeToAdd = 0;
-				if(activator == 1 || activator == 2 || activator == 6)
-					nbEdgeToAdd = nbEdgeToAddByNode;
-//				if(activator == 5)
-//					nbEdgeToAdd = Toolz.getRandomNumber(nbNodeInit / 2);
-
-				if(activator != 0){
-					do
+				nbEdgeToAdd = nbEdgeToAddByNode;
+				do
+				{
+					if(availableNodes.size() > 0)
 					{
-						if(availableNodes.size() > 0)
-						{
-							choosenNodeToAdd = Toolz.getRandomElementAndRemoveIt(availableNodes);
-							networkInstance.addEdgeToNodes(i, choosenNodeToAdd, false);
-						}
-					}while (--nbEdgeToAdd > 0);
-				}
+						choosenNodeToAdd = Toolz.getRandomElementAndRemoveIt(availableNodes);
+						networkInstance.addEdgeToNodes(i, choosenNodeToAdd, false);
+					}
+				}while (--nbEdgeToAdd > 0);
 			}
 		}
 	}
