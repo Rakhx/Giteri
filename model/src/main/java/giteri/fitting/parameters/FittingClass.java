@@ -321,7 +321,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 *
 	 */
 	public void endRepetition(){
-
 		com.suspend();
 
 		// STEP: On prend les properties courantes pour calculer une distance avec le réseau cible
@@ -713,7 +712,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		}
 
 		// TODO[checkPoint]-  Full silent ?
-		System.out.println("Score " + type.toString() + ": " + distance);
+		if(!Configurator.fullSilent)
+			System.out.println("Score " + type.toString() + ": " + distance);
 
 		return distance;
 	}

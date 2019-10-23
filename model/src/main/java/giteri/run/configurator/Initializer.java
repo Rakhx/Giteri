@@ -37,7 +37,7 @@ import static giteri.run.configurator.Configurator.withGraphicalDisplay;
  *
  */
 public class Initializer {
-    public static Double initialize(Configurator.EnumLauncher launcher, File fileInput, ArrayList<Boolean> memeActication ,ArrayList<Double> memeProba) {
+    public static Double initialize(Configurator.EnumLauncher launcher, File fileInput, List<Boolean> memeActication , List<Double> memeProba) {
 
         // A instancier dans les if. à lancer dans tous les cas a la fin?
         Runnable willBeRun;
