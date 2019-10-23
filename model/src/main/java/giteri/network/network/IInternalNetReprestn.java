@@ -96,7 +96,7 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 
 			// Calcul de la densité
 			if (Configurator.isAttribActived(activationCode, NetworkAttribType.DENSITY)) {
-				density = (double) nbEdges / ( nbNodes * (nbNodes -1  ));
+				density = (double) nbEdges / ( nbNodes * (nbNodes -1));
 				netPropResult.setValue(NetworkAttribType.DENSITY,density);
 			}
 			// degré moyen sur les nodes
@@ -111,7 +111,6 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 					Configurator.isAttribActived(activationCode, NetworkAttribType.thirdMoment)) {
 				
 				distrib = new int[nbNodes];
-				
 				if(avgClust) 
 					clustByNode = new Hashtable<>();
 
@@ -232,7 +231,7 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 				}
 
 				apl = (double)total / nbValue;
-				netPropResult.setValue(NetworkAttribType.APL,(double)total / nbValue);
+				netPropResult.setValue(NetworkAttribType.APL,apl);
 			}
 			// endregion
 

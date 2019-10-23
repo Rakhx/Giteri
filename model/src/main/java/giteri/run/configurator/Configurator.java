@@ -77,7 +77,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static int nbRepetitionbyRun = 20;
 	@toOutput ( yes = true )
-	public static int nbRepetitionForJar = 2;
+	public static int nbRepetitionForJar = 1;
 
 	@toOutput ( yes = true )
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
@@ -132,9 +132,10 @@ public final class Configurator {
 	public static boolean debugEntite = false;
 	public static boolean debugEntiteHandler = false;
 
-
 	public static boolean overallDebug = !jarMode;
 	public static boolean debugHopAway = false;
+
+
 	public static boolean debugJarMode = false;
 
 	// endregion

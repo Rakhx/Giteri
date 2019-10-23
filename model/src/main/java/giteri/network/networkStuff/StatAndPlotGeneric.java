@@ -58,6 +58,9 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 	private int nbEltCirDensity = 100;
 	private CircularFifoQueue<Double> cfqDensityOnFitting = new CircularFifoQueue<>(nbEltCirDensity);
+	private int cptCountNbAction = 0; // compteur du nombre d'action mis a jour moins souvent
+	private int moduloCount = 100; // valeur du modulo pour réel vérification du nb d'action
+	private int nbActionRelaxe = 0;
 
 	//endregion
 
@@ -190,17 +193,14 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		ArrayList<String> memesSelectionnes = null;
 		Meme selectedMeme;
 		File toWrite = writeNRead.createAndGetDirFromString(Arrays.asList("."));
-		if(debugJarMode)
-			writeNRead.writeSmallFile(toWrite, "RezTemp", activation.stream().map(e->e.toString()).collect(Collectors.toList()));
-
-		if(debugJarMode)
+		if(debugJarMode) {
+			writeNRead.writeSmallFile(toWrite, "RezTemp", activation.stream().map(e -> e.toString()).collect(Collectors.toList()));
 			memesSelectionnes = new ArrayList<>();
+		}
 
 		// Parcourt la liste des memes
 		for (int i = 0; i < activation.size(); i++) {
 			if(activation.get(i)) {
-
-				//	memeAndProba.put(memeFactory.getMemeFromIndex(i), new GenericDoubleParameter(proba.get(i)));
 				selectedMeme = memeFactory.getIemeMemeFromSpecList(MemeList.FITTING, i);
 				if(selectedMeme != null) {
 					memeAndProba.put(selectedMeme, new GenericDoubleParameter(proba.get(i)));
@@ -213,23 +213,12 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			}
 		}
 		if(debugJarMode)
-			writeNRead.writeSmallFile(toWrite, "RezTemp", memeAndProba.keySet().stream().map(e->e.toString()).collect(Collectors.toList()));
-		//	if(Configurator.debugJarMode)
-//			System.out.println("Memes voulus "+memesSelectionnes.stream().reduce(String::concat));
-
-
+			writeNRead.writeSmallFile(toWrite, "RezTemp",
+		memeAndProba.entrySet().stream().map(( v -> v.getKey().toFourCharString().concat(v.getValue().valueString()))).collect(Collectors.toList()));
 
 		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeAndProba);
 		memeDiffu.setEntiteHandler(entiteHandler);
 		providers.put(0,memeDiffu);
-
-//		IModelParameter.ModelParamNbNode nodesChanging = new IModelParameter.ModelParamNbNode(100, 1000, 100);
-//		providers.put(1, nodesChanging);
-//
-//		// l'ordre est important. Rapport au mise a jour de noeud etc dans les structures de données et graphstream
-//		nodesChanging.addMemeListListener(networkConstructor);
-//		nodesChanging.addMemeListListener(entiteHandler);
-//		nodesChanging.addMemeListListener(fitter);
 
 		return ExplorationMethod.getSpecificExplorator(EnumExplorationMethod.oneShot, providers);
 	}
@@ -283,7 +272,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		// Qui définira pour la classe de fitting l'espace de recherche
 		IExplorationMethod explorator = null;
-
 		FittingClass configuration = new FittingClass();
 
 		// Dans le cas ou on veut un one shot de l'IHM il faut remplir les listes
@@ -328,11 +316,10 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		fittingConfig.init();
 		int nbActionPassee;
 
-		// boucle changement de fittingConfig RUN++
+		// [RUN++] boucle changement de fittingConfig
 		do {
 			fittingConfig.newRun();
-
-			// On fait nbRunByConfig mesures par configuration pour étudier la variance des résultats REPETITION++
+			// [REPETITION++] On fait nbRunByConfig mesures par configuration pour étudier la variance des résultats
 			for (int i = 0; i < fittingConfig.nbRepetitionByConfig; i++)
 			{
 				fittingConfig.newRepetition();
@@ -348,7 +335,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 					for (int x = 0; x < fittingConfig.boucleExterneSize; x++)
 					{
 						do{
-							nbActionPassee  = getNbAction();
+							nbActionPassee  = getNbActionRelaxe();
 						}while(nbActionPassee <= fittingConfig.nbActionByStep);
 
 						NetworkProperties np = networkConstructor.updatePreciseNetworkProperties(Configurator.getIndicateur(NetworkAttribType.DENSITY));
@@ -539,6 +526,20 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		return "" + avg + ":" + deviation + "=\n" + total;
 	}
 
+	/** Vérifie la vraie valeur moins souvent ; le synchronized ralenti pas mal
+	 *
+	 * @return
+	 */
+	protected int getNbActionRelaxe(){
+		if(cptCountNbAction++ % moduloCount == 0){
+			synchronized (nbAction){
+				nbActionRelaxe = nbAction;
+			}
+		}
+
+		return nbActionRelaxe;
+	}
+
 	protected int getNbAction() {
 		synchronized(nbAction)
 		{
@@ -549,6 +550,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	protected void resetNbAction(){
 		synchronized(nbAction){
 			nbAction = 0;
+			nbActionRelaxe = 0;
 		}
 	}
 

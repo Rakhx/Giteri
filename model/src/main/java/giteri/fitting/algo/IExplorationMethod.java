@@ -207,8 +207,13 @@ public interface IExplorationMethod {
 			super(provids);
 		}
 
-		@Override
+		/** One shot, pas de next.
+		 *
+		 * @return false, pas de plusieurs tours.
+		 */
 		public boolean gotoNext() {
+			return false;
+			/*
 			boolean hasGo = false;
 			for (int i = 0; i < provider.keySet().size(); i++) {
 				if(provider.get(i).gotoNext()){
@@ -219,7 +224,7 @@ public interface IExplorationMethod {
 				}
 			}
 
-			return hasGo;
+			return hasGo;*/
 		}
 		
 	}

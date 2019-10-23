@@ -105,7 +105,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	// RESULTATS DE SIMULATION
 
 	// relevés des différentes densité pour une meme configuration
-	public ArrayList<NetworkProperties> networksSameTurn = new ArrayList<>();
+	public List<NetworkProperties> networksSameTurn = new ArrayList<>();
 
 	NetworkProperties targetNetProperties;
 	NetworkProperties currentNetProperties = new NetworkProperties();
@@ -262,7 +262,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		networksSameTurn.clear();
 		numeroRunAsString = "Run#" + numeroRun;
 		repertoires.add(numeroRunAsString);
-
 		resultNetwork.put(numeroRun, new Result(explorator.getModelParameterSet()));
 	}
 
@@ -299,17 +298,15 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 						Collections.singletonList(
 						entiteHandler.memeProperties.getStringHeaderMemeDetail(explorator.getModelParameterSet(), true)));
 		}
-
 		if(debug) System.out.println(numeroRunAsString + " at " + numeroRepetitionAsString);
+
 		entiteHandler.resetProba();
 		// STEP: Concernant la continuité du fitting sur meme config.
 		turnCount = 0;
 		nbCallContinuOnThisConfig = 0;
-
 		cqLastXActionDone.clear();
 		cfqMemeAppliancePropOnFitting.clear();
 		cfqMemeApplianceNumberOnFitting.clear();
-
 		kvOverallProportionActionDone.clear();
 		kvOverallNumberOfActionDone.clear();
 

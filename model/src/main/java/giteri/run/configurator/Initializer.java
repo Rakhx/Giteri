@@ -98,7 +98,7 @@ public class Initializer {
             stat = new StatAndPlotJarVersion(entiteHandler, memeFactory, networkConstructor, writeNRead, networkFileLoader, workerFactory);
 
         // Communication model
-        CommunicationModel communicationModel = null;
+        CommunicationModel communicationModel ;
 
         if(ihmLauncher && Configurator.withGraphicalDisplay){
             communicationModel = new CommunicationModel(entiteHandler, networkConstructor, networkFileLoader, workerFactory, drawerGraphStream);
@@ -126,9 +126,7 @@ public class Initializer {
         Controller.ModelController mControl = c.new ModelController(vControl, communicationModel);
         // Crée une fenetre stub
         if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.jarOpenMole) {
-
             // La fenetre en elle meme Controller de Model donné a l'IHM
-//            IHMStub fenetre = new IHMStub();
             IHM fenetre = new IHM(mControl,
                     memeFactory,
                     entiteHandler,
@@ -184,7 +182,6 @@ public class Initializer {
 
             // le gestionnaire de multiple vue possible.
             vControl.addView(fenetre);
-           // vControl.setView(displaysMng);
             if((Configurator.activationCodeForView & 4) == 4)
                 vControl.addView(new FileView(false));
             if((Configurator.activationCodeForView & 2) == 2)
@@ -217,7 +214,6 @@ public class Initializer {
             // Dans le but de faire changer la couleur du noeud en fonction des memes possédés par ce dernier
             entiteHandler.addMemeListener(workerFactory.getDrawer());
             entiteHandler.addEntityListener(workerFactory.getCalculator());
-
             entiteHandler.giveMemeToEntite(Configurator.methodOfGeneration);
 
             networkConstructor.start();
