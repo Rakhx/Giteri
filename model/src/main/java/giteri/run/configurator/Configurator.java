@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public final class Configurator {
 
-	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
+	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
 
 	// region initializer stuff
 	// VALEURS DONNEES A TITRE INDICATIF, set définitif dans l'initializer
@@ -77,7 +77,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static int nbRepetitionbyRun = 20;
 	@toOutput ( yes = true )
-	public static int nbRepetitionForJar = 1;
+	public static int nbRepetitionForJar = 2;
 
 	@toOutput ( yes = true )
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
@@ -141,8 +141,8 @@ public final class Configurator {
 
 	//region ancien boolean, osef, etc
 	// moyen osef
-	public static final boolean lotOfNodes = true;
-	private static int nbNode = lotOfNodes ? 300 : 100;
+	public static final boolean lotOfNodes = false;
+	private static int nbNode = lotOfNodes ? 500 : 100;
 	public static int refreshInfoRate = 10;
 	public final static boolean autoRedoActionIfNoAction = false;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour

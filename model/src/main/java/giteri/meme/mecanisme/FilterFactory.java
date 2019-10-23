@@ -56,7 +56,7 @@ public class FilterFactory {
 			case THEIREQUAL:
 				return new TheirEqual();
 			case SELFSUP:
-				return new SelfSup();
+				return new SelfSup(2);
 			default:
 				return null;
 		}
@@ -271,40 +271,8 @@ public class FilterFactory {
 	/** Prise en compte de la valeur d'attribut de la cible sans le comparer a l'attribut de l'acting.
 	 *
 	 */
-	public class TheirSupTwo implements IFilter {
-		int valueAttribut = 2;
-
-		@Override
-		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
-			ArrayList<Entite> resultat = new ArrayList<Entite>();
-			for (Entite entite : entites) {
-					if(entite.getDegree() >= valueAttribut)
-						resultat.add(entite);
-				}
-
-
-			entites.clear();
-			entites.addAll(resultat);
-		}
-
-		public AgregatorType getEnumType() {
-			return AgregatorType.THEIRSUP;
-		}
-
-		public String toString(){
-			return "TheirSup2";
-		}
-
-		public String getFourCharName() {
-			return "TRSP2";
-		}
-	}
-
-	/**
-	 *
-	 */
 	public class TheirSupParam implements IFilter {
-		int valueAttribut = 6;
+		int valueAttribut ;
 
 		public TheirSupParam(int param){
 			valueAttribut = param;
@@ -341,11 +309,13 @@ public class FilterFactory {
 	 */
 	public class TheirEqual implements IFilter {
 
+		int valueAttribut = 2;
+
 		@Override
 		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			ArrayList<Entite> resultat = new ArrayList<Entite>();
 			for (Entite entite : entites) {
-				if(entite.getDegree() == asker.getDegree())
+				if(entite.getDegree() == valueAttribut)
 					resultat.add(entite);
 			}
 
@@ -764,12 +734,14 @@ public class FilterFactory {
 	 *
 	 */
 	public class SelfSup extends Filter implements IFilter {
-		int attributValue = 1;
+		int attributValue ;
 
+		public SelfSup(int param){
+			attributValue = param;
+		}
 
 		@Override
 		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
-			Set<Entite> resultat = new HashSet<>();
 			if(asker.getDegree() > attributValue){
 			}else {
 				entites.clear();

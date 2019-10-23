@@ -182,7 +182,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 
 		// Verification de la propagation totale des memes initiaux
-		if(Configurator.checkWhenFullPropagate && !allTransmitted &&  cptModulo % Configurator.checkFullProRefreshRate == 0) {
+		if(!Configurator.fullSilent && Configurator.checkWhenFullPropagate && !allTransmitted &&  cptModulo % Configurator.checkFullProRefreshRate == 0) {
 			if(areAllMemeTransmitted()) {
                 allTransmitted = true;
                 vueController.displayInfo(ViewMessageType.PROPAGATION, Arrays.asList("ALL TRANSMISTED IN ;" + cptModulo));
@@ -1323,7 +1323,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		memeFactory.registerMemeAction("Add-",1, true,true, add, attributs,KVAttributAgregator, false);
 
 		agregators.clear(); index = 0;
-		// agregators.put(index++, notLinked);
 		agregators.put(index++, theMost);
 		agregators.put(index++, random);
 		memeFactory.registerMemeAction("Add∞", 1, false, true, add, attributs, KVAttributAgregator,false);
@@ -1344,7 +1343,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(0, notLinked);
 		agregators.put(1, theirEqual);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("AddLol",1, false, false, add,  attributs, KVAttributAgregator, false);
+		memeFactory.registerMemeAction("AddEq",1, false, true, add,  attributs, KVAttributAgregator, false);
 
 		agregators.clear();index = 0;
 		agregators.put(0, linked);
@@ -1376,7 +1375,13 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, linked);
 		agregators.put(index++, theirSup);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("Rmv2",1, false, false, remove,  attributs, KVAttributAgregator, false);
+		memeFactory.registerMemeAction("RmvChain",1, false, true, remove,  attributs, KVAttributAgregator, false);
+
+		agregators.clear(); index = 0;
+		agregators.put(index++, linked);
+		agregators.put(index++, theirEqual);
+		agregators.put(index++, random);
+		memeFactory.registerMemeAction("RmvEq",1, false, true, remove,  attributs, KVAttributAgregator, false);
 
 		agregators.clear();
 		agregators.put(0, linked);
