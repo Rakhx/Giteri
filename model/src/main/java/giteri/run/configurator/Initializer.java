@@ -110,7 +110,6 @@ public class Initializer {
 
         networkFileLoader.setCommunicationModel(communicationModel);
         actionFactory.setEntiteHandler(entiteHandler);
-        filterFactory.setEntiteHandler(entiteHandler);
 
         if(ihmLauncher && withGraphicalDisplay ){
             workerFactory.setNecessary(drawerGraphStream, drawerGraphStream);
