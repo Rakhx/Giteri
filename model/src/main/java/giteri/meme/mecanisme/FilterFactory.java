@@ -22,13 +22,6 @@ public class FilterFactory {
 		this.eh = eh;
 	}
 
-//	public void setNetwork(int networkV, Interfaces.INetworkRepresentation rpz){
-//		if(this.networkVersion != networkV){
-//			networkVersion = networkV;
-//			this.rpz = rpz;
-//		}
-//	}
-
 	public boolean[][] getNetwork(){
 		return eh.getMatrixNetwork();
 	}
@@ -591,7 +584,7 @@ public class FilterFactory {
 				beforeFil[entite.getIndex()] = true;
 			}
 
-			 //getNeightboor(entiteResult, entites, asker, reach);
+			// getNeightboor(entiteResult, entites, asker, reach);
 			entiteResult = zzz(asker.getIndex(), getNetwork(), beforeFil ,reach);
 
 			if(Configurator.debugHopAway){

@@ -17,6 +17,7 @@ import giteri.run.displaysStuff.IHMStub;
 import giteri.run.interfaces.Interfaces;
 import giteri.run.jarVersion.StatAndPlotJarVersion;
 import giteri.test.TestProvider;
+import giteri.tool.other.StopWatchFactory;
 import giteri.tool.other.WriteNRead;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
@@ -38,6 +39,11 @@ import static giteri.run.configurator.Configurator.withGraphicalDisplay;
  */
 public class Initializer {
     public static Double initialize(Configurator.EnumLauncher launcher, File fileInput, List<Boolean> memeActication , List<Double> memeProba) {
+
+        if(Configurator.timeEfficiency) {
+            StopWatchFactory.getInstance().addWatch("", "test");
+            StopWatchFactory.getInstance().startWatch("test");
+        }
 
         // A instancier dans les if. à lancer dans tous les cas a la fin?
         Runnable willBeRun;

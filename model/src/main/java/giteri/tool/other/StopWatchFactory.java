@@ -59,6 +59,9 @@ public class StopWatchFactory {
 		if(watch == null){
 			System.err.println("Pas de watch a ce nom");
 		}else {
+			if(!watch.parent.data.isRunning())
+				//this.startWatch(watch.parent.leafName);
+				watch.parent.data.startTiming();
 			watch.data.startTiming();
 		}
 	}

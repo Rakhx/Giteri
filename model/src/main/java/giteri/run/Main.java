@@ -2,6 +2,7 @@ package giteri.run;
 
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Initializer;
+import giteri.tool.other.StopWatchFactory;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;

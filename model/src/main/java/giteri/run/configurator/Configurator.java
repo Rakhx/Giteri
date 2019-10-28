@@ -137,6 +137,7 @@ public final class Configurator {
 
 
 	public static boolean debugJarMode = false;
+	public static boolean timeEfficiency = true;
 
 	// endregion
 

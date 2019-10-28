@@ -20,6 +20,7 @@ import giteri.run.configurator.Configurator.*;
 import giteri.run.controller.Controller.VueController;
 import giteri.tool.math.Toolz;
 import giteri.tool.objects.ObjectRef;
+import giteri.tool.other.StopWatchFactory;
 
 import java.util.*;
 
@@ -141,6 +142,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 
 		OneStep();
+
+
 	}
 
 	/**
@@ -154,6 +157,11 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			checkAPM();
 		}
 		cptModulo++;
+
+		if(Configurator.timeEfficiency && cptModulo % 10000 == 0 ) {
+			System.out.println("nbAction: "+ cptModulo);
+			StopWatchFactory.getInstance().publishResult();
+		}
 
 		// Indicateur meme repartition, etc.
 		if(Configurator.displayMemePosessionDuringSimulation &&cptModulo % (Configurator.refreshInfoRate * 25) == 0 ) {
@@ -169,7 +177,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 			vueController.addValueToApplianceSerie(++cptMemePossession, kvMemeCodeNbEntities);
 		}
-
 		if (Configurator.displayLogAvgDegreeByMeme)
 			vueController.displayInfo(ViewMessageType.AVGDGRBYMEME, Arrays.asList(checkPropertiesByMemePossession()));
 
