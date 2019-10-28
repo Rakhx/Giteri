@@ -2,6 +2,7 @@ package giteri.meme.mecanisme;
 
 import java.util.*;
 
+import giteri.meme.entite.EntiteHandler;
 import giteri.run.interfaces.Interfaces;
 import giteri.tool.math.Toolz;
 import giteri.run.configurator.Configurator;
@@ -10,18 +11,26 @@ import giteri.meme.entite.Entite;
 
 public class FilterFactory {
 
-
 	private Interfaces.INetworkRepresentation rpz;
 	private int networkVersion;
+	EntiteHandler eh;
 
 	public FilterFactory(){
 	}
 
-	public void setNetwork(int networkV, Interfaces.INetworkRepresentation rpz){
-		if(this.networkVersion != networkV){
-			networkVersion = networkV;
-			this.rpz = rpz;
-		}
+	public void setEntiteHandler(EntiteHandler eh){
+		this.eh = eh;
+	}
+
+//	public void setNetwork(int networkV, Interfaces.INetworkRepresentation rpz){
+//		if(this.networkVersion != networkV){
+//			networkVersion = networkV;
+//			this.rpz = rpz;
+//		}
+//	}
+
+	public boolean[][] getNetwork(){
+		return eh.getMatrixNetwork();
 	}
 
 	/** FACTORY Renvoi un agregator depuis l'enum du configurator.
@@ -564,25 +573,41 @@ public class FilterFactory {
 		@Override
 		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 
-			Set<Entite> entiteResult = new HashSet<>();
-
-			if(Configurator.debugHopAway){
+			//Set<Entite> entiteResult = new HashSet<>();
+			List<Entite> entiteResult = new ArrayList<>();
+			boolean[] beforeFil = new boolean[Configurator.getNbNode()];
+			boolean[] selected ;
+			if(Configurator.debugHopAway)
+			{
 				String result = "before Entites";
-
 				for (Entite entite : entites) {
 					result +=":" + entite.getIndex();
 				}
+
 				System.out.println(result); // l'ensemble des entites pré filtrage
 			}
 
-			getNeightboor(entiteResult, entites, asker, reach);
+			for (Entite entite : entites) {
+				beforeFil[entite.getIndex()] = true;
+			}
+
+			 //getNeightboor(entiteResult, entites, asker, reach);
+			entiteResult = zzz(asker.getIndex(), getNetwork(), beforeFil ,reach);
 
 			if(Configurator.debugHopAway){
 				String result = "after Entites:";
+				String resultNoooo = "after Entites nope actionsljzmzljd:";
 				for (Entite entite : entiteResult) {
 					result +=":" + entite.getIndex();
 				}
+
+				for (int i = 0; i < Configurator.getNbNode(); i++) {
+					//if(selected[i])
+					//resultNoooo += ":" + i;
+				}
+
 				System.out.println(result);
+				System.out.println(resultNoooo);
 			}
 
 			entites.clear();
@@ -600,10 +625,6 @@ public class FilterFactory {
 			return AgregatorType.HOPAWAY3;
 		}
 
-		public void mdr(int lol, Double... XD){
-
-		}
-
 		@Override
 		public String getFourCharName() {
 			return "HA"+reach;
@@ -618,8 +639,6 @@ public class FilterFactory {
 		 * @param deepToGo
 		 */
 		private void getNeightboor(Set<Entite> entiteToReturn, Set<Entite> entiteSearchSpace, Entite target, int deepToGo){
-			mdr(12, new Double(4), new Double(5));
-
 			deepToGo --;
 			Set<Entite> entiteAccepted = new HashSet<>();
 			// pout chaque voisin connecté a la cible,
@@ -631,7 +650,6 @@ public class FilterFactory {
 					entiteSearchSpace.remove(neighboor);
 				}
 			}
-
 			if(deepToGo == 0)
 			entiteToReturn.addAll(entiteAccepted);
 			else if(deepToGo > 0)
@@ -642,17 +660,18 @@ public class FilterFactory {
 		private void getNeightboorOpti(Set<Entite> entiteToReturn, Set<Entite> entiteSearchSpace, Entite target, int deepToGo){
 			deepToGo--;
 			Set<Entite> entiteAccepted = new HashSet<>();
-
 		}
 
-		private boolean[] zzz(int asker ,boolean[][] network, int deep){
+		private List<Entite> zzz(int asker, boolean[][] network, boolean[] beforeFilter ,int deep){
+			List<Entite> result= new ArrayList<>();
 			// On trouve les adjacents a l'asker; il s'agit du cercle de distance 1
 			boolean[] adja ;
 			int nbNode = Configurator.getNbNode();
 			boolean[] soFar  = network[asker];
-			boolean[] thisRound = new boolean[nbNode];
+			soFar[asker] = true;
+			boolean[] resultat = new boolean[nbNode];
 
-			for (int profondeur = 0; profondeur < deep; profondeur++) {
+			for (int profondeur = 1; profondeur < deep; profondeur++) {
 				     adja = new boolean[nbNode];
 					// On récupère tt les noeuds adjacents à ceux qu'on a soFar
 					for (int indexNode = 0; indexNode < nbNode; indexNode++) {
@@ -661,33 +680,36 @@ public class FilterFactory {
 							// On ajoute a Adja la liste des liens du noeud indexNode
 							for (int i = 0; i < nbNode; i++) {
 								adja[i] |= network[indexNode][i];
-
 							}
 						}
 					}
 					// A la fin de la boucle for on se retrouve avec tous les noeuds adjacents a ceux de la liste soFar
 				// Si on est pas arrivé la fin de profondeur, on ajoute ces noeuds a la liste des soFar
 				if(profondeur != deep - 1 ){
-
+					for (int i = 0; i < nbNode; i++) {
+						soFar[i] |= adja[i];
+					}
 
 				}
-				// Si on est arrivé a la fin, on ne veut retenir que les noeuds qui sont a cette fin et qui n'étaient pas dans la liste avant,
+				// Si on est arrivé a la fin, on ne veut retenir que les noeuds qui sont à cette fin et qui n'étaient pas dans la liste avant,
 				// donc on soustrait ceux de la liste so far
 				else {
+					for (int i = 0; i < nbNode; i++) {
+						if(!soFar[i] && adja[i]) {
+							result.add(eh.getEntitesActive().get(i));
 
+						}
+					}
 
 				}
 
 			}
 
 
-	return  null;
+			return  result;
 		}
 
-
-
 	}
-
 
 	/** retourne les noeuds liés entre eux de ceux pris en param.
 	 * Plus optimal si une réduction a déja été appelé avant

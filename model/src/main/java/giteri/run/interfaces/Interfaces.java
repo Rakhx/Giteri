@@ -139,7 +139,7 @@ public class Interfaces {
 		 * 
 		 * @param toCopy Le réseau a copier. 
 		 */
-		 void ConvertNetwork(Network toCopy);
+		 void convertNetwork(Network toCopy);
 		/** Obtenir les propriétés issu de la représentation obtenue, avec un activator
 		 * définissant quel type de propriété on souhaite obtenir. 
 		 * 

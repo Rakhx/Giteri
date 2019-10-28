@@ -27,6 +27,8 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	Interfaces.DrawerNetworkInterface drawer;
 	final Network networkInstance;
 	IInternalNetReprestn networkRepresentation;
+
+
 	NetworkProperties networkInstanceProperties;
 
 	boolean onceOneStep = true;
@@ -118,7 +120,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		// Si le tiny n'es pas en accord avec le current
 		if(!isNetPropUpToDate()) {
 			synchronized (networkInstance) {
-				networkRepresentation.ConvertNetwork(networkInstance);
+				networkRepresentation.convertNetwork(networkInstance);
 			}
 		}
 
@@ -270,7 +272,6 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		}
 	}
 
-
 	/** NETWORK MODIFICATIONS. Ajout d'un noeud.
 	 *
 	 */
@@ -356,6 +357,14 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		return networkInstance;
 	}
 
+	public boolean[][] getNetworkMatrix(){
+		IInternalNetReprestn.AdjacencyMatrixNetwork matrix = new IInternalNetReprestn.AdjacencyMatrixNetwork();
+		synchronized (networkInstance) {
+			matrix.convertNetwork(networkInstance);
+		}
+		return matrix.matrix;
+	}
+
 	/** Retourne les noeuds connectés au noeud en parametre,
 	 * null si le noeud en question n'existe pas.
 	 *
@@ -390,13 +399,16 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		return networkInstance.getUpdateId() == networkRepresentation.getRepresentationUUID();
 	}
 
+	public boolean isVersionCorrect(int version){
+		return networkInstance.getUpdateId() == version;
+	}
+
 	/** compare réseau réel au properties, sans passer par le tiny
 	 *
 	 * @return
 	 */
 	public boolean isNetPropUpToDate(){
 		return (Integer.compare(networkInstance.getUpdateId(),networkInstanceProperties.getNetworkInstance() ) == 0);
-
 	}
 
 	//endregion

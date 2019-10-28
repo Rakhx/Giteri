@@ -47,7 +47,7 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 		 * @param toCopy Le réseau a copier.
 		 */
 		@Override
-		public void ConvertNetwork(Network toCopy) {
+		public void convertNetwork(Network toCopy) {
 			ArrayList<Integer> linkOfANode;
 			nbNodes = 0;
 			nbEdges = 0;
@@ -288,15 +288,15 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 	 */
 	public class AdjacencyMatrixNetwork implements IInternalNetReprestn {
 
-		int[][] matrix;
+		public boolean[][] matrix;
 		int nbNodes;
 		
 		@Override
-		public void ConvertNetwork(Network toCopy) {
-			nbNodes = toCopy.getNbNodes();
-			matrix = new int[nbNodes][nbNodes];
+		public void convertNetwork(Network toCopy) {
+			nbNodes = Configurator.getNbNode();
+			matrix = new boolean[nbNodes][nbNodes];
 			for (Edge edge : toCopy.getEdges()) 
-				matrix[edge.from.getIndex()][edge.to.getIndex()] = matrix[edge.to.getIndex()][edge.from.getIndex()] = 1; 
+				matrix[edge.from.getIndex()][edge.to.getIndex()] = matrix[edge.to.getIndex()][edge.from.getIndex()] = true;
 		}
 
 		@Override

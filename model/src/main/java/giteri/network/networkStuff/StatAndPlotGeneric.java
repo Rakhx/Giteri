@@ -194,7 +194,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		Meme selectedMeme;
 		File toWrite = writeNRead.createAndGetDirFromString(Arrays.asList("."));
 		if(debugJarMode) {
-			writeNRead.writeSmallFile(toWrite, "RezTemp", activation.stream().map(e -> e.toString()).collect(Collectors.toList()));
+			//writeNRead.writeSmallFile(toWrite, "RezTemp", activation.stream().map(e -> e.toString()).collect(Collectors.toList()));
 			memesSelectionnes = new ArrayList<>();
 		}
 
@@ -213,8 +213,9 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			}
 		}
 		if(debugJarMode)
-			writeNRead.writeSmallFile(toWrite, "RezTemp",
-		memeAndProba.entrySet().stream().map(( v -> v.getKey().toFourCharString().concat(v.getValue().valueString()))).collect(Collectors.toList()));
+//			writeNRead.writeSmallFile(toWrite, "RezTemp",
+//		memeAndProba.entrySet().stream().map(( v -> v.getKey().toFourCharString().concat(v.getValue().valueString()))).collect(Collectors.toList()));
+			writeNRead.writeSmallFile(toWrite, "RezTemp", memesSelectionnes);
 
 		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeAndProba);
 		memeDiffu.setEntiteHandler(entiteHandler);

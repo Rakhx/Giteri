@@ -149,37 +149,29 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @return les actions qui ont été réalisé
 	 */
 	public void OneStep() {
-		if (Configurator.autoRedoActionIfNoAction)
-			while (runEntite().contains("Nope"));
-		else
-			runEntite();
-
+		runEntite();
 		if(!Configurator.jarMode){
 			checkAPM();
 		}
 		cptModulo++;
 
 		// Indicateur meme repartition, etc.
-		if (cptModulo % (Configurator.refreshInfoRate * 25) == 0) {
-			if (Configurator.displayMemePosessionDuringSimulation) {
-				vueController.displayMemeUsage(cptModulo,
-						memeProperties.getNbActivationByMemes(),
-						memeProperties.countOfLastMemeActivation,
-						memeProperties.lastHundredActionDone); }
+		if(Configurator.displayMemePosessionDuringSimulation &&cptModulo % (Configurator.refreshInfoRate * 25) == 0 ) {
+			vueController.displayMemeUsage(cptModulo,
+					memeProperties.getNbActivationByMemes(),
+					memeProperties.countOfLastMemeActivation,
+					memeProperties.lastHundredActionDone); }
+		if(Configurator.displayMemePossessionEvolution && cptModulo % (Configurator.refreshInfoRate * 200) == 0){
+			kvMemeCodeNbEntities.clear();
+			for (Meme meme : memeProperties.countOfEntitiesHavingMeme.keySet()) {
+				kvMemeCodeNbEntities.put(meme, (double)memeProperties.countOfEntitiesHavingMeme.get(meme) / entites.size());
+			}
 
-			if (cptModulo % (Configurator.refreshInfoRate * 200) == 0)
-				if(Configurator.displayMemePossessionEvolution){
-					kvMemeCodeNbEntities.clear();
-					for (Meme meme : memeProperties.countOfEntitiesHavingMeme.keySet()) {
-						kvMemeCodeNbEntities.put(meme, (double)memeProperties.countOfEntitiesHavingMeme.get(meme) / entites.size());
-					}
-
-					vueController.addValueToApplianceSerie(++cptMemePossession, kvMemeCodeNbEntities);
-				}
-
-			if (Configurator.displayLogAvgDegreeByMeme)
-				vueController.displayInfo(ViewMessageType.AVGDGRBYMEME, Arrays.asList(checkPropertiesByMemePossession()));
+			vueController.addValueToApplianceSerie(++cptMemePossession, kvMemeCodeNbEntities);
 		}
+
+		if (Configurator.displayLogAvgDegreeByMeme)
+			vueController.displayInfo(ViewMessageType.AVGDGRBYMEME, Arrays.asList(checkPropertiesByMemePossession()));
 
 		// Verification de la propagation totale des memes initiaux
 		if(!Configurator.fullSilent && Configurator.checkWhenFullPropagate && !allTransmitted &&  cptModulo % Configurator.checkFullProRefreshRate == 0) {
@@ -219,6 +211,11 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	public void generateNetwork(int activator) {
 		networkConstruct.generateNetwork(activator);
 	}
+
+	public boolean[][] getMatrixNetwork(){
+		return networkConstruct.getNetworkMatrix();
+	}
+
 
 	/**
 	 * fonction qui va forcer chaque entité à essayer chacune des actions de son
@@ -1598,7 +1595,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				System.out.println("Scandale deux fois le meme");
 		}
 	}
-
 
 	public class memeComparatorAscending implements Comparator<Meme> {
 		@Override
