@@ -311,8 +311,7 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 
 		@Override
 		public void resetRepresentation() {
-			matrix = null;
-			
+			matrix = new boolean[Configurator.getNbNode()][Configurator.getNbNode()];
 		}
 
 		/**

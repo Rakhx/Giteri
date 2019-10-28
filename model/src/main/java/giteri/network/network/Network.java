@@ -25,24 +25,23 @@ public class Network {
 		updateId = -1;
 	}
 
-	/** On supprime tous les edges 
-	 * 
+	//region Public methods
+
+	/** On supprime tous les edges
+	 *
 	 */
 	public synchronized void resetStat(){
 		edges.clear();
 	}
 
-	/** On supprime tous les edges
+	/** On supprime tous les edges et nodes
 	 *
 	 */
-	public synchronized void fullEesetStat(){
+	public synchronized void fullResetStat(){
 		edges.clear();
 		nodes.clear();
 	}
 
-
-	//region Public methods
-	
 	/** Méthode pour ajouter un edge 
 	 * 
 	 * @param from
@@ -152,60 +151,16 @@ public class Network {
 		return nodes;
 	}
 	
-	/** Donne le nombre de node dans le réseau
-	 * 
-	 * @return la taille de la liste de node
-	 */
-	public synchronized int getNbNodes(){
-		return this.nodes.size();
-	}
-	
 	/** Obtient la liste des edges.
-	 * 
+	 *
 	 * @return la liste des edges
 	 */
 	public synchronized  ArrayList<Edge> getEdges(){
 			return this.edges;
-	}	
-
-	/** Obtient le nombre d'edge du réseau
-	 * 
-	 * @return la size de la liste
-	 */
-	public synchronized int getNbEdges(){
-			return this.edges.size();
 	}
 
-	/** Retourne le réseau sous forme textuel.
-	 * 
-	 */
-	public synchronized String toString(){
-		String resultat = "";
-		Collections.sort(edges, new Edge());
-		Edge currentEdge;		
-
-		for (int i = 0; i < edges.size(); i++) {
-			currentEdge = edges.get(i);
-			resultat += "Node["+currentEdge.from.getIndex()+"] <---> Node["+ currentEdge.to.getIndex() + "]";
-			resultat += "\n";
-		}
-		
-		return resultat;
-	}
-
-	/** Alloue une couleur a un node s'il existe
-	 * 
-	 * @param index
-	 * @param color
-	 */
-	public synchronized void setColorToNode(int index, Color color){
-		Node node = getNode(index);
-		if(node!= null)
-			node.setMyColor(color);
-	}
-	
 	/** Alloue une couleur a un edge s'il existe
-	 * 
+	 *
 	 * @param from
 	 * @param to
 	 * @param color
@@ -225,13 +180,31 @@ public class Network {
 	public boolean areNodesConnected(int from, int to){
 		return nodes.get(from).getConnectedNodes().contains(to);
 	}
+
+	/** Retourne le réseau sous forme textuel.
+	 *
+	 */
+	public synchronized String toString(){
+		String resultat = "";
+		Collections.sort(edges, new Edge());
+		Edge currentEdge;
+
+		for (int i = 0; i < edges.size(); i++) {
+			currentEdge = edges.get(i);
+			resultat += "Node["+currentEdge.from.getIndex()+"] <---> Node["+ currentEdge.to.getIndex() + "]";
+			resultat += "\n";
+		}
+
+		return resultat;
+	}
+
 	//endregion
 
 	//region Private Methode
-	
+
 	/** Ajoute un node a la liste des nodes,
 	 * si il n'existe pas de node possédant cet index.
-	 * 
+	 *
 	 * @return renvoi le node ainsi créé
 	 */
 	private synchronized Node addNode(int index){
@@ -245,31 +218,30 @@ public class Network {
 		updateId ++;
 		return added;
 	}
-	
-	/** Ajoute un edge a la liste d'edge 
-	 * 
+	/** Ajoute un edge a la liste d'edge
+	 *
 	 * @param edgeee
 	 */
 	private synchronized void addEdge(Edge edgeee) {
 //		synchronized (lockNodeAndEdge) {
 			edges.add(edgeee);
 //		}
-//		
+//
 		updateId ++;
 	}
-	
+
 	/** Retire de la liste l'edgee spécifié
-	 * 
+	 *
 	 * @param edgeee
 	 */
 	private synchronized void removeEdge(Edge edgeee){
 //		synchronized (lockNodeAndEdge) {
 			edges.remove(edgeee);
 //		}
-		
+
 		updateId ++;
 	}
-	
+
 	/** Trouve un edge en fonction de l'index de node in out et
 	 * d'un boolean directed
 	 * @param from
@@ -280,25 +252,25 @@ public class Network {
 	private synchronized Edge getEdge(int from, int to, boolean directed){
 	    Edge edgeToReturn = null;
 		Node nodeFrom, nodeTo;
-				
+
 		// Trouver l'edge correspondant
 		nodeFrom = getNode(from);
 		nodeTo = getNode(to);
-		if(nodeFrom != null && nodeTo != null)		
+		if(nodeFrom != null && nodeTo != null)
 			for (Edge edge : getEdges()) {
 				if(edge.getNodeFrom() == nodeFrom && edge.getNodeTo() == nodeTo)
 					edgeToReturn = edge;
-				
+
 				if(!directed && edge.getNodeFrom() == nodeTo && edge.getNodeTo() == nodeFrom)
-					edgeToReturn = edge;				
+					edgeToReturn = edge;
 			}
-			
+
 		return edgeToReturn;
 	}
-	
+
 	/** Retrouve un edge qui a comme point de départ le node spéficié, de giteri.meme pour l'arrivé.
 	 * Ou le contraire, si directed = false
-	 * 
+	 *
 	 * @param nodeFrom Noeud de départ pour l'edge
 	 * @param nodeTo Noeufd d'arrivée pour l'edge
 	 * @param directed efface la notion de départ et arrivé
@@ -313,23 +285,53 @@ public class Network {
 				return edge;
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	/** Retrait d'un edge de la liste des edges du réseau, et dissociation
-	 * des noeuds pour qu'ils ne se considérent pas comme connecté ensemble. 
+	 * des noeuds pour qu'ils ne se considérent pas comme connecté ensemble.
 	 * Singulier si l'edge est dirigé, pluriel si non dirigé.
-	 * 
+	 *
 	 * @param edgeee edge a retiré
 	 * @param from depuis
-	 * @param to vers. 
+	 * @param to vers.
 	 */
 	private synchronized void removeEdgeFromNodes(Edge edgeee, Node from, Node to){
 		to.removeConnectedNode(from);
 		if(!edgeee.isDirected())
 			from.removeConnectedNode(to);
 		this.removeEdge(edgeee);
+	}
+
+	//endregion
+
+	//region Unused
+	/** Donne le nombre de node dans le réseau
+	 *
+	 * @return la taille de la liste de node
+	 */
+	public synchronized int getNbNodes(){
+		return this.nodes.size();
+	}
+
+	/** Obtient le nombre d'edge du réseau
+	 *
+	 * @return la size de la liste
+	 */
+	public synchronized int getNbEdges(){
+		return this.edges.size();
+	}
+
+	/** Alloue une couleur a un node s'il existe
+	 *
+	 * @param index
+	 * @param color
+	 */
+	public synchronized void setColorToNode(int index, Color color){
+		Node node = getNode(index);
+		if(node!= null)
+			node.setMyColor(color);
 	}
 
 	//endregion

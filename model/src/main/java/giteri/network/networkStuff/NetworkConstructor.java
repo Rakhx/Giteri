@@ -429,7 +429,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	@Override
 	public void handlerNbNodeChanged(NbNodeChangedEvent e) {
 		nbNodeInit = e.nbNode;
-		networkInstance.fullEesetStat();
+		networkInstance.fullResetStat();
 		generateNodes();
 
 	}

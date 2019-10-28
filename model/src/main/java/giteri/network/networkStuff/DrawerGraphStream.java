@@ -118,12 +118,9 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 		if(outsideView){
 
 		}
-
-
 		else{
 			toDisplay = graph;
 		}
-
 
 		String attrib;
 		for (giteri.network.network.Node node : net.getNodes())
