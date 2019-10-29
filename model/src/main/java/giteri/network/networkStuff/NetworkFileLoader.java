@@ -27,6 +27,7 @@ public class NetworkFileLoader implements IReadNetwork {
 	private CommunicationModel communicationModel;
 	private MemeFactory memeFactory;
 	private WriteNRead writeNRead;
+	// KV nodeIndex:<nodeIndex>
 	private Hashtable<Integer, ArrayList<Integer>> nodesAndLinks = new Hashtable<>();
 	private boolean changed = true;
 	private TinyNetworks net;
@@ -140,6 +141,7 @@ public class NetworkFileLoader implements IReadNetwork {
 				edges.add(integer);
 				nbEdges++;
 			}
+
 			net.addNodeWithEdge(nodeIndex, edges);
 		}
 

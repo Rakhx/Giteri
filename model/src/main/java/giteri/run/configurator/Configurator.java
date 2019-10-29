@@ -9,7 +9,11 @@ import java.util.ArrayList;
 
 public final class Configurator {
 
-	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
+	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
+
+	public static boolean tempConstantMatrice = true; // mise a jour constant de la matrice ou non
+	public static boolean tempRecursMatrice = false; // utilisation de la fonction récursive
+
 
 	// region initializer stuff
 	// VALEURS DONNEES A TITRE INDICATIF, set définitif dans l'initializer
@@ -120,7 +124,7 @@ public final class Configurator {
 	public static boolean displayLogRatioLogFailOverSuccess = faster;
 	public static boolean displayLogRatioTryAddOverTryRmv = faster;
 
-	public static boolean checkWhenFullPropagate = true; 	// All action spread? affiche en combien d'action
+	public static boolean checkWhenFullPropagate = false; 	// All action spread? affiche en combien d'action
 	public static int checkFullProRefreshRate = 75; // every X step vérification du full propagate
 
 	//endregion
@@ -136,7 +140,7 @@ public final class Configurator {
 	public static boolean debugHopAway = false;
 
 
-	public static boolean debugJarMode = false;
+	public static boolean debugJarMode = true;
 	public static boolean timeEfficiency = true;
 
 	// endregion

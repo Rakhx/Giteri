@@ -151,7 +151,8 @@ public class Interfaces {
 		 * @return
 		 */
 		 int getRepresentationUUID();
-		/** Reset des propriétés de la copie du réseau
+
+		 /** Reset des propriétés de la copie du réseau
 		 * 
 		 */
 		 void resetRepresentation();
@@ -163,6 +164,9 @@ public class Interfaces {
 		 */
 		 void addNodeWithEdge(int nodeIndex, List<Integer> edgesIndexes);
 
+		 void addNodeWithEdge(int nodeFrom, int nodeTo, boolean directed);
+
+		 boolean removeEdgeFromNodes(int nodeFrom, int nodeTo, boolean directed);
 
 		 /** Obtient la liste des edges du giteri.network sous la forme
 		 * IndexNode espace IndexNode, classé en ordre croissant. 

@@ -26,13 +26,15 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	//region Properties
 	Interfaces.DrawerNetworkInterface drawer;
 	final Network networkInstance;
-	IInternalNetReprestn networkRepresentation;
-
-
+	IInternalNetReprestn networkRepresentation; // Pour l'instant le tiny n'est pas mis a jour en meme temps que les networks
 	NetworkProperties networkInstanceProperties;
-
+	// Liste des représentations a mettre a jour au fur et a mesure de la simultion. Network; Opt<matrice>
+	Set<IInternalNetReprestn> netRepzsToUpdate;
 	boolean onceOneStep = true;
 	int nbNodeInit = Configurator.getNbNode();
+	int cptSale = 0;
+
+	IInternalNetReprestn.AdjacencyMatrixNetwork tmp;
 
 	//endregion
 
@@ -40,7 +42,17 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	 *
 	 */
 	public NetworkConstructor() {
+		netRepzsToUpdate = new HashSet<>();
 		networkInstance = new Network();
+		netRepzsToUpdate.add(networkInstance);
+
+		if(Configurator.tempConstantMatrice) {
+			IInternalNetReprestn.AdjacencyMatrixNetwork matrice = new IInternalNetReprestn.AdjacencyMatrixNetwork();
+			netRepzsToUpdate.add(matrice);
+			tmp = matrice;
+
+		}
+
 		generateNodes();
 		networkInstanceProperties = new NetworkProperties("Courant");
 		networkInstanceProperties.createStub();
@@ -99,12 +111,15 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	}
 
 	/** Remise a zero des variables etc pour pouvoir relancer une simulation
-	 * Eventuellemen,t y appliquer ensuite les liens la création de l'état de base voulu
+	 * Eventuellement, y appliquer ensuite les liens la création de l'état de base voulu
 	 */
 	public void resetStat(){
 		onceOneStep = true;
-		networkInstance.resetStat();
-//		tinyNetworkInstance.resetTiny();
+		for (IInternalNetReprestn netRepz : netRepzsToUpdate) {
+			netRepz.resetRepresentation();
+		}
+
+//		networkInstance.resetRepresentation();
 		networkRepresentation.resetRepresentation();
 		networkInstanceProperties.createStub();
 	}
@@ -176,7 +191,10 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 				for(int k = 0; k < m;k++) {
 					if (KVNodeDegree.size() > 0) {
 						target = Toolz.getElementByUniformProba(KVNodeDegree);
-						networkInstance.addEdgeToNodes(i, target, false);
+						for (IInternalNetReprestn iInternalNetReprestn : netRepzsToUpdate) {
+							iInternalNetReprestn.addNodeWithEdge(i, target, false);
+						}
+//						networkInstance.addEdgeToNodes(i, target, false);
 						KVNodeDegree.remove(target);
 					}
 				}
@@ -199,10 +217,16 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 						} while(newTarget == i || networkInstance.areNodesConnected(i,newTarget)
 								|| networkInstance.areNodesConnected(newTarget,i));//newTarget == (i+j) % nbNodeInit );
 
-						networkInstance.addEdgeToNodes(i, newTarget, false);
+						for (IInternalNetReprestn iInternalNetReprestn : netRepzsToUpdate) {
+							iInternalNetReprestn.addNodeWithEdge(i, newTarget, false);
+						}
+//						networkInstance.addEdgeToNodes(i, newTarget, false);
 					}
 					else{
-						networkInstance.addEdgeToNodes(i, (i + j) % nbNodeInit, false);
+						for (IInternalNetReprestn iInternalNetReprestn : netRepzsToUpdate) {
+							iInternalNetReprestn.addNodeWithEdge(i, (i + j) % nbNodeInit, false);
+						}
+//						networkInstance.addEdgeToNodes(i, (i + j) % nbNodeInit, false);
 					}
 				}
 			}
@@ -211,7 +235,11 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 			for (int i = 0; i < nbNodeInit; i++)
 				for (int j = 0; j < nbNodeInit; j++)
 					if(i != j && !networkInstance.getNode(j).getConnectedNodes().contains(i) )
-						networkInstance.addEdgeToNodes(i, j, false);
+						for (IInternalNetReprestn iInternalNetReprestn : netRepzsToUpdate) {
+							iInternalNetReprestn.addNodeWithEdge(i, j , false);
+						}
+
+//						networkInstance.addEdgeToNodes(i, j, false);
 		}
 		else if(activator == 6){ // CUSTOM RANDOM
 			nbEdgeToAddByNode = 5614/500;
@@ -232,7 +260,9 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 				//System.out.println(linkIn.size());
 				for (Integer integer : linkIn) {
 					if(!networkInstance.areNodesConnected(i, integer))
-						networkInstance.addEdgeToNodes(i, integer, false);
+						for (IInternalNetReprestn iInternalNetReprestn : netRepzsToUpdate) {
+							iInternalNetReprestn.addNodeWithEdge(i, integer, false);
+						}
 				}
 			}
 		}
@@ -252,7 +282,10 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 					if(availableNodes.size() > 0)
 					{
 						choosenNodeToAdd = Toolz.getRandomElementAndRemoveIt(availableNodes);
-						networkInstance.addEdgeToNodes(i, choosenNodeToAdd, false);
+						for (IInternalNetReprestn iInternalNetReprestn : netRepzsToUpdate) {
+							iInternalNetReprestn.addNodeWithEdge(i, choosenNodeToAdd, false);
+						}
+//						networkInstance.addEdgeToNodes(i, choosenNodeToAdd, false);
 					}
 				}while (--nbEdgeToAdd > 0);
 			}
@@ -288,9 +321,21 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	public void NMAddLink(int fromNodeIndex,int toNodeIndex, boolean directed){
 		synchronized(networkInstance)
 		{
-			networkInstance.addEdgeToNodes(fromNodeIndex, toNodeIndex, directed);
+			for (IInternalNetReprestn iInternalNetReprestn : netRepzsToUpdate) {
+				iInternalNetReprestn.addNodeWithEdge(fromNodeIndex, toNodeIndex, directed);
+			}
 			drawer.addEdge(fromNodeIndex, toNodeIndex);
 		}
+
+//		cptSale++;
+//		if(cptSale% 10000 == 0){
+//			synchronized (networkInstance) {
+//				if(!tmp.checkConsistency(networkInstance)){
+//					System.out.println("WOOWOWW");
+//				}else
+//					System.out.println("ALLFINE");
+//			}
+//		}
 	}
 
 	/** NETWORK MODIFICATIONS. Retrait d'un lien
@@ -299,22 +344,17 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	 * @param to
 	 */
 	public boolean NMRemoveLink(int from, int to, boolean directed){
-		boolean sucess ;
-		sucess =  networkInstance.removeEdgeFromNodes(from, to, directed);
+		boolean sucess = true ;
+		for (IInternalNetReprestn iInternalNetReprestn : netRepzsToUpdate) {
+			sucess &= iInternalNetReprestn.removeEdgeFromNodes(from, to, directed);
+		}
+//		sucess =  networkInstance.removeEdgeFromNodes(from, to, directed);
 		if(sucess){
 			drawer.removeEdge(from, to);
+		}else {
+			System.out.println("ABON??");
 		}
 		return sucess;
-	}
-
-	/** NETWORK MODIFICATIONS. Reroutage d'un lien
-	 *
-	 * @param from
-	 * @param oldTo
-	 * @param newTo
-	 */
-	public void NMChangeLink(int from, int oldTo, int newTo){
-
 	}
 
 	/** NETWORK MODIFICATIONS. Changement d'une couleur
@@ -358,11 +398,22 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	}
 
 	public boolean[][] getNetworkMatrix(){
-		IInternalNetReprestn.AdjacencyMatrixNetwork matrix = new IInternalNetReprestn.AdjacencyMatrixNetwork();
-		synchronized (networkInstance) {
-			matrix.convertNetwork(networkInstance);
+		if(!Configurator.tempConstantMatrice) {
+			IInternalNetReprestn.AdjacencyMatrixNetwork matrix = new IInternalNetReprestn.AdjacencyMatrixNetwork();
+			synchronized (networkInstance) {
+				matrix.convertNetwork(networkInstance);
+			}
+			return matrix.matrix;
 		}
-		return matrix.matrix;
+		else {
+			for (IInternalNetReprestn iInternalNetReprestn : netRepzsToUpdate) {
+				if (iInternalNetReprestn instanceof IInternalNetReprestn.AdjacencyMatrixNetwork) {
+					return ((IInternalNetReprestn.AdjacencyMatrixNetwork) iInternalNetReprestn).getMatrix();
+				}
+			}
+
+			return null;
+		}
 	}
 
 	/** Retourne les noeuds connectés au noeud en parametre,
@@ -396,11 +447,11 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	 * @return
 	 */
 	public boolean isTinyUpToDate(){
-		return networkInstance.getUpdateId() == networkRepresentation.getRepresentationUUID();
+		return networkInstance.getRepresentationUUID() == networkRepresentation.getRepresentationUUID();
 	}
 
 	public boolean isVersionCorrect(int version){
-		return networkInstance.getUpdateId() == version;
+		return networkInstance.getRepresentationUUID() == version;
 	}
 
 	/** compare réseau réel au properties, sans passer par le tiny
@@ -408,7 +459,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	 * @return
 	 */
 	public boolean isNetPropUpToDate(){
-		return (Integer.compare(networkInstance.getUpdateId(),networkInstanceProperties.getNetworkInstance() ) == 0);
+		return (Integer.compare(networkInstance.getRepresentationUUID(),networkInstanceProperties.getNetworkInstance() ) == 0);
 	}
 
 	//endregion

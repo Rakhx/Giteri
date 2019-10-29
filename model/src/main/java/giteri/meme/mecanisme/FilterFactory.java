@@ -566,8 +566,13 @@ public class FilterFactory {
 		@Override
 		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 
-			//Set<Entite> entiteResult = new HashSet<>();
-			List<Entite> entiteResult = new ArrayList<>();
+			if(Configurator.tempRecursMatrice){
+
+			}
+			else {
+
+			}
+
 			boolean[] beforeFil = new boolean[Configurator.getNbNode()];
 			boolean[] selected ;
 			if(Configurator.debugHopAway)
@@ -583,10 +588,14 @@ public class FilterFactory {
 			for (Entite entite : entites) {
 				beforeFil[entite.getIndex()] = true;
 			}
+			Set<Entite> entiteResult = new HashSet<>();
 
-			// getNeightboor(entiteResult, entites, asker, reach);
-			entiteResult = zzz(asker.getIndex(), getNetwork(), beforeFil ,reach);
-
+			if(Configurator.tempRecursMatrice){
+				getNeightboor(entiteResult, entites, asker, reach);
+			}
+			else {
+				entiteResult = zzz(asker.getIndex(), getNetwork(), beforeFil, reach);
+			}
 			if(Configurator.debugHopAway){
 				String result = "after Entites:";
 				String resultNoooo = "after Entites nope actionsljzmzljd:";
@@ -655,8 +664,8 @@ public class FilterFactory {
 			Set<Entite> entiteAccepted = new HashSet<>();
 		}
 
-		private List<Entite> zzz(int asker, boolean[][] network, boolean[] beforeFilter ,int deep){
-			List<Entite> result= new ArrayList<>();
+		private Set<Entite> zzz(int asker, boolean[][] network, boolean[] beforeFilter ,int deep){
+			Set<Entite> result= new HashSet<>();
 			// On trouve les adjacents a l'asker; il s'agit du cercle de distance 1
 			boolean[] adja ;
 			int nbNode = Configurator.getNbNode();
@@ -690,7 +699,6 @@ public class FilterFactory {
 					for (int i = 0; i < nbNode; i++) {
 						if(!soFar[i] && adja[i]) {
 							result.add(eh.getEntitesActive().get(i));
-
 						}
 					}
 

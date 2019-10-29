@@ -10,6 +10,7 @@ import giteri.tool.math.Toolz;
 import org.graphstream.algorithm.APSP;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
 /** Interface et impplémentations des différentes représentation
@@ -25,6 +26,7 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 	 */
 	public class TinyNetworks implements IInternalNetReprestn {
 		public int networkVersion;
+		//KV NodeIndex:<NodeIndex> connecté à la Key
 		private Map<Integer, List<Integer>> nodesAndConnections;
 		private final Object syncOnNodes;
 		public int nbNodes, nbEdges;
@@ -62,7 +64,7 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 					nodesAndConnections.put(node.index, linkOfANode);
 				}
 			}
-			networkVersion = toCopy.getUpdateId();
+			networkVersion = toCopy.getRepresentationUUID();
 		}
 
 		/** TODO [Waypoint]- Calcul des propriétés du réseau courant.
@@ -261,6 +263,16 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 		}
 
 		@Override
+		public void addNodeWithEdge(int nodeFrom, int nodeTo, boolean directed) {
+			throw new NotImplementedException();
+		}
+
+		@Override
+		public boolean removeEdgeFromNodes(int nodeFrom, int nodeTo, boolean directed) {
+			throw new NotImplementedException();
+		}
+
+		@Override
 		public ArrayList<String> getNetworkEdges(){
 			ArrayList<String> edges = new ArrayList<>();
 			List<Integer> nodesIndex = new ArrayList<>();
@@ -290,7 +302,12 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 
 		public boolean[][] matrix;
 		int nbNodes;
-		
+
+		public AdjacencyMatrixNetwork(){
+			nbNodes = Configurator.getNbNode();
+			matrix = new boolean[nbNodes][nbNodes];
+		}
+
 		@Override
 		public void convertNetwork(Network toCopy) {
 			nbNodes = Configurator.getNbNode();
@@ -306,7 +323,7 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 
 		@Override
 		public int getRepresentationUUID() {
-			return 0;
+			throw new NotImplementedException();
 		}
 
 		@Override
@@ -322,14 +339,33 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 		 */
 		@Override
 		public void addNodeWithEdge(int nodeIndex, List<Integer> edgesIndexes) {
+			throw new NotImplementedException();
+		}
 
+		@Override
+		public void addNodeWithEdge(int nodeFrom, int nodeTo, boolean directed) {
+			matrix[nodeFrom][nodeTo] = true;
+			if(!directed)
+				matrix[nodeTo][nodeFrom] = true;
+		}
+
+		@Override
+		public boolean removeEdgeFromNodes(int nodeFrom, int nodeTo, boolean directed) {
+			matrix[nodeFrom][nodeTo] = false;
+			if(!directed)
+				matrix[nodeTo][nodeFrom] = false;
+			return true;
 		}
 
 		@Override
 		public ArrayList<String> getNetworkEdges() {
 			return null;
 		}
-	
+
+		public boolean[][] getMatrix() {
+			return matrix;
+		}
+
 		/**
 		 * 
 		 * @param distance
@@ -347,6 +383,25 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 			
 			return neighboor;
 		}
+
+		public boolean checkConsistency(Network toCheck){
+			boolean[][] matrixReal;
+			matrixReal = new boolean[nbNodes][nbNodes];
+			for (Edge edge : toCheck.getEdges())
+				matrixReal[edge.from.getIndex()][edge.to.getIndex()] = matrixReal[edge.to.getIndex()][edge.from.getIndex()] = true;
+
+			// Vérification croisée
+			for (int i = 0; i < nbNodes; i++) {
+				for (int j = 0; j < nbNodes; j++) {
+					if(matrix[i][j]!= matrixReal[i][j])
+						return false;
+				}
+			}
+
+			return true;
+		}
+
+
 	}
 
 }
