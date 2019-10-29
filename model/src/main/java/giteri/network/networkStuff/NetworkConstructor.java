@@ -34,8 +34,6 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	int nbNodeInit = Configurator.getNbNode();
 	int cptSale = 0;
 
-	IInternalNetReprestn.AdjacencyMatrixNetwork tmp;
-
 	//endregion
 
 	/** Constructeur sans paramètre.
@@ -46,12 +44,9 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		networkInstance = new Network();
 		netRepzsToUpdate.add(networkInstance);
 
-		if(Configurator.tempConstantMatrice) {
-			IInternalNetReprestn.AdjacencyMatrixNetwork matrice = new IInternalNetReprestn.AdjacencyMatrixNetwork();
-			netRepzsToUpdate.add(matrice);
-			tmp = matrice;
-
-		}
+		// Représentation matriciel qui double la rep. network, utilisé pour les filtes hop away
+		IInternalNetReprestn.AdjacencyMatrixNetwork matrice = new IInternalNetReprestn.AdjacencyMatrixNetwork();
+		netRepzsToUpdate.add(matrice);
 
 		generateNodes();
 		networkInstanceProperties = new NetworkProperties("Courant");
@@ -397,23 +392,19 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		return networkInstance;
 	}
 
+	/** Retour la matrice d'adjacency
+	 *
+	 * @return
+	 */
 	public boolean[][] getNetworkMatrix(){
-		if(!Configurator.tempConstantMatrice) {
-			IInternalNetReprestn.AdjacencyMatrixNetwork matrix = new IInternalNetReprestn.AdjacencyMatrixNetwork();
-			synchronized (networkInstance) {
-				matrix.convertNetwork(networkInstance);
-			}
-			return matrix.matrix;
-		}
-		else {
-			for (IInternalNetReprestn iInternalNetReprestn : netRepzsToUpdate) {
-				if (iInternalNetReprestn instanceof IInternalNetReprestn.AdjacencyMatrixNetwork) {
-					return ((IInternalNetReprestn.AdjacencyMatrixNetwork) iInternalNetReprestn).getMatrix();
-				}
-			}
 
-			return null;
+		for (IInternalNetReprestn iInternalNetReprestn : netRepzsToUpdate) {
+			if (iInternalNetReprestn instanceof IInternalNetReprestn.AdjacencyMatrixNetwork) {
+				return ((IInternalNetReprestn.AdjacencyMatrixNetwork) iInternalNetReprestn).getMatrix();
+			}
 		}
+
+		return null;
 	}
 
 	/** Retourne les noeuds connectés au noeud en parametre,

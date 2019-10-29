@@ -11,10 +11,6 @@ public final class Configurator {
 
 	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
 
-	public static boolean tempConstantMatrice = true; // mise a jour constant de la matrice ou non
-	public static boolean tempRecursMatrice = false; // utilisation de la fonction récursive
-
-
 	// region initializer stuff
 	// VALEURS DONNEES A TITRE INDICATIF, set définitif dans l'initializer
 	// La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
@@ -141,7 +137,7 @@ public final class Configurator {
 
 
 	public static boolean debugJarMode = true;
-	public static boolean timeEfficiency = true;
+	public static boolean timeEfficiency = false;
 
 	// endregion
 

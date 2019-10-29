@@ -565,14 +565,6 @@ public class FilterFactory {
 
 		@Override
 		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
-
-			if(Configurator.tempRecursMatrice){
-
-			}
-			else {
-
-			}
-
 			boolean[] beforeFil = new boolean[Configurator.getNbNode()];
 			boolean[] selected ;
 			if(Configurator.debugHopAway)
@@ -590,12 +582,10 @@ public class FilterFactory {
 			}
 			Set<Entite> entiteResult = new HashSet<>();
 
-			if(Configurator.tempRecursMatrice){
-				getNeightboor(entiteResult, entites, asker, reach);
-			}
-			else {
-				entiteResult = zzz(asker.getIndex(), getNetwork(), beforeFil, reach);
-			}
+			// plus de fonction recursive
+//				getNeightboor(entiteResult, entites, asker, reach);
+
+			entiteResult = zzz(asker.getIndex(), getNetwork(), beforeFil, reach);
 			if(Configurator.debugHopAway){
 				String result = "after Entites:";
 				String resultNoooo = "after Entites nope actionsljzmzljd:";
