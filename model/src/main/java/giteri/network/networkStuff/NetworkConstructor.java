@@ -15,6 +15,8 @@ import giteri.network.network.Network;
 import giteri.network.network.NetworkProperties;
 import giteri.run.ThreadHandler;
 import giteri.run.configurator.Configurator;
+import org.graphstream.graph.EdgeRejectedException;
+import org.graphstream.graph.IdAlreadyInUseException;
 
 /** Prend en entrée un fichier texte, ou génére aléatoirement un réseau.
  * Va instancier des Node & Edge
@@ -316,10 +318,26 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	public void NMAddLink(int fromNodeIndex,int toNodeIndex, boolean directed){
 		synchronized(networkInstance)
 		{
+			for (org.graphstream.graph.Edge edge : ((DrawerGraphStream) drawer).graph.getNode(fromNodeIndex).getEachEdge()) {
+				if((edge.getNode1().getIndex() == fromNodeIndex && edge.getNode0().getIndex() == toNodeIndex) ||
+						((edge.getNode1().getIndex() == toNodeIndex && edge.getNode0().getIndex() == fromNodeIndex)) ){
+					System.out.println("WALLAH");
+				}
+
+			}
+
 			for (IInternalNetReprestn iInternalNetReprestn : netRepzsToUpdate) {
 				iInternalNetReprestn.addNodeWithEdge(fromNodeIndex, toNodeIndex, directed);
 			}
-			drawer.addEdge(fromNodeIndex, toNodeIndex);
+
+			try {
+				drawer.addEdge(fromNodeIndex, toNodeIndex);
+			}catch(EdgeRejectedException ere){
+				System.out.println(ere.getMessage());
+			}catch(IdAlreadyInUseException iaiue){
+				System.out.println(iaiue.getMessage());
+
+			}
 		}
 
 //		cptSale++;

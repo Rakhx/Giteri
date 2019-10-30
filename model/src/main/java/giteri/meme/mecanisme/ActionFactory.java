@@ -40,8 +40,6 @@ public class ActionFactory{
 				return new ActionEvaporation(entiteHandler);
 			case REFRESH:
 				return new ActionRefreshLinks(entiteHandler);
-			case PURIFY:
-				return new ActionPurifyLinks(entiteHandler);
 			default:
 				return null;
 		}
@@ -342,56 +340,4 @@ public class ActionFactory{
 		}
 	}
 
-	private class ActionPurifyLinks  extends ActionBase implements IAction {
-
-		public ActionPurifyLinks(EntiteHandler eh){
-			super(eh);
-		}
-		@Override
-		public String applyAction(Entite asker, Set<Entite> cibles) {
-			String actionDone = "";
-			Entite target;
-			ArrayList<Entite> connectedNodeSeveralConnection = new ArrayList<Entite>();
-
-			for (Entite entite : cibles)
-			{
-				// Pour chaque entité, a X%
-				if(Toolz.rollDice(.5)){
-					connectedNodeSeveralConnection.clear();
-					// si l'entité est connecté a plus de Y noeud
-					if(entite.getDegree() > 2){
-						for (Integer indexEventuality : entite.getConnectedNodesIndex()) {
-							// Et si le noeud auquel elle est connecté possede aussi un degré Sup a Z
-							if(applier.getEntityCorresponding(indexEventuality).getDegree() > 1){
-								connectedNodeSeveralConnection.add(applier.getEntityCorresponding(indexEventuality));
-							}
-						}
-
-						// On supprime au hasard l'un de ces liens // noeuds
-						if(connectedNodeSeveralConnection.size() > 1){
-							target = connectedNodeSeveralConnection.get(Toolz.getRandomNumber(connectedNodeSeveralConnection.size()));
-							applier.removeLink(entite, target);
-							actionDone += this.toString() + " " + entite.getIndex() + " => " + target.getIndex();
-						}
-					}
-				}
-			}
-			return actionDone;
-		}
-
-		@Override
-		public ActionType getActionType() {
-			return ActionType.RETRAITLIEN;
-		}
-
-		@Override
-		public String getFourCharName() {
-			return "PURI";
-		}
-
-		public String toString(){
-			return "Purification";
-		}
-
-	}
 }

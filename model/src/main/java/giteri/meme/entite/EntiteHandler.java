@@ -306,8 +306,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			// ajout dans la couche network; Ajout dans la couche meme
 			// automatique car les entitées ont leur edges en passant par la
 			// propriété dans les nodes.
-			networkConstruct.NMAddLink(
-					from.getNode().getIndex(), to.getNode().getIndex(), false);
+			networkConstruct.NMAddLink(from.getNode().getIndex(), to.getNode().getIndex(), false);
 			// Ajout dans la liste des entités pour faire la correspondance
 			// lien, temps de connection
 			from.addConnectedEntite(to);
@@ -827,21 +826,16 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			}
 
 			// Le dernier filtre appliqué est tjrs un random() unitaire : sauf purify
-			if (cibles.size() == 1 || memeAction.getAction().getFourCharName() == "PURI") {
+			if (cibles.size() == 1) {
 				actionDone += memeAction.getAction().applyAction(movingOne, cibles);
-
-				// region PROPAGATION du meme
-				if (Configurator.usePropagation) {
+				if (Configurator.usePropagation)
 					propagationDirect(cibles, movingOne, memeAction);
-				}
-
-				// endregion
 
 				// evenement d'application d'une action
 				eventActionDone(movingOne, memeAction, actionDone);
 			}
 
-			// Dans le cas ou il y a plus d'une cible // ou pas action purify // ou aucune cible.
+			// Dans le cas ou il y a plus d'une cible
 			else {
 				if (cibles.size() > 1) System.err.println("Plusieurs cibles pour une action, pas normal");
 				actionDone = "Nope, Entite " + movingOne.getIndex()  + " Aucune(ou trop de) cible pour l'action" + memeAction.toFourCharString();
@@ -855,9 +849,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			actionDone = "Nope, Entite " + movingOne.getIndex() + " Liste d'action vide ou aucune action sélectionnée";
 			eventActionDone(movingOne, null, "NOACTION");
 		}
-
-//		if (Configurator.displayLogMemeApplication)
-//			vueController.displayInfo(ViewMessageType.MEMEAPPLICATION, Arrays.asList("MemeApplied- " + memeApply,"ActionDone- " +  actionDone));
 
 		return actionDone;
 	}
@@ -1250,7 +1241,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		ActionType remove = ActionType.RETRAITLIEN;
 
 		@SuppressWarnings("unused")
-		ActionType puri = ActionType.PURIFY;
 		AttributType degree = AttributType.DEGREE;
 		AgregatorType linked = AgregatorType.LINKED;
 		AgregatorType notLinked = AgregatorType.NOTLINKED;
@@ -1354,12 +1344,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(2, random);
 		memeFactory.registerMemeAction("Rmv3",.5, false, false, remove,  attributs, KVAttributAgregator, false);
 
-		agregators.clear();
-		memeFactory.registerMemeAction("Puri",.1,false, false, puri, attributs, KVAttributAgregator, false);
-
-//		for (Meme memeDispo : memeFactory.getMemes(Configurator.MemeList.EXISTING,Configurator.ActionType.ANYTHING)) {
-//			memeTranslationReadable.put(memeDispo.toFourCharString(),memeDispo.getName());
-//		}
 	}
 
 	/**
@@ -1586,28 +1570,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	public void purgeLink() {
 
-		Meme purify = memeFactory.getMemeFromFourString("PURIDG");
-		purify.getAction().applyAction(null, entites);
-
-//		Entite target;
-//		ArrayList<Entite> connectedNodeSeveralConnection = new ArrayList<Entite>();
-//
-//		for (Entite entite : entites) {
-//			connectedNodeSeveralConnection.clear();
-//			if (entite.getDegree() > 1) {
-//				for (Entite entite2 : entite.getConnectedEntite()) {
-//					if (entite2.getDegree() > 1) {
-//						connectedNodeSeveralConnection.add(entite2);
-//					}
-//				}
-//
-//				if (connectedNodeSeveralConnection.size() > 1) {
-//					target = connectedNodeSeveralConnection.get
-//							(Toolz.getRandomNumber(connectedNodeSeveralConnection.size()));
-//					removeLink(entite, target);
-//				}
-//			}
-//		}
 	}
 
 	/** Obtient les memes effectivements présent sur la map.

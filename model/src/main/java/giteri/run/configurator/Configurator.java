@@ -77,7 +77,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static int nbRepetitionbyRun = 20;
 	@toOutput ( yes = true )
-	public static int nbRepetitionForJar = 1;
+	public static int nbRepetitionForJar = 3;
 
 	@toOutput ( yes = true )
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
@@ -265,7 +265,6 @@ public final class Configurator {
 		COPIERANDOMMEME,
 		EVAPORATION,
 		REFRESH,
-		PURIFY,
 		ANYTHING;
 	}
 

@@ -47,7 +47,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 
 
 	// Graphe associé
-	private Graph graph;
+	public Graph graph;
 	// x3
 	private int nbColorWanted = 3;
 	private Hashtable<Integer, String> colorPieAsString;
