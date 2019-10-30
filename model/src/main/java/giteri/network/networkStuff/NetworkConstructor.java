@@ -339,17 +339,11 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	 * @param to
 	 */
 	public boolean NMRemoveLink(int from, int to, boolean directed){
-		boolean sucess = true ;
 		for (IInternalNetReprestn iInternalNetReprestn : netRepzsToUpdate) {
-			sucess &= iInternalNetReprestn.removeEdgeFromNodes(from, to, directed);
+			iInternalNetReprestn.removeEdgeFromNodes(from, to, directed);
 		}
-//		sucess =  networkInstance.removeEdgeFromNodes(from, to, directed);
-		if(sucess){
-			drawer.removeEdge(from, to);
-		}else {
-			System.out.println("ABON??");
-		}
-		return sucess;
+
+		return true;
 	}
 
 	/** NETWORK MODIFICATIONS. Changement d'une couleur

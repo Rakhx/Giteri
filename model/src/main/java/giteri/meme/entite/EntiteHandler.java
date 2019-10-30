@@ -70,6 +70,13 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private ObjectRef<Integer> nbFail = new ObjectRef<>(0);
 	private Map<Meme, Double> kvMemeCodeNbEntities;
 
+	// Variable utilisé dans la fonction doAction - fn appelée a chaque step
+	Set<Entite> cibles;
+	Set<Integer> ciblesIndex;
+	IFilter currentFilter;
+	String attribString;
+	String actionDone;
+
 	/** Constructeur sans param.
 	 *
 	 */
@@ -89,6 +96,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		if(Configurator.displayMemePossessionEvolution)
 			kvMemeCodeNbEntities = new HashMap<>();
 		this.addMemeListener(this);
+
+		// Variable pour la fonction doAction
+		cibles = new HashSet<>(Configurator.getNbNode());
+		ciblesIndex = new HashSet<>();
 	}
 
 	public void initialisation(){
@@ -164,7 +175,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 
 		// Indicateur meme repartition, etc.
-		if(Configurator.displayMemePosessionDuringSimulation &&cptModulo % (Configurator.refreshInfoRate * 25) == 0 ) {
+		if(Configurator.displayMemePosessionDuringSimulation && (cptModulo % (Configurator.refreshInfoRate * 25) == 0) ) {
 			vueController.displayMemeUsage(cptModulo,
 					memeProperties.getNbActivationByMemes(),
 					memeProperties.countOfLastMemeActivation,
@@ -778,25 +789,29 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	@SuppressWarnings("unchecked")
 	private String doAction(Entite movingOne, Meme memeAction) {
-		String actionDone = "";String memeApply = "";Set<Entite> cibles ;Set<Integer> ciblesIndex = new HashSet<>();
-		IFilter currentFilter = null; Iterator<Entite> ite; Entite one; Meme memeReturned;
+		//Set<Entite>cibles = new HashSet<>(entites);
+		//Set<Integer> ciblesIndex = new HashSet<>();
 
 		// Execution d'un meme de l'entite.
 		if (memeAction != null) {
+//			cibles.clear();
+//			cibles.addAll(entites);
 			cibles = new HashSet<>(entites);
 			cibles.remove(movingOne);
+			actionDone = "";
 
 			// FILTRE Pour chaque attribut sur lesquels on applique des filtres
 			for (IAttribut<Integer> attribut : memeAction.getAttributs()) {
+				attribString = attribut.toString();
 				// region semi auto
 				if (Configurator.semiStepProgression && filterOnSemiAuto(null, null)) {
 					System.out.println("On va appliquer les filtres suivants pour l'action " + memeAction.name);
-					System.out.println(memeAction.getFilter(attribut.toString()).values());
+					System.out.println(memeAction.getFilter(attribString).values());
 				} //endregion
 
 				// Pour chaque filtre appliqué a un attribut
-				for (int order = 0; order < memeAction.getFilter(attribut.toString()).size(); order++) {
-					currentFilter = memeAction.getFilter(attribut.toString()).get(order);
+				for (int order = 0; order < memeAction.getFilter(attribString).size(); order++) {
+					currentFilter = memeAction.getFilter(attribString).get(order);
 					currentFilter.applyFilter(movingOne, cibles, attribut);
 					//region semi-auto
 					// Dans le cas ou on veut un mode semi automatique
@@ -815,64 +830,11 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			if (cibles.size() == 1 || memeAction.getAction().getFourCharName() == "PURI") {
 				actionDone += memeAction.getAction().applyAction(movingOne, cibles);
 
-
 				// region PROPAGATION du meme
 				if (Configurator.usePropagation) {
-					propagationDirect(cibles,movingOne,memeAction);
-
-
-//					// Si on a appliquer à plus d'une entité l'action, mais qu'on ne veut qu'une seule propagation
-//					if(cibles.size() > 1 && Configurator.onlyOneToPropagate) {
-//						ite = cibles.iterator();
-//						for (int i = 0; i < Toolz.getRandomNumber(cibles.size()); i++) {
-//							ite.next();
-//						}
-//
-//						one = ite.next();
-//						cibles.clear();
-//						cibles.add(one);
-//					}
-//
-//					for (Entite entite : cibles) {
-//						// region Transmission de l'un de behavior possédé par l'acting.
-//						if (Configurator.usePropagationSecondGeneration) {
-//							Meme selectedMeme = movingOne.chooseAction();
-//							if (selectedMeme == null) {
-//								if (Configurator.debugEntiteHandler)
-//									System.out.println("Meme joué par " + movingOne.toString() + " disparu");
-//							}
-//							memeReturned = entite.receiveMeme(selectedMeme);
-//							// Si retour du meme a a jouter
-//							if (memeReturned == selectedMeme)
-//								eventMemeChanged(entite, selectedMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-//
-//							// alors il y a eu remplacement
-//							if (memeReturned != null && memeReturned != selectedMeme) {
-//								// un retrait
-//								eventMemeChanged(entite, memeReturned, Configurator.MemeActivityPossibility.RetraitMeme.toString());
-//								// et un ajout
-//								eventMemeChanged(entite, selectedMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-//							}
-//						}
-//						// endregion
-//
-//						// ou transmission du behavior appliqué
-//						else {
-//							memeReturned = entite.receiveMeme(memeAction);
-//							// Si retour du meme a a jouter
-//							if (memeReturned == memeAction)
-//								eventMemeChanged(entite, memeAction, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-//
-//							// alors il y a eu remplacement
-//							if (memeReturned != null && memeReturned != memeAction) {
-//								// un retrait
-//								eventMemeChanged(entite, memeReturned, Configurator.MemeActivityPossibility.RetraitMeme.toString());
-//								// et un ajout
-//								eventMemeChanged(entite, memeAction, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-//							}
-//						}
-//					}
+					propagationDirect(cibles, movingOne, memeAction);
 				}
+
 				// endregion
 
 				// evenement d'application d'une action
@@ -894,8 +856,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			eventActionDone(movingOne, null, "NOACTION");
 		}
 
-		if (Configurator.displayLogMemeApplication)
-			vueController.displayInfo(ViewMessageType.MEMEAPPLICATION, Arrays.asList("MemeApplied- " + memeApply,"ActionDone- " +  actionDone));
+//		if (Configurator.displayLogMemeApplication)
+//			vueController.displayInfo(ViewMessageType.MEMEAPPLICATION, Arrays.asList("MemeApplied- " + memeApply,"ActionDone- " +  actionDone));
 
 		return actionDone;
 	}

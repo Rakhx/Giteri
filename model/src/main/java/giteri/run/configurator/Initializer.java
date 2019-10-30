@@ -132,14 +132,15 @@ public class Initializer {
         Controller.ModelController mControl = c.new ModelController(vControl, communicationModel);
         // Crée une fenetre stub
         if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.jarOpenMole) {
-            // La fenetre en elle meme Controller de Model donné a l'IHM
-            IHM fenetre = new IHM(mControl,
-                    memeFactory,
-                    entiteHandler,
-                    new DrawerStub(),
-                    writeNRead);
 
-            vControl.addView(fenetre);
+            // La fenetre en elle meme Controller de Model donné a l'IHM
+//            IHM fenetre = new IHM(mControl,
+//                    memeFactory,
+//                    entiteHandler,
+//                    new DrawerStub(),
+//                    writeNRead);
+//            vControl.addView(fenetre);
+
             if((Configurator.activationCodeForView & 4) == 4)
                 vControl.addView(new FileView(false));
             if((Configurator.activationCodeForView & 2) == 2)

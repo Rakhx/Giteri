@@ -8,6 +8,7 @@ import giteri.tool.math.Toolz;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.AgregatorType;
 import giteri.meme.entite.Entite;
+import giteri.tool.objects.ObjectRef;
 
 public class FilterFactory {
 
