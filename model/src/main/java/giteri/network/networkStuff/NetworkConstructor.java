@@ -360,7 +360,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		for (IInternalNetReprestn iInternalNetReprestn : netRepzsToUpdate) {
 			iInternalNetReprestn.removeEdgeFromNodes(from, to, directed);
 		}
-
+		drawer.removeEdge(from, to);
 		return true;
 	}
 
