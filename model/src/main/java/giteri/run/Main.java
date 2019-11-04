@@ -16,19 +16,19 @@ public final class Main {
 	public static void main(String[] args)  {
 		Initializer.initialize(Configurator.EnumLauncher.ihm, null, null ,null);
 	}
-} 
+}
 
 //region osef
 
 /** Fermeture de fenetre.
- *  
+ *
  */
 class FrameListener extends WindowAdapter
 {
-   public void windowClosing(WindowEvent e)
-  {
-    System.exit(0);
-  }
+	public void windowClosing(WindowEvent e)
+	{
+		System.exit(0);
+	}
 }
 
 

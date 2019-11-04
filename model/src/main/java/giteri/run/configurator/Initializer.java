@@ -50,7 +50,7 @@ public class Initializer {
         boolean ihmLauncher = (launcher == Configurator.EnumLauncher.ihm) ;
         if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.jarOpenMole){
             // La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
-	        // depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent cette configuration initiale
+            // depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent cette configuration initiale
             Configurator.methodOfGeneration = Configurator.MemeDistributionType.Nothing;
             Configurator.withGraphicalDisplay = false;
             Configurator.jarMode = true;
@@ -103,6 +103,7 @@ public class Initializer {
         else
             stat = new StatAndPlotJarVersion(entiteHandler, memeFactory, networkConstructor, writeNRead, networkFileLoader, workerFactory);
 
+
         // Communication model
         CommunicationModel communicationModel ;
 
@@ -133,13 +134,6 @@ public class Initializer {
         // Crée une fenetre stub
         if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.jarOpenMole) {
 
-            // La fenetre en elle meme Controller de Model donné a l'IHM
-//            IHM fenetre = new IHM(mControl,
-//                    memeFactory,
-//                    entiteHandler,
-//                    new DrawerStub(),
-//                    writeNRead);
-//            vControl.addView(fenetre);
 
             if((Configurator.activationCodeForView & 4) == 4)
                 vControl.addView(new FileView(false));
@@ -176,10 +170,10 @@ public class Initializer {
             // La fenetre en elle meme Controller de Model donné a l'IHM
             if(withGraphicalDisplay)
                 fenetre = new IHM(mControl,
-                    memeFactory,
-                    entiteHandler,
-                    drawerGraphStream,
-                    writeNRead);
+                        memeFactory,
+                        entiteHandler,
+                        drawerGraphStream,
+                        writeNRead);
             else
                 fenetre = new IHM(mControl,
                         memeFactory,

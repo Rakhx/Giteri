@@ -318,13 +318,6 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	public void NMAddLink(int fromNodeIndex,int toNodeIndex, boolean directed){
 		synchronized(networkInstance)
 		{
-			for (org.graphstream.graph.Edge edge : ((DrawerGraphStream) drawer).graph.getNode(fromNodeIndex).getEachEdge()) {
-				if((edge.getNode1().getIndex() == fromNodeIndex && edge.getNode0().getIndex() == toNodeIndex) ||
-						((edge.getNode1().getIndex() == toNodeIndex && edge.getNode0().getIndex() == fromNodeIndex)) ){
-					System.out.println("WALLAH");
-				}
-
-			}
 
 			for (IInternalNetReprestn iInternalNetReprestn : netRepzsToUpdate) {
 				iInternalNetReprestn.addNodeWithEdge(fromNodeIndex, toNodeIndex, directed);

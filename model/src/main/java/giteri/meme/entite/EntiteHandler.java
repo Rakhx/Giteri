@@ -1338,11 +1338,11 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, random);
 		memeFactory.registerMemeAction("RmvEq",1, false, true, remove,  attributs, KVAttributAgregator, false);
 
-		agregators.clear();
-		agregators.put(0, linked);
-		agregators.put(1, theirSupSix);
-		agregators.put(2, random);
-		memeFactory.registerMemeAction("Rmv3",.5, false, false, remove,  attributs, KVAttributAgregator, false);
+//		agregators.clear();
+//		agregators.put(0, linked);
+//		agregators.put(1, theirSupSix);
+//		agregators.put(2, random);
+//		memeFactory.registerMemeAction("Rmv3",.5, false, false, remove,  attributs, KVAttributAgregator, false);
 
 	}
 

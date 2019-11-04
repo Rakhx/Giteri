@@ -46,7 +46,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static boolean autoMemeForBreeder = false;	// Les breeder ont associé un meme complémement, rmd ajout ou retrait.
 	public static boolean onlyOneToPropagate = true; // Dans le cas ou une action s'applique sur plusieurs entités
-	public static boolean usePropagationSecondGeneration = true; // transmet un des memes du porteur, pas forcement celui applied
+	public static boolean usePropagationSecondGeneration = false; // transmet un des memes du porteur, pas forcement celui applied
 
 	public static boolean useEntitySuccesProba = false; // Prend en compte la proba porté pour l'entité pour APPLY a meme. Actuellement l'index
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
@@ -54,7 +54,7 @@ public final class Configurator {
 	// SCORE
 
 	public static boolean exploreSpecialNetworks = false; // Si on cherche les networks non moyen plutot que faire un score de distance
-    // Si true, passe par la méthode getNetworkScoreExplo qui ne prend en compte que CC et 3moment.
+	// Si true, passe par la méthode getNetworkScoreExplo qui ne prend en compte que CC et 3moment.
 	@toOutput ( yes = true )
 	public static int activationCodeForScore = 202+512; // 202+512 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
 	// 16 + 512 Clust + third
@@ -77,12 +77,12 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static int nbRepetitionbyRun = 20;
 	@toOutput ( yes = true )
-	public static int nbRepetitionForJar = 3;
+	public static int nbRepetitionForJar = 2;
 
 	@toOutput ( yes = true )
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
 	@toOutput ( yes = true )
-	public static int multiplicatorNbAction  = 5000; //  Par combein on multiplie le nombdre de noeud sur la simulation
+	public static int multiplicatorNbAction  = 4000; //  Par combein on multiplie le nombdre de noeud sur la simulation
 
 	// endregion
 
