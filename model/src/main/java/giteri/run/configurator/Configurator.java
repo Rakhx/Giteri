@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public final class Configurator {
 
 	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
+	public static boolean writInfo4OpnMol = true; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
 
 	// region initializer stuff
 	// VALEURS DONNEES A TITRE INDICATIF, set définitif dans l'initializer
