@@ -388,10 +388,10 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 */
 	public boolean continuFittingSimpliestVersion(){
 		boolean oneMoreTurn = true;
-		ObjectRef<String> message = new ObjectRef<>("");
-		oneMoreTurn = readingActionCanContinue(message);
+	//	ObjectRef<String> message = new ObjectRef<>("");
+		// oneMoreTurn = readingActionCanContinue(message);
 		if(getNbAction() > nbActionBeforeQuit )
-			oneMoreTurn &= false;
+			oneMoreTurn /*&*/= false;
 		return oneMoreTurn;
 
 
@@ -416,12 +416,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		if (avgNSqrt[0] < .001 && avgNSqrt[1] < .0001) {
 			com.view.displayInfo(Configurator.ViewMessageType.FITTINGSKIP, new ArrayList<String>(Arrays.asList("Empty Network")));
 			return false;
-		}
-
-
-		// Si full transmission, vérification de:
-		if(entiteHandler.memeAllTransmitted()){
-
 		}
 
 		return continuFittingSimpliestVersion();
@@ -466,6 +460,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			if(!entiteHandler.forceAction()){
 				resultat = false;
 				resume += "[ActionReading] - Plus d'action possible dans ce réseau";
+			}else {
+				System.out.println("On a réussi a forcer");
 			}
 		} // Si on a réussi a faire faire une action
 		else{

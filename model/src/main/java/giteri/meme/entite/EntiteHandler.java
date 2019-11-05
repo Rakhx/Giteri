@@ -24,6 +24,8 @@ import giteri.tool.other.StopWatchFactory;
 
 import java.util.*;
 
+import static giteri.run.configurator.Configurator.fullSilent;
+
 /**
  * Classe qui gère les entités du réseau.
  *
@@ -192,7 +194,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			vueController.displayInfo(ViewMessageType.AVGDGRBYMEME, Arrays.asList(checkPropertiesByMemePossession()));
 
 		// Verification de la propagation totale des memes initiaux
-		if(!Configurator.fullSilent && Configurator.checkWhenFullPropagate && !allTransmitted &&  cptModulo % Configurator.checkFullProRefreshRate == 0) {
+		if(!fullSilent && Configurator.checkWhenFullPropagate && !allTransmitted &&  cptModulo % Configurator.checkFullProRefreshRate == 0) {
 			if(areAllMemeTransmitted()) {
                 allTransmitted = true;
                 vueController.displayInfo(ViewMessageType.PROPAGATION, Arrays.asList("ALL TRANSMISTED IN ;" + cptModulo));
@@ -688,9 +690,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		List<String> rez = new ArrayList<>();
 		boolean actionMe ;
-		List<Meme> memeActions = new ArrayList<>();
+		Meme memeActions;
 
 		synchronized (workerFactory.waitingForReset) {
+			workerFactory.getCalculator().incrementNbAction();
 			toDisplayForRatio.clear();
 
 			// CHOIX D'UNE ENTITÉE AU HASARD
@@ -699,72 +702,56 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				System.out.println("[EH.runEntite]- entite choisie " + entiteActing.getIndex());
 			if (entiteActing == null) {
 				if(Configurator.debugEntiteHandler) System.err.println("[EH.runEntite()]- Aucune entité sélectionnée");
-				return ("Nope pas d'entite prete");  }
-
-			// CHOIX DE L'ACTION POUR CETTE ENTITE
-			if(!Configurator.rebranchementAction) {
-				memeActions.add(actionSelectionRulesVersion(entiteActing));
-				if(Configurator.debugEntiteHandler)
-					System.out.println("[EH.runEntite]- action choisie " + memeActions.get(0).toFourCharString());
+				return ("Nope pas d'entite prete");
 			}
-			else
-				memeActions.addAll(entiteActing.getMyMemes());
+
+			memeActions =(actionSelectionRulesVersion(entiteActing));
+			if(Configurator.debugEntiteHandler)
+				System.out.println("[EH.runEntite]- action choisie " + memeActions.toFourCharString());
 
 			// APPLICATION ET PROPAGATION DE L'ACTION
-			actionMe = !Configurator.useEntitySuccesProba || Toolz.rollDice(entiteActing.getProbaAppliying());
-			for (Meme memeAction : memeActions) {
-				if(actionMe)
-					rez.add(doAction(entiteActing, memeAction));
-				else {
-					rez.add("Nope, entite ne veux pas agir");
-					if (Configurator.debugEntiteHandler)
-						System.out.println("[EH.runEntite]- resultat de l'action" + rez);
-				}
-			}
+			rez.add(doAction(entiteActing, memeActions));
+
+			if(Configurator.debugEntiteHandler)
+				System.out.println("[EH.runEntite]- resultat de l'action" + rez);
 
 			// AFFICHAGE ET DEBUGGUAGE
 			if (Configurator.displayLogRatioTryAddOverTryRmv) {
-				for (Meme memeAction : memeActions) {
-					if (memeAction != null) {
-						if (memeAction.action.getActionType() == ActionType.AJOUTLIEN)
-							cptActionAddTried++;
-						else if (memeAction.action.getActionType() == ActionType.RETRAITLIEN)
-							cptActionRmvTried++;
+				if (memeActions != null) {
+					if (memeActions.action.getActionType() == ActionType.AJOUTLIEN)
+						cptActionAddTried++;
+					else if (memeActions.action.getActionType() == ActionType.RETRAITLIEN)
+						cptActionRmvTried++;
 
-						toDisplayForRatio.add(memeAction.action.getActionType().name());
-						toDisplayForRatio.add("AddTried/rmvTried;" + (double) cptActionAddTried / cptActionRmvTried);
-					}
+					toDisplayForRatio.add(memeActions.action.getActionType().name());
+					toDisplayForRatio.add("AddTried/rmvTried;" + (double) cptActionAddTried / cptActionRmvTried);
 				}
 			}
 
 			// Si on veut afficher les X dernieres actions entreprises & action depuis le début
 			if (Configurator.displayMemePosessionDuringSimulation) {
-				int i = -1;
-				for (Meme memeAction : memeActions) {
-					i++;
-					if (Configurator.displayLogRatioLogFailOverFail || Configurator.displayLogRatioLogFailOverSuccess )
-					{
-						List<String> temp = memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez.get(i), cptModulo);
-						if(temp != null)
-							toDisplayForRatio.addAll(temp);
-					}
-					else
-						memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez.get(i), cptModulo);
+				if (Configurator.displayLogRatioLogFailOverFail || Configurator.displayLogRatioLogFailOverSuccess )
+				{
+					List<String> temp = memeProperties.updateActionCount(memeActions, entiteActing.getIndex(), rez.get(0), cptModulo);
+					if(temp != null)
+						toDisplayForRatio.addAll(temp);
+				}
+				else
+					memeProperties.updateActionCount(memeActions, entiteActing.getIndex(), rez.get(0), cptModulo);
 
-					if(cptModulo % (Configurator.refreshInfoRate * 25)== 0) {
+				if(cptModulo % (Configurator.refreshInfoRate * 25)== 0) {
 
-						sumFailAction =  memeProperties.lastFailAction(nbFail);
-						//vueController.displayInfo("FAILSTUFF", Arrays.asList("" + sumFailAction));
+					sumFailAction =  memeProperties.lastFailAction(nbFail);
+					//vueController.displayInfo("FAILSTUFF", Arrays.asList("" + sumFailAction));
 
-						if(Configurator.writeFailDensityLink)
-							vueController.displayInfo(ViewMessageType.FAILXDENSITY, getFailXDensity( nbFail.getValue(),
-									networkConstruct.updatePreciseNetworkProperties
-											(Configurator.getIndicateur(NetworkAttribType.DENSITY)).getDensity(),sumFailAction));
-					}
+					if(Configurator.writeFailDensityLink)
+						vueController.displayInfo(ViewMessageType.FAILXDENSITY, getFailXDensity( nbFail.getValue(),
+								networkConstruct.updatePreciseNetworkProperties
+										(Configurator.getIndicateur(NetworkAttribType.DENSITY)).getDensity(),sumFailAction));
 				}
 			}
 
-			if(!toDisplayForRatio.isEmpty())
+			if(!fullSilent && toDisplayForRatio.isEmpty())
 				vueController.displayInfo(ViewMessageType.ECHECS, toDisplayForRatio);
 
 			// Dans le cas ou on veut les filtres en semi step, remis a zero des couleurs.
@@ -776,7 +763,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			}
 		}
 
-		workerFactory.getCalculator().incrementNbAction();
 		return rez.stream().reduce(String::concat).toString();
 	}
 

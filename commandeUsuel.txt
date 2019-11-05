@@ -1,3 +1,6 @@
+cd C:\Users\John\IdeaProjects\Giteri\model
+cd c:\soft\Openmole
+
 // A lancer depuis le folder model pour compiler
 sbt osgiBundle
 // => $ [info] Packaging C:\Users\John\IdeaProjects\Giteri\model\target\scala-2.12\giteri_2.12-1.0-SNAPSHOT.jar ...
@@ -10,6 +13,9 @@ sbt osgiBundle
 //Lancement d'open avec le jar en plugin
  openmole -p C:\Users\John\IdeaProjects\Giteri\model\target\scala-2.12\giteri_2.12-1.0-SNAPSHOT.jar
 
+
+ 
+ 
 // Clean du jar et des résultats écrits depuis le jar
 rm -rf C:\Users\John\IdeaProjects\Giteri\Stability C:\Users\John\IdeaProjects\Giteri\model\target
 
@@ -33,4 +39,10 @@ Example d'appel pour lanchement cmdline
 ".\default.txt" 0 0 0 1 1 1 0 0 0 0 1 0 0 .0 .1 .2 .15 1 1 .6 .7 .8 .9 .91 .92 .93
 
 Example pour Scala
-".\default.txt" 1 .2 1 .2 1 .2 1 .2 1 .2 1 .2 1 .2 1 .2 1 .2 1 .2 1 .2 1 .2 1 .2
+
+run-main giteri.Run default.txt .0 .1 .2 .15 1 1 .6 .7 .8 .9 .91 .92 .93 0 0 0 1 1 1 0 0 0 0 1 0 0
+
+
+
+
+".\default.txt", 1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2, ,2000

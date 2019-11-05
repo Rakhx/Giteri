@@ -345,9 +345,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 						resetNbAction();
 					}
 
-//					debugBeforeSkip = fittingConfig.continuFittingSimpliestVersion();
 					debugBeforeSkip = fittingConfig.continuFitting(cfqDensityOnFitting);
-
 					if(!debugBeforeSkip){
 						if(debug) System.out.println("Voudrait passer au step suivant");
 					}
