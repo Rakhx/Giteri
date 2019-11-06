@@ -689,7 +689,7 @@ public class FilterFactory {
 				else {
 					for (int i = 0; i < nbNode; i++) {
 						if(!soFar[i] && adja[i]) {
-							result.add(eh.getEntitesActive().get(i));
+							result.add(eh.getEntites().get(i));
 						}
 					}
 

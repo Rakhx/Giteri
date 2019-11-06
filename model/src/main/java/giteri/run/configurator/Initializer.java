@@ -5,15 +5,14 @@ import giteri.fitting.parameters.IModelParameter;
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
 import giteri.meme.mecanisme.ActionFactory;
-import giteri.meme.mecanisme.FilterFactory;
 import giteri.meme.mecanisme.AttributFactory;
+import giteri.meme.mecanisme.FilterFactory;
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.networkStuff.*;
 import giteri.run.controller.Controller;
 import giteri.run.displaysStuff.ConsoleView;
 import giteri.run.displaysStuff.FileView;
 import giteri.run.displaysStuff.IHM;
-import giteri.run.displaysStuff.IHMStub;
 import giteri.run.interfaces.Interfaces;
 import giteri.run.jarVersion.StatAndPlotJarVersion;
 import giteri.test.TestProvider;
@@ -21,11 +20,12 @@ import giteri.tool.other.StopWatchFactory;
 import giteri.tool.other.WriteNRead;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
-import org.graphstream.ui.view.Viewer;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Optional;
 
 import static giteri.run.configurator.Configurator.fullSilent;
 import static giteri.run.configurator.Configurator.withGraphicalDisplay;
@@ -61,7 +61,7 @@ public class Initializer {
         }
 
         else if(launcher == Configurator.EnumLauncher.ihm){
-            Configurator.methodOfGeneration = Configurator.MemeDistributionType.SingleBasic;
+//            Configurator.methodOfGeneration = Configurator.MemeDistributionType.SingleBasic;
             Configurator.displayPlotWhileSimulation = true;
             // Configurator.withGraphicalDisplay = true; // On le laisse a la valeur donné dans le configurator
             Configurator.jarMode = false;

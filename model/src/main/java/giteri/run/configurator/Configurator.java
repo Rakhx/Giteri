@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public final class Configurator {
 
-	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
+	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
 	public static boolean writInfo4OpnMol = true; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
 
 	// region initializer stuff
@@ -22,7 +22,7 @@ public final class Configurator {
 	public static boolean systemPaused = false;
 	public static boolean writeNetworkResultOnFitting = !fullSilent; // Screenshot, network.csv...
 	public static boolean writeMemeResultOnFitting = writeNetworkResultOnFitting; // NetworkDetails.csv
-	public static MemeDistributionType methodOfGeneration = MemeDistributionType.Nothing;
+	public static MemeDistributionType methodOfGeneration = MemeDistributionType.specificDistrib;
 	// endregion
 
 	// region Modèle
@@ -144,8 +144,8 @@ public final class Configurator {
 
 	//region ancien boolean, osef, etc
 	// moyen osef
-	public static final boolean lotOfNodes = true;
-	private static int nbNode = lotOfNodes ? 500 : 100;
+	public static final boolean lotOfNodes = false;
+	private static int nbNode = lotOfNodes ? 500 : 200;
 	public static int refreshInfoRate = 10;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
 	public static boolean memeCanBeReplaceByCategory = true;

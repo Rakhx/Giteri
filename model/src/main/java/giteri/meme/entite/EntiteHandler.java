@@ -4,7 +4,6 @@ import giteri.meme.event.ActionApplyEvent;
 import giteri.meme.event.BehavTransmEvent;
 import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.IBehaviorTransmissionListener;
-import giteri.meme.mecanisme.ActionFactory;
 import giteri.meme.mecanisme.FilterFactory.IFilter;
 import giteri.meme.mecanisme.AttributFactory.IAttribut;
 import giteri.meme.mecanisme.MemeFactory;
@@ -855,10 +854,9 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @return le meme sélectionné
 	 */
 	private Meme actionSelectionRulesVersion(Entite movingOne) {
-		if(!Configurator.oneAddForOneRmv)
+
 			return movingOne.chooseAction();
-		else
-			return actionSelectionControlledVersion(movingOne);
+
 	}
 
 	private void propagationDirect(Set<Entite> cibles, Entite movingOne, Meme memeAction){
@@ -1079,40 +1077,33 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 *
 	 */
 	private void giveMemeToEntiteSpecific() {
-		int i = 0;
 		Entite entiteReceptrice;
-		ArrayList<Double> swParamSet3 = new ArrayList<>(Arrays.asList(0.907489970963927,0.363546615459677,0.458976194767827,0.247873953220028,0.984710568248182));
-		ArrayList<Double> currentParamSet = swParamSet3;
+		Meme meme;
+
+		ArrayList<Double> propagation1 = new ArrayList<>(Arrays.asList(0.890174165702972,0.4840796104944469,0.5965055626611295,0.1314756191593478,0.5388118705027556,0.8593971677763401,0.8101281137912986,0.9317975949424213,0.7993798535437271,0.653047296377897,0.9924213888975464,0.7927778041722493,0.2925023994563933));
+		ArrayList<Integer> activation1 = new ArrayList<>(Arrays.asList(0,1,0,0,1,0,1,0,1,0,0,0,1));
+
+		ArrayList<Double> propagation = propagation1;
+		ArrayList<Integer> activation = activation1;
 		Iterator<Entite> entitees = entites.iterator();
-		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.EXISTING,Configurator.ActionType.ANYTHING)) {
-			entiteReceptrice = entitees.next();
-			if(meme.getName().compareTo("Add∞") == 0){
-				meme.setProbaOfPropagation(currentParamSet.get(i));
-				entiteReceptrice.addMeme(meme, true);
-				eventMemeChanged(entiteReceptrice, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
+
+		for (int i = 0; i < activation.size(); i++) {
+			if(activation.get(i)==1) {
+				entiteReceptrice = entitees.next();
+				meme = memeFactory.getIemeMemeFromSpecList(MemeList.FITTING, i);
+				if(meme != null)
+				{
+					meme.setProbaOfPropagation(propagation.get(i));
+					entiteReceptrice.addMeme(meme, true);
+					eventMemeChanged(entiteReceptrice, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
+//						memesSelectionnes.add(";" + memeFactory.translateMemeCombinaisonReadable(selectedMeme.toString()) + "-" + proba.get(i));
+				}else {
+					System.err.println("[StatAndPlotGeneric.CallFromJar]- Pas assez de meme dans la liste de fitting pour le nombre de param appelé");
+				}
 			}
-			if(meme.getName().compareTo("AddØ-Hop") == 0){
-				meme.setProbaOfPropagation(currentParamSet.get(i));
-				entiteReceptrice.addMeme(meme, true);
-				eventMemeChanged(entiteReceptrice, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-			}
-			if(meme.getName().compareTo("Rmv-") == 0){
-				meme.setProbaOfPropagation(currentParamSet.get(i));
-				entiteReceptrice.addMeme(meme, true);
-				eventMemeChanged(entiteReceptrice, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-			}
-			if(meme.getName().compareTo("Rmv+") == 0){
-				meme.setProbaOfPropagation(currentParamSet.get(i));
-				entiteReceptrice.addMeme(meme, true);
-				eventMemeChanged(entiteReceptrice, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-			}
-			if(meme.getName().compareTo("RmvØ-2hop") == 0){
-				meme.setProbaOfPropagation(currentParamSet.get(i));
-				entiteReceptrice.addMeme(meme, true);
-				eventMemeChanged(entiteReceptrice, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-			}
-			i++;
 		}
+
+
 	}
 
 	// TODO REFACTORING Prendre les memes a appliquer a tous en parametre plutot qu'avoir des variables statics
@@ -1480,7 +1471,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 	@Override
 	public void handlerNbNodeChanged(NbNodeChangedEvent e) {
-		entites.clear();
+		getEntites().clear();
 		bindNodeWithEntite(networkConstruct.getNetwork());
 	}
 
@@ -1504,7 +1495,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	public String getEntitesInfoAsString() {
 		String resultat = "";
-		for (Entite entitee : entites) {
+		for (Entite entitee : getEntites()) {
 			resultat += "\n né" + entitee.getIndex();
 			for (Meme meme : entitee.getMyMemes()) {
 				resultat += "\n \t meme " + meme.toShortString();
@@ -1525,13 +1516,17 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 	private void checkConsistency(){
 		ArrayList<Meme> myMemes;
-		for (Entite entite: entites) {
+		for (Entite entite: getEntites()) {
 			myMemes = entite.getMyMemes();
 			if(myMemes.size() > 2)
 				System.out.println("TROP DE COMPORTEMENT");
 			if(myMemes.size() == 2 && myMemes.get(0).equals(myMemes.get(1)))
 				System.out.println("Scandale deux fois le meme");
 		}
+	}
+
+	public List<Entite> getEntites() {
+		return new ArrayList<Entite>(entites);
 	}
 
 	public class memeComparatorAscending implements Comparator<Meme> {
@@ -1564,7 +1559,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	public ArrayList<Meme> getMemeOnMap() {
 		ArrayList<Meme> memes = new ArrayList<Meme>();
-		for (Entite entite : entites) {
+		for (Entite entite : getEntites()) {
 			for (Meme meme : entite.getMyMemes()) {
 				if (!memes.contains(meme))
 					memes.add(meme);
