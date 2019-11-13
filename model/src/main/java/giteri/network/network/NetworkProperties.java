@@ -1,5 +1,6 @@
 package giteri.network.network;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -14,7 +15,7 @@ import giteri.run.configurator.Configurator;
 /** Classe qui contient les données analysées d'un réseau
  *
  */
-public class NetworkProperties implements Cloneable{
+public class NetworkProperties implements Cloneable, Serializable {
 	
 	//region properties ! les propriétés publics sont utilisées génériquement !
 	

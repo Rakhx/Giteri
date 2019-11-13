@@ -1190,7 +1190,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		btPause.addActionListener(new PauseAction());
 		btStep.addActionListener(new StepAction());
-		btReset.addActionListener(e-> modelController.comparaisonScreenshot());
+		//btReset.addActionListener(e-> modelController.comparaisonScreenshot());
 
 		btFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1222,7 +1222,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 					e1.printStackTrace();
 				}
 
-				fileReadProperties = fileNetRdr.getNetworkProperties();
+				fileReadProperties = fileNetRdr.getNetworkProperties(false);
 				currentNetProperties = modelController.getCurrentNetProperties(Configurator.activationCodeAllAttrib);
 				// Mettre dnas les bons JP
 				plNetworkRead.removeAll();

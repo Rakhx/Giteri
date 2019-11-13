@@ -1,16 +1,15 @@
 package giteri
 import java.io.File
 
+import giteri.network.networkStuff.NetworkFileLoader
 import giteri.run.jarVersion.JarVersion
+import giteri.tool.other.WriteNRead
 
 import scala.util.Random
 
 object Run{
 
   def main(args: Array[String]): Unit = {
-    println("Hello, world!")
-    // args.foreach(arg => println(arg))
-
     val network = new File(args(0))
     val one: Double = args(1).toDouble
     val two: Double = args(2).toDouble
@@ -50,6 +49,18 @@ object Run{
       seed))
   }
 
+  /** Sérialize, après lecture, les propriétés d'un réseau, issu d'un fichier .txt sous forme
+   * list des edges séparé par un espace (tabulation? )
+   *
+   */
+  def serializNetworkTarget(): Unit = {
+    val trueReader = new WriteNRead
+    val lineReader = new NetworkFileLoader(null, trueReader)
+    val reader = trueReader.readAndCreateNetwork("default.txt", lineReader," ","#")
+    reader.getNetworkProperties(true);
+
+  }
+
   def run(network: File, one: Double, oneActi: Integer, two: Double, twoActi: Integer,
           three: Double, threeActi: Integer, four: Double, fourActi: Integer,
           five : Double, fiveActi: Integer, six: Double, sixActi:Integer,
@@ -68,9 +79,4 @@ object Run{
    //  (math.abs(one * 2 - 10) + rand.nextGaussian(), math.abs(10 - two) + rand.nextGaussian())
 
   }
-
 }
-//
-//object Appli extends App{
-//  println("tefh")
-//}

@@ -59,6 +59,7 @@ public class WriteNRead {
 
 		rez = new File(allRep);
 		rez.mkdirs();
+		rez.setWritable(true);
 		return rez;
 	}
 

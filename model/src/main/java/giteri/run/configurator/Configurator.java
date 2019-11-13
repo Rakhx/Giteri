@@ -17,12 +17,12 @@ public final class Configurator {
 	// La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
 	// depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent
 	// cette configuration initiale
-	public static boolean withGraphicalDisplay = true;
-	public static boolean jarMode = true; // Si vrai, affiche le score resultat de simu
-	public static boolean systemPaused = false;
-	public static boolean writeNetworkResultOnFitting = !fullSilent; // Screenshot, network.csv...
-	public static boolean writeMemeResultOnFitting = writeNetworkResultOnFitting; // NetworkDetails.csv
-	public static MemeDistributionType methodOfGeneration = MemeDistributionType.specificDistrib;
+	public static boolean withGraphicalDisplay;// = true;
+	public static boolean jarMode; // = true; // Si vrai, affiche le score resultat de simu
+	public static boolean systemPaused;// = false;
+	public static boolean writeNetworkResultOnFitting ; //= !fullSilent; // Screenshot, network.csv...
+	public static boolean writeMemeResultOnFitting ; //= writeNetworkResultOnFitting; // NetworkDetails.csv
+	public static MemeDistributionType methodOfGeneration ; //= MemeDistributionType.specificDistrib;
 	// endregion
 
 	// region Modèle
@@ -35,6 +35,8 @@ public final class Configurator {
 	public static boolean initializeDefaultBehaviorToBreeder = true;	// ----FLUIDITE BREEDER----
 	@toOutput ( yes = true )
 	public static boolean rebranchementAction = false; // REWIRE Faire l'ajout et le retrait dans le meme temps
+
+	// TODO A voir utilité
 	public static boolean isFitting = false; // Pour la liste des memes présents sur la map / fitting
 
 	// MEME
@@ -53,7 +55,6 @@ public final class Configurator {
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 
 	// SCORE
-
 	public static boolean exploreSpecialNetworks = false; // Si on cherche les networks non moyen plutot que faire un score de distance
 	// Si true, passe par la méthode getNetworkScoreExplo qui ne prend en compte que CC et 3moment.
 	@toOutput ( yes = true )
@@ -63,7 +64,6 @@ public final class Configurator {
 	public static int activationCodeAllAttrib = 255 + 512;
 	// public static int activationCodeActual = 255;
 
-	//
 	public static int initialnetworkForBase = 0; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 3- SF 4-SW
 
 	// endregion
@@ -105,6 +105,8 @@ public final class Configurator {
 	public static String fileNameCsvSimple = "NetworkCSV";
 	public static String fileNameCsvDetail = "NetworkDetailsCSV";
 	public static String fileNameMeme = "memeCSV";
+	public static String fileNameSerialisation = "serialization.se";
+
 
 	public static boolean displayOnIHMDensitySD = false;
 	// endregion
@@ -136,8 +138,7 @@ public final class Configurator {
 	public static boolean overallDebug = !jarMode;
 	public static boolean debugHopAway = false;
 
-
-	public static boolean debugJarMode = true;
+	public static boolean debugJarMode = false;
 	public static boolean timeEfficiency = false;
 
 	// endregion
@@ -176,8 +177,7 @@ public final class Configurator {
 	{
 		ihm,
 		jarC,
-		jarOpenMole,
-		testProvider
+		jarOpenMole
 	}
 
 	/** Exhaustive..

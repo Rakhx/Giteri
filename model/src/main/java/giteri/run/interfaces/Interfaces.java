@@ -38,7 +38,7 @@ public class Interfaces {
 	public interface IReadNetwork{
 		void whatToDoWithOneLine(String line, String separator);
 		void init();
-		NetworkProperties getNetworkProperties();
+		NetworkProperties getNetworkProperties(boolean andSerializIt);
 		Graph getGraphFromDataRead();
 	}
 	
@@ -112,7 +112,6 @@ public class Interfaces {
 		void exploFitting();
 		void rdmConfig();
 		void takeSnapshot(long seed, Optional<ArrayList<String>> simulationPath);
-		void comparaisonScreenS();
 
 		void suspend();
 		void resume();

@@ -51,13 +51,7 @@ public class JarVersion {
 
 		if(debug) System.out.println("Activation recup " + memeActi);
 		if(debug) System.out.println("Proba Recup "+ memeProba);
-
 		run(inputFile, memeActi, memeProba);
-//	 	run(inputFile,
-//				memeActi.get(0),memeActi.get(1),memeActi.get(2),memeActi.get(3),memeActi.get(4),
-//				memeActi.get(5),memeActi.get(6),memeActi.get(7),memeActi.get(8),
-//				memeProba.get(0),memeProba.get(1),memeProba.get(2),memeProba.get(3),memeProba.get(4),
-//				memeProba.get(5),memeProba.get(6),memeProba.get(7),memeProba.get(8));
 
 		System.exit(0);
 	}
