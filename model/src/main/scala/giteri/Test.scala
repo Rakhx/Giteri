@@ -22,7 +22,7 @@ object Test {
     val lineReader = new NetworkFileLoader(null, trueReader)
 
     val reader = trueReader.readAndCreateNetwork("default.txt", lineReader," ","#")
-    reader.getNetworkProperties(true);
+    reader.getNetworkProperties(false, true);
 
   }
 }

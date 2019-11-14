@@ -38,7 +38,7 @@ public class Interfaces {
 	public interface IReadNetwork{
 		void whatToDoWithOneLine(String line, String separator);
 		void init();
-		NetworkProperties getNetworkProperties(boolean andSerializIt);
+		NetworkProperties getNetworkProperties(boolean fromSerializedFile ,boolean andSerializIt);
 		Graph getGraphFromDataRead();
 	}
 	

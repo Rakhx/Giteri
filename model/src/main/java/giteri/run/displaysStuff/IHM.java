@@ -1222,7 +1222,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 					e1.printStackTrace();
 				}
 
-				fileReadProperties = fileNetRdr.getNetworkProperties(false);
+				fileReadProperties = fileNetRdr.getNetworkProperties(false,false);
 				currentNetProperties = modelController.getCurrentNetProperties(Configurator.activationCodeAllAttrib);
 				// Mettre dnas les bons JP
 				plNetworkRead.removeAll();

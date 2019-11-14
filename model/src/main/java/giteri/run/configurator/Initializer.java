@@ -39,6 +39,7 @@ public class Initializer {
             StopWatchFactory.getInstance().startWatch("test");
         }
 
+        Configurator.typeOfConfig = launcher;
         boolean ihmLauncher = (launcher == Configurator.EnumLauncher.ihm) ;
 
          if(ihmLauncher){
@@ -51,6 +52,7 @@ public class Initializer {
             Configurator.writeMemeResultOnFitting = !fullSilent;
             Configurator.explorator = Configurator.EnumExplorationMethod.exhaustive;
             Configurator.isFitting = false;
+
         }
         else{
             // La configuration de base correspond a OpenMole, car histoire de multi acces a des variables

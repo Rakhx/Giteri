@@ -180,7 +180,11 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public void init(){
 		Configurator.isFitting = true;
 		Configurator.methodOfGeneration = Configurator.MemeDistributionType.Nothing;
-		targetNetProperties = networkFileLoader.getNetworkProperties(false);
+		if(Configurator.typeOfConfig == Configurator.EnumLauncher.jarOpenMole)
+			targetNetProperties = networkFileLoader.getNetworkProperties(true,false);
+		else
+			targetNetProperties = networkFileLoader.getNetworkProperties(false,false);
+
 		boolean doTheWrite = !Configurator.fullSilent;
 
 		// ECRITURE

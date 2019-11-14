@@ -57,8 +57,7 @@ object Run{
     val trueReader = new WriteNRead
     val lineReader = new NetworkFileLoader(null, trueReader)
     val reader = trueReader.readAndCreateNetwork("default.txt", lineReader," ","#")
-    reader.getNetworkProperties(true);
-
+    reader.getNetworkProperties(false, true);
   }
 
   def run(network: File, one: Double, oneActi: Integer, two: Double, twoActi: Integer,

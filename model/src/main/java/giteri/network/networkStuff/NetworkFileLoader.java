@@ -76,7 +76,11 @@ public class NetworkFileLoader implements IReadNetwork {
 	 *
 	 * @return
 	 */
-	public NetworkProperties getNetworkProperties(boolean andWriteThem){
+	public NetworkProperties getNetworkProperties(boolean fromSerialised, boolean andWriteThem){
+		if(fromSerialised){
+			return readSerializedPropertiesFromFile();
+		}
+
 		if(changed){
 			achieve();
 			changed = false;
@@ -84,11 +88,11 @@ public class NetworkFileLoader implements IReadNetwork {
 
 		NetworkProperties netProp;
 		netProp = net.getNetworkProperties(Optional.empty(),"lu", Configurator.activationCodeAllAttrib);
-		writePropertiesInFile(netProp);
-		netProp = readPropertiesFromFile();
+		// writeSerializePropertiesIntoFile(netProp);
+		// netProp = readSerializedPropertiesFromFile();
 
 		if(andWriteThem)
-			writePropertiesInFile(netProp);
+			writeSerializePropertiesIntoFile(netProp);
 		return netProp;
 	}
 
@@ -164,7 +168,7 @@ public class NetworkFileLoader implements IReadNetwork {
 	 *
 	 * @param toSave
 	 */
-	public void writePropertiesInFile(NetworkProperties toSave){
+	public void writeSerializePropertiesIntoFile(NetworkProperties toSave){
 		try {
 			FileOutputStream file = new FileOutputStream(Configurator.fileNameSerialisation);
 			ObjectOutputStream out = new ObjectOutputStream(file);
@@ -182,13 +186,13 @@ public class NetworkFileLoader implements IReadNetwork {
 	 *
 	 * @return
 	 */
-	public NetworkProperties readPropertiesFromFile(){
+	public NetworkProperties readSerializedPropertiesFromFile(){
 		NetworkProperties netProp = null;
-		File repertoires = writeNRead.createAndGetDirFromString(new ArrayList<>(Arrays.asList(Configurator.fileNameSerialisation)));
+		// File repertoires = writeNRead.createAndGetDirFromString(new ArrayList<>(Arrays.asList(Configurator.fileNameSerialisation)));
 		try
 		{
 			// Reading the object from a file
-			FileInputStream file = new FileInputStream(repertoires);
+			FileInputStream file = new FileInputStream(Configurator.fileNameSerialisation);
 			ObjectInputStream in = new ObjectInputStream(file);
 			// Method for deserialization of object
 			netProp = (NetworkProperties)in.readObject();
@@ -200,7 +204,6 @@ public class NetworkFileLoader implements IReadNetwork {
 		{
 			System.out.println("IOException is caught");
 		}
-
 		catch(ClassNotFoundException ex)
 		{
 			System.out.println("ClassNotFoundException is caught");

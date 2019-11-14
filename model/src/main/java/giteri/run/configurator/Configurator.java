@@ -10,7 +10,8 @@ import java.util.ArrayList;
 public final class Configurator {
 
 	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
-	public static boolean writInfo4OpnMol = true; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
+	// TODO
+	public static boolean writInfo4OpnMol = false; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
 
 	// region initializer stuff
 	// VALEURS DONNEES A TITRE INDICATIF, set définitif dans l'initializer
@@ -23,6 +24,8 @@ public final class Configurator {
 	public static boolean writeNetworkResultOnFitting ; //= !fullSilent; // Screenshot, network.csv...
 	public static boolean writeMemeResultOnFitting ; //= writeNetworkResultOnFitting; // NetworkDetails.csv
 	public static MemeDistributionType methodOfGeneration ; //= MemeDistributionType.specificDistrib;
+	public static EnumLauncher typeOfConfig ;
+
 	// endregion
 
 	// region Modèle
@@ -165,9 +168,7 @@ public final class Configurator {
 	private static Object lockOnPause = new Object();
 
 	// Ancien mecanismes
-	public static boolean desgressiveLearningProba = false;
 	public static boolean useEntitePropagationProba = false;
-	public static boolean learningOnlyOnce = false;
 
 	//endregion
 

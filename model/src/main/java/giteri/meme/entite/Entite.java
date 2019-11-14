@@ -198,10 +198,6 @@ public class Entite implements Comparable<Entite>{
 		if(okToBeAdded)
 		{
 			addMeme(meme);
-			if(Configurator.desgressiveLearningProba)
-				probaLearning /= 2;
-			if(Configurator.learningOnlyOnce)
-				probaLearning = 0;
 			myMemes.sort(null);
 			addedOrReplaced = true;
 		}
