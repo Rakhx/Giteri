@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public final class Configurator {
 
-	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
+	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
 	// TODO
 	public static boolean writInfo4OpnMol = false; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
 
@@ -148,7 +148,7 @@ public final class Configurator {
 
 	//region ancien boolean, osef, etc
 	// moyen osef
-	public static final boolean lotOfNodes = false;
+	public static final boolean lotOfNodes = true;
 	private static int nbNode = lotOfNodes ? 500 : 100;
 	public static int refreshInfoRate = 10;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
