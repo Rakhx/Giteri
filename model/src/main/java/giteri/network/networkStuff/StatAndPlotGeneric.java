@@ -388,8 +388,9 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 * @param proba
 	 */
 	private void generateProxyParam(List<Boolean> activator, List<Double> proba) {
-		List<Integer> toConvert = new ArrayList<>(Arrays.asList(0,1,0,0,0,1,1,1,1,1,0,1,1));
-		proba.addAll(Arrays.asList(0.,0.,0.,0.,0.6464899970161321,0.9459220475345989,0.40217083668130743,0.16150710090693732,0.34342435076753297,0.2804314566243382,0.6275044516474456,0.5379313443647284,0.3425778627165515));
+		List<Integer> toConvert = new ArrayList<>(Arrays.asList(1,1,0,1,1,0,1,0,0,0,1,0,0));
+		proba.addAll(Arrays.asList(
+				0.1541369084441082,0.8201371570915066,0.7950058488241256,0.35503764313317254,0.04992122575292979,0.5702979600609019,0.5340290688714397,0.2277092587961005,0.5616650380903643,0.91668701058526,0.5339744433558051,0.3647168157366365,0.29716596915272375		));
 
 		// A verifier
 		activator.addAll(toConvert.stream().map(e -> e==1).collect(Collectors.toList()));
