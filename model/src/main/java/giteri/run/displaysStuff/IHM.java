@@ -1360,7 +1360,8 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	 * ces dernière dans les labels ou autres.
 	 *
 	 */
-	private void updateInformationDisplay() {
+	private void
+	updateInformationDisplay() {
 		if (Configurator.displayPlotWhileSimulation)
 		{
 			try

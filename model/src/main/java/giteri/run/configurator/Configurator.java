@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public final class Configurator {
 
-	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
+	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
 	// TODO
 	public static boolean writInfo4OpnMol = false; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
 
@@ -79,7 +79,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static int initialNetworkForFitting = 0; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
 	@toOutput ( yes = true )
-	public static int nbRepetitionbyRun = 20;
+	public static int nbRepetitionbyRun = 1;
 	@toOutput ( yes = true )
 	public static int nbRepetitionForJar = 5;
 
@@ -95,7 +95,7 @@ public final class Configurator {
 	public static boolean displayFittingProviderApplied = fullSilent ? false : true;	// affiche dans la console apprlications des params:
 	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
-	public static int activationCodeForView = fullSilent? 0 : 4;
+	public static int activationCodeForView = fullSilent? 0 : 5;
 
 	public static boolean displayMemePossessionEvolution = true && !fullSilent; // Affiche dans l'IHM la possession des meme au fur et a mesure
 	public static boolean displayPlotWhileSimulation = true && !fullSilent; // Affichage des DD et densité
@@ -148,8 +148,8 @@ public final class Configurator {
 
 	//region ancien boolean, osef, etc
 	// moyen osef
-	public static final boolean lotOfNodes = true;
-	private static int nbNode = lotOfNodes ? 500 : 200;
+	public static final boolean lotOfNodes = false;
+	private static int nbNode = lotOfNodes ? 500 : 100;
 	public static int refreshInfoRate = 10;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
 	public static boolean memeCanBeReplaceByCategory = true;
