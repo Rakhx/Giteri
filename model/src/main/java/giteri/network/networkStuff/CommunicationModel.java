@@ -2,7 +2,6 @@ package giteri.network.networkStuff;
 
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
-import giteri.network.network.Network;
 import giteri.network.network.NetworkProperties;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.FittingBehavior;
@@ -12,7 +11,6 @@ import giteri.run.interfaces.Interfaces.IModel;
 import giteri.run.interfaces.Interfaces.IReadNetwork;
 import giteri.run.interfaces.Interfaces.StatAndPlotInterface;
 import giteri.tool.other.WriteNRead;
-import org.graphstream.graph.Graph;
 
 import java.io.IOException;
 import java.util.*;
@@ -23,12 +21,12 @@ import java.util.*;
  */
 public class CommunicationModel implements IModel {
 
-	public EntiteHandler eh;
-	public NetworkConstructor nc;
-	public StatAndPlotInterface calculator;
-	public NetworkFileLoader nl;
+	EntiteHandler eh;
+	NetworkConstructor nc;
+	private StatAndPlotInterface calculator;
+	private NetworkFileLoader nl;
 	public VueController view;
-	public WorkerFactory wf;
+	private WorkerFactory wf;
 
 	//region constructeur
 	/** Constructeur sans paramètre.
@@ -101,7 +99,8 @@ public class CommunicationModel implements IModel {
 	 *
 	 */
 	public void fittingSpecificConfig() {
-		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.specific, Optional.empty(), Optional.empty());
+		System.out.println("Pouet");
+//		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.specific, Optional.empty(), Optional.empty());
 	}
 
 	/** Plus de fonctionnalité
@@ -121,10 +120,16 @@ public class CommunicationModel implements IModel {
 		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.exhaustive, Optional.empty(), Optional.empty());
 	}
 
+	/** Lorsqu'on fait du step by step pour le fitting.
+	 *
+	 */
+	public void fittingNextStep(){
+		calculator.fitNextStep();
+	}
+
 	public void exploFitting(){
 		this.calculator.exploFitting();
 	}
-
 
 	/** Affichage d'un graphe représentant le fichier donné en input.
 	 *
@@ -141,6 +146,14 @@ public class CommunicationModel implements IModel {
 		nl.getGraphFromDataRead();
 	}
 
+	/** Indique aux vues les memes disponibles sur la map.
+	 *
+	 * @param memes
+	 */
+	public void setViewMemeAvailable(List<Meme> memes){
+		view.setMemeAvailable(memes);
+	}
+
 	public void rdmConfig(){
 	}
 
@@ -155,13 +168,6 @@ public class CommunicationModel implements IModel {
 		path.add(screen);
 		wf.getDrawer().screenshotDisplay(path);
 		path.remove(screen);
-	}
-
-	/** Lorsqu'on fait du step by step pour le fitting.
-	 *
-	 */
-	public void fittingNextStep(){
-		calculator.fitNextStep();
 	}
 
 	//endregion
@@ -184,7 +190,7 @@ public class CommunicationModel implements IModel {
 		eh.synchronizeNodeConnectionWithEntiteConnection();
 
 		wf.getDrawer().drawThisNetwork(nc.networkInstance, false);
-		eh.giveMemeToEntite(Configurator.methodOfGeneration);
+		// eh.giveMemeToEntite(Configurator.methodOfGeneration);
 
 		// Reste en pause après avoir générer les graphes depuis l'interface
 //		synchronized (nc) {				nc.resume();			}
@@ -210,7 +216,6 @@ public class CommunicationModel implements IModel {
 		nc.resetStat();
 		wf.getDrawer().resetDisplay();
 		view.resetIHM();
-		// wf.getDrawer().drawThisNetwork(nc.networkInstance);
 		generateGraph(0);
 	}
 

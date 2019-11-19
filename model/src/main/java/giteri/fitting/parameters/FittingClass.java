@@ -8,6 +8,7 @@ import java.util.*;
 
 import giteri.fitting.algo.Result;
 import giteri.fitting.algo.ResultSet;
+import giteri.meme.event.*;
 import giteri.network.event.INbNodeChangedListener;
 import giteri.network.event.NbNodeChangedEvent;
 import giteri.tool.math.Toolz;
@@ -19,6 +20,7 @@ import giteri.network.networkStuff.NetworkFileLoader;
 import giteri.network.networkStuff.WorkerFactory;
 import giteri.tool.objects.ObjectRef;
 
+import giteri.tool.other.StopWatchFactory;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import giteri.tool.other.WriteNRead;
@@ -27,10 +29,6 @@ import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.NetworkAttribType;
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
-import giteri.meme.event.ActionApplyEvent;
-import giteri.meme.event.IActionApplyListener;
-import giteri.meme.event.BehavTransmEvent;
-import giteri.meme.event.IBehaviorTransmissionListener;
 
 
 /**
@@ -44,7 +42,7 @@ import giteri.meme.event.IBehaviorTransmissionListener;
  * de la simulation. Ne change pas pendant un run.
  */
 public class FittingClass implements IBehaviorTransmissionListener, IActionApplyListener,
-		INbNodeChangedListener {
+		INbNodeChangedListener, IMemeAvailableListener {
 
 	//region Variables diverses
 
@@ -164,7 +162,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		kvOverallNumberOfActionDone = new Hashtable<>();
 		cfqMemeAppliancePropOnFitting = new CircularFifoQueue<>(nbEltCircularQFitting);
 		cfqMemeApplianceNumberOnFitting = new CircularFifoQueue<>(nbEltCircularQFitting);
-		memesAvailables = memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING);
+		//memesAvailables = memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING);
 		currentNetProperties.createStub();
 	}
 
@@ -173,17 +171,27 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	//region Fitting turn & run
 
 	/**
-	 * Initialisation des variables nécessaire a un fitting.
+	 * Initialisation des variables nécessaire à un fitting.
 	 * Ecriture dans les fichiers, ouverture des répertoires.
 	 *
 	 */
 	public void init(){
 		Configurator.isFitting = true;
-		Configurator.methodOfGeneration = Configurator.MemeDistributionType.Nothing;
-		if(Configurator.typeOfConfig == Configurator.EnumLauncher.jarOpenMole)
+
+		// Si openMole, lire les propriétés du réseau cible depuis le fichier serialisé
+		if(Configurator.typeOfConfig == Configurator.EnumLauncher.jarOpenMole ||
+		Configurator.typeOfConfig == Configurator.EnumLauncher.jarC)
 			targetNetProperties = networkFileLoader.getNetworkProperties(true,false);
-		else
-			targetNetProperties = networkFileLoader.getNetworkProperties(false,false);
+
+		// CHEAT CODE
+		else // Sinon, les lire depuis le fichier donné en paramètre dans l'interface
+			targetNetProperties = networkFileLoader.getNetworkProperties(true,false);
+
+		if(Configurator.prepareTheOpti){
+			boolean dog = (Configurator.typeOfConfig == Configurator.EnumLauncher.jarOpenMole) || (Configurator.typeOfConfig == Configurator.EnumLauncher.jarC);
+			System.out.println("FittingClass.Init() - Fin de lecture du fichier cible " + (dog? "serialise" : "non sériealisé"));
+			StopWatchFactory.getInstance().publishResult();
+		}
 
 		boolean doTheWrite = !Configurator.fullSilent;
 
@@ -233,13 +241,13 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		}
 		// endregion
 
-        toWriteConfiguratorFile = "Champs;Valeurs";
-        if(doTheWrite)
-		writeNRead.writeSmallFile(repOfTheSearch,"configurator",
-                Collections.singletonList(toWriteConfiguratorFile));
+        //region fichier configurator
+		toWriteConfiguratorFile = "Champs;Valeurs";
+		if(doTheWrite)
+			writeNRead.writeSmallFile(repOfTheSearch,"configurator",
+					Collections.singletonList(toWriteConfiguratorFile));
 
-        // region fichier configurator
-        Class<?> conf = new Configurator().getClass();
+		Class<?> conf = new Configurator().getClass();
         if(doTheWrite)
         for (int i = 0; i < conf.getFields().length; i++) {
             Field fieldOne = conf.getFields()[i];
@@ -254,6 +262,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 //                System.out.println("fiesta " + fieldOne.getName());
             }
         }
+
+        //endregion
 	}
 
 	/**
@@ -267,6 +277,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		numeroRunAsString = "Run#" + numeroRun;
 		repertoires.add(numeroRunAsString);
 		resultNetwork.put(numeroRun, new Result(explorator.getModelParameterSet()));
+
 	}
 
 	/**
@@ -276,6 +287,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 */
 	public void newRepetition(){
 		resetAction();
+		resetActionLocal();
 		numeroRepetitionAsString = "Repetition#" + ++numeroRepetition;
 		repertoires.add(numeroRepetitionAsString);
 		synchronized(workerFactory.waitingForReset)
@@ -288,6 +300,9 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 		com.generateGraph(Configurator.initialNetworkForFitting);
 		explorator.apply();
+
+		// Mise à jour des indicateurs de l'interface ( meme disponible a afficher )
+		com.setViewMemeAvailable(memesAvailables);
 
 		entiteHandler.updateMemeAvailableForProperties();
 
@@ -743,6 +758,27 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			}
 		}
 	}
+
+	/** Handler sur le changement de nombre de noeud disponibles sur la simulation.
+	 *
+	 * @param e
+	 */
+	@Override
+	public void handlerNbNodeChanged(NbNodeChangedEvent e) {
+		// Changement des steps etc
+		nbActionByStep = e.nbNode * 10;
+		nbActionBeforeQuit = 20 * e.nbNode;
+		com.generateGraph(Configurator.initialNetworkForFitting);
+	}
+
+	/** En cas de changement des memes disponibles sur la map.
+	 *
+	 * @param e
+	 */
+	@Override
+	public void handlerMemeAvailable(MemeAvailableEvent e) {
+		this.memesAvailables = new ArrayList<>(e.listOfMeme);
+	}
 	public void handlerBehavTransm(BehavTransmEvent e) {
 		newBehaviorTransmitted();
 	}
@@ -757,23 +793,23 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			nbActionCount = 0;
 		}
 	}
+
 	public void resetActionLocal(){
 		synchronized(nbActionCountLocal){
 			nbActionCountLocal = 0;
 		}
 	}
-
 	public int getNbAction(){
 		synchronized(nbActionCount){
 			return nbActionCount;
 		}
 	}
+
 	public int getNbActionLocal(){
 		synchronized(nbActionCountLocal){
 			return nbActionCountLocal;
 		}
 	}
-
 	public void newBehaviorTransmitted(){
 		synchronized(nbTransmissionCount){
 			nbTransmissionCount++;
@@ -784,18 +820,11 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			nbTransmissionCount = 0;
 		}
 	}
+
 	public int getNbBehaviorTransmitted(){
 		synchronized(nbTransmissionCount){
 			return nbTransmissionCount;
 		}
-	}
-
-	@Override
-	public void handlerNbNodeChanged(NbNodeChangedEvent e) {
-		// Changement des steps etc
-		nbActionByStep = e.nbNode * 10;
-		nbActionBeforeQuit = 20 * e.nbNode;
-		com.generateGraph(Configurator.initialNetworkForFitting);
 	}
 
 	//endregion

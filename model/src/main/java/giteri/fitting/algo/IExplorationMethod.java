@@ -29,14 +29,15 @@ public interface IExplorationMethod {
 	 * @return un string détaillant les informations de la configuration courante.
 	 */
 	String toString();
-
 	/** Renvoi une liste des IModelParameter contenu dans le provider.
 	 *
 	 * @return la liste des parametre de l'explorateur
 	 */
 	List<IModelParameter<?>> getModelParameterSet();
 
-	/** CLASSE ABSTRAITE commune a tte les méthodes d'explorations.
+	// IMPLEMENTATION ABSTRAITE
+
+	/** CLASSE ABSTRAITE commune à tte les méthodes d'explorations.
 	 * 
 	 */
 	 abstract class ExplorationMethod implements IExplorationMethod{
@@ -44,6 +45,7 @@ public interface IExplorationMethod {
 		/** La liste des paramètres sur laquelle tourne les explorations. L'integer indique
 		 * l'ordre d'application des param. Le premier IModelParameter à cycler est celui en position
 		 * 0.
+		 * Ex: Probabilité de diffusion, nb de noeud, disponibilité des mêmes...
 		 */
 		Hashtable<Integer, IModelParameter<?>> provider;
 
@@ -70,7 +72,7 @@ public interface IExplorationMethod {
 			return new ArrayList<>(provider.values()) ;
 		}
 		
-		/** APplication au modèle dans l'ordre indiqué par la hashtable.
+		/** Application au modèle dans l'ordre indiqué par la hashtable.
 		 * 
 		 */
 		public void apply() {
@@ -203,7 +205,7 @@ public interface IExplorationMethod {
 	 */
 	 class ExplorationOneShot extends ExplorationMethod {
 
-		public ExplorationOneShot(Hashtable<Integer, IModelParameter<?>> provids) {
+	 	ExplorationOneShot(Hashtable<Integer, IModelParameter<?>> provids) {
 			super(provids);
 		}
 
@@ -213,18 +215,6 @@ public interface IExplorationMethod {
 		 */
 		public boolean gotoNext() {
 			return false;
-			/*
-			boolean hasGo = false;
-			for (int i = 0; i < provider.keySet().size(); i++) {
-				if(provider.get(i).gotoNext()){
-					hasGo = true;
-					break;
-				}else {
-					provider.get(i).gotoMinValue();
-				}
-			}
-
-			return hasGo;*/
 		}
 		
 	}

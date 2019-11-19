@@ -93,6 +93,7 @@ public class Interfaces {
 		void toggleEnableInterface();
 		void toggleWkProgress(String message);
 		void addValueToApplianceSerie(double time, Map<Meme, Double> kvIndexValue);
+		void setMemeAvailable(List<Meme> memes);
 		JFreeChart getDDChart();
 		JFreeChart getDensityChart();
 		JFreeChart getDensityOverProbaChart();
@@ -111,7 +112,9 @@ public class Interfaces {
 		void fittingOnce();
 		void exploFitting();
 		void rdmConfig();
+		void setViewMemeAvailable(List<Meme> memes);
 		void takeSnapshot(long seed, Optional<ArrayList<String>> simulationPath);
+
 
 		void suspend();
 		void resume();

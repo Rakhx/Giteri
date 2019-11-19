@@ -52,6 +52,11 @@ public class IHMStub implements IView {
 	}
 
 	@Override
+	public void setMemeAvailable(List<Meme> memes) {
+
+	}
+
+	@Override
 	public JFreeChart getDDChart() {
 		return null;
 	}

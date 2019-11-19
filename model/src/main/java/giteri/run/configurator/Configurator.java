@@ -9,7 +9,9 @@ import java.util.ArrayList;
 
 public final class Configurator {
 
-	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
+	public static boolean prepareTheOpti = true;
+
+	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
 	// TODO
 	public static boolean writInfo4OpnMol = false; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
 
@@ -23,7 +25,6 @@ public final class Configurator {
 	public static boolean systemPaused;// = false;
 	public static boolean writeNetworkResultOnFitting ; //= !fullSilent; // Screenshot, network.csv...
 	public static boolean writeMemeResultOnFitting ; //= writeNetworkResultOnFitting; // NetworkDetails.csv
-	public static MemeDistributionType methodOfGeneration ; //= MemeDistributionType.specificDistrib;
 	public static EnumLauncher typeOfConfig ;
 
 	// endregion
@@ -38,6 +39,7 @@ public final class Configurator {
 	public static boolean initializeDefaultBehaviorToBreeder = true;	// ----FLUIDITE BREEDER----
 	@toOutput ( yes = true )
 	public static boolean rebranchementAction = false; // REWIRE Faire l'ajout et le retrait dans le meme temps
+	public static boolean limitlessAction;
 
 	// TODO A voir utilité
 	public static boolean isFitting = false; // Pour la liste des memes présents sur la map / fitting
@@ -110,8 +112,7 @@ public final class Configurator {
 	public static String fileNameMeme = "memeCSV";
 	public static String fileNameSerialisation = "serialization.se";
 
-
-	public static boolean displayOnIHMDensitySD = false;
+	public static boolean displayOnIHMDensitySD = true;
 	// endregion
 
 	// region Affichage log

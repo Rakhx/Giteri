@@ -88,7 +88,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	//region Interface stat&plot
 
 	/**
-	 * Lancement de thread qui va comparer un réseau lu et le réseau en cours.
+	 * Lancement de thread qui va comparer un réseau lu et le réseau en cours par rapport a différente configuration
 	 *
 	 */
 	public Double fitNetwork(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
@@ -123,7 +123,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 *
 	 */
 	public String getDDInfos(){
-
 		Hashtable<Integer, Double> furDurchschnitt = new Hashtable<Integer, Double>();
 		String total = "";
 		networkConstructor.updatePreciseNetworkProperties(Configurator.getIndicateur(NetworkAttribType.DDARRAY));
@@ -161,10 +160,10 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 *
 	 * @return
 	 */
-	private IExplorationMethod callFromJava(){
+	private IExplorationMethod callFromJava(FittingClass fitter){
 		// Tout le trala des explorateurs qui enchaine les IModelParameter
-		Hashtable<Meme, GenericBooleanParameter> memeDispo = new Hashtable<>();
-		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
+		Hashtable<Meme, GenericBooleanParameter> memeDispo = new Hashtable<>(); // Meme sur map
+		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>(); // List de config
 
 		// Rempli la liste des memes que l'on veut pour lancer le fitting.
 		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING))
@@ -172,14 +171,15 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		MemeAvailability memeProvider = new MemeAvailability(memeDispo);
 		memeProvider.setEntiteHandler(entiteHandler);
-		// providers.put(1,memeProvider); // Détermine si on va aussi cycler sur l'existence des memes sur la map
+		providers.put(1,memeProvider); // Détermine si on va aussi cycler sur l'existence des memes sur la map
 
 		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING),
-				new GenericDoubleParameter(.0,.0,1.,.1));
+				new GenericDoubleParameter(.0,.0,1.,.5));
 		memeDiffu.setEntiteHandler(entiteHandler);
 		providers.put(0,memeDiffu);
 
 		memeProvider.addMemeListListener(memeDiffu);
+		memeProvider.addMemeListListener(fitter);
 		return ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
 	}
 
@@ -221,40 +221,16 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		memeDiffu.setEntiteHandler(entiteHandler);
 		providers.put(0,memeDiffu);
 
+		MemeAvailability memeProvider = new MemeAvailability( memeAndProba.keySet().stream().collect(Collectors.toList()));
+		memeProvider.setEntiteHandler(entiteHandler);
+		providers.put(1,memeProvider); // Détermine si on va aussi cycler sur l'existence des memes sur la map
+
+		// Astuce de renard, un poil trop complexe a faire proprement...
+		//memeProvider.addMemeListListener(memeDiffu);
+		memeProvider.addMemeListListener(fitter);
 		return ExplorationMethod.getSpecificExplorator(EnumExplorationMethod.oneShot, providers);
 	}
 
-	/** Retourne une liste spécifique a explorer.
-	 * TODO [WayPoint]- Bouton Specific Config
-	 * @return
-	 */
-	private IExplorationMethod callSpecificParam(){
-		// appelle sec avec un seul jeu de parametre, aux probas fixés
-		Hashtable<Meme, GenericDoubleParameter> memeAndProba = new Hashtable<>();
-		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
-		List<Meme> existingMeme = memeFactory.getMemes(Configurator.MemeList.EXISTING, Configurator.ActionType.ANYTHING);
-
-		for (int i = 0; i < existingMeme.size(); i++) {
-			if(existingMeme.get(i).getName().compareToIgnoreCase("ADDØ") == 0 ){
-				memeAndProba.put(existingMeme.get(i),new GenericDoubleParameter(1.,1.,1.,1.));
-			}
-			else if(existingMeme.get(i).getName().compareToIgnoreCase("RMV+") == 0 ){
-				memeAndProba.put(existingMeme.get(i),new GenericDoubleParameter(.2,.2,1.,.2));
-			}
-			else if(existingMeme.get(i).getName().compareToIgnoreCase("RMV-") == 0 ){
-				memeAndProba.put(existingMeme.get(i),new GenericDoubleParameter(.2,.2,1.,.2));
-			}
-		}
-
-		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeAndProba);
-		memeDiffu.setEntiteHandler(entiteHandler);
-		providers.put(0,memeDiffu);
-
-		IModelParameter.ModelParamNbNode nodesChanging = new IModelParameter.ModelParamNbNode(100, 2100, 400);
-		// providers.put(1, nodesChanging);
-
-		return ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
-	}
 
 	//endregion
 
@@ -275,15 +251,15 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		IExplorationMethod explorator = null;
 		FittingClass configuration = new FittingClass();
 
-		// Pour les cas OneShot from IHM, START, lancement depuis JAR
+		// Pour les cas OneShot from IHM;JAR
 		if(typeOfExplo == EnumExplorationMethod.oneShot && !memeActivationOpt.isPresent())
 			generateProxyParam(memeActivation,memeProba);
 
-		// Si on veut plus d'une itération, besoin d'utiliser un explorator
+		// Si on veut plus d'une itération, besoin d'utiliser un explorator plus complet
 		if(typeOfExplo != EnumExplorationMethod.oneShot)
-			explorator = callFromJava();
-		// Si appelle oneShot, depuis IHM ou depuis JAR, explorator one shot
-		else {//if(typeOfExplo == EnumExplorationMethod.oneShot)
+			explorator = callFromJava(configuration);
+		// Si appelle oneShot, depuis IHM ou depuis JAR, explorator oneShot
+		else {
 			explorator = callFromJar(configuration, memeActivation, memeProba);
 		}
 
@@ -388,9 +364,10 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 * @param proba
 	 */
 	private void generateProxyParam(List<Boolean> activator, List<Double> proba) {
-		List<Integer> toConvert = new ArrayList<>(Arrays.asList(1,1,0,1,1,0,1,0,0,0,1,0,0));
+		List<Integer> toConvert = new ArrayList<>(Arrays.asList(1,0,1,0,0,1,0,1,0,1,0,0,1));
 		proba.addAll(Arrays.asList(
-				0.1541369084441082,0.8201371570915066,0.7950058488241256,0.35503764313317254,0.04992122575292979,0.5702979600609019,0.5340290688714397,0.2277092587961005,0.5616650380903643,0.91668701058526,0.5339744433558051,0.3647168157366365,0.29716596915272375		));
+				0.09094493705148832,0.559803510101563,0.9478957814491791,0.6564748620624896,0.24412158325192546,0.8211847640692205,0.5779144209370191,0.8690467033902893,0.4293142759673372,0.16451510138821646,0.9784304705736422,0.2234727281986859,0.3213933256064305
+		));
 
 		// A verifier
 		activator.addAll(toConvert.stream().map(e -> e==1).collect(Collectors.toList()));

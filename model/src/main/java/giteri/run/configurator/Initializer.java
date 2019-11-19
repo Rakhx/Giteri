@@ -35,15 +35,14 @@ public class Initializer {
     public static Double initialize(Configurator.EnumLauncher launcher, File fileInput, List<Boolean> memeActication , List<Double> memeProba) {
 
         if(Configurator.timeEfficiency) {
-            StopWatchFactory.getInstance().addWatch("", "test");
-            StopWatchFactory.getInstance().startWatch("test");
+            StopWatchFactory.getInstance().addWatch("", "perf");
+            StopWatchFactory.getInstance().startWatch("perf");
         }
 
         Configurator.typeOfConfig = launcher;
         boolean ihmLauncher = (launcher == Configurator.EnumLauncher.ihm) ;
 
          if(ihmLauncher){
-            Configurator.methodOfGeneration = Configurator.MemeDistributionType.SingleBasic;
             Configurator.displayPlotWhileSimulation = true;
             Configurator.withGraphicalDisplay = true;
             Configurator.jarMode = false;
@@ -52,12 +51,12 @@ public class Initializer {
             Configurator.writeMemeResultOnFitting = !fullSilent;
             Configurator.explorator = Configurator.EnumExplorationMethod.exhaustive;
             Configurator.isFitting = false;
+            Configurator.limitlessAction = true;
 
         }
         else{
             // La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
             // depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent cette configuration initiale
-            Configurator.methodOfGeneration = Configurator.MemeDistributionType.Nothing;
             Configurator.withGraphicalDisplay = false;
             Configurator.jarMode = true;
             Configurator.systemPaused = false;
@@ -65,6 +64,7 @@ public class Initializer {
             Configurator.writeMemeResultOnFitting = !fullSilent;
             Configurator.nbRepetitionbyRun = Configurator.nbRepetitionForJar;
             Configurator.isFitting = true;
+            Configurator.limitlessAction = false;
         }
 
         WriteNRead writeNRead = new WriteNRead();
@@ -160,8 +160,6 @@ public class Initializer {
             entiteHandler.addMemeListener(workerFactory.getDrawer());
             entiteHandler.addEntityListener(workerFactory.getCalculator());
 
-            //   entiteHandler.giveMemeToEntite(Configurator.methodOfGeneration);
-
             networkConstructor.start();
             if (!Configurator.isSystemPaused()) {
                 networkConstructor.start();
@@ -194,7 +192,6 @@ public class Initializer {
                 e1.printStackTrace();
             }
 
-          //  entiteHandler.giveMemeToEntite(Configurator.methodOfGeneration);
             entiteHandler.suspend();
             networkConstructor.suspend();
             networkConstructor.start();
@@ -204,7 +201,6 @@ public class Initializer {
                     Configurator.EnumExplorationMethod.oneShot,
                     Optional.of(memeActication),
                     Optional.of(memeProba));
-
         }
     }
 }

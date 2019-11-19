@@ -236,7 +236,11 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		densityValues = new ArrayList<>();
 
 		memesTitle = new Hashtable<String, Meme>();
-		this.setSelectedMeme(memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING));
+
+
+		  this.setMemeAvailable(memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING));
+
+
 		densityMaxValue = 0.0;
 		otherSymbols = new DecimalFormatSymbols(Locale.US);
 		decimal = new DecimalFormat("",otherSymbols);
@@ -255,17 +259,12 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 	//<editor-fold desc="fonction public, diverses">
 
-	/**
-	 * Met en place la liste des memes qui seront utilisés lors de la
-	 * simulation.
-	 *
-	 * @param selectedMeme
-	 *            la liste des memes utilisés
-	 */
-	public void setSelectedMeme(ArrayList<Meme> selectedMeme) {
-		this.selectedMemeOnSimulation = selectedMeme;
+	@Override
+	public void setMemeAvailable(List<Meme> memes) {
+		this.selectedMemeOnSimulation = new ArrayList<>(memes);
 		resetHashTableKeys();
 	}
+
 
 	/**
 	 * Lorsqu'une entité fait une action, fonction appelée. Mise à jour des
@@ -573,7 +572,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		btDisplayInput = new JButton("display In");
 		btNextStep = new JButton("Next Step");
 		bFittingOneStep = new JButton("FittingOnce");
-		btSpecificConfig = new JButton("Specific Config");
+		btSpecificConfig = new JButton("-");
 		btSemiAutomaticStep= new JButton("ToggleSemiautoAction");
 		btExplo = new JButton("Explo");
 
@@ -836,11 +835,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 			memePane.add(li);
 			memePane.add(la);
 			memePane.add(lol);
-
 			panel.add(memePane);
-			// panel.add(Box.createRigidArea(new Dimension(0,1)));
-			// panel.add(createVerticalSeparator());
-			// panel.add(Box.createRigidArea(new Dimension(0,1)));
 		}
 
 		panel.add(lastActionRatioLabel);
@@ -1541,10 +1536,11 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	 */
 	public void resetIHM() {
 
-		if(Configurator.isFitting)
-			this.setSelectedMeme(memeFactory.getMemes(Configurator.MemeList.FITTING, Configurator.ActionType.ANYTHING));
-		else
-			this.setSelectedMeme(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.ActionType.ANYTHING));
+//		if(Configurator.isFitting)
+//			this.setSelectedMeme(memeFactory.getMemes(Configurator.MemeList.FITTING, Configurator.ActionType.ANYTHING));
+//		else
+//			this.setSelectedMeme(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.ActionType.ANYTHING));
+//
 		resetHashTableKeys();
 		updateInformationDisplay();
 		// seriesMemeAppliance.clear();
@@ -1568,7 +1564,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 	//</editor-fold>
 
-	//<editor-fold desc="fonction public, diverses">
+	//<editor-fold desc="fonction private, diverses">
 
 	/** Action de faire avancer step par step.
 	 *
