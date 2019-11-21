@@ -581,7 +581,7 @@ public class FilterFactory {
 			for (Entite entite : entites) {
 				beforeFil[entite.getIndex()] = true;
 			}
-			Set<Entite> entiteResult = new HashSet<>();
+			Set<Entite> entiteResult;  // = new HashSet<>();
 
 			// plus de fonction recursive
 //				getNeightboor(entiteResult, entites, asker, reach);
@@ -657,11 +657,12 @@ public class FilterFactory {
 
 		private Set<Entite> zzz(int asker, boolean[][] network, boolean[] beforeFilter ,int deep){
 			Set<Entite> result= new HashSet<>();
+			List<Entite> entites = eh.getEntites() ;
 			// On trouve les adjacents a l'asker; il s'agit du cercle de distance 1
 			boolean[] adja ;
 			int nbNode = Configurator.getNbNode();
-			boolean[] soFar  = network[asker];
-			soFar[asker] = true;
+			boolean[] soFar  = network[asker]; // Liste des noeuds déjà visité, qu'on retirera de la liste à la fin
+			soFar[asker] = true; // on y ajoute le noeud agissant
 			boolean[] resultat = new boolean[nbNode];
 
 			for (int profondeur = 1; profondeur < deep; profondeur++) {
@@ -687,18 +688,16 @@ public class FilterFactory {
 				// Si on est arrivé a la fin, on ne veut retenir que les noeuds qui sont à cette fin et qui n'étaient pas dans la liste avant,
 				// donc on soustrait ceux de la liste so far
 				else {
+
 					for (int i = 0; i < nbNode; i++) {
 						if(!soFar[i] && adja[i]) {
-							result.add(eh.getEntites().get(i));
+							result.add(entites.get(i));
 						}
 					}
-
 				}
-
 			}
 
-
-			return  result;
+			return result;
 		}
 
 	}

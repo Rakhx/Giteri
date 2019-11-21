@@ -11,7 +11,7 @@ public final class Configurator {
 
 	public static boolean prepareTheOpti = true;
 
-	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
+	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
 	// TODO
 	public static boolean writInfo4OpnMol = true; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
 	public static String fittingTxtPath = "fittingInfo";
@@ -84,7 +84,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static int nbRepetitionbyRun = 1;
 	@toOutput ( yes = true )
-	public static int nbRepetitionForJar = 5;
+	public static int nbRepetitionForJar = 2;
 
 	@toOutput ( yes = true )
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
