@@ -45,6 +45,7 @@ public class CommunicationModel implements IModel {
 		this.nl = ln;
 
 	}
+
 	public void setViewController(VueController vue){
 		view = vue;
 	}

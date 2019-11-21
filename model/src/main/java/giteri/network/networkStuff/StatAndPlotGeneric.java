@@ -231,13 +231,12 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		return ExplorationMethod.getSpecificExplorator(EnumExplorationMethod.oneShot, providers);
 	}
 
-
 	//endregion
 
 	//region fitting
 
 	/**
-	 * Refact. Fonction commune à tous les appels, premiere de la série.
+	 * Refact. Fonction commune à tous les appels, première de la série.
 	 *
 	 */
 	public double fittingLauncher(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,

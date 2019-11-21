@@ -259,7 +259,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
-//                System.out.println("fiesta " + fieldOne.getName());
             }
         }
 
@@ -277,7 +276,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		numeroRunAsString = "Run#" + numeroRun;
 		repertoires.add(numeroRunAsString);
 		resultNetwork.put(numeroRun, new Result(explorator.getModelParameterSet()));
-
 	}
 
 	/**
@@ -351,9 +349,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		networksSameTurn.add(currentNetProperties);
 
 		// TODO [WayPoint]- Score distance entre deux network
-		currentNetworkScore = Configurator.exploreSpecialNetworks?
-			getNetworkScoreExplo(currentNetProperties)
-			:getNetworksDistanceDumb(Configurator.activationCodeForScore, targetNetProperties, currentNetProperties);
+		currentNetworkScore = getNetworksDistanceDumb(Configurator.activationCodeForScore, targetNetProperties, currentNetProperties);
 
 		// Ajout a la classe des resultSet un score et propriété d'un réseau
 		resultNetwork.addScore(numeroRun, currentNetworkScore, currentNetProperties);

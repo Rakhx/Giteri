@@ -13,7 +13,8 @@ public final class Configurator {
 
 	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
 	// TODO
-	public static boolean writInfo4OpnMol = false; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
+	public static boolean writInfo4OpnMol = true; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
+	public static String fittingTxtPath = "fittingInfo";
 
 	// region initializer stuff
 	// VALEURS DONNEES A TITRE INDICATIF, set définitif dans l'initializer
@@ -63,7 +64,7 @@ public final class Configurator {
 	public static boolean exploreSpecialNetworks = false; // Si on cherche les networks non moyen plutot que faire un score de distance
 	// Si true, passe par la méthode getNetworkScoreExplo qui ne prend en compte que CC et 3moment.
 	@toOutput ( yes = true )
-	public static int activationCodeForScore = 202+512; // 202+512 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
+	public static int activationCodeForScore = 170+512; // 202+512 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
 	// 16 + 512 Clust + third
 
 	public static int activationCodeAllAttrib = 255 + 512;
@@ -88,7 +89,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
 	@toOutput ( yes = true )
-	public static int multiplicatorNbAction  = 4000; //  Par combein on multiplie le nombdre de noeud sur la simulation
+	public static int multiplicatorNbAction  = 2000; //  Par combein on multiplie le nombdre de noeud sur la simulation
 
 	// endregion
 

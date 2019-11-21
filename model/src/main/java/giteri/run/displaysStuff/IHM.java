@@ -24,7 +24,6 @@ import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
@@ -33,7 +32,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
-import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -46,6 +44,8 @@ import javax.swing.text.DefaultFormatter;
 import giteri.tool.math.Toolz;
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.network.NetworkProperties;
+
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -108,6 +108,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	private double densityMaxValue;
 	private double sdDensity;
 	private ArrayList<Double> densityValues;
+	private CircularFifoQueue<Double> densityValuesLast;
 	private double densityValue;
 	private double temp = 0.;
 
@@ -118,6 +119,8 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	private JLabel validated;
 	private Icon ok;
 	private Icon nope;
+
+	private JPanel memeInfoPanel;
 
 	// -- Panel simulation
 	private JButton launchSimu;
@@ -233,13 +236,11 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		nodesHavingXoxoMemesLabel = new Hashtable<String, JLabel>();
 		lastActionRatioLabel = new JLabel();
 		jlScore = new JLabel();
-		densityValues = new ArrayList<>();
-
+		// densityValues = new ArrayList<>();
+		densityValuesLast = new CircularFifoQueue<>(sizeOfCircularQueue);
 		memesTitle = new Hashtable<String, Meme>();
 
-
-		  this.setMemeAvailable(memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING));
-
+		this.setMemeAvailable(memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING));
 
 		densityMaxValue = 0.0;
 		otherSymbols = new DecimalFormatSymbols(Locale.US);
@@ -263,6 +264,8 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	public void setMemeAvailable(List<Meme> memes) {
 		this.selectedMemeOnSimulation = new ArrayList<>(memes);
 		resetHashTableKeys();
+		if(memeInfoPanel != null) // sale mais fonctionnel
+			resetComponentLabelMemeInformation();
 	}
 
 
@@ -462,7 +465,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 //				new MerdeImplementor().new elapsedTimeEvapMerdeImplementator()));
 
 		// Element concernant les memes a la disposition des agents
-		jpPaneTwo.add(createComponentLabelMemeInformation());
+		//jpPaneTwo.add(createComponentLabelMemeInformation());
 
 		JPanel memeAndDensities = new JPanel();
 		memeAndDensities.setLayout(new BoxLayout(memeAndDensities,BoxLayout.X_AXIS));
@@ -805,6 +808,40 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 //		return allMemeSelector;
 //	}
 
+	private void resetComponentLabelMemeInformation() {
+		memeInfoPanel.removeAll();
+		nodesHavingXoxoMemesLabel.clear();
+		nbActivationByMemesLabel.clear();
+		nbLastActivationByMemesLabel.clear();
+		memeInfoPanel.setLayout(new BoxLayout(memeInfoPanel, BoxLayout.X_AXIS));
+
+		for (Meme meme : selectedMemeOnSimulation) {
+			// Création du label pour la série de noeud possédant tel meme
+			memesTitle.put(meme.toString(), meme);
+			JLabel li = new JLabel();
+			JLabel la = new JLabel();
+			JLabel lol = new JLabel();
+			JPanel memePane = new JPanel();
+			BoxLayout box = new BoxLayout(memePane, BoxLayout.Y_AXIS);
+			memePane.setLayout(box);
+			nodesHavingXoxoMemesLabel.put(meme.toString(), li);
+			// Creation du label pour la série de noeud du nombre d'activation
+			// total
+			nbActivationByMemesLabel.put(meme.toString(), la);
+			// Creation des labels pour le nombre d'activation sur les 20
+			// dernieres fois
+			nbLastActivationByMemesLabel.put(meme.toString(), lol);
+			memePane.add(li);
+			memePane.add(la);
+			memePane.add(lol);
+			memeInfoPanel.add(memePane);
+		}
+
+		memeInfoPanel.add(lastActionRatioLabel);
+
+	}
+
+
 	/** génération du panneau contenant les informations sur les nodes.
 	 *
 	 * @return
@@ -839,8 +876,12 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		}
 
 		panel.add(lastActionRatioLabel);
+		memeInfoPanel = panel;
 		return panel;
 	}
+
+
+
 
 	/**
 	 * Génération d'un panneau contenant les informations sur le network.
@@ -1355,8 +1396,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	 * ces dernière dans les labels ou autres.
 	 *
 	 */
-	private void
-	updateInformationDisplay() {
+	private void updateInformationDisplay() {
 		if (Configurator.displayPlotWhileSimulation)
 		{
 			try
@@ -1372,24 +1412,27 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 				// densité seul
 				int activator = 1;
 				Color associatedColor;
+				String memeString, memeFourChar;
 
 				if(refreshDDArray)
 					activator = 9;//Configurator.AllAttribActivator;
 				// TODO est ce que ca vaut le coup de mettre a jour l'information en direct?
 				netProp = modelController.getCurrentNetProperties(activator);
-
+				// Pour chaque Meme disponible sur la simulation
 				for (Meme meme : selectedMemeOnSimulation) {
+					memeString = meme.toString();
+					memeFourChar = meme.toFourCharString();
 					associatedColor = drawerGraphStream.getColorAsColor(memeFactory.getIndexFromMemeFourChar(meme.toFourCharString()));
 
 					// NOMBRE DE POSSESSION DE MEME PAR LES ENTITES
-					// Savoir quel noeud possède quel meme;
-					JLabel lbl = nodesHavingXoxoMemesLabel.get(meme.toString());
+					// Trouver le label correspondant
+					JLabel lbl = nodesHavingXoxoMemesLabel.get(memeString);
 					// Nom sous forme "add+"
-					memeRef = memeFactory.translateMemeCombinaisonReadable(meme.toString()) ;
+					memeRef = memeFactory.translateMemeCombinaisonReadable(memeString) ;
 					String toPut = memeRef + ": [";
 					// Si tout les noeuds possede ce meme
-					if (nodesHavingXoxoMemes.get(meme.toString()) != null
-							&& nodesHavingXoxoMemes.get(meme.toString()).size() == Configurator.getNbNode()){
+					if (nodesHavingXoxoMemes.get(memeString) != null
+							&& nodesHavingXoxoMemes.get(memeString).size() == Configurator.getNbNode()){
 						toPut += "ALL]";
 					}
 					// Si tout les noeuds ne sont pas de ce type
@@ -1397,8 +1440,8 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 					{
 						int nbNodesWithThisMeme = 0;
 
-						nbNodesWithThisMeme = nodesHavingXoxoMemes.get(meme.toString()) == null? 0 :
-							nodesHavingXoxoMemes.get(meme.toString()).size();
+						nbNodesWithThisMeme = nodesHavingXoxoMemes.get(memeString) == null? 0 :
+							nodesHavingXoxoMemes.get(memeString).size();
 						toPut += nbNodesWithThisMeme;
 						toPut += "]";
 					}
@@ -1409,30 +1452,31 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 						// NOMBRE D'APPEL DES MEMES DEPUIS LE DEBUT DE LA SIMULATION
 						// Savoir combien de fois le meme a été appelé depuis le début de la simulation
-						nbAppel = nbActivationByMemes.get(meme.toString());
+						nbAppel = nbActivationByMemes.containsKey(memeString)? nbActivationByMemes.get(memeString) : 0;
 						// LABEL générique
-						nbActivationByMemesLabel.get(meme.toString()).setText(memeRef + ":" + nbAppel );
-						nbActivationByMemesLabel.get(meme.toString()).setForeground(associatedColor);
+						nbActivationByMemesLabel.get(memeString).setText(memeRef + ":" + nbAppel );
+						nbActivationByMemesLabel.get(memeString).setForeground(associatedColor);
 						totalAppel += nbAppel;
-						nbAppelInLast100 = countOfLastMemeActivation.containsKey(meme.toString()) ? countOfLastMemeActivation
-								.get(meme.toString()) : 0;
+						nbAppelInLast100 = countOfLastMemeActivation.containsKey(memeString) ? countOfLastMemeActivation
+								.get(memeString) : 0;
 
 						// Partie last 100 compte du nombre
-						nbLastActivationByMemesLabel.get(meme.toString()).setText(memeRef + ": "
-								+ countOfLastMemeActivation.get(meme.toString()) + "("
-								+ countOfLastMemeActivation.get(meme.toString()) * 100 / sizeOfCircularQueue
+						nbLastActivationByMemesLabel.get(memeString).setText(memeRef + ": "
+								+ nbAppelInLast100 + "("
+								+ nbAppelInLast100 * 100 / sizeOfCircularQueue
 								+"%)");
-						nbLastActivationByMemesLabel.get(meme.toString()).setForeground(associatedColor);
+						nbLastActivationByMemesLabel.get(memeString).setForeground(associatedColor);
 					}
 				}
 
 				String oldText;
 				// On refait une passe pour mettre a jour les % de possession
 				for (Meme meme : selectedMemeOnSimulation) {
-					if(totalAppel != 0){
-						oldText = nbActivationByMemesLabel.get(meme.toString()).getText();
-						nbActivationByMemesLabel.get(meme.toString()).setText(oldText +
-								"(" + nbActivationByMemes.get(meme.toString()) * 100 / totalAppel +"%)");
+					memeString = meme.toString();
+					if(totalAppel != 0 && nbActivationByMemesLabel.containsKey(memeString)){
+						oldText = nbActivationByMemesLabel.get(memeString).getText();
+						nbActivationByMemesLabel.get(memeString).setText(oldText +
+								"(" + nbActivationByMemes.get(memeString) * 100 / totalAppel +"%)");
 					}
 				}
 
@@ -1449,13 +1493,12 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 					displayDDChart(netProp.getDd());
 				if(Configurator.displayOnIHMDensitySD)
 				{
-					densityValues.add(netProp.getDensity());
+					densityValuesLast.add(netProp.getDensity());
 					try {
-						temp = Toolz.getNumberCutToPrecision(Toolz.getDeviation(densityValues, Optional.ofNullable(null)), 4);
+						temp = Toolz.getNumberCutToPrecision(Toolz.getDeviation(densityValuesLast), 4);
 					}catch (Exception e){}
 					jlDensitySD.setText("SD density: " + temp);
 				}
-
 			}
 			catch(NullPointerException npe){
 				if(Configurator.overallDebug)
@@ -1521,6 +1564,14 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		nbActivationByMemes.clear();
 		countOfLastMemeActivation.clear();
 		nodesHavingXoxoMemes.clear();
+
+//
+//		nbLastActivationByMemesLabel.clear();
+//		nbActivationByMemesLabel.clear();
+//		nodesHavingXoxoMemesLabel.clear();
+//		createComponentLabelMemeInformation();
+
+
 
 		for (Meme meme : selectedMemeOnSimulation) {
 			nodesHavingXoxoMemes.put(meme.toString(), new ArrayList<Integer>());

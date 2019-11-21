@@ -94,7 +94,7 @@ public class Interfaces {
 		void toggleWkProgress(String message);
 		void addValueToApplianceSerie(double time, Map<Meme, Double> kvIndexValue);
 		void setMemeAvailable(List<Meme> memes);
-		JFreeChart getDDChart();
+		JFreeChart getDDChart(); // Pour prendre les screenshot. Pas propre.
 		JFreeChart getDensityChart();
 		JFreeChart getDensityOverProbaChart();
 	}
