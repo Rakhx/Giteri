@@ -140,12 +140,13 @@ public class Initializer {
             }
 
             Interfaces.IReadNetwork nl = mControl.getReader();
-            // Permet d'éviter d'avoir besoin de cliquer sur analyse avant de fitté
-            try {
-                writeNRead.readAndCreateNetwork("" + Configurator.defaultPathForReadingNetwork, nl, " ", "#");
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+
+//            // Permet d'éviter d'avoir besoin de cliquer sur analyse avant de fitté
+//            try {
+//                writeNRead.readAndCreateNetwork("" + Configurator.defaultPathForReadingNetwork, nl, " ", "#");
+//            } catch (IOException e1) {
+//                e1.printStackTrace();
+//            }
 
             fenetre.setVisible(true);
             entiteHandler.setVueController(vControl);
@@ -185,12 +186,13 @@ public class Initializer {
             entiteHandler.addEntityListener(workerFactory.getCalculator());
 
             Interfaces.IReadNetwork nl = mControl.getReader();
-            // Pour pouvoir lancer direct le fitting.
-            try {
-                writeNRead.readAndCreateNetwork(fileInput, nl," ","#");
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+
+//            // Pour pouvoir lancer direct le fitting.
+//            try {
+//                writeNRead.readAndCreateNetwork(fileInput, nl," ","#");
+//            } catch (IOException e1) {
+//                e1.printStackTrace();
+//            }
 
             entiteHandler.suspend();
             networkConstructor.suspend();
