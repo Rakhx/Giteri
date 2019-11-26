@@ -198,34 +198,38 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 			}
 		}
 		else if(activator == 4){ // SMALL WORLD
-			double probaRelink = 0.1;//.1;
+			double probaRelink = .01;//.1;
 			int newTarget;
-			int nbNodeLattice = 11;
+			int nbNodeLattice = 7;
 
 			// pour chaque noeud le connecter au deux suivants modulo
 			for (int i = 0; i < nbNodeInit; i++) {
-				// Ajout de deux link
-				for (int j = 1; j < 1+nbNodeLattice; j++) {
-					// Ca peut etre redirigé de suite
-					if(Toolz.rollDice(probaRelink)){
-						do
-						{
-							newTarget = Toolz.getRandomNumber(nbNodeInit);
-						} while(newTarget == i || networkInstance.areNodesConnected(i,newTarget)
-								|| networkInstance.areNodesConnected(newTarget,i));//newTarget == (i+j) % nbNodeInit );
-
-						for (IInternalNetReprestn iInternalNetReprestn : netRepzsToUpdate) {
-							iInternalNetReprestn.addNodeWithEdge(i, newTarget, false);
-						}
-//						networkInstance.addEdgeToNodes(i, newTarget, false);
-					}
-					else{
-						for (IInternalNetReprestn iInternalNetReprestn : netRepzsToUpdate) {
-							iInternalNetReprestn.addNodeWithEdge(i, (i + j) % nbNodeInit, false);
-						}
-//						networkInstance.addEdgeToNodes(i, (i + j) % nbNodeInit, false);
+				// Ajout de j link
+				for (int j = 1; j < 1 + nbNodeLattice; j++) {
+					for (IInternalNetReprestn iInternalNetReprestn : netRepzsToUpdate) {
+						iInternalNetReprestn.addNodeWithEdge(i, (i + j) % nbNodeInit, false);
 					}
 				}
+			}
+
+			// Puis étape de redirection
+			for (int i = 0; i < nbNodeInit; i++) {
+				List<Integer> connections = networkInstance.getConnectedNodes(i);
+				for (Integer connection : connections) {
+					if (Toolz.rollDice(probaRelink)) {
+						do {
+							newTarget = Toolz.getRandomNumber(nbNodeInit);
+						} while (newTarget == i || networkInstance.areNodesConnected(i, newTarget)
+								|| networkInstance.areNodesConnected(newTarget, i));
+
+						for (IInternalNetReprestn iInternalNetReprestn : netRepzsToUpdate) {
+							iInternalNetReprestn.removeEdgeFromNodes(i,connection, false);
+							iInternalNetReprestn.addNodeWithEdge(i, newTarget, false);
+						}
+					}
+				}
+
+
 			}
 		}
 		else if(activator == 5){ // COMPLET
