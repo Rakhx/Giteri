@@ -42,7 +42,7 @@ public class Initializer {
         Configurator.typeOfConfig = launcher;
         boolean ihmLauncher = (launcher == Configurator.EnumLauncher.ihm) ;
 
-         if(ihmLauncher){
+        if(ihmLauncher){
             Configurator.displayPlotWhileSimulation = true;
             Configurator.withGraphicalDisplay = true;
             Configurator.jarMode = false;
@@ -50,7 +50,6 @@ public class Initializer {
             Configurator.writeNetworkResultOnFitting = !fullSilent;
             Configurator.writeMemeResultOnFitting = !fullSilent;
             Configurator.explorator = Configurator.EnumExplorationMethod.exhaustive;
-            Configurator.isFitting = false;
             Configurator.limitlessAction = true;
 
         }
@@ -63,7 +62,6 @@ public class Initializer {
             Configurator.writeNetworkResultOnFitting = !fullSilent;
             Configurator.writeMemeResultOnFitting = !fullSilent;
             Configurator.nbRepetitionbyRun = Configurator.nbRepetitionForJar;
-            Configurator.isFitting = true;
             Configurator.limitlessAction = false;
         }
 
@@ -140,14 +138,6 @@ public class Initializer {
             }
 
             Interfaces.IReadNetwork nl = mControl.getReader();
-
-//            // Permet d'éviter d'avoir besoin de cliquer sur analyse avant de fitté
-//            try {
-//                writeNRead.readAndCreateNetwork("" + Configurator.defaultPathForReadingNetwork, nl, " ", "#");
-//            } catch (IOException e1) {
-//                e1.printStackTrace();
-//            }
-
             fenetre.setVisible(true);
             entiteHandler.setVueController(vControl);
 
@@ -186,13 +176,6 @@ public class Initializer {
             entiteHandler.addEntityListener(workerFactory.getCalculator());
 
             Interfaces.IReadNetwork nl = mControl.getReader();
-
-//            // Pour pouvoir lancer direct le fitting.
-//            try {
-//                writeNRead.readAndCreateNetwork(fileInput, nl," ","#");
-//            } catch (IOException e1) {
-//                e1.printStackTrace();
-//            }
 
             entiteHandler.suspend();
             networkConstructor.suspend();

@@ -74,8 +74,5 @@ object Run{
       heiActi.==(1), nineActi.==(1),tenActi.==(1), elevenActi.==(1), twelveActi.==(1), thirteenActi.==(1),
       one, two, three, four, five, six, sevn, hei, nine, ten, eleven, twelve, thirteen)
 
-    // val s = io.Source.fromFile(network).getLines()
-   //  (math.abs(one * 2 - 10) + rand.nextGaussian(), math.abs(10 - two) + rand.nextGaussian())
-
   }
 }

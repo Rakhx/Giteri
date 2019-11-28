@@ -176,16 +176,17 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 *
 	 */
 	public void init(){
-		Configurator.isFitting = true;
-
 		// Si openMole, lire les propriétés du réseau cible depuis le fichier serialisé
 		if(Configurator.typeOfConfig == Configurator.EnumLauncher.jarOpenMole ||
 		Configurator.typeOfConfig == Configurator.EnumLauncher.jarC)
 			targetNetProperties = networkFileLoader.getNetworkProperties(true,false);
-
 		// CHEAT CODE
 		else // Sinon, les lire depuis le fichier donné en paramètre dans l'interface
 			targetNetProperties = networkFileLoader.getNetworkProperties(true,false);
+
+		if(Configurator.writInfo4OpnMol){
+			System.out.println("Propriété fichier source " + targetNetProperties.avgClust);
+		}
 
 		if(Configurator.prepareTheOpti){
 			boolean dog = (Configurator.typeOfConfig == Configurator.EnumLauncher.jarOpenMole) || (Configurator.typeOfConfig == Configurator.EnumLauncher.jarC);
@@ -350,6 +351,9 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 		// TODO [WayPoint]- Score distance entre deux network
 		currentNetworkScore = getNetworksDistanceDumb(Configurator.activationCodeForScore, targetNetProperties, currentNetProperties);
+
+		if(Configurator.writInfo4OpnMol)
+			System.out.println("endRepet:" + targetNetProperties.avgClust);
 
 		// Ajout a la classe des resultSet un score et propriété d'un réseau
 		resultNetwork.addScore(numeroRun, currentNetworkScore, currentNetProperties);

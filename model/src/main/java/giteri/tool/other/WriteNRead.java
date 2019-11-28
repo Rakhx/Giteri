@@ -76,6 +76,7 @@ public class WriteNRead {
 	 */
 	public IReadNetwork readAndCreateNetwork(String aFileName, IReadNetwork networkLoader, String separator ,String comString) throws IOException{
 		Path path = Paths.get(aFileName);
+		System.out.println(path.getFileName().toAbsolutePath());
 		return pReadAndCreateNetwork(path, networkLoader, separator, comString);
 	}
 

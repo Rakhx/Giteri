@@ -9,9 +9,9 @@ import java.util.ArrayList;
 
 public final class Configurator {
 
-	public static boolean prepareTheOpti = true;
+	public static boolean prepareTheOpti = false;
 
-	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
+	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
 	// TODO
 	public static boolean writInfo4OpnMol = true; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
 	public static String fittingTxtPath = "fittingInfo";
@@ -41,9 +41,6 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static boolean rebranchementAction = false; // REWIRE Faire l'ajout et le retrait dans le meme temps
 	public static boolean limitlessAction;
-
-	// TODO A voir utilité
-	public static boolean isFitting = false; // Pour la liste des memes présents sur la map / fitting
 
 	// MEME
 	@toOutput ( yes = true )

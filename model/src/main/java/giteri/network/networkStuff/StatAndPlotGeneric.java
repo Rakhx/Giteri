@@ -221,7 +221,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		memeDiffu.setEntiteHandler(entiteHandler);
 		providers.put(0,memeDiffu);
 
-		MemeAvailability memeProvider = new MemeAvailability( memeAndProba.keySet().stream().collect(Collectors.toList()));
+		MemeAvailability memeProvider = new MemeAvailability(memeAndProba.keySet().stream().collect(Collectors.toList()));
 		memeProvider.setEntiteHandler(entiteHandler);
 		providers.put(1,memeProvider); // Détermine si on va aussi cycler sur l'existence des memes sur la map
 
@@ -363,9 +363,11 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 * @param proba
 	 */
 	private void generateProxyParam(List<Boolean> activator, List<Double> proba) {
-		List<Integer> toConvert = new ArrayList<>(Arrays.asList(1,1,0,0,1,1,1,0,0,0,1,0,0));
+		List<Integer> toConvert = new ArrayList<>(Arrays.asList(0,1,1,1,0,0,1,0,1,0,1,0,0));
 		proba.addAll(Arrays.asList(
-				0.33647798837715337,0.8242861898983211,0.507860719502454,0.5338613429129917,0.018557876351679825,0.7512526694406567,0.052630766217027336,0.5354497059164869,0.3091585339374312,0.6907355753478974,0.24792911016664854,0.5547243001723559,0.9919495244275178
+				0.010925840317201896,0.8851247546028258,0.5974367201617817,0.33731312839947525,0.5293783833567871,0.5741177280430749,0.4790649155474489,0.6075781196948897,0.3931494164345141,0.8294305199564218,0.6920643105640236,0.43089372950155513,0.5905208421257632
+
+
 
 
 		));
