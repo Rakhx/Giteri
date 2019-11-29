@@ -185,7 +185,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			targetNetProperties = networkFileLoader.getNetworkProperties(true,false);
 
 		if(Configurator.writInfo4OpnMol){
-			System.out.println("Propriété fichier source " + targetNetProperties.avgClust);
+			// System.out.println("Propriété fichier source " + targetNetProperties.avgClust);
 		}
 
 		if(Configurator.prepareTheOpti){

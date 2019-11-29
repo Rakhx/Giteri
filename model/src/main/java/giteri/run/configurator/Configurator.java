@@ -11,7 +11,7 @@ public final class Configurator {
 
 	public static boolean prepareTheOpti = false;
 
-	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
+	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
 	// TODO
 	public static boolean writInfo4OpnMol = true; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
 	public static String fittingTxtPath = "fittingInfo";

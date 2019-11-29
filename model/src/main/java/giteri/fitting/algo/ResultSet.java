@@ -55,7 +55,7 @@ public class ResultSet extends Hashtable<Integer, Result> {
 				resForOneRun = get(numeroRun).getAvgScore();
 				stdDevia = get(numeroRun).getScoreStdDvt();
 				if(stdDevia > 0)
-					resForOneRun *= stdDevia;
+					resForOneRun *= (1+stdDevia);
 				nbRun++;
 				resOfSimu += resForOneRun;
 			}
