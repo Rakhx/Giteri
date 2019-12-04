@@ -11,7 +11,7 @@ public final class Configurator {
 
 	public static boolean prepareTheOpti = false;
 
-	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
+	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
 	// TODO
 	public static boolean writInfo4OpnMol = true; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
 	public static String fittingTxtPath = "fittingInfo";
@@ -58,21 +58,14 @@ public final class Configurator {
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 
 	// SCORE
-	public static boolean exploreSpecialNetworks = false; // Si on cherche les networks non moyen plutot que faire un score de distance
-	// Si true, passe par la méthode getNetworkScoreExplo qui ne prend en compte que CC et 3moment.
 	@toOutput ( yes = true )
 	public static int activationCodeForScore = 17; // Config "is max CC possible?"
-
-
-			// 153;// SCORE POUR SMALLWORLD DENSITY - DDARRAY - DDAVG - APL
-
+	// 153;// SCORE POUR SMALLWORLD DENSITY - DDARRAY - DDAVG - APL
 	// 170+512; // 170+512 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
 	// 16 + 512 Clust + third
 	// 170+512 = THIRD APL EDGES ARRAY DDAVG
 
-
 	public static int activationCodeAllAttrib = 255 + 512;
-	// public static int activationCodeActual = 255;
 
 	public static int initialnetworkForBase = 0; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 3- SF 4-SW
 
