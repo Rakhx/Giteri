@@ -48,8 +48,11 @@ public class StopWatch
      * 
      */
     public String toString(){
-    	return isRunning? ""+(System.nanoTime() - startTime): "" + cumuledTime; 
+    	return isRunning() ? ""+(System.nanoTime() - startTime): "" + cumuledTime;
     }
-    
-    
+
+
+    public boolean isRunning() {
+        return isRunning;
+    }
 }

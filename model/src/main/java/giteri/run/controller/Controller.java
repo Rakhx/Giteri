@@ -42,6 +42,11 @@ public class Controller {
 
 
 		//region iview part
+		public void setMemeAvailable(List<Meme> memes) {
+			for (Interfaces.IView vue : vues) {
+				vue.setMemeAvailable(memes);
+			}
+		}
 
 		public void displayInfo(Configurator.ViewMessageType type, List<String> info) {
 			for (Interfaces.IView vue:  vues) {
@@ -50,7 +55,7 @@ public class Controller {
 		}
 
 		public void resetIHM(){
-			for (Interfaces.IView vue:  vues) {
+			for (Interfaces.IView vue: vues) {
 				vue.resetIHM();
 			}
 		}
@@ -184,10 +189,6 @@ public class Controller {
 
 		public void takeScreenshot(Optional<ArrayList<String>> simulationPath){
 			model.takeSnapshot(Toolz.getLastSeed(), simulationPath);
-		}
-
-		public void comparaisonScreenshot(){
-			model.comparaisonScreenS();
 		}
 
 		//endregion

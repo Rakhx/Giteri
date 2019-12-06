@@ -4,7 +4,7 @@ import giteri.meme.event.ActionApplyEvent;
 import giteri.meme.event.BehavTransmEvent;
 import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.IBehaviorTransmissionListener;
-import giteri.meme.mecanisme.FilterFactory;
+import giteri.meme.mecanisme.ActionFactory;
 import giteri.meme.mecanisme.FilterFactory.IFilter;
 import giteri.meme.mecanisme.AttributFactory.IAttribut;
 import giteri.meme.mecanisme.MemeFactory;
@@ -20,8 +20,11 @@ import giteri.run.configurator.Configurator.*;
 import giteri.run.controller.Controller.VueController;
 import giteri.tool.math.Toolz;
 import giteri.tool.objects.ObjectRef;
+import giteri.tool.other.StopWatchFactory;
 
 import java.util.*;
+
+import static giteri.run.configurator.Configurator.fullSilent;
 
 /**
  * Classe qui gère les entités du réseau.
@@ -70,6 +73,13 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private int sumFailAction;
 	private ObjectRef<Integer> nbFail = new ObjectRef<>(0);
 	private Map<Meme, Double> kvMemeCodeNbEntities;
+
+	// Variable utilisé dans la fonction doAction - fn appelée a chaque step
+	Set<Entite> cibles;
+	Set<Integer> ciblesIndex;
+	IFilter currentFilter;
+	String attribString;
+	String actionDone;
 
 	/** Constructeur sans param.
 	 *
@@ -152,40 +162,36 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @return les actions qui ont été réalisé
 	 */
 	public void OneStep() {
-		if (Configurator.autoRedoActionIfNoAction)
-			while (runEntite().contains("Nope"));
-		else
-			runEntite();
-
+		runEntite();
 		if(!Configurator.jarMode){
 			checkAPM();
 		}
 		cptModulo++;
 
-		// Indicateur meme repartition, etc.
-		if (cptModulo % (Configurator.refreshInfoRate * 25) == 0) {
-			if (Configurator.displayMemePosessionDuringSimulation) {
-				vueController.displayMemeUsage(cptModulo,
-						memeProperties.getNbActivationByMemes(),
-						memeProperties.countOfLastMemeActivation,
-						memeProperties.lastHundredActionDone); }
-
-			if (cptModulo % (Configurator.refreshInfoRate * 200) == 0)
-				if(Configurator.displayMemePossessionEvolution){
-					kvMemeCodeNbEntities.clear();
-					for (Meme meme : memeProperties.countOfEntitiesHavingMeme.keySet()) {
-						kvMemeCodeNbEntities.put(meme, (double)memeProperties.countOfEntitiesHavingMeme.get(meme) / entites.size());
-					}
-
-					vueController.addValueToApplianceSerie(++cptMemePossession, kvMemeCodeNbEntities);
-				}
-
-			if (Configurator.displayLogAvgDegreeByMeme)
-				vueController.displayInfo(ViewMessageType.AVGDGRBYMEME, Arrays.asList(checkPropertiesByMemePossession()));
+		if(Configurator.timeEfficiency && cptModulo % 10000 == 0 ) {
+			System.out.println("nbAction: "+ cptModulo);
+			StopWatchFactory.getInstance().publishResult();
 		}
 
+		// Indicateur meme repartition, etc.
+		if(Configurator.displayMemePosessionDuringSimulation && (cptModulo % (Configurator.refreshInfoRate * 25) == 0) ) {
+			vueController.displayMemeUsage(cptModulo,
+					memeProperties.getNbActivationByMemes(),
+					memeProperties.countOfLastMemeActivation,
+					memeProperties.lastHundredActionDone); }
+		if(Configurator.displayMemePossessionEvolution && cptModulo % (Configurator.refreshInfoRate * 200) == 0){
+			kvMemeCodeNbEntities.clear();
+			for (Meme meme : memeProperties.countOfEntitiesHavingMeme.keySet()) {
+				kvMemeCodeNbEntities.put(meme, (double)memeProperties.countOfEntitiesHavingMeme.get(meme) / entites.size());
+			}
+
+			vueController.addValueToApplianceSerie(++cptMemePossession, kvMemeCodeNbEntities);
+		}
+		if (Configurator.displayLogAvgDegreeByMeme)
+			vueController.displayInfo(ViewMessageType.AVGDGRBYMEME, Arrays.asList(checkPropertiesByMemePossession()));
+
 		// Verification de la propagation totale des memes initiaux
-		if(Configurator.checkWhenFullPropagate && !allTransmitted &&  cptModulo % Configurator.checkFullProRefreshRate == 0) {
+		if(!fullSilent && Configurator.checkWhenFullPropagate && !allTransmitted &&  cptModulo % Configurator.checkFullProRefreshRate == 0) {
 			if(areAllMemeTransmitted()) {
                 allTransmitted = true;
                 vueController.displayInfo(ViewMessageType.PROPAGATION, Arrays.asList("ALL TRANSMISTED IN ;" + cptModulo));
@@ -221,6 +227,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	public void generateNetwork(int activator) {
 		networkConstruct.generateNetwork(activator);
+	}
+
+	public boolean[][] getMatrixNetwork(){
+		return networkConstruct.getNetworkMatrix();
 	}
 
 	/**
@@ -295,8 +305,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			// ajout dans la couche network; Ajout dans la couche meme
 			// automatique car les entitées ont leur edges en passant par la
 			// propriété dans les nodes.
-			networkConstruct.NMAddLink(
-					from.getNode().getIndex(), to.getNode().getIndex(), false);
+			networkConstruct.NMAddLink(from.getNode().getIndex(), to.getNode().getIndex(), false);
 			// Ajout dans la liste des entités pour faire la correspondance
 			// lien, temps de connection
 			from.addConnectedEntite(to);
@@ -437,6 +446,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	public void addEntityListener(IActionApplyListener myListener) {
 		synchronized (entityListeners) {
+
 			if (!entityListeners.contains(myListener)) {
 				entityListeners.add(myListener);
 			}
@@ -484,34 +494,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	//endregion
 
 	//region Meme
-
-	/** Distribut les memes aux entités suivant certains mode.
-	 * Utilisé pour les lancement manuels. l'apply du IModelParameter DiffuProba
-	 * fourni une liste et appelle giveMemeToEntiteFitting
-	 *
-	 * @param distrib
-	 */
-	public void giveMemeToEntite(MemeDistributionType distrib) {
-		switch (distrib) {
-			case SingleBasic:
-				giveMemeToEntiteOnlyBasis();
-				break;
-			case SingleCombinaison:
-				giveMemeToEntiteOnlyCombinaison();
-				break;
-			case AllCombinaison:
-				giveMemeToEntiteGeneric();
-				break;
-			case AllSingle:
-				giveMemeBasicAllNodes();
-				break;
-			case specificDistrib:
-				giveMemeToEntiteCouple();
-				break;
-			default:
-				break;
-		}
-	}
 
 	/** Applique directement depuis une liste de meme au X premier agents pour les
 	 * recevoir. Si option de défault behavior, donne des memes fluides aux autres agent.
@@ -680,6 +662,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		List<Meme> memeActions = new ArrayList<>();
 
 		synchronized (workerFactory.waitingForReset) {
+			workerFactory.getCalculator().incrementNbAction();
 			toDisplayForRatio.clear();
 
 			// CHOIX D'UNE ENTITÉE AU HASARD
@@ -688,7 +671,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				System.out.println("[EH.runEntite]- entite choisie " + entiteActing.getIndex());
 			if (entiteActing == null) {
 				if(Configurator.debugEntiteHandler) System.err.println("[EH.runEntite()]- Aucune entité sélectionnée");
-				return ("Nope pas d'entite prete");  }
+				return ("Nope pas d'entite prete");
+			}
 
 			// CHOIX DE L'ACTION POUR CETTE ENTITE
 			if(!Configurator.rebranchementAction) {
@@ -711,7 +695,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				}
 			}
 
-			//region AFFICHAGE ET DEBUGGUAGE
+			// AFFICHAGE ET DEBUGGUAGE
 			if (Configurator.displayLogRatioTryAddOverTryRmv) {
 				for (Meme memeAction : memeActions) {
 					if (memeAction != null) {
@@ -728,32 +712,28 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 			// Si on veut afficher les X dernieres actions entreprises & action depuis le début
 			if (Configurator.displayMemePosessionDuringSimulation) {
-				int i = -1;
-				for (Meme memeAction : memeActions) {
-					i++;
-					if (Configurator.displayLogRatioLogFailOverFail || Configurator.displayLogRatioLogFailOverSuccess )
-					{
-						List<String> temp = memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez.get(i), cptModulo);
-						if(temp != null)
-							toDisplayForRatio.addAll(temp);
-					}
-					else
-						memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez.get(i), cptModulo);
+				if (Configurator.displayLogRatioLogFailOverFail || Configurator.displayLogRatioLogFailOverSuccess )
+				{
+					List<String> temp = memeProperties.updateActionCount(memeActions, entiteActing.getIndex(), rez.get(0), cptModulo);
+					if(temp != null)
+						toDisplayForRatio.addAll(temp);
+				}
+				else
+					memeProperties.updateActionCount(memeActions, entiteActing.getIndex(), rez.get(0), cptModulo);
 
-					if(cptModulo % (Configurator.refreshInfoRate * 25)== 0) {
+				if(cptModulo % (Configurator.refreshInfoRate * 25)== 0) {
 
-						sumFailAction =  memeProperties.lastFailAction(nbFail);
-						//vueController.displayInfo("FAILSTUFF", Arrays.asList("" + sumFailAction));
+					sumFailAction =  memeProperties.lastFailAction(nbFail);
+					//vueController.displayInfo("FAILSTUFF", Arrays.asList("" + sumFailAction));
 
-						if(Configurator.writeFailDensityLink)
-							vueController.displayInfo(ViewMessageType.FAILXDENSITY, getFailXDensity( nbFail.getValue(),
-									networkConstruct.updatePreciseNetworkProperties
-											(Configurator.getIndicateur(NetworkAttribType.DENSITY)).getDensity(),sumFailAction));
-					}
+					if(Configurator.writeFailDensityLink)
+						vueController.displayInfo(ViewMessageType.FAILXDENSITY, getFailXDensity( nbFail.getValue(),
+								networkConstruct.updatePreciseNetworkProperties
+										(Configurator.getIndicateur(NetworkAttribType.DENSITY)).getDensity(),sumFailAction));
 				}
 			}
 
-			if(!toDisplayForRatio.isEmpty())
+			if(!fullSilent && toDisplayForRatio.isEmpty())
 				vueController.displayInfo(ViewMessageType.ECHECS, toDisplayForRatio);
 
 			// Dans le cas ou on veut les filtres en semi step, remis a zero des couleurs.
@@ -765,9 +745,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			}
 		}
 
-		//endregion
-
-		workerFactory.getCalculator().incrementNbAction();
 		return rez.stream().reduce(String::concat).toString();
 	}
 
@@ -779,25 +756,29 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	@SuppressWarnings("unchecked")
 	private String doAction(Entite movingOne, Meme memeAction) {
-		String actionDone = "";String memeApply = "";Set<Entite> cibles ;Set<Integer> ciblesIndex = new HashSet<>();
-		IFilter currentFilter = null; Iterator<Entite> ite; Entite one; Meme memeReturned;
+		//Set<Entite>cibles = new HashSet<>(entites);
+		//Set<Integer> ciblesIndex = new HashSet<>();
 
 		// Execution d'un meme de l'entite.
 		if (memeAction != null) {
+//			cibles.clear();
+//			cibles.addAll(entites);
 			cibles = new HashSet<>(entites);
 			cibles.remove(movingOne);
+			actionDone = "";
 
 			// FILTRE Pour chaque attribut sur lesquels on applique des filtres
 			for (IAttribut<Integer> attribut : memeAction.getAttributs()) {
+				attribString = attribut.toString();
 				// region semi auto
 				if (Configurator.semiStepProgression && filterOnSemiAuto(null, null)) {
-					System.out.println("On va appliquer les filtres suivants pour l'action " + memeAction.getName());
-					System.out.println(memeAction.getFilter(attribut.toString()).values());
+					System.out.println("On va appliquer les filtres suivants pour l'action " + memeAction.name);
+					System.out.println(memeAction.getFilter(attribString).values());
 				} //endregion
 
 				// Pour chaque filtre appliqué a un attribut
-				for (int order = 0; order < memeAction.getFilter(attribut.toString()).size(); order++) {
-					currentFilter = memeAction.getFilter(attribut.toString()).get(order);
+				for (int order = 0; order < memeAction.getFilter(attribString).size(); order++) {
+					currentFilter = memeAction.getFilter(attribString).get(order);
 					currentFilter.applyFilter(movingOne, cibles, attribut);
 					//region semi-auto
 					// Dans le cas ou on veut un mode semi automatique
@@ -813,7 +794,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			}
 
 			// Le dernier filtre appliqué est tjrs un random() unitaire : sauf purify
-			if (cibles.size() == 1 || memeAction.getAction().getFourCharName() == "PURI") {
+			if (cibles.size() == 1) {
 				actionDone += memeAction.getAction().applyAction(movingOne, cibles);
 
 				// region PROPAGATION du meme
@@ -828,7 +809,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				eventActionDone(movingOne, memeAction, actionDone);
 			}
 
-			// Dans le cas ou il y a plus d'une cible // ou pas action purify // ou aucune cible.
+			// Dans le cas ou il y a plus d'une cible
 			else {
 				if (cibles.size() > 1) System.err.println("Plusieurs cibles pour une action, pas normal");
 				actionDone = "Nope, Entite " + movingOne.getIndex()  + " Aucune(ou trop de) cible pour l'action" + memeAction.toFourCharString();
@@ -842,9 +823,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			actionDone = "Nope, Entite " + movingOne.getIndex() + " Liste d'action vide ou aucune action sélectionnée";
 			eventActionDone(movingOne, null, "NOACTION");
 		}
-
-		if (Configurator.displayLogMemeApplication)
-			vueController.displayInfo(ViewMessageType.MEMEAPPLICATION, Arrays.asList("MemeApplied- " + memeApply,"ActionDone- " +  actionDone));
 
 		return actionDone;
 	}
@@ -865,10 +843,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @return le meme sélectionné
 	 */
 	private Meme actionSelectionRulesVersion(Entite movingOne) {
-		if(!Configurator.oneAddForOneRmv)
-			return movingOne.chooseAction();
-		else
-			return actionSelectionControlledVersion(movingOne);
+	    return movingOne.chooseAction();
 	}
 
 	private void propagationCasteNew(Entite movingOne){
@@ -1036,151 +1011,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		return res;
 	}
 
-	/** Donne des memes aux entités. Ici chaque meme est donnée une fois pour une
-	 * entité dans le réseau.
-	 * x = nb de meme la map. Nombre d'agent avec comportement = x
-	 */
-	private void giveMemeToEntiteOnlyBasis() {
-		ArrayList<Entite> entiteContente = new ArrayList<>();
-		ArrayList<Entite> others = new ArrayList<>(entites);
-
-		Iterator<Entite> entitees = entites.iterator();
-		Entite actual;
-
-		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING)) {
-			actual = entitees.next();
-			actual.addMeme(meme, true);
-			eventMemeChanged(actual, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-			entiteContente.add(actual);
-		}
-
-		if(Configurator.initializeDefaultBehavior){
-			others.removeAll(entiteContente);
-			giveFluideMeme(others);
-			if(Configurator.initializeDefaultBehaviorToBreeder)
-				giveFluideMemeBreeder(entiteContente);
-		}
-	}
-
-	/** Donne les combinaisons de meme existantes sur la map à tous les agents, un par un.
-	 *
-	 */
-	private void giveMemeToEntiteGeneric() {
-		Hashtable<Integer, ArrayList<Meme>> composition;
-		composition = getMemeCombinaisonAvailable(Optional.empty());
-
-		for (Entite entite : entites)
-			for (Meme meme : composition.get( entite.getIndex()%composition.keySet().size() ))
-				eventMemeChanged(entite, entite.addMeme(meme, true), Configurator.MemeActivityPossibility.AjoutMeme.toString());
-
-	}
-
-	/** Donne tout les memes basics réparti équitablement sur tout les nodes
-	 *
-	 */
-	private void giveMemeBasicAllNodes() {
-		int nbMeme = memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING).size();
-		int partSize = entites.size() / nbMeme;
-		int lastIndex = 0;
-		int part = 0;
-		Iterator<Entite> entitees = entites.iterator();
-		Entite actual;
-		for (Meme meme :memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING)) {
-			part++;
-			actual = entitees.next();
-			for (int i = lastIndex; i < partSize * part; i++)
-				eventMemeChanged(actual,actual.addMeme(meme, true),
-						Configurator.MemeActivityPossibility.AjoutMeme.toString());
-			lastIndex = partSize * part;
-		}
-	}
-
-	/**
-	 * Donne une instance de chaque combinaison a un agent.
-	 *
-	 */
-	private void giveMemeToEntiteOnlyCombinaison() {
-		Hashtable<ActionType, ArrayList<Meme>> memesByCategory = new Hashtable<ActionType, ArrayList<Meme>>();
-		ArrayList<Meme> memeOfOneCategory;
-		ArrayList<ActionType> key = new ArrayList<ActionType>();
-
-		for (ActionType action : Configurator.ActionType.values()) {
-			if (action == ActionType.AJOUTLIEN || action == ActionType.RETRAITLIEN) {
-				memeOfOneCategory = memeFactory.getMemeAvailable(action, false);
-				if (memeOfOneCategory.size() > 0) {
-					memesByCategory.put(action, memeOfOneCategory);
-					key.add(action);
-				}
-			}
-		}
-
-		ActionType[] keyz = new ActionType[memesByCategory.keySet().size()];
-		for (int i = 0; i < key.size(); i++) {
-			keyz[i] = key.get(i);
-		}
-
-		Hashtable<Integer, ArrayList<Meme>> composition = new Hashtable<Integer, ArrayList<Meme>>();
-		ArrayList<Meme> memez = new ArrayList<Meme>();
-		indexOfMemesCombinaisonRecursion = -1;
-		recursive(memesByCategory, memez, keyz, composition, -1);
-		Iterator<Entite> entitees = entites.iterator();
-		Entite actual;
-
-		for (Integer integer : composition.keySet()) {
-			actual = entitees.next();
-			for (Meme meme : composition.get(integer)) {
-				eventMemeChanged(actual, actual.addMeme(meme, true),
-						Configurator.MemeActivityPossibility.AjoutMeme.toString());
-
-			}
-		}
-	}
-
-	/** donne les couples défini dans cette meme classe (EH) aux breeders
-	 *
-	 */
-	private void giveMemeToEntiteCouple() {
-
-		Iterator<Entite> iteEnti = entites.iterator();
-		Iterator<Meme> iteMemeCouple;
-		Entite currentEnti;
-		Meme currentMeme;
-		ArrayList<Entite> forFluid = new ArrayList<>();
-
-		for (CoupleMeme coupleMeme : memeFactory.getCouple()) {
-			currentEnti = iteEnti.next();
-			currentEnti.setBreederOnCouple(true);
-			currentEnti.setCoupleMeme(coupleMeme);
-			iteMemeCouple = coupleMeme.iterator();
-			while(iteMemeCouple.hasNext()) {
-				currentMeme = iteMemeCouple.next();
-				currentEnti.addOrReplaceFast(currentMeme); // pas de vérification du type de retour on est au début de l simulation
-				eventMemeChanged(currentEnti, currentMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-			}
-		}
-
-		while(iteEnti.hasNext()){
-//			currentEnti=iteEnti.next();
-			forFluid.add(iteEnti.next());
-		}
-		if(Configurator.initializeDefaultBehavior) {
-			giveFluideCouple(forFluid);
-		}
-	}
-
-	private void giveFluideCouple(ArrayList<Entite> entitesToBeApplied){
-		for (Entite entite : entitesToBeApplied) {
-			entite.setCoupleMeme(doubleRandom);
-			entite.setBreederOnCouple(false);
-			for (Meme meme : doubleRandom) {
-				entite.addMeme(meme);
-			}
-		}
-
-		this.entitesActive.addAll(entitesToBeApplied);
-
-	}
-
 	// TODO REFACTORING Prendre les memes a appliquer a tous en parametre plutot qu'avoir des variables statics
 	/** Dote les entités qui n'ont pas encore d'action des actions Add et remove de base.
 	 *
@@ -1227,6 +1057,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			toBindToNode = new Entite();
 			toBindToNode.setNode(node);
 			entites.add(toBindToNode);
+			if(Configurator.autoMemeForBreeder) {
+				toBindToNode.ajoutRandomFlemme = addRandom;
+				toBindToNode.retraitRandomFlemme = removeRandom;
+			}
 		}
 
 		for (Entite entite : entites) {
@@ -1284,7 +1118,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		Hashtable<AttributType, Hashtable<Integer, AgregatorType>> KVAttributAgregator = new Hashtable<>();
 		Hashtable<Integer, AgregatorType> agregators = new Hashtable<>();
 		int index;
-		Meme currentMeme;
 
 		ActionType add = ActionType.AJOUTLIEN;
 		ActionType remove = ActionType.RETRAITLIEN;
@@ -1312,7 +1145,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();index= 0;
 		agregators.put(index++, notLinked);
 		agregators.put(index++, random);
-		currentMeme = memeFactory.registerMemeAction("AddØ",0.15, false, true, add, attributs, KVAttributAgregator, false);
+		memeFactory.registerMemeAction("AddØ",0.15, true, true, add, attributs, KVAttributAgregator, false);
 		agregators.put(index++, random);
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, false, false, add, attributs, KVAttributAgregator, true);
 
@@ -1320,46 +1153,43 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, notLinked);
 		agregators.put(index++, mineInf);
 		agregators.put(index++, random);
-		currentMeme = memeFactory.registerMemeAction("Add+", 1, true,true, add, attributs,KVAttributAgregator, false);
+		memeFactory.registerMemeAction("Add+", 1, true,true, add, attributs,KVAttributAgregator, false);
 
 		agregators.clear();index = 0;
 		agregators.put(0, notLinked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		currentMeme = memeFactory.registerMemeAction("Add-",1, false,true, add, attributs,KVAttributAgregator, false);
+		memeFactory.registerMemeAction("Add-",1, true,true, add, attributs,KVAttributAgregator, false);
 
 		agregators.clear(); index = 0;
 		// agregators.put(index++, notLinked);
 		agregators.put(index++, theMost);
 		agregators.put(index++, random);
-		currentMeme = memeFactory.registerMemeAction("Add∞", 1, false, true, add, attributs, KVAttributAgregator,false);
+		memeFactory.registerMemeAction("Add∞", 1, false, true, add, attributs, KVAttributAgregator,false);
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, hopAWay);
 		agregators.put(index++, notLinked);
 		agregators.put(index++, random);
-		currentMeme = memeFactory.registerMemeAction("AddØ-Hop", .4, false, true, add,attributs, KVAttributAgregator ,false);
+		memeFactory.registerMemeAction("AddØ-Hop", .4, false, true, add,attributs, KVAttributAgregator ,false);
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, hopAWay3);
 		agregators.put(index++, notLinked);
 		agregators.put(index++, random);
-		currentMeme = memeFactory.registerMemeAction("AddØ-3Hop", 1, false, true, add,attributs, KVAttributAgregator ,false);
+		memeFactory.registerMemeAction("AddØ-3Hop", 1, false, true, add,attributs, KVAttributAgregator ,false);
 
 		agregators.clear();index = 0;
 		agregators.put(0, notLinked);
 		agregators.put(1, theirEqual);
 		agregators.put(2, random);
-		currentMeme = memeFactory.registerMemeAction("AddEq",1, false, false, add,  attributs, KVAttributAgregator, false);
+		memeFactory.registerMemeAction("AddLol",1, false, false, add,  attributs, KVAttributAgregator, false);
 
-		agregators.clear();
-		agregators.put(0, blank);
-		currentMeme = memeFactory.registerMemeAction("Add0",.5, false, false, add,  attributs, KVAttributAgregator, false);
 
 		agregators.clear();index = 0;
 		agregators.put(0, linked);
 		agregators.put(1, random);
-		currentMeme = memeFactory.registerMemeAction("RmvØ",1, false, true, remove,  attributs, KVAttributAgregator, false);
+		memeFactory.registerMemeAction("RmvØ",.7, true, true, remove,  attributs, KVAttributAgregator, false);
 		agregators.put(2, random);
 		removeRandom = memeFactory.registerMemeAction("RmvØ-neutral",0, false, false, remove,  attributs, KVAttributAgregator, true);
 
@@ -1367,36 +1197,32 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(0, linked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		currentMeme = memeFactory.registerMemeAction("Rmv-", 1, true, true, remove, attributs, KVAttributAgregator ,false);
+		memeFactory.registerMemeAction("Rmv-", 1, false, true, remove, attributs, KVAttributAgregator ,false);
 
 		agregators.clear();index = 0;
 		agregators.put(0, linked);
 		agregators.put(1, mineInf);
 		agregators.put(2, random);
-		currentMeme = memeFactory.registerMemeAction("Rmv+", 1, true, true, remove, attributs, KVAttributAgregator ,false);
+		memeFactory.registerMemeAction("Rmv+", 1, false, true, remove, attributs, KVAttributAgregator ,false);
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, linked);
 		agregators.put(index++, triangle);
 		agregators.put(index++, random);
-		currentMeme = memeFactory.registerMemeAction("RmvØ-2hop", .3, false, true, remove, attributs,KVAttributAgregator ,false);
+		memeFactory.registerMemeAction("RmvØ-2hop", .3, false, true, remove, attributs,KVAttributAgregator ,false);
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, selfSup);
 		agregators.put(index++, linked);
 		agregators.put(index++, theirSup);
 		agregators.put(index++, random);
-		currentMeme = memeFactory.registerMemeAction("Rmv2",1, false, false, remove,  attributs, KVAttributAgregator, false);
+		memeFactory.registerMemeAction("Rmv2",1, false, false, remove,  attributs, KVAttributAgregator, false);
 
-		agregators.clear();
-		agregators.put(0, linked);
-		agregators.put(1, theirSupSix);
-		agregators.put(2, random);
-		currentMeme = memeFactory.registerMemeAction("Rmv3",.5, false, false, remove,  attributs, KVAttributAgregator, false);
-
-		agregators.clear();
-		agregators.put(0, blank);
-		currentMeme = memeFactory.registerMemeAction("Rmv0",.5, false, false, remove,  attributs, KVAttributAgregator, false);
+		agregators.clear(); index = 0;
+		agregators.put(index++, linked);
+		agregators.put(index++, theirEqual);
+		agregators.put(index++, random);
+		memeFactory.registerMemeAction("RmvEq",1, true, true, remove,  attributs, KVAttributAgregator, false);
 
 		agregators.clear();
 		memeFactory.registerMemeAction("Puri",.1,false, false, puri, attributs, KVAttributAgregator, false);
@@ -1404,14 +1230,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		index = 0;
 		// Creation des couples d'actions
 		this.doubleRandom = memeFactory.extractAndAddCoupleMeme(-1,"AddØ","RmvØ",0);
-
-
-
-	//	memeFactory.extractAndAddCoupleMeme(index++,"Add0","Rmv+",.1);
-		// memeFactory.extractAndAddCoupleMeme(index++,"AddEq","rmv+",.50);
-
-
-		memeFactory.extractAndAddCoupleMeme(index++,"AddØ-hop","rmv+",1);
+        memeFactory.extractAndAddCoupleMeme(index++,"AddØ-hop","rmv+",1);
 //
 	}
 
@@ -1563,7 +1382,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 	@Override
 	public void handlerNbNodeChanged(NbNodeChangedEvent e) {
-		entites.clear();
+		getEntites().clear();
 		bindNodeWithEntite(networkConstruct.getNetwork());
 	}
 
@@ -1587,7 +1406,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	public String getEntitesInfoAsString() {
 		String resultat = "";
-		for (Entite entitee : entites) {
+		for (Entite entitee : getEntites()) {
 			resultat += "\n né" + entitee.getIndex();
 			for (Meme meme : entitee.getMyMemes()) {
 				resultat += "\n \t meme " + meme.toShortString();
@@ -1608,7 +1427,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 	private void checkConsistency(){
 		ArrayList<Meme> myMemes;
-		for (Entite entite: entites) {
+		for (Entite entite: getEntites()) {
 			myMemes = entite.getMyMemes();
 			if(myMemes.size() > 2)
 				System.out.println("TROP DE COMPORTEMENT");
@@ -1617,6 +1436,9 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 	}
 
+	public List<Entite> getEntites() {
+		return new ArrayList<Entite>(entites);
+	}
 
 	public class memeComparatorAscending implements Comparator<Meme> {
 		@Override
@@ -1640,28 +1462,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	public void purgeLink() {
 
-		Meme purify = memeFactory.getMemeFromFourString("PURIDG");
-		purify.getAction().applyAction(null, entites);
-
-//		Entite target;
-//		ArrayList<Entite> connectedNodeSeveralConnection = new ArrayList<Entite>();
-//
-//		for (Entite entite : entites) {
-//			connectedNodeSeveralConnection.clear();
-//			if (entite.getDegree() > 1) {
-//				for (Entite entite2 : entite.getConnectedEntite()) {
-//					if (entite2.getDegree() > 1) {
-//						connectedNodeSeveralConnection.add(entite2);
-//					}
-//				}
-//
-//				if (connectedNodeSeveralConnection.size() > 1) {
-//					target = connectedNodeSeveralConnection.get
-//							(Toolz.getRandomNumber(connectedNodeSeveralConnection.size()));
-//					removeLink(entite, target);
-//				}
-//			}
-//		}
 	}
 
 	/** Obtient les memes effectivements présent sur la map.
@@ -1670,7 +1470,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	public ArrayList<Meme> getMemeOnMap() {
 		ArrayList<Meme> memes = new ArrayList<Meme>();
-		for (Entite entite : entites) {
+		for (Entite entite : getEntites()) {
 			for (Meme meme : entite.getMyMemes()) {
 				if (!memes.contains(meme))
 					memes.add(meme);

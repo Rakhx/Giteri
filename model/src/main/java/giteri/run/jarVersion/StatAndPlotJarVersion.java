@@ -9,7 +9,7 @@ import giteri.tool.other.WriteNRead;
 
 public class StatAndPlotJarVersion extends StatAndPlotGeneric {
 
-	// Attribut propre a la classe
+	// Attribut propre à la classe
 	private int module = 0;
 
 	/**
@@ -24,7 +24,7 @@ public class StatAndPlotJarVersion extends StatAndPlotGeneric {
 	 *
 	 */
 	public void handlerActionApply(ActionApplyEvent e) {
-		if(++module% Configurator.refreshInfoRate == 0){
+		if(++module % Configurator.refreshInfoRate == 0){
 			module = 0;
 			// mise a jour d'un boolean
 		}

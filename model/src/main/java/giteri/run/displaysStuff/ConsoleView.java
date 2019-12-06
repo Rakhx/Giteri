@@ -11,7 +11,6 @@ import giteri.run.configurator.Configurator.ViewMessageType;
 
 public class ConsoleView implements Interfaces.IView {
 
-
     // region IVIEW
 
     @Override
@@ -58,6 +57,11 @@ public class ConsoleView implements Interfaces.IView {
     @Override
     public void addValueToApplianceSerie(double time, Map<Meme, Double> value) {
 
+    }
+
+    @Override
+    public void setMemeAvailable(List<Meme> memes) {
+        System.out.println("Cht de liste de memes: " + memes.stream().map(e -> e.toFourCharString()).reduce("", String::concat));
     }
 
     @Override

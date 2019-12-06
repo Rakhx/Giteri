@@ -122,6 +122,11 @@ public class FileView implements Interfaces.IView {
     }
 
     @Override
+    public void setMemeAvailable(List<Meme> memes) {
+        addLine("Configuration", Collections.singletonList(memes.stream().map(e -> e.toFourCharString()).reduce("", String::concat)));
+    }
+
+    @Override
     public JFreeChart getDDChart() {
         return null;
     }

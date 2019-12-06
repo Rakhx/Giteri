@@ -9,8 +9,9 @@ import org.graphstream.graph.Node;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Classe qui va modifier un réseau et vérifier les propriétés
+/** NON UTILISE
+ * Classe qui va modifier un réseau et vérifier les propriétés -
+ *
  */
 public class NetworkModificator {
 

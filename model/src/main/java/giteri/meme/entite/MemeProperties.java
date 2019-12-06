@@ -23,18 +23,15 @@ public class MemeProperties {
 
     // Meme actif sur la map
     List<Meme> memeOnMap;
-
     // Nombre d'appel depuis le début de la simu
-    Map<Meme, Integer> nbActivationByMemes;
-
+    private Map<Meme, Integer> nbActivationByMemes;
+    // Compte sur les X derniers appels des memes
     Map<Meme, Integer> countOfLastMemeActivation;
-
     // k:meme v:nb entity with this meme
     Map<Meme, Integer> countOfEntitiesHavingMeme;
 
     // Sur les 100 dernières actions, quel meme a été appelé
     final CircularFifoQueue<Meme> lastHundredActionDone;
-    int sizeOfCircularQueue = Configurator.sizeOfCircularForLastActionDone;
 
     List<Integer> lastFailActionTried;
 
@@ -47,7 +44,7 @@ public class MemeProperties {
         nbActivationByMemes = new Hashtable<>();
         countOfLastMemeActivation = new Hashtable<>();
         countOfEntitiesHavingMeme = new Hashtable<>();
-        lastHundredActionDone = new CircularFifoQueue<>(sizeOfCircularQueue);
+        lastHundredActionDone = new CircularFifoQueue<>(Configurator.sizeOfCircularForLastActionDone);
         lastFailActionTried = new ArrayList<>();
     }
 
@@ -56,12 +53,13 @@ public class MemeProperties {
         countOfLastMemeActivation.clear();
         lastHundredActionDone.clear();
         countOfEntitiesHavingMeme.clear();
+        lastFailActionTried.clear();
     }
 
     //endregion
 
     /** Appelée a chaque action effectuée
-     * mise a jour des listes de possession de meme et des dernier meme jouée,
+     * mise à jour des listes de possession de meme et des dernier meme jouée,
      * +
      *  renvoi une list de string composée de ce qu'il faut output si on veut suivre l'évolution des ratio de fail etc.
      *
@@ -69,7 +67,7 @@ public class MemeProperties {
      * @param entiteIndex
      * @param message
      * @param cptModulo
-     * @return
+     * @return Une liste décrivant les échecs en détails, null sinon.
      */
     List<String> updateActionCount(Meme memeApply, int entiteIndex, String message, int cptModulo){
         // SUCCES: En cas de réussite de l'action
@@ -77,7 +75,6 @@ public class MemeProperties {
         {
             Meme elementRemoveOfCircular = null;
             Toolz.addCountToElementInHashArray(nbActivationByMemes, memeApply, 1);
-
             synchronized (lastHundredActionDone) {
                 // partie last twenty
                 if (lastHundredActionDone.size() == lastHundredActionDone.maxSize()) {
@@ -89,8 +86,8 @@ public class MemeProperties {
             }
             Toolz.addCountToElementInHashArray(countOfLastMemeActivation, memeApply, 1);
         }
-
         // ECHEC: Dans le cas ou il n'y a pas de meme apply, c'est a dire que l'action d'application du meme à échouée.
+        // Ne contient que de l'affichage et erciture.
         else if (Configurator.displayLogRatioLogFailOverFail || Configurator.displayLogRatioLogFailOverSuccess )
         {
             int nbWin = 0;
@@ -230,9 +227,10 @@ public class MemeProperties {
         return toWrite;
     }
 
+    // endregion
+
     Map<Meme, Integer> getNbActivationByMemes() {
         return nbActivationByMemes;
     }
 
-    // endregion
 }

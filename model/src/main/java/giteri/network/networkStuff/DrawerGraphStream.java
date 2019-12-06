@@ -46,8 +46,9 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 		fs.setLayoutPolicy(LayoutPolicy.COMPUTED_FULLY_AT_NEW_IMAGE);
 	}
 
+
 	// Graphe associé
-	private Graph graph;
+	public Graph graph;
 	// x3
 	private int nbColorWanted = 3;
 	private Hashtable<Integer, String> colorPieAsString;
@@ -79,8 +80,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 		if(e.message == Configurator.MemeActivityPossibility.AjoutMeme.toString()){
 			// On cherche le noeud concerné
 			Node noeud = graph.getNode(""+e.entite.getIndex());
-			setNodeClass(noeud, memeFactory.getCoupleMemeFromIndex(e.entite.getCoupleMemeIndex()).getColorClass());
-
+			setNodeClass(noeud, e.entite.getGraphStreamClass());
 			if(Configurator.displayLogMemeTransmission)
 				System.out.println(noeud+" "+e.meme.getName());
 		}
@@ -140,8 +140,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 		}
 	}
 
-	/** Semi progression stuff.
-	 * Associe aux noeuds du réseau des classes qui permettront de changer leur couleurs d'affichage.
+	/** Associe aux noeuds du réseau des classes qui permettront de changer leur couleurs d'affichage.
 	 * Prend un network et des noeuds sur lesquels il faut appliquer la couleur propore au target
 	 * Sur les autres noeuds, les passer en noirs. Le noeud qui fait l'action rester dans sa couleur
 	 * d'origine.
@@ -273,15 +272,23 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 	private void defineGraphAttributes(Graph graph){
 
 		String attribut = "";
-		int officialIndex;
-		String combi;
-		for (CoupleMeme couple : memeFactory.getCoupleMemes()) {
-			combi = couple.getColorClass();
-			officialIndex = couple.getIndex();
+//		int index = -1;
+		Integer officialIndex;
+		int nbMemeSolo = memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING).size();
+		nbMemeSolo--;
+		int aAppliquer;
 
-			attribut += "node."+combi+" {fill-color: "+ colorPieAsString.get(officialIndex)+";}";
+		for (String combi : entiteHandler.getMemeAvailableAsString(Configurator.FittingBehavior.simpleAndComplex)) {
+			officialIndex = memeFactory.getIndexFromMemeFourChar(combi);
+
+			if(officialIndex != null)
+				aAppliquer = officialIndex;
+			else
+				aAppliquer = ++nbMemeSolo;
+
+			attribut += "node. "+combi+" {fill-color: "+ colorPieAsString.get(aAppliquer)+";}";
 			if(Configurator.DisplayLogBehaviorColors){
-				System.out.println(couple.getName() + ":" + colorPieAsString.get(officialIndex));
+				System.out.println(memeFactory.translateMemeCombinaisonReadable(combi) + ":" + colorPieAsString.get(aAppliquer));
 			}
 		}
 
@@ -290,11 +297,9 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 		attribut += "node.NONTARGET {fill-color: "+ colorPieAsString.get(101)+";}";
 
 		graph.addAttribute("ui.stylesheet", attribut);
+
 	}
-	public void giveColorIndex(int nodeIndex, int color){
-		Node noeud = graph.getNode(""+ nodeIndex);
-//		setNodeClass(noeud, e.entite.getGraphStreamClass());
-	}
+
 	/** Retourne la couleur correspondant a l'index en param
 	 *
 	 * @param index

@@ -2,20 +2,29 @@ package giteri.meme.mecanisme;
 
 import java.util.*;
 
+import giteri.meme.entite.EntiteHandler;
+import giteri.run.interfaces.Interfaces;
 import giteri.tool.math.Toolz;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.AgregatorType;
 import giteri.meme.entite.Entite;
-import giteri.meme.entite.EntiteHandler;
+import giteri.tool.objects.ObjectRef;
 
 public class FilterFactory {
 
-	// EntiteHandler entiteHandler;
+	private Interfaces.INetworkRepresentation rpz;
+	private int networkVersion;
+	EntiteHandler eh;
+
 	public FilterFactory(){
 	}
 
 	public void setEntiteHandler(EntiteHandler eh){
-	//	entiteHandler = eh;
+		this.eh = eh;
+	}
+
+	public boolean[][] getNetwork(){
+		return eh.getMatrixNetwork();
 	}
 
 	/** FACTORY Renvoi un agregator depuis l'enum du configurator.
@@ -44,9 +53,9 @@ public class FilterFactory {
 			case RANDOM:
 				return new random();
 			case HOPAWAY:
-				return new HopWay();
+				return new HopWay(2);
 			case HOPAWAY3:
-				return new HopWay3();
+				return new HopWay(3);
 			case TRIANGLE:
 				return new Triangle();
 			case THEIRSUP:
@@ -54,11 +63,9 @@ public class FilterFactory {
 				case THEIRSUPSIX:
 				return new TheirSupParam(6);
 			case THEIREQUAL:
-				return new TheirEqual();
+				return new TheirEqual(2);
 			case SELFSUP:
-				return new SelfSup();
-			case BLANK:
-				return new Blank();
+				return new SelfSup(2);
 			default:
 				return null;
 		}
@@ -273,40 +280,8 @@ public class FilterFactory {
 	/** Prise en compte de la valeur d'attribut de la cible sans le comparer a l'attribut de l'acting.
 	 *
 	 */
-	public class TheirSupTwo implements IFilter {
-		int valueAttribut = 2;
-
-		@Override
-		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
-			ArrayList<Entite> resultat = new ArrayList<Entite>();
-			for (Entite entite : entites) {
-					if(entite.getDegree() >= valueAttribut)
-						resultat.add(entite);
-				}
-
-
-			entites.clear();
-			entites.addAll(resultat);
-		}
-
-		public AgregatorType getEnumType() {
-			return AgregatorType.THEIRSUP;
-		}
-
-		public String toString(){
-			return "TheirSup2";
-		}
-
-		public String getFourCharName() {
-			return "TRSP2";
-		}
-	}
-
-	/**
-	 *
-	 */
 	public class TheirSupParam implements IFilter {
-		int valueAttribut = 6;
+		int valueAttribut;
 
 		public TheirSupParam(int param){
 			valueAttribut = param;
@@ -326,6 +301,8 @@ public class FilterFactory {
 		}
 
 		public AgregatorType getEnumType() {
+			if(valueAttribut == 2)
+				return AgregatorType.THEIREQUAL;
 			return AgregatorType.THEIRSUPSIX;
 		}
 
@@ -334,7 +311,7 @@ public class FilterFactory {
 		}
 
 		public String getFourCharName() {
-			return "TRSP6";
+			return "TRSP"+valueAttribut;
 		}
 	}
 
@@ -343,11 +320,17 @@ public class FilterFactory {
 	 */
 	public class TheirEqual implements IFilter {
 
+		int valueAttribut = 2;
+
+		public TheirEqual(int value){
+			valueAttribut = value;
+		}
+
 		@Override
 		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
 			ArrayList<Entite> resultat = new ArrayList<Entite>();
 			for (Entite entite : entites) {
-				if(entite.getDegree() == asker.getDegree())
+				if(entite.getDegree() == valueAttribut)
 					resultat.add(entite);
 			}
 
@@ -357,6 +340,7 @@ public class FilterFactory {
 		}
 
 		public AgregatorType getEnumType() {
+
 			return AgregatorType.THEIREQUAL;
 		}
 
@@ -574,30 +558,49 @@ public class FilterFactory {
 	 */
 	public class HopWay extends Filter implements IFilter {
 
-		public int reach = 2;
+		public int reach;
+
+		public HopWay(int reachParam){
+			this.reach = reachParam;
+		}
 
 		@Override
 		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
-
-			Set<Entite> entiteResult = new HashSet<>();
-
-			if(Configurator.debugHopAway){
+			boolean[] beforeFil = new boolean[Configurator.getNbNode()];
+			boolean[] selected ;
+			if(Configurator.debugHopAway)
+			{
 				String result = "before Entites";
-
 				for (Entite entite : entites) {
 					result +=":" + entite.getIndex();
 				}
+
 				System.out.println(result); // l'ensemble des entites pré filtrage
 			}
 
-			getNeightboor(entiteResult, entites, asker, reach);
+			for (Entite entite : entites) {
+				beforeFil[entite.getIndex()] = true;
+			}
+			Set<Entite> entiteResult;  // = new HashSet<>();
 
+			// plus de fonction recursive
+//				getNeightboor(entiteResult, entites, asker, reach);
+
+			entiteResult = zzz(asker.getIndex(), getNetwork(), beforeFil, reach);
 			if(Configurator.debugHopAway){
 				String result = "after Entites:";
+				String resultNoooo = "after Entites nope actionsljzmzljd:";
 				for (Entite entite : entiteResult) {
 					result +=":" + entite.getIndex();
 				}
+
+				for (int i = 0; i < Configurator.getNbNode(); i++) {
+					//if(selected[i])
+					//resultNoooo += ":" + i;
+				}
+
 				System.out.println(result);
+				System.out.println(resultNoooo);
 			}
 
 			entites.clear();
@@ -610,12 +613,14 @@ public class FilterFactory {
 
 		@Override
 		public AgregatorType getEnumType() {
-			return AgregatorType.HOPAWAY;
+			if(reach == 2)
+				return AgregatorType.HOPAWAY;
+			return AgregatorType.HOPAWAY3;
 		}
 
 		@Override
 		public String getFourCharName() {
-			return "HA";
+			return "HA"+reach;
 		}
 
 		/** Fonction récursive qui va chercher les noeuds liés a la @target à une distance de @deepToGo initial.
@@ -638,7 +643,6 @@ public class FilterFactory {
 					entiteSearchSpace.remove(neighboor);
 				}
 			}
-
 			if(deepToGo == 0)
 			entiteToReturn.addAll(entiteAccepted);
 			else if(deepToGo > 0)
@@ -646,83 +650,54 @@ public class FilterFactory {
 					getNeightboor(entiteToReturn, entiteSearchSpace, entite, deepToGo);
 		}
 
-	}
-
-	/** Renvoi les noeuds liés a une distance de @reach
-	 *
-	 */
-	public class HopWay3 extends Filter implements IFilter {
-
-		public int reach = 3;
-
-		@Override
-		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
-
-			Set<Entite> entiteResult = new HashSet<>();
-
-			if(Configurator.debugHopAway){
-				String result = "before Entites";
-
-				for (Entite entite : entites) {
-					result +=":" + entite.getIndex();
-				}
-				System.out.println(result); // l'ensemble des entites pré filtrage
-			}
-
-			getNeightboor(entiteResult, entites, asker, reach);
-
-			if(Configurator.debugHopAway){
-				String result = "after Entites:";
-				for (Entite entite : entiteResult) {
-					result +=":" + entite.getIndex();
-				}
-				System.out.println(result);
-			}
-
-			entites.clear();
-			entites.addAll(entiteResult);
-		}
-
-		public String toString(){
-			return "Hopaway3";
-		}
-
-		@Override
-		public AgregatorType getEnumType() {
-			return AgregatorType.HOPAWAY3;
-		}
-
-		@Override
-		public String getFourCharName() {
-			return "HA3";
-		}
-
-		/** Fonction récursive qui va chercher les noeuds liés a la @target à une distance de @deepToGo initial.
-		 * 1er appel : on regarde les voisins de @target et les rajoute dans une liste @entiteSearchSpace.
-		 *  l @deepToGo est décrementé, si égal 0 on arrete l'appel récursif.
-		 * @param entiteToReturn
-		 * @param entiteSearchSpace
-		 * @param target
-		 * @param deepToGo
-		 */
-		private void getNeightboor(Set<Entite> entiteToReturn, Set<Entite> entiteSearchSpace, Entite target, int deepToGo){
-			deepToGo --;
+		private void getNeightboorOpti(Set<Entite> entiteToReturn, Set<Entite> entiteSearchSpace, Entite target, int deepToGo){
+			deepToGo--;
 			Set<Entite> entiteAccepted = new HashSet<>();
-			// pout chaque voisin connecté a la cible,
-			for (Entite neighboor : target.getConnectedEntite()) {
-				// On regarde si le voisin en question est dans la liste des éléments a regarder
-				if(entiteSearchSpace.contains(neighboor)){
-					entiteAccepted.add(neighboor);
-					// on le retire de la liste des éléments que l'on regarde pour éviter les doublons retour
-					entiteSearchSpace.remove(neighboor);
+		}
+
+		private Set<Entite> zzz(int asker, boolean[][] network, boolean[] beforeFilter ,int deep){
+			Set<Entite> result= new HashSet<>();
+			List<Entite> entites = eh.getEntites() ;
+			// On trouve les adjacents a l'asker; il s'agit du cercle de distance 1
+			boolean[] adja ;
+			int nbNode = Configurator.getNbNode();
+			boolean[] soFar  = network[asker]; // Liste des noeuds déjà visité, qu'on retirera de la liste à la fin
+			soFar[asker] = true; // on y ajoute le noeud agissant
+			boolean[] resultat = new boolean[nbNode];
+
+			for (int profondeur = 1; profondeur < deep; profondeur++) {
+				     adja = new boolean[nbNode];
+					// On récupère tt les noeuds adjacents à ceux qu'on a soFar
+					for (int indexNode = 0; indexNode < nbNode; indexNode++) {
+						// Si on a un noeud a l'index
+						if(soFar[indexNode]) {
+							// On ajoute a Adja la liste des liens du noeud indexNode
+							for (int i = 0; i < nbNode; i++) {
+								adja[i] |= network[indexNode][i];
+							}
+						}
+					}
+					// A la fin de la boucle for on se retrouve avec tous les noeuds adjacents a ceux de la liste soFar
+				// Si on est pas arrivé la fin de profondeur, on ajoute ces noeuds a la liste des soFar
+				if(profondeur != deep - 1 ){
+					for (int i = 0; i < nbNode; i++) {
+						soFar[i] |= adja[i];
+					}
+
+				}
+				// Si on est arrivé a la fin, on ne veut retenir que les noeuds qui sont à cette fin et qui n'étaient pas dans la liste avant,
+				// donc on soustrait ceux de la liste so far
+				else {
+
+					for (int i = 0; i < nbNode; i++) {
+						if(!soFar[i] && adja[i]) {
+							result.add(entites.get(i));
+						}
+					}
 				}
 			}
 
-			if(deepToGo == 0)
-				entiteToReturn.addAll(entiteAccepted);
-			else if(deepToGo > 0)
-				for (Entite entite : entiteAccepted)
-					getNeightboor(entiteToReturn, entiteSearchSpace, entite, deepToGo);
+			return result;
 		}
 
 	}
@@ -766,12 +741,14 @@ public class FilterFactory {
 	 *
 	 */
 	public class SelfSup extends Filter implements IFilter {
-		int attributValue = 1;
+		int attributValue ;
 
+		public SelfSup(int param){
+			attributValue = param;
+		}
 
 		@Override
 		public <T extends Comparable<T>> void applyFilter(Entite asker, Set<Entite> entites, AttributFactory.IAttribut<T> attribut) {
-			Set<Entite> resultat = new HashSet<>();
 			if(asker.getDegree() > attributValue){
 			}else {
 				entites.clear();

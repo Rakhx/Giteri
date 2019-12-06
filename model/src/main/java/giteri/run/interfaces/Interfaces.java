@@ -38,7 +38,7 @@ public class Interfaces {
 	public interface IReadNetwork{
 		void whatToDoWithOneLine(String line, String separator);
 		void init();
-		NetworkProperties getNetworkProperties();
+		NetworkProperties getNetworkProperties(boolean fromSerializedFile ,boolean andSerializIt);
 		Graph getGraphFromDataRead();
 	}
 	
@@ -94,7 +94,8 @@ public class Interfaces {
 		void toggleEnableInterface();
 		void toggleWkProgress(String message);
 		void addValueToApplianceSerie(double time, Map<Meme, Double> kvIndexValue);
-		JFreeChart getDDChart();
+		void setMemeAvailable(List<Meme> memes);
+		JFreeChart getDDChart(); // Pour prendre les screenshot. Pas propre.
 		JFreeChart getDensityChart();
 		JFreeChart getDensityOverProbaChart();
 	}
@@ -112,8 +113,9 @@ public class Interfaces {
 		void fittingOnce();
 		void exploFitting();
 		void rdmConfig();
+		void setViewMemeAvailable(List<Meme> memes);
 		void takeSnapshot(long seed, Optional<ArrayList<String>> simulationPath);
-		void comparaisonScreenS();
+
 
 		void suspend();
 		void resume();
@@ -140,7 +142,7 @@ public class Interfaces {
 		 * 
 		 * @param toCopy Le réseau a copier. 
 		 */
-		 void ConvertNetwork(Network toCopy);
+		 void convertNetwork(Network toCopy);
 		/** Obtenir les propriétés issu de la représentation obtenue, avec un activator
 		 * définissant quel type de propriété on souhaite obtenir. 
 		 * 
@@ -152,7 +154,8 @@ public class Interfaces {
 		 * @return
 		 */
 		 int getRepresentationUUID();
-		/** Reset des propriétés de la copie du réseau
+
+		 /** Reset des propriétés de la copie du réseau
 		 * 
 		 */
 		 void resetRepresentation();
@@ -164,6 +167,9 @@ public class Interfaces {
 		 */
 		 void addNodeWithEdge(int nodeIndex, List<Integer> edgesIndexes);
 
+		 void addNodeWithEdge(int nodeFrom, int nodeTo, boolean directed);
+
+		 boolean removeEdgeFromNodes(int nodeFrom, int nodeTo, boolean directed);
 
 		 /** Obtient la liste des edges du giteri.network sous la forme
 		 * IndexNode espace IndexNode, classé en ordre croissant. 

@@ -1,5 +1,6 @@
 package giteri.network.network;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -14,7 +15,7 @@ import giteri.run.configurator.Configurator;
 /** Classe qui contient les données analysées d'un réseau
  *
  */
-public class NetworkProperties implements Cloneable{
+public class NetworkProperties implements Cloneable, Serializable {
 	
 	//region properties ! les propriétés publics sont utilisées génériquement !
 	
@@ -83,53 +84,6 @@ public class NetworkProperties implements Cloneable{
 
 		return header;
 	}
-	
-	/** renvoi les valeurs dans le memes ordre que le header plus haut.
-	 * 
-	 * @return
-	 */
-//	public String getCsvFormat(String entete, int activationCode){
-//		String values = "" + entete;
-//		String toConcat = "";
-//		for (Configurator.NetworkAttribType attrib: getActivatedAttrib(activationCode)) {
-//			switch (attrib) {
-//			case DENSITY:
-//				toConcat = ";" + density;
-//				break;
-//			case DDAVG:
-//				toConcat = ";" + ddAvg;
-//				break;
-//			case DDINTERQRT:
-//				toConcat = ";" + ddInterQrt;
-//				break;
-//			case DDARRAY:
-//				toConcat = ";dd array lol" ;
-//				break;
-//			case AVGCLUST:
-//				toConcat = ";" + avgClust;
-//				break;
-//			case NBEDGES:
-//				toConcat = ";" + nbEdges;
-//				break;
-//			case NBNODES:
-//				toConcat = ";" + nbNodes;
-//				break;
-//			case APL:
-//				toConcat = ";" + APL;
-//				break;
-//			case nbEdgesOnNbNodes:
-//				toConcat = ";" + (double)nbEdges / nbNodes;
-//				break;
-//			default:
-//				toConcat += ";nolose";
-//				break;
-//			}
-//
-//			values +=  toConcat;
-//		}
-//
-//		return values;
-//	}
 
 	/** Prend un giteri.network qui représente le SD et renvoi une ligne de csv,
 	 * avec les valeurs du networkProperties courant et celui en paramètre en 

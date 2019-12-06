@@ -293,11 +293,10 @@ public class MemeFactory {
 	public String translateMemeCombinaisonReadable(String memeCombinaison) {
 		String compo = "";
 		String[] combinaison = memeCombinaison.contains(".")? memeCombinaison.split("\\."):new String[]{memeCombinaison};
-		for (String oneName:
-				memeTranslationReadable.keySet()) {
+		for (String oneName: memeTranslationReadable.keySet()) {
 			for (String combi:combinaison) {
 				if(combi.compareToIgnoreCase(oneName) == 0)
-					compo += "." + memeTranslationReadable.get(oneName);
+					compo += "." + memeTranslationReadable.get(combi);
 			}
 		}
 

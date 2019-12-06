@@ -1,7 +1,9 @@
+cd C:\Users\John\IdeaProjects\Giteri\model
+cd c:\soft\Openmole
+
 // A lancer depuis le folder model pour compiler
 sbt osgiBundle
 // => $ [info] Packaging C:\Users\John\IdeaProjects\Giteri\model\target\scala-2.12\giteri_2.12-1.0-SNAPSHOT.jar ...
-
 
 //exemple de param pour lancer les trucs
 ".\.\src\main\resources\default.txt" 1 1 1 1 1 1 1 1 1 .0 .1 .2 .3 .4 .5 .6 .7 .8
@@ -10,14 +12,38 @@ sbt osgiBundle
  
 //Lancement d'open avec le jar en plugin
  openmole -p C:\Users\John\IdeaProjects\Giteri\model\target\scala-2.12\giteri_2.12-1.0-SNAPSHOT.jar
+
+
  
  
 // Clean du jar et des résultats écrits depuis le jar
 rm -rf C:\Users\John\IdeaProjects\Giteri\Stability C:\Users\John\IdeaProjects\Giteri\model\target
 
 // Quel complexe action // position dans la liste d'activation et proba de propagation
-[;.AddØ-Hop-0.0;.Add+-0.1;.Add--0.2;.Add∞-0.3;.AddØ-0.4;.RmvØ-2hop-0.5;.RmvØ-0.6;.Rmv+-0.7;.Rmv--0.8]
-       1			2		3			4			5		6				7		8			9
 
-	   
-	   Scoring
+;.Add+-0.0
+;.Add--0.1
+;.Add∞-0.2
+;.AddØ-0.3
+;.AddØ-Hop-0.4
+;.AddØ-3Hop-0.5
+;.AddEq-0.6
+;.RmvØ-2hop-0.7
+;.RmvØ-0.8
+;.Rmv+-0.9
+;.Rmv--0.91
+;.RmvEq-0.92
+;.RmvChain-0.93
+
+Example d'appel pour lanchement cmdline
+".\default.txt" 0 0 0 1 1 1 0 0 0 0 1 0 0 .0 .1 .2 .15 1 1 .6 .7 .8 .9 .91 .92 .93
+
+Example pour Scala
+
+run-main giteri.Run default.txt .0 .1 .2 .15 1 1 .6 .7 .8 .9 .91 .92 .93 0 0 0 1 1 1 0 0 0 0 1 0 0
+".\default.txt", 1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2, ,2000
+
+
+SOUS SBT
+Verification des classes disponibles a appeler
+ show compile:discoveredMainClasses

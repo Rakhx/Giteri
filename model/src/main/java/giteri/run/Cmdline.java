@@ -34,14 +34,14 @@ public class Cmdline {
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-                fileReadProperties = fileNetRdr.getNetworkProperties();
+                fileReadProperties = fileNetRdr.getNetworkProperties(false,false);
 
                 try {
                     fileNetRdr = new WriteNRead().readAndCreateNetwork(net2, fileNetRdr, " ", "#");
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-                currentNetProperties = fileNetRdr.getNetworkProperties();
+                currentNetProperties = fileNetRdr.getNetworkProperties(false,false);
                 double score = FittingClass.getNetworksDistanceDumb(Configurator.activationCodeForScore, fileReadProperties, currentNetProperties);
                 System.out.println(score);
 
@@ -62,7 +62,7 @@ public class Cmdline {
                 int fixedProperties = 0;
 
                 // Parcours du graph pour en déduire la valeur des propriétés auxquelles on s'intéresse
-                NetworkProperties properties = networkReader.getNetworkProperties();
+                NetworkProperties properties = networkReader.getNetworkProperties(false,false);
 
                 // Fonction qui construit un graph possédant les memes propriétés que le 1er
                 Graph graphMade = new SingleGraph("Generated");
@@ -99,7 +99,7 @@ public class Cmdline {
         }
 
         // appelle necessaire pour la création d'un tiny network.
-        fileReadProperties = fileNetRdr.getNetworkProperties();
+        fileReadProperties = fileNetRdr.getNetworkProperties(false,false);
 
         return fileNetRdr;
     }

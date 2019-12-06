@@ -58,6 +58,9 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 	private int nbEltCirDensity = 100;
 	private CircularFifoQueue<Double> cfqDensityOnFitting = new CircularFifoQueue<>(nbEltCirDensity);
+	private int cptCountNbAction = 0; // compteur du nombre d'action mis a jour moins souvent
+	private int moduloCount = 100; // valeur du modulo pour réel vérification du nb d'action
+	private int nbActionRelaxe = 0;
 
 	//endregion
 
@@ -85,22 +88,23 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	//region Interface stat&plot
 
 	/**
-	 * Lancement de thread qui va comparer un réseau lu et le réseau en cours.
+	 * Lancement de thread qui va comparer un réseau lu et le réseau en cours par rapport a différente configuration
 	 *
 	 */
 	public Double fitNetwork(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
 							   Optional<List<Boolean>> memeActivation, Optional<List<Double>> memeProba) {
-		if (!(typeOfLaunch == Configurator.EnumLauncher.jarC || typeOfLaunch == Configurator.EnumLauncher.jarOpenMole)) {
+
+		// appelé quand on lance en jar
+		if ((typeOfLaunch == Configurator.EnumLauncher.jarC || typeOfLaunch == Configurator.EnumLauncher.jarOpenMole)) {
+			return fittingLauncher(typeOfLaunch, typeOfExplo, memeActivation, memeProba);
+		} else {
 			// appelé depuis IHM
 			(new Thread() {
 				public void run() {
-					fittingLauncherVersionClean(typeOfLaunch, typeOfExplo, Optional.empty(), Optional.empty());
+					fittingLauncher(typeOfLaunch, typeOfExplo, Optional.empty(), Optional.empty());
 				}
 			}).start();
 			return 0.;
-		} else {
-			// appelé quand on lance en jar
-			return fittingLauncherVersionClean(typeOfLaunch, typeOfExplo, memeActivation, memeProba);
 		}
 	}
 
@@ -119,7 +123,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 *
 	 */
 	public String getDDInfos(){
-
 		Hashtable<Integer, Double> furDurchschnitt = new Hashtable<Integer, Double>();
 		String total = "";
 		networkConstructor.updatePreciseNetworkProperties(Configurator.getIndicateur(NetworkAttribType.DDARRAY));
@@ -157,10 +160,10 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 *
 	 * @return
 	 */
-	private IExplorationMethod callFromJava(){
+	private IExplorationMethod callFromJava(FittingClass fitter){
 		// Tout le trala des explorateurs qui enchaine les IModelParameter
-		Hashtable<Meme, GenericBooleanParameter> memeDispo = new Hashtable<>();
-		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
+		Hashtable<Meme, GenericBooleanParameter> memeDispo = new Hashtable<>(); // Meme sur map
+		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>(); // List de config
 
 		// Rempli la liste des memes que l'on veut pour lancer le fitting.
 		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING))
@@ -168,14 +171,15 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		MemeAvailability memeProvider = new MemeAvailability(memeDispo);
 		memeProvider.setEntiteHandler(entiteHandler);
-		// providers.put(1,memeProvider); // Détermine si on va aussi cycler sur l'existence des memes sur la map
+		providers.put(1,memeProvider); // Détermine si on va aussi cycler sur l'existence des memes sur la map
 
 		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING),
-				new GenericDoubleParameter(.0,.0,1.,.1));
+				new GenericDoubleParameter(.0,.0,1.,.5));
 		memeDiffu.setEntiteHandler(entiteHandler);
 		providers.put(0,memeDiffu);
 
 		memeProvider.addMemeListListener(memeDiffu);
+		memeProvider.addMemeListListener(fitter);
 		return ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
 	}
 
@@ -190,17 +194,14 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		ArrayList<String> memesSelectionnes = null;
 		Meme selectedMeme;
 		File toWrite = writeNRead.createAndGetDirFromString(Arrays.asList("."));
-		if(debugJarMode)
-			writeNRead.writeSmallFile(toWrite, "RezTemp", activation.stream().map(e->e.toString()).collect(Collectors.toList()));
-
-		if(debugJarMode)
+		if(debugJarMode) {
 			memesSelectionnes = new ArrayList<>();
+			writeNRead.writeSmallFile(toWrite, "RezTemp", activation.stream().map(e -> e.toString()).collect(Collectors.toList()));
+		}
 
 		// Parcourt la liste des memes
 		for (int i = 0; i < activation.size(); i++) {
 			if(activation.get(i)) {
-
-				//	memeAndProba.put(memeFactory.getMemeFromIndex(i), new GenericDoubleParameter(proba.get(i)));
 				selectedMeme = memeFactory.getIemeMemeFromSpecList(MemeList.FITTING, i);
 				if(selectedMeme != null) {
 					memeAndProba.put(selectedMeme, new GenericDoubleParameter(proba.get(i)));
@@ -208,62 +209,26 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 						memesSelectionnes.add(";" + memeFactory.translateMemeCombinaisonReadable(selectedMeme.toString()) + "-" + proba.get(i));
 				}else {
 					System.err.println("[StatAndPlotGeneric.CallFromJar]- Pas assez de meme dans la liste de fitting pour le nombre de param appelé");
-
 				}
 			}
 		}
 		if(debugJarMode)
-			writeNRead.writeSmallFile(toWrite, "RezTemp", memeAndProba.keySet().stream().map(e->e.toString()).collect(Collectors.toList()));
-		//	if(Configurator.debugJarMode)
-//			System.out.println("Memes voulus "+memesSelectionnes.stream().reduce(String::concat));
-
-
+//			writeNRead.writeSmallFile(toWrite, "RezTemp",
+//		memeAndProba.entrySet().stream().map(( v -> v.getKey().toFourCharString().concat(v.getValue().valueString()))).collect(Collectors.toList()));
+			writeNRead.writeSmallFile(toWrite, "RezTemp", memesSelectionnes);
 
 		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeAndProba);
 		memeDiffu.setEntiteHandler(entiteHandler);
 		providers.put(0,memeDiffu);
 
-//		IModelParameter.ModelParamNbNode nodesChanging = new IModelParameter.ModelParamNbNode(100, 1000, 100);
-//		providers.put(1, nodesChanging);
-//
-//		// l'ordre est important. Rapport au mise a jour de noeud etc dans les structures de données et graphstream
-//		nodesChanging.addMemeListListener(networkConstructor);
-//		nodesChanging.addMemeListListener(entiteHandler);
-//		nodesChanging.addMemeListListener(fitter);
+		MemeAvailability memeProvider = new MemeAvailability(memeAndProba.keySet().stream().collect(Collectors.toList()));
+		memeProvider.setEntiteHandler(entiteHandler);
+		providers.put(1,memeProvider); // Détermine si on va aussi cycler sur l'existence des memes sur la map
 
+		// Astuce de renard, un poil trop complexe a faire proprement...
+		//memeProvider.addMemeListListener(memeDiffu);
+		memeProvider.addMemeListListener(fitter);
 		return ExplorationMethod.getSpecificExplorator(EnumExplorationMethod.oneShot, providers);
-	}
-
-	/** Retourne une liste spécifique a explorer.
-	 * TODO [WayPoint]- Bouton Specific Config
-	 * @return
-	 */
-	private IExplorationMethod callSpecificParam(){
-		// appelle sec avec un seul jeu de parametre, aux probas fixés
-		Hashtable<Meme, GenericDoubleParameter> memeAndProba = new Hashtable<>();
-		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
-		List<Meme> existingMeme = memeFactory.getMemes(Configurator.MemeList.EXISTING, Configurator.ActionType.ANYTHING);
-
-		for (int i = 0; i < existingMeme.size(); i++) {
-			if(existingMeme.get(i).getName().compareToIgnoreCase("ADDØ") == 0 ){
-				memeAndProba.put(existingMeme.get(i),new GenericDoubleParameter(1.,1.,1.,1.));
-			}
-			else if(existingMeme.get(i).getName().compareToIgnoreCase("RMV+") == 0 ){
-				memeAndProba.put(existingMeme.get(i),new GenericDoubleParameter(.2,.2,1.,.2));
-			}
-			else if(existingMeme.get(i).getName().compareToIgnoreCase("RMV-") == 0 ){
-				memeAndProba.put(existingMeme.get(i),new GenericDoubleParameter(.2,.2,1.,.2));
-			}
-		}
-
-		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeAndProba);
-		memeDiffu.setEntiteHandler(entiteHandler);
-		providers.put(0,memeDiffu);
-
-		IModelParameter.ModelParamNbNode nodesChanging = new IModelParameter.ModelParamNbNode(100, 2100, 400);
-		// providers.put(1, nodesChanging);
-
-		return ExplorationMethod.getSpecificExplorator(Configurator.explorator, providers);
 	}
 
 	//endregion
@@ -271,11 +236,11 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	//region fitting
 
 	/**
-	 * Refact. Fonction commune à tous les appels, premiere de la série.
+	 * Refact. Fonction commune à tous les appels, première de la série.
 	 *
 	 */
-	public double fittingLauncherVersionClean(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
-											  Optional<List<Boolean>> memeActivationOpt, Optional<List<Double>> memeProbaOpt) {
+	public double fittingLauncher(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
+								  Optional<List<Boolean>> memeActivationOpt, Optional<List<Double>> memeProbaOpt) {
 		double resultat;
 
 		List<Boolean> memeActivation = memeActivationOpt.orElse(new ArrayList<>());
@@ -283,26 +248,19 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		// Qui définira pour la classe de fitting l'espace de recherche
 		IExplorationMethod explorator = null;
-
 		FittingClass configuration = new FittingClass();
 
-		// Dans le cas ou on veut un one shot de l'IHM il faut remplir les listes
-		// En gros quand on lance depuis lIHM
+		// Pour les cas OneShot from IHM;JAR
 		if(typeOfExplo == EnumExplorationMethod.oneShot && !memeActivationOpt.isPresent())
-			//fitListEMManuel(memeActivation, memeProba);
-			fitListAnotherHJ(memeActivation,memeProba);
+			generateProxyParam(memeActivation,memeProba);
 
-		// Si appelle toutifruiti, explo full ou random, depuis IHM Besoin de cycler sur les config de IModel, etc etc.
-		if(typeOfExplo == EnumExplorationMethod.exhaustive)
-			explorator = callFromJava();
-
-		// Si appelle oneShot, depuis IHM ou depuis JAR
-		else if(typeOfExplo == EnumExplorationMethod.oneShot)
+		// Si on veut plus d'une itération, besoin d'utiliser un explorator plus complet
+		if(typeOfExplo != EnumExplorationMethod.oneShot)
+			explorator = callFromJava(configuration);
+		// Si appelle oneShot, depuis IHM ou depuis JAR, explorator oneShot
+		else {
 			explorator = callFromJar(configuration, memeActivation, memeProba);
-
-		// NON FINI
-		else if (typeOfExplo == EnumExplorationMethod.specific)
-			explorator = callSpecificParam();
+		}
 
 		// Classe de configuration qui contient tout ce qu'il faut pour faire une simu
 		configuration.KindaConstructor(writeNRead, communicationModel,
@@ -328,11 +286,10 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		fittingConfig.init();
 		int nbActionPassee;
 
-		// boucle changement de fittingConfig RUN++
+		// [RUN++] boucle changement de fittingConfig
 		do {
 			fittingConfig.newRun();
-
-			// On fait nbRunByConfig mesures par configuration pour étudier la variance des résultats REPETITION++
+			// [REPETITION++] On fait nbRunByConfig mesures par configuration pour étudier la variance des résultats
 			for (int i = 0; i < fittingConfig.nbRepetitionByConfig; i++)
 			{
 				fittingConfig.newRepetition();
@@ -348,7 +305,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 					for (int x = 0; x < fittingConfig.boucleExterneSize; x++)
 					{
 						do{
-							nbActionPassee  = getNbAction();
+							nbActionPassee  = getNbActionRelaxe();
 						}while(nbActionPassee <= fittingConfig.nbActionByStep);
 
 						NetworkProperties np = networkConstructor.updatePreciseNetworkProperties(Configurator.getIndicateur(NetworkAttribType.DENSITY));
@@ -357,9 +314,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 						resetNbAction();
 					}
 
-//					debugBeforeSkip = fittingConfig.continuFittingSimpliestVersion();
 					debugBeforeSkip = fittingConfig.continuFitting(cfqDensityOnFitting);
-
 					if(!debugBeforeSkip){
 						if(debug) System.out.println("Voudrait passer au step suivant");
 					}
@@ -400,109 +355,24 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		return fittingConfig.endSimu();
 	}
 
-	/** prends les listes vides en entrée et les remplis pour les faire correspondre a une
-	 * entrée standard en appelle console.
-	 *  Pour faire un oneshot depuis IHM
-	 *  TODO [WayPoint] - ONESHOT CONFIGURATION
-	 * @param activator
-	 * @param proba
-	 */
-	private void fitListEMManuel(List<Boolean> activator, List<Double> proba){
-		activator.clear(); proba.clear();
-		List<Meme> existingMeme = memeFactory.getMemes(Configurator.MemeList.EXISTING, Configurator.ActionType.ANYTHING);
 
-		for (int i = 0; i < existingMeme.size(); i++) {
-			if(existingMeme.get(i).getName().compareToIgnoreCase("AddØ-Hop") == 0 ) {
-				activator.add(true);proba.add(1.); }
-			else
- 				if(existingMeme.get(i).getName().compareToIgnoreCase("Add+") == 0 ){
-				activator.add(true); proba.add(1.);}
-			 else
-			 	if(existingMeme.get(i).getName().compareToIgnoreCase("Add-") == 0 ){
-				activator.add(true); proba.add(1.);}
-			else
-				if(existingMeme.get(i).getName().compareToIgnoreCase("Add∞") == 0 ){
-					activator.add(true); proba.add(1.); }
-			else
-				if(existingMeme.get(i).getName().compareToIgnoreCase("AddØ") == 0 ){
-					activator.add(true); proba.add(1.); }
-			else
-				if(existingMeme.get(i).getName().compareToIgnoreCase("RmvØ-2hop") == 0 ){
-					activator.add(true); proba.add(1.); }
-			else
-				if(existingMeme.get(i).getName().compareToIgnoreCase("RMVØ") == 0 ){
-					activator.add(true); proba.add(1.); }
-			else
-				if(existingMeme.get(i).getName().compareToIgnoreCase("Rmv+") == 0 ){
-					activator.add(true); proba.add(1.); }
-			else
-				if(existingMeme.get(i).getName().compareToIgnoreCase("Rmv-") == 0 ){
-					activator.add(true); proba.add(1.); }
-		}
-
-	}
-
-	/**
-	 * TODO [WayPoint]- Bouton Fitting Once
+	/** Va être appelé par le start classique et pour l'instant le oneshote aussi
+	 *
 	 *
 	 * @param activator
 	 * @param proba
 	 */
-	private void fitListAnotherHJ(List<Boolean> activator, List<Double> proba) {
-//
-//		proba.addAll(Arrays.asList(0.4896876945560127,1.0,0.3153859310075393,0.50838000211191,0.018001887353770396,0.0632136919314535,0.6353615845440006,0.6060318584075923,0.3081120972199657 ));
-//		ProbaPropagation: .Add+:0.4896876945560127 .Add-:1.0 .Add∞:0.3153859310075393  .AddØ:0.50838000211191 .AddØ-Hop:0.018001887353770396  .RmvØ-2hop:0.0632136919314535  .RmvØ:0.6353615845440006 .Rmv+:0.6060318584075923.Rmv-:0.3081120972199657
-//
+	private void generateProxyParam(List<Boolean> activator, List<Double> proba) {
+		List<Integer> toConvert = new ArrayList<>(Arrays.asList(0,0,0,1,0,0,1,0,0,0,0,1,0));
+		proba.addAll(Arrays.asList(
+				0.9627720666747352,0.2559838797762375,0.7969203634094254,0.8580268727470562,0.3358543882264913,0.849136850072306,0.7667072298886954,0.18527085724031966,0.8605838516655864,0.743762583297914,0.5992868107380205,0.09960619627293377,0.6068812397689891
 
 
 
-		// SCORING 55
+		));
 
-        // small world? @ 100 noeuds
-//		proba.addAll(Arrays.asList(0.041,0.618,.155,0.811,0.594,0.582,1.,.446,.557));
-//		activator.addAll(Arrays.asList(true, false, false, true, false, true,true,true,true));
-		// Jazz @ 194 noeud @ bad scoring
-		// proba.addAll(Arrays.asList(0.4374,0.,.963,0.513,1.,0.388,.5914,.0,.989));
-		// activator.addAll(Arrays.asList(false, true, false, true, false, true,true,false,true));
-		// Jazz @ 194 noeud @  scoring 352
-//		proba.addAll(Arrays.asList(0.7759,0.9701,.15157,0.6078,.69379,0.6541,.8387,.100,.8346));
-//		activator.addAll(Arrays.asList(true, false, true, false, false, false,true,true,true));
-		// Jazz @ 194 noeud @  scoring 174 20 min iteration marche pas mal
-//		proba.addAll(Arrays.asList(0.8361,0.0587,0.,0.1333,.4851,0.35549,.08054,.17551,.24969));
-//		activator.addAll(Arrays.asList(true, true, true, false, false, true,false,false,false));
-		// Jazz @ 194 noeud @  scoring 174 10h itération
-//		proba.addAll(Arrays.asList(0.36619,0.662239,0.2188339,0.7548696,.5282568,0.55852,.835418,.77056,.045));
-//		activator.addAll(Arrays.asList(false, false, false, 	true, 	 false, 	true,  true, true,  false));
-		// bof @ 1h de simu 3 repet par config
-		//proba.addAll(Arrays.asList(0.36619,0.662239,0.2188339,0.5524068,.5282568,0.9388505,.835418,.77056,.549245149));
-		//activator.addAll(Arrays.asList(false, false, false, 	true, 	 false, 	true,  false, false,  true));
-         //Good @ 12h de simu avec
-// 		proba.addAll(Arrays.asList(0.537244,0.1521694,0.2188339,0.5524068,.5282568,0.218909,.835418,.77056,.549245149));
-//		activator.addAll(Arrays.asList(true, true, false, 	false, 	 false, 	true,  false, false,  false));
-
-//		proba.addAll(Arrays.asList(0.39502254698724504,0.14734812316413426,0.1881433193671096,0.35610837754779356,0.8530818497900912,0.649708309830368,0.9434847536531004,0.5146669894328433,0.6188785584129679));
-//		activator.addAll(Arrays.asList(false, true, true, 	false, 	 true, 	true,  true, true, true));
-
-		// config gen. 150 pour CC eleve et skeness eleve
-		//proba.addAll(Arrays.asList(0.5185,0.4842,0.2003,0.3897,0.,0.9448,1.,0.2484,0.9143));
-
-		// Resultat del a génération 368 apres 25h de simu
-		// Rez 1 score -520
-		proba.addAll(Arrays.asList(0.6464899970161321,0.9459220475345989,0.40217083668130743,0.16150710090693732,0.34342435076753297,0.2804314566243382,0.6275044516474456,0.5379313443647284,0.3425778627165515));
-		// Rez 2 score 60
-//		proba.addAll(Arrays.asList( 0.9735259035801708,0.266731272032813,0.7087372613105017,0.1921817173520981,0.3379368610604472,0.0,0.7918744720040132,0.269392316025812,0.443944010873615));
-		// rez 3 -60
-//		proba.addAll(Arrays.asList(0.4896876945560127,1.0,0.3153859310075393,0.50838000211191,0.018001887353770396,0.0632136919314535,0.6353615845440006,0.6060318584075923,0.3081120972199657 ));
-		// Rez 4 -187
-//		proba.addAll(Arrays.asList(0.6832675288961947,1.0,0.34440778658248616,0.0,0.36010854343688886,0.35233645659609636,0.6595882367032324,0.4806594320088112,0.4021693797833791));
-		// Rez 5 54
-//		proba.addAll(Arrays.asList(0.973492240065817,0.2136037447895356,0.7092116213172879,0.8055787108444641,0.0886686477410048,0.6818645181236331,0.7914046210433263,0.2695047762229932,0.44219045667803125 ));
-
-		activator.addAll(Arrays.asList(true, true, true, 	true, 	 true, 	true,  true, true, true));
-
-
-
-        // ENDSCORING 55
+		// A vérifier
+		activator.addAll(toConvert.stream().map(e -> e==1).collect(Collectors.toList()));
 	}
 
 	//endregion
@@ -539,6 +409,20 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		return "" + avg + ":" + deviation + "=\n" + total;
 	}
 
+	/** Vérifie la vraie valeur moins souvent ; le synchronized ralenti pas mal
+	 *
+	 * @return
+	 */
+	protected int getNbActionRelaxe(){
+		if(cptCountNbAction++ % moduloCount == 0){
+			synchronized (nbAction){
+				nbActionRelaxe = nbAction;
+			}
+		}
+
+		return nbActionRelaxe;
+	}
+
 	protected int getNbAction() {
 		synchronized(nbAction)
 		{
@@ -549,6 +433,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	protected void resetNbAction(){
 		synchronized(nbAction){
 			nbAction = 0;
+			nbActionRelaxe = 0;
 		}
 	}
 

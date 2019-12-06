@@ -416,7 +416,9 @@ public interface IModelParameter<T> {
 	 */
 	class GenericBooleanParameter extends AbstractBooleanParameter{
 
-		public GenericBooleanParameter(){}
+		public GenericBooleanParameter(){
+			// super();
+		}
 
 		public GenericBooleanParameter(Boolean valeur){
 			value = valeur;
@@ -476,6 +478,7 @@ public interface IModelParameter<T> {
 		 * @param memes
 		 */
 		public MemeAvailability(List<Meme> memes){
+			value = new Hashtable<>();
 			memes.sort(null);
 			for (Meme meme : memes) {
 				value.put(meme, new GenericBooleanParameter());
@@ -600,6 +603,7 @@ public interface IModelParameter<T> {
 		 */
 		public MemeDiffusionProba(){
 			value = new Hashtable<>();
+			defautDoubleParam = new GenericDoubleParameter(1.);
 		}
 
 		/** Prend un hashmap de meme associé a un doubleParameter
@@ -664,15 +668,6 @@ public interface IModelParameter<T> {
 			Meme meme = new ArrayList<>(value.keySet()).get(Toolz.getRandomNumber(value.keySet().size()));
 			value.get(meme).gotoRandom();
 		}
-
-		/** Surcharge de la méthode, permet de redéfinir les meme actifs de la
-		 * simulation. Utile lorsque cycle en conjonction avec des paramètres modifiant
-		 * les memes actifs sur le network.
-		 *
-		 */
-//		public void gotoMinValue(){
-//			super.gotoMinValue();
-//		}
 
 		public void setValue(Hashtable<Meme, GenericDoubleParameter> value){
 			this.value = value;

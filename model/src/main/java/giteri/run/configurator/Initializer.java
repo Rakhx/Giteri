@@ -1,30 +1,25 @@
 package giteri.run.configurator;
 
-import giteri.fitting.algo.IExplorationMethod;
-import giteri.fitting.parameters.IModelParameter;
 import giteri.meme.entite.EntiteHandler;
-import giteri.meme.entite.Meme;
 import giteri.meme.mecanisme.ActionFactory;
-import giteri.meme.mecanisme.FilterFactory;
 import giteri.meme.mecanisme.AttributFactory;
+import giteri.meme.mecanisme.FilterFactory;
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.networkStuff.*;
 import giteri.run.controller.Controller;
 import giteri.run.displaysStuff.ConsoleView;
 import giteri.run.displaysStuff.FileView;
 import giteri.run.displaysStuff.IHM;
-import giteri.run.displaysStuff.IHMStub;
 import giteri.run.interfaces.Interfaces;
-import giteri.run.jarVersion.StatAndPlotJarVersion;
-import giteri.test.TestProvider;
+import giteri.tool.other.StopWatchFactory;
 import giteri.tool.other.WriteNRead;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
-import org.graphstream.ui.view.Viewer;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import static giteri.run.configurator.Configurator.fullSilent;
 import static giteri.run.configurator.Configurator.withGraphicalDisplay;
@@ -37,44 +32,37 @@ import static giteri.run.configurator.Configurator.withGraphicalDisplay;
  *
  */
 public class Initializer {
-    public static Double initialize(Configurator.EnumLauncher launcher, File fileInput, ArrayList<Boolean> memeActication ,ArrayList<Double> memeProba) {
+    public static Double initialize(Configurator.EnumLauncher launcher, File fileInput, List<Boolean> memeActication , List<Double> memeProba) {
 
-        // A instancier dans les if. à lancer dans tous les cas a la fin?
-        Runnable willBeRun;
+        if(Configurator.timeEfficiency) {
+            StopWatchFactory.getInstance().addWatch("", "perf");
+            StopWatchFactory.getInstance().startWatch("perf");
+        }
+
+        Configurator.typeOfConfig = launcher;
         boolean ihmLauncher = (launcher == Configurator.EnumLauncher.ihm) ;
-        if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.jarOpenMole){
+
+        if(ihmLauncher){
+            Configurator.displayPlotWhileSimulation = true;
+            Configurator.withGraphicalDisplay = true;
+            Configurator.jarMode = false;
+            Configurator.systemPaused = true;
+            Configurator.writeNetworkResultOnFitting = !fullSilent;
+            Configurator.writeMemeResultOnFitting = !fullSilent;
+            Configurator.explorator = Configurator.EnumExplorationMethod.exhaustive;
+            Configurator.limitlessAction = true;
+
+        }
+        else{
             // La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
-	        // depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent cette configuration initiale
-            Configurator.methodOfGeneration = Configurator.MemeDistributionType.Nothing;
+            // depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent cette configuration initiale
             Configurator.withGraphicalDisplay = false;
             Configurator.jarMode = true;
             Configurator.systemPaused = false;
             Configurator.writeNetworkResultOnFitting = !fullSilent;
+            Configurator.writeMemeResultOnFitting = !fullSilent;
             Configurator.nbRepetitionbyRun = Configurator.nbRepetitionForJar;
-            Configurator.isFitting = true;
-        }
-
-        else if(launcher == Configurator.EnumLauncher.ihm){
-           // Configurator.methodOfGeneration = Configurator.MemeDistributionType.SingleBasic;
-            Configurator.methodOfGeneration = Configurator.MemeDistributionType.specificDistrib;
-
-            Configurator.displayPlotWhileSimulation = true;
-            // Configurator.withGraphicalDisplay = true; // On le laisse a la valeur donné dans le configurator
-            Configurator.jarMode = false;
-            Configurator.systemPaused = true;
-            Configurator.writeNetworkResultOnFitting = !fullSilent;
-            Configurator.explorator = Configurator.EnumExplorationMethod.exhaustive;
-            Configurator.isFitting = false;
-        }
-
-        else if(launcher == Configurator.EnumLauncher.testProvider){
-            Configurator.methodOfGeneration = Configurator.MemeDistributionType.SingleBasic;
-            Configurator.displayPlotWhileSimulation = false;
-            Configurator.withGraphicalDisplay = false;
-            Configurator.jarMode = false;
-            Configurator.systemPaused = false;
-            Configurator.writeNetworkResultOnFitting = false;
-            Configurator.explorator = Configurator.EnumExplorationMethod.exhaustive;
+            Configurator.limitlessAction = false;
         }
 
         WriteNRead writeNRead = new WriteNRead();
@@ -89,23 +77,14 @@ public class Initializer {
         DrawerGraphStream drawerGraphStream = null;
         StatAndPlotGeneric stat = null;
 
-        if(ihmLauncher)
-        {
-            if(Configurator.withGraphicalDisplay)
-                drawerGraphStream =  new DrawerGraphStream(entiteHandler, memeFactory, networkConstructor, writeNRead, networkFileLoader, workerFactory);
-            else
-                stat = new StatAndPlotWithoutIHM(entiteHandler, memeFactory, networkConstructor, writeNRead, networkFileLoader, workerFactory);
-        }
-        else
-            stat = new StatAndPlotJarVersion(entiteHandler, memeFactory, networkConstructor, writeNRead, networkFileLoader, workerFactory);
-
         // Communication model
-        CommunicationModel communicationModel = null;
-
-        if(ihmLauncher && Configurator.withGraphicalDisplay){
+        CommunicationModel communicationModel ;
+        if(Configurator.withGraphicalDisplay) {
+            drawerGraphStream = new DrawerGraphStream(entiteHandler, memeFactory, networkConstructor, writeNRead, networkFileLoader, workerFactory);
             communicationModel = new CommunicationModel(entiteHandler, networkConstructor, networkFileLoader, workerFactory, drawerGraphStream);
             drawerGraphStream.setCommunicationModel(communicationModel);
-        }else {
+        } else {
+            stat = new StatAndPlotWithoutIHM(entiteHandler, memeFactory, networkConstructor, writeNRead, networkFileLoader, workerFactory);
             communicationModel = new CommunicationModel(entiteHandler, networkConstructor, networkFileLoader, workerFactory, stat);
             stat.setCommunicationModel(communicationModel);
         }
@@ -114,7 +93,7 @@ public class Initializer {
         actionFactory.setEntiteHandler(entiteHandler);
         filterFactory.setEntiteHandler(entiteHandler);
 
-        if(ihmLauncher && withGraphicalDisplay ){
+        if( withGraphicalDisplay ){
             workerFactory.setNecessary(drawerGraphStream, drawerGraphStream);
             networkConstructor.setDrawer(drawerGraphStream);
         }else {
@@ -126,57 +105,17 @@ public class Initializer {
         Controller c = new Controller();
         Controller.VueController vControl = c.new VueController();
         Controller.ModelController mControl = c.new ModelController(vControl, communicationModel);
-        // Crée une fenetre stub
-        if(launcher == Configurator.EnumLauncher.jarC || launcher == Configurator.EnumLauncher.jarOpenMole) {
 
-            // La fenetre en elle meme Controller de Model donné a l'IHM
-//            IHMStub fenetre = new IHMStub();
-            IHM fenetre = new IHM(mControl,
-                    memeFactory,
-                    entiteHandler,
-                    new DrawerStub(),
-                    writeNRead);
-
-            vControl.addView(fenetre);
-            if((Configurator.activationCodeForView & 4) == 4)
-                vControl.addView(new FileView(false));
-            if((Configurator.activationCodeForView & 2) == 2)
-                vControl.addView(new ConsoleView());
-            entiteHandler.setVueController(vControl);
-            entiteHandler.initialisation();
-            entiteHandler.addMemeListener(workerFactory.getDrawer());
-            entiteHandler.addEntityListener(workerFactory.getCalculator());
-
-            Interfaces.IReadNetwork nl = mControl.getReader();
-            // Pour pouvoir lancer direct le fitting.
-            try {
-                writeNRead.readAndCreateNetwork(fileInput, nl," ","#");
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-
-            entiteHandler.giveMemeToEntite(Configurator.methodOfGeneration);
-
-            entiteHandler.suspend();
-            networkConstructor.suspend();
-            networkConstructor.start();
-            entiteHandler.start();
-
-            return stat.fitNetwork(Configurator.EnumLauncher.jarC,
-                    Configurator.EnumExplorationMethod.oneShot,
-                    Optional.of(memeActication),
-                    Optional.of(memeProba));
-
-        }else if (launcher == Configurator.EnumLauncher.ihm) {
+        if (ihmLauncher) {
             entiteHandler.initialisation();
             IHM fenetre;
             // La fenetre en elle meme Controller de Model donné a l'IHM
             if(withGraphicalDisplay)
                 fenetre = new IHM(mControl,
-                    memeFactory,
-                    entiteHandler,
-                    drawerGraphStream,
-                    writeNRead);
+                        memeFactory,
+                        entiteHandler,
+                        drawerGraphStream,
+                        writeNRead);
             else
                 fenetre = new IHM(mControl,
                         memeFactory,
@@ -186,7 +125,6 @@ public class Initializer {
 
             // le gestionnaire de multiple vue possible.
             vControl.addView(fenetre);
-           // vControl.setView(displaysMng);
             if((Configurator.activationCodeForView & 4) == 4)
                 vControl.addView(new FileView(false));
             if((Configurator.activationCodeForView & 2) == 2)
@@ -200,13 +138,6 @@ public class Initializer {
             }
 
             Interfaces.IReadNetwork nl = mControl.getReader();
-            // Permet d'éviter d'avoir besoin de cliquer sur analyse avant de fitté
-            try {
-                writeNRead.readAndCreateNetwork("" + Configurator.defaultPathForReadingNetwork, nl, " ", "#");
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-
             fenetre.setVisible(true);
             entiteHandler.setVueController(vControl);
 
@@ -220,8 +151,6 @@ public class Initializer {
             entiteHandler.addMemeListener(workerFactory.getDrawer());
             entiteHandler.addEntityListener(workerFactory.getCalculator());
 
-            entiteHandler.giveMemeToEntite(Configurator.methodOfGeneration);
-
             networkConstructor.start();
             if (!Configurator.isSystemPaused()) {
                 networkConstructor.start();
@@ -232,37 +161,31 @@ public class Initializer {
                 entiteHandler.start();
                 entiteHandler.suspend();
             }
-
             return 0.;
         }
-        else if(launcher == Configurator.EnumLauncher.testProvider){
+
+        // Crée une fenetre stub
+       else  {
+            if((Configurator.activationCodeForView & 4) == 4)
+                vControl.addView(new FileView(false));
+            if((Configurator.activationCodeForView & 2) == 2)
+                vControl.addView(new ConsoleView());
+            entiteHandler.setVueController(vControl);
             entiteHandler.initialisation();
-            entiteHandler.giveMemeToEntite(Configurator.methodOfGeneration);
+            entiteHandler.addMemeListener(workerFactory.getDrawer());
+            entiteHandler.addEntityListener(workerFactory.getCalculator());
 
-            Hashtable<Meme, IModelParameter.GenericBooleanParameter> memeDispo = new Hashtable<>();
-            Hashtable<Integer, IModelParameter<?>> providers = new Hashtable<>();
+            Interfaces.IReadNetwork nl = mControl.getReader();
 
-            for (Meme meme : memeFactory.getMemes(Configurator.MemeList.FITTING, Configurator.ActionType.ANYTHING)) {
-                memeDispo.put(meme, new IModelParameter.GenericBooleanParameter());
-            }
+            entiteHandler.suspend();
+            networkConstructor.suspend();
+            networkConstructor.start();
+            entiteHandler.start();
 
-            IModelParameter.MemeAvailability memeProvider = new IModelParameter.MemeAvailability(memeDispo);
-            memeProvider.setEntiteHandler(entiteHandler);
-            providers.put(1,memeProvider);
-
-            IModelParameter.MemeDiffusionProba memeDiffu = new IModelParameter.MemeDiffusionProba(memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING),
-                    new IModelParameter.GenericDoubleParameter(.2,.2,.6,.2));
-            memeDiffu.setEntiteHandler(entiteHandler);
-            providers.put(0,memeDiffu);
-
-            memeProvider.addMemeListListener(memeDiffu);
-
-            willBeRun = new TestProvider.Companion(IExplorationMethod.ExplorationMethod.getSpecificExplorator(Configurator.EnumExplorationMethod.exhaustive, providers)).giveMyself();
-            willBeRun.run();
-
-            return 0.;
+            return stat.fitNetwork(Configurator.EnumLauncher.jarC,
+                    Configurator.EnumExplorationMethod.oneShot,
+                    Optional.of(memeActication),
+                    Optional.of(memeProba));
         }
-
-        return 0.;
     }
 }
