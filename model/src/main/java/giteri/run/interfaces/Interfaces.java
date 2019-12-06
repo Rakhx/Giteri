@@ -52,7 +52,6 @@ public class Interfaces {
 		void networkOverview();
 		void screenshotDisplay(ArrayList<String> rep);
 
-		void giveColorIndex(int nodeIndex, int color);
 		void applyTargetColor(Network net, Integer actingEntite ,Set<Integer> nodeToDesignAsTarget);
 		void resetGoodColor(Network net);
 		Color getColorAsColor(int i);

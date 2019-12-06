@@ -246,7 +246,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		// densityValues = new ArrayList<>();
 		densityValuesLast = new CircularFifoQueue<>(sizeOfCircularQueue);
 		memesTitle = new Hashtable<String, Meme>();
-		this.setSelectedMeme(memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING));
+		this.setMemeAvailable(memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING));
 		densityMaxValue = 0.0;
 		otherSymbols = new DecimalFormatSymbols(Locale.US);
 		decimal = new DecimalFormat("",otherSymbols);
@@ -272,12 +272,14 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	 * @param selectedMeme
 	 *            la liste des memes utilisés
 	 */
-	public void setSelectedMeme(ArrayList<Meme> selectedMeme) {
-		this.selectedMemeOnSimulation = selectedMeme;
+	@Override
+	public void setMemeAvailable(List<Meme> memes) {
+		this.selectedMemeOnSimulation = new ArrayList<>(memes);
 		resetHashTableKeys();
 		if(memeInfoPanel != null) // sale mais fonctionnel
 			resetComponentLabelMemeInformation();
 	}
+
 
 	/**
 	 * Lorsqu'une entité fait une action, fonction appelée. Mise à jour des
@@ -479,10 +481,10 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		JPanel memeAndDensities = new JPanel();
 		memeAndDensities.setLayout(new BoxLayout(memeAndDensities,BoxLayout.X_AXIS));
-		memeAndDensities.add(createComponentLabelMemeInformation());
-??
-        memeAndDensities.add(createComponentLabelCoupleInformation());
 
+	//	memeAndDensities.add(createComponentLabelMemeInformation());
+
+        memeAndDensities.add(createComponentLabelCoupleInformation());
         memeAndDensities.add(createComponentLabelNetworkInformation());
 
 
@@ -895,7 +897,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		return panel;
 	}
 
-	??
+
     /** génération du panneau contenant les informations sur les nodes.
      *
      * @return
@@ -1511,36 +1513,19 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 					if (lbl != null) {
 						lbl.setText(toPut);
 						lbl.setForeground(associatedColor);
-
-						// NOMBRE D'APPEL DES MEMES DEPUIS LE DEBUT DE LA SIMULATION
-						// Savoir combien de fois le meme a été appelé depuis le début de la simulation
-						nbAppel = nbActivationByMemes.get(meme.toString());
-						// LABEL générique
-						nbActivationByMemesLabel.get(meme.toString()).setText(memeRef + ":" + nbAppel );
-						nbActivationByMemesLabel.get(meme.toString()).setForeground(associatedColor);
-						totalAppel += nbAppel;
-						nbAppelInLast100 = countOfLastMemeActivation.containsKey(meme.toString()) ? countOfLastMemeActivation
-								.get(meme.toString()) : 0;
-
-						// Partie last 100 compte du nombre
-						nbLastActivationByMemesLabel.get(meme.toString()).setText(memeRef + ": "
-								+ countOfLastMemeActivation.get(meme.toString()) + "("
-								+ countOfLastMemeActivation.get(meme.toString()) * 100 / sizeOfCircularQueue
-								+"%)");
-						nbLastActivationByMemesLabel.get(meme.toString()).setForeground(associatedColor);
 					}
 				}
 
 				String oldText;
 				// On refait une passe pour mettre a jour les % de possession
-				for (Meme meme : selectedMemeOnSimulation) {
-					memeString = meme.toString();
-					if(totalAppel != 0 && nbActivationByMemesLabel.containsKey(memeString)){
-						oldText = nbActivationByMemesLabel.get(memeString).getText();
-						nbActivationByMemesLabel.get(memeString).setText(oldText +
-								"(" + nbActivationByMemes.get(memeString) * 100 / totalAppel +"%)");
-					}
-				}
+//				for (Meme meme : selectedMemeOnSimulation) {
+//					memeString = meme.toString();
+//					if(totalAppel != 0 && nbActivationByMemesLabel.containsKey(memeString)){
+//						oldText = nbActivationByMemesLabel.get(memeString).getText();
+//						nbActivationByMemesLabel.get(memeString).setText(oldText +
+//								"(" + nbActivationByMemes.get(memeString) * 100 / totalAppel +"%)");
+//					}
+//				}
 
 				densityValue = netProp.getDensity();
 				jlDensityLabel.setText("Density: " + Double.parseDouble(decimal.format(densityValue)));

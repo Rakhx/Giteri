@@ -5,6 +5,7 @@ import giteri.meme.event.BehavTransmEvent;
 import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.IBehaviorTransmissionListener;
 import giteri.meme.mecanisme.ActionFactory;
+import giteri.meme.mecanisme.FilterFactory;
 import giteri.meme.mecanisme.FilterFactory.IFilter;
 import giteri.meme.mecanisme.AttributFactory.IAttribut;
 import giteri.meme.mecanisme.MemeFactory;
@@ -712,24 +713,27 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 			// Si on veut afficher les X dernieres actions entreprises & action depuis le début
 			if (Configurator.displayMemePosessionDuringSimulation) {
-				if (Configurator.displayLogRatioLogFailOverFail || Configurator.displayLogRatioLogFailOverSuccess )
-				{
-					List<String> temp = memeProperties.updateActionCount(memeActions, entiteActing.getIndex(), rez.get(0), cptModulo);
-					if(temp != null)
-						toDisplayForRatio.addAll(temp);
-				}
-				else
-					memeProperties.updateActionCount(memeActions, entiteActing.getIndex(), rez.get(0), cptModulo);
 
-				if(cptModulo % (Configurator.refreshInfoRate * 25)== 0) {
+				int i = -1;
+				for (Meme memeAction : memeActions) {
+					i++;
+					if (Configurator.displayLogRatioLogFailOverFail || Configurator.displayLogRatioLogFailOverSuccess) {
+						List<String> temp = memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez.get(i), cptModulo);
+						if (temp != null)
+							toDisplayForRatio.addAll(temp);
+					} else
+						memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez.get(i), cptModulo);
 
-					sumFailAction =  memeProperties.lastFailAction(nbFail);
-					//vueController.displayInfo("FAILSTUFF", Arrays.asList("" + sumFailAction));
+					if (cptModulo % (Configurator.refreshInfoRate * 25) == 0) {
 
-					if(Configurator.writeFailDensityLink)
-						vueController.displayInfo(ViewMessageType.FAILXDENSITY, getFailXDensity( nbFail.getValue(),
-								networkConstruct.updatePreciseNetworkProperties
-										(Configurator.getIndicateur(NetworkAttribType.DENSITY)).getDensity(),sumFailAction));
+						sumFailAction = memeProperties.lastFailAction(nbFail);
+						//vueController.displayInfo("FAILSTUFF", Arrays.asList("" + sumFailAction));
+
+						if (Configurator.writeFailDensityLink)
+							vueController.displayInfo(ViewMessageType.FAILXDENSITY, getFailXDensity(nbFail.getValue(),
+									networkConstruct.updatePreciseNetworkProperties
+											(Configurator.getIndicateur(NetworkAttribType.DENSITY)).getDensity(), sumFailAction));
+					}
 				}
 			}
 
@@ -756,8 +760,9 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	@SuppressWarnings("unchecked")
 	private String doAction(Entite movingOne, Meme memeAction) {
-		//Set<Entite>cibles = new HashSet<>(entites);
-		//Set<Integer> ciblesIndex = new HashSet<>();
+		String actionDone = "";String memeApply = "";Set<Entite> cibles ;Set<Integer> ciblesIndex = new HashSet<>();
+		IFilter currentFilter = null; Iterator<Entite> ite; Entite one; Meme memeReturned;
+
 
 		// Execution d'un meme de l'entite.
 		if (memeAction != null) {
@@ -772,7 +777,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				attribString = attribut.toString();
 				// region semi auto
 				if (Configurator.semiStepProgression && filterOnSemiAuto(null, null)) {
-					System.out.println("On va appliquer les filtres suivants pour l'action " + memeAction.name);
+					System.out.println("On va appliquer les filtres suivants pour l'action " + memeAction.getName());
 					System.out.println(memeAction.getFilter(attribString).values());
 				} //endregion
 
@@ -1057,10 +1062,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			toBindToNode = new Entite();
 			toBindToNode.setNode(node);
 			entites.add(toBindToNode);
-			if(Configurator.autoMemeForBreeder) {
-				toBindToNode.ajoutRandomFlemme = addRandom;
-				toBindToNode.retraitRandomFlemme = removeRandom;
-			}
+
 		}
 
 		for (Entite entite : entites) {
@@ -1123,7 +1125,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		ActionType remove = ActionType.RETRAITLIEN;
 
 		@SuppressWarnings("unused")
-		ActionType puri = ActionType.PURIFY;
 		AttributType degree = AttributType.DEGREE;
 		AgregatorType linked = AgregatorType.LINKED;
 		AgregatorType blank = AgregatorType.BLANK;
@@ -1225,7 +1226,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		memeFactory.registerMemeAction("RmvEq",1, true, true, remove,  attributs, KVAttributAgregator, false);
 
 		agregators.clear();
-		memeFactory.registerMemeAction("Puri",.1,false, false, puri, attributs, KVAttributAgregator, false);
 
 		index = 0;
 		// Creation des couples d'actions

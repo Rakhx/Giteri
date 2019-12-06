@@ -254,7 +254,8 @@ public final class Configurator {
 		THEIRSUP,
 		THEIRSUPSIX,
 		THEIREQUAL,
-		SELFSUP
+		SELFSUP,
+		BLANK
 	}
 
 	/** Ajout lien...

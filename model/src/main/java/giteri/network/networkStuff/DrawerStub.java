@@ -53,11 +53,6 @@ public class DrawerStub implements DrawerNetworkInterface {
 	}
 
 	@Override
-	public void giveColorIndex(int nodeIndex, int color) {
-
-	}
-
-	@Override
 	public void applyTargetColor(Network net, Integer actingEntite,
 			Set<Integer> nodeToDesignAsTarget) {
 	}
