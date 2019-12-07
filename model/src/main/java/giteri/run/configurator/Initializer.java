@@ -51,7 +51,6 @@ public class Initializer {
             Configurator.writeMemeResultOnFitting = !fullSilent;
             Configurator.explorator = Configurator.EnumExplorationMethod.exhaustive;
             Configurator.limitlessAction = true;
-
         }
         else{
             // La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
@@ -161,6 +160,9 @@ public class Initializer {
                 entiteHandler.start();
                 entiteHandler.suspend();
             }
+
+            if(Configurator.coupleVersion)
+                entiteHandler.giveCoupleMemeToEntite(memeFactory.getCoupleMemes());
             return 0.;
         }
 

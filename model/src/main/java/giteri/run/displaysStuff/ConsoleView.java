@@ -1,5 +1,6 @@
 package giteri.run.displaysStuff;
 
+import giteri.meme.entite.CoupleMeme;
 import giteri.meme.entite.Meme;
 import giteri.run.configurator.Configurator;
 import giteri.run.interfaces.Interfaces;
@@ -62,6 +63,12 @@ public class ConsoleView implements Interfaces.IView {
     @Override
     public void setMemeAvailable(List<Meme> memes) {
         System.out.println("Cht de liste de memes: " + memes.stream().map(e -> e.toFourCharString()).reduce("", String::concat));
+    }
+
+    @Override
+    public void setCoupleMemeAvailable(List<CoupleMeme> cMemes) {
+        System.out.println("Cht de liste de memes: " + cMemes.stream().map(e -> e.getName()).reduce("", String::concat));
+
     }
 
     @Override

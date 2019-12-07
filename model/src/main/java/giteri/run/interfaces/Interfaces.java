@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
+import giteri.meme.entite.CoupleMeme;
 import giteri.network.network.Network;
 import giteri.network.network.NetworkProperties;
 
@@ -94,6 +95,7 @@ public class Interfaces {
 		void toggleWkProgress(String message);
 		void addValueToApplianceSerie(double time, Map<Meme, Double> kvIndexValue);
 		void setMemeAvailable(List<Meme> memes);
+		void setCoupleMemeAvailable(List<CoupleMeme> cMemes);
 		JFreeChart getDDChart(); // Pour prendre les screenshot. Pas propre.
 		JFreeChart getDensityChart();
 		JFreeChart getDensityOverProbaChart();

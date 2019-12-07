@@ -1,5 +1,6 @@
 package giteri.run.controller;
 
+import giteri.meme.entite.CoupleMeme;
 import giteri.meme.entite.Meme;
 import giteri.run.configurator.Configurator;
 import giteri.run.interfaces.Interfaces;
@@ -47,6 +48,14 @@ public class Controller {
 				vue.setMemeAvailable(memes);
 			}
 		}
+
+
+		public void setCoupleMemeAvailable(List<CoupleMeme> cMemes) {
+			for (Interfaces.IView vue : vues) {
+				vue.setCoupleMemeAvailable(cMemes);
+			}
+		}
+
 
 		public void displayInfo(Configurator.ViewMessageType type, List<String> info) {
 			for (Interfaces.IView vue:  vues) {

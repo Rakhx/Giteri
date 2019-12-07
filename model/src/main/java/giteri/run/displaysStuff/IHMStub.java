@@ -1,5 +1,6 @@
 package giteri.run.displaysStuff;
 
+import giteri.meme.entite.CoupleMeme;
 import giteri.meme.entite.Meme;
 import giteri.run.configurator.Configurator;
 import giteri.run.interfaces.Interfaces.IView;
@@ -53,6 +54,11 @@ public class IHMStub implements IView {
 
 	@Override
 	public void setMemeAvailable(List<Meme> memes) {
+
+	}
+
+	@Override
+	public void setCoupleMemeAvailable(List<CoupleMeme> cMemes) {
 
 	}
 

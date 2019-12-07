@@ -66,6 +66,8 @@ public class FilterFactory {
 				return new TheirEqual(2);
 			case SELFSUP:
 				return new SelfSup(2);
+			case BLANK:
+				return new Blank();
 			default:
 				return null;
 		}
@@ -244,7 +246,7 @@ public class FilterFactory {
 		}
 	}
 
-	/** CLASSE valeur de l'attribut strictement supérieur é celle des entités sélectionnées
+	/** CLASSE valeur de l'attribut strictement supérieur à celle des entités sélectionnées
 	 *
 	 */
 	public class MineSup implements IFilter {

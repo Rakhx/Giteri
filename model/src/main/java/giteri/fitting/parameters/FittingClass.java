@@ -465,33 +465,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		return isEmpty;
 	}
 
-	/** Verification de la possibilité de jouer des actions valeur pas relevé de
-	 *  facon synchronisé, le but étant de savoir si une action est encore possible ou si le systeme est bloqué.
-	 *
-	 * @param message
-	 * @return
-	 */
-	private boolean readingActionCanContinue(ObjectRef<String> message){
-		String resume = "\n [ReadingActionCanContinu]- ";
-		boolean resultat = true;
-		if(getNbActionLocal() == 0){
-			// Et si aucune action n'a pu etre forcée a être faite
-			if(!entiteHandler.forceAction()){
-				resultat = false;
-				resume += "[ActionReading] - Plus d'action possible dans ce réseau";
-			}else {
-				System.out.println("On a réussi a forcer");
-			}
-		} // Si on a réussi a faire faire une action
-		else{
-			resume += "[ActionReading] - passé par un soft end d'actions réalisées";
-			resetActionLocal();
-		}
-
-		message.setValue(message.getValue() + resume);
-		return resultat;
-	}
-
 	/**
 	 * utilisation de la variation des coefficients directeurs sur des plages de données
 	 *

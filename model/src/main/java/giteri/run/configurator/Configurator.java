@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public final class Configurator {
 
 	public static boolean prepareTheOpti = false;
+	public static boolean coupleVersion = true;
 
 	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
 	// TODO

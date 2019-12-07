@@ -246,7 +246,10 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		// densityValues = new ArrayList<>();
 		densityValuesLast = new CircularFifoQueue<>(sizeOfCircularQueue);
 		memesTitle = new Hashtable<String, Meme>();
-		this.setMemeAvailable(memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING));
+		if(Configurator.coupleVersion)
+			this.setCoupleMemeAvailable(memeFactory.getCoupleMemes());
+		else
+			this.setMemeAvailable(memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING));
 		densityMaxValue = 0.0;
 		otherSymbols = new DecimalFormatSymbols(Locale.US);
 		decimal = new DecimalFormat("",otherSymbols);
@@ -257,6 +260,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		nope = UIManager.getIcon("OptionPane.errorIcon");
 		ok = UIManager.getIcon("Tree.collapsedIcon");
 
+		couplesTitle = new Hashtable<>();
 		times = new Hashtable<String, JLabel>();
 
 		ArraySeriesMemeAppliances = new ArrayList<XYSeries>();
@@ -275,6 +279,20 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	@Override
 	public void setMemeAvailable(List<Meme> memes) {
 		this.selectedMemeOnSimulation = new ArrayList<>(memes);
+		resetHashTableKeys();
+		if(memeInfoPanel != null) // sale mais fonctionnel
+			resetComponentLabelMemeInformation();
+	}
+
+	/**
+	 * Met en place la liste des memes qui seront utilisés lors de la
+	 * simulation.
+	 *
+	 * @param selectedMeme
+	 *            la liste des memes utilisés
+	 */
+	public void setCoupleMemeAvailable(List<CoupleMeme> cMemes) {
+		selectedCoupleMemeOnSimulation = new ArrayList<>(cMemes);
 		resetHashTableKeys();
 		if(memeInfoPanel != null) // sale mais fonctionnel
 			resetComponentLabelMemeInformation();
@@ -483,8 +501,10 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		memeAndDensities.setLayout(new BoxLayout(memeAndDensities,BoxLayout.X_AXIS));
 
 	//	memeAndDensities.add(createComponentLabelMemeInformation());
-
-        memeAndDensities.add(createComponentLabelCoupleInformation());
+		if(Configurator.coupleVersion)
+			memeAndDensities.add(createComponentLabelCoupleInformation());
+		else
+			memeAndDensities.add(createComponentLabelMemeInformation());
         memeAndDensities.add(createComponentLabelNetworkInformation());
 
 
@@ -913,8 +933,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
         for (CoupleMeme couple : selectedCoupleMemeOnSimulation) {
-
-            // Création du label pour la série de noeud possédant tel meme
+        	// Création du label pour la série de noeud possédant tel meme
             couplesTitle.put(couple.getName(), couple);
             JLabel li = new JLabel();
 //			JLabel la = new JLabel();
@@ -936,6 +955,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
         }
 
         panel.add(lastActionRatioLabel);
+        memeInfoPanel = panel;
         return panel;
     }
 
@@ -1612,18 +1632,16 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		countOfLastMemeActivation.clear();
 		nodesHavingXoxoMemes.clear();
 
-//
-//		nbLastActivationByMemesLabel.clear();
-//		nbActivationByMemesLabel.clear();
-//		nodesHavingXoxoMemesLabel.clear();
-//		createComponentLabelMemeInformation();
-
-
-
-		for (Meme meme : selectedMemeOnSimulation) {
-			nodesHavingXoxoMemes.put(meme.toString(), new ArrayList<Integer>());
-			nbActivationByMemes.put(meme.toString(), 0);
-			countOfLastMemeActivation.put(meme.toString(), 0);
+		if(Configurator.coupleVersion){
+			for (CoupleMeme cMeme : selectedCoupleMemeOnSimulation) {
+				nodesHavingCoupleMemes.put(cMeme.toString(), new ArrayList<>());
+			}
+		}else{
+			for (Meme meme : selectedMemeOnSimulation) {
+				nodesHavingXoxoMemes.put(meme.toString(), new ArrayList<>());
+				nbActivationByMemes.put(meme.toString(), 0);
+				countOfLastMemeActivation.put(meme.toString(), 0);
+			}
 		}
 	}
 

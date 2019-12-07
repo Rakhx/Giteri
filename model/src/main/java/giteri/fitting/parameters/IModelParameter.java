@@ -649,7 +649,7 @@ public interface IModelParameter<T> {
 		}
 
 		/** Apply aux memes leurs probabilités de propagation.
-		 *
+		 * Devrait etre en mesure de juste changer la proba de propagation d'un meme sans les réallouer
 		 */
 		public void apply() {
 			ArrayList<Meme> memeo = new ArrayList<>();

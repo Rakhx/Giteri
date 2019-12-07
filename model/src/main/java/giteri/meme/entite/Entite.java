@@ -288,7 +288,6 @@ public class Entite implements Comparable<Entite>{
 		return succes;
 	}
 
-
 	//region Getter/Setter
 	/** Vérifie que les memes possédés par l'entité sont des memes propagés,
 	 * et non slot vide // meme fluidité de bootstrap.
@@ -436,10 +435,12 @@ public class Entite implements Comparable<Entite>{
 		resultat += "Index: "+getIndex();
 		resultat += "\nDegree: "+getDegree();
 		resultat += "\nMeme: ";
-		for (Meme memeAction : getMyMemes()) {
-			resultat += "\n \t "+ memeAction;
-		}
-
+		if(Configurator.coupleVersion)
+			resultat += "\n \t "+ coupleMeme.getName();
+		else
+			for (Meme memeAction : getMyMemes()) {
+				resultat += "\n \t "+ memeAction;
+			}
 		return resultat;
 	}
 

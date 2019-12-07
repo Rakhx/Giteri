@@ -1,5 +1,6 @@
 package giteri.run.displaysStuff;
 
+import giteri.meme.entite.CoupleMeme;
 import giteri.meme.entite.Meme;
 import giteri.run.configurator.Configurator;
 import giteri.run.interfaces.Interfaces;
@@ -124,6 +125,12 @@ public class FileView implements Interfaces.IView {
     @Override
     public void setMemeAvailable(List<Meme> memes) {
         addLine("Configuration", Collections.singletonList(memes.stream().map(e -> e.toFourCharString()).reduce("", String::concat)));
+    }
+
+    @Override
+    public void setCoupleMemeAvailable(List<CoupleMeme> cMemes) {
+        addLine("Configuration", Collections.singletonList(cMemes.stream().map(e -> e.getName()).reduce("", String::concat)));
+
     }
 
     @Override
