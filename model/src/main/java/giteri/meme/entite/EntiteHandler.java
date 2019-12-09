@@ -494,14 +494,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				}else
 					break;
 		}
-
-
 	}
 
 	/** Obtention de la liste des memes disponibles sur la map, soit les simples,
 	 * soit les combinaisons de deux memes existantes, en fonction du param de configuration.
-	 *
-	 *
 	 * @param setAsked
 	 *            Défini si on veut les comportements simples, leur combinaison
 	 *            ou les deux.
@@ -637,6 +633,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		List<String> rez = new ArrayList<>();
 		boolean actionMe;
 		List<Meme> memeActions = new ArrayList<>();
+		Meme oneAction = null;
+		CoupleMeme coupleAction;
 
 		synchronized (workerFactory.waitingForReset) {
 			workerFactory.getCalculator().incrementNbAction();
@@ -652,30 +650,32 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			}
 
 			// CHOIX DE L'ACTION POUR CETTE ENTITE
-
 			if(Configurator.rebranchementAction)
 				memeActions.addAll(entiteActing.getMyMemes());
 			else {
-				// Si version couple, ajout des deux meme a la liste des choses a appliquées
+				// Si version couple, inutile de selectionner une action en particulier.
 				if(Configurator.coupleVersion){
-					entiteActing.getCoupleMeme().forEach(e -> memeActions.add(e));
+					if(Configurator.debugEntiteHandler) // la flemme de changer la structure d'afichage
+						entiteActing.getCoupleMeme().forEach(e -> memeActions.add(e));
 				}
 				else
-					memeActions.add(actionSelectionRulesVersion(entiteActing));
-
+					oneAction = actionSelectionRulesVersion(entiteActing);
 				if (Configurator.debugEntiteHandler)
 					System.out.println("[EH.runEntite]- action choisie " + memeActions.stream().map(e->e.toFourCharString()).reduce("",(added, e)-> added +" : "+e));
 			}
+
 			// APPLICATION ET PROPAGATION DE L'ACTION
 			actionMe = !Configurator.useEntitySuccesProba || Toolz.rollDice(entiteActing.getProbaAppliying());
-			for (Meme memeAction : memeActions) {
-				if(actionMe)
-					rez.add(doAction(entiteActing, memeAction));
-				else {
-					rez.add("Nope, entite ne veux pas agir");
-					if (Configurator.debugEntiteHandler)
-						System.out.println("[EH.runEntite]- resultat de l'action" + rez);
-				}
+			if(actionMe){
+				if(Configurator.coupleVersion)
+					rez.add(doAction(entiteActing, null));
+				else
+					rez.add(doAction(entiteActing, oneAction));
+
+			}else {
+				rez.add("Nope, entite ne veux pas agir");
+				if (Configurator.debugEntiteHandler)
+					System.out.println("[EH.runEntite]- resultat de l'action" + rez);
 			}
 
 			// AFFICHAGE ET DEBUGGUAGE
@@ -723,18 +723,18 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				vueController.displayInfo(ViewMessageType.ECHECS, toDisplayForRatio);
 
 			// Dans le cas ou on veut les filtres en semi step, remis a zero des couleurs.
-			if (Configurator.semiStepProgression)
-			{
+			if (Configurator.semiStepProgression) {
 				giveEntiteBaseColor();
 				if (filterOnSemiAuto(null, null))
 					pauseStepInSemiAutoAction();
 			}
 		}
 
-		return rez.stream().reduce(String::concat).toString();
+		return rez.stream().reduce(String::concat).get();
 	}
 
-	/** Application de l'action de l'entité et propagation
+	/** Application de l'action de l'entité ET propagation
+	 * Si version couple, ne prend pas en compte memeAction mais fait le couple tenu par movingOne.
 	 *
 	 * @param movingOne
 	 * @param memeAction
@@ -742,76 +742,92 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	@SuppressWarnings("unchecked")
 	private String doAction(Entite movingOne, Meme memeAction) {
-		String actionDone = "";String memeApply = "";Set<Entite> cibles ;Set<Integer> ciblesIndex = new HashSet<>();
+		String actionDone, actionsDone = "";String memeApply = "";Set<Entite> cibles ;Set<Integer> ciblesIndex = new HashSet<>();
 		IFilter currentFilter = null; Iterator<Entite> ite; Entite one; Meme memeReturned;
+		List<Meme> memesToApply = new ArrayList<>();
 
-		// Execution d'un meme de l'entite.
-		if (memeAction != null) {
-//			cibles.clear();
-//			cibles.addAll(entites);
-			cibles = new HashSet<>(entites);
-			cibles.remove(movingOne);
+		if(Configurator.coupleVersion){
+			movingOne.getCoupleMeme().forEach(memesToApply::add);
+		}else{
+			memesToApply.add(memeAction);
+		}
+
+		// Un seul élément si classique, les 2 actions du couple sinon
+		for (Meme meme : memesToApply) {
 			actionDone = "";
+			memeAction = meme; // la flemme
+			if (memeAction != null) {
+				cibles = new HashSet<>(entites);
+				cibles.remove(movingOne);
+				// actionDone = "";
 
-			// FILTRE Pour chaque attribut sur lesquels on applique des filtres
-			for (IAttribut<Integer> attribut : memeAction.getAttributs()) {
-				attribString = attribut.toString();
-				// region semi auto
-				if (Configurator.semiStepProgression && filterOnSemiAuto(null, null)) {
-					System.out.println("On va appliquer les filtres suivants pour l'action " + memeAction.getName());
-					System.out.println(memeAction.getFilter(attribString).values());
-				} //endregion
+				// FILTRE Pour chaque attribut sur lesquels on applique des filtres
+				for (IAttribut<Integer> attribut : memeAction.getAttributs()) {
+					attribString = attribut.toString();
+					// region semi auto
+					if (Configurator.semiStepProgression && filterOnSemiAuto(null, null)) {
+						System.out.println("On va appliquer les filtres suivants pour l'action " + memeAction.getName());
+						System.out.println(memeAction.getFilter(attribString).values());
+					} //endregion
 
-				// Pour chaque filtre appliqué a un attribut
-				for (int order = 0; order < memeAction.getFilter(attribString).size(); order++) {
-					currentFilter = memeAction.getFilter(attribString).get(order);
-					currentFilter.applyFilter(movingOne, cibles, attribut);
-					//region semi-auto
-					// Dans le cas ou on veut un mode semi automatique
-					if (Configurator.semiStepProgression && filterOnSemiAuto(memeAction, currentFilter)) {
-						ciblesIndex.clear();
-						for (Entite entite : cibles)
-							ciblesIndex.add(entite.getIndex());
-						System.out.println("Application du filtre suivant: " + currentFilter.getFourCharName());
-						this.giveEntiteTargetedColor(movingOne.getIndex(), ciblesIndex);
-						pauseStepInSemiAutoAction();
-					} // endregion
+					// Pour chaque filtre appliqué à un attribut
+					for (int order = 0; order < memeAction.getFilter(attribString).size(); order++) {
+						currentFilter = memeAction.getFilter(attribString).get(order);
+						currentFilter.applyFilter(movingOne, cibles, attribut);
+						//region semi-auto
+						// Dans le cas ou on veut un mode semi automatique
+						if (Configurator.semiStepProgression && filterOnSemiAuto(memeAction, currentFilter)) {
+							ciblesIndex.clear();
+							for (Entite entite : cibles)
+								ciblesIndex.add(entite.getIndex());
+							System.out.println("Application du filtre suivant: " + currentFilter.getFourCharName());
+							this.giveEntiteTargetedColor(movingOne.getIndex(), ciblesIndex);
+							pauseStepInSemiAutoAction();
+						} // endregion
+					}
 				}
-			}
 
-			// Le dernier filtre appliqué est tjrs un random() unitaire : sauf purify
-			if (cibles.size() == 1) {
-				actionDone += memeAction.getAction().applyAction(movingOne, cibles);
+				// Le dernier filtre appliqué devrait tjrs être un random() unitaire ( par la construction des memes )
+				if (cibles.size() == 1) {
+					actionDone += memeAction.getAction().applyAction(movingOne, cibles);
 
-				// region PROPAGATION du meme
-				if (Configurator.usePropagation) {
-					if(Configurator.coupleVersion)
-						propagationCasteNew(movingOne);
+					// region PROPAGATION du meme
+					if (Configurator.usePropagation) {
+						if(Configurator.coupleVersion)
+							propagationCasteNew(movingOne);
+						else
+							propagationDirect(cibles,movingOne,memeAction);
+					}
+					// endregion
+
+					// evenement d'application d'une action
+					eventActionDone(movingOne, memeAction, actionDone);
+				}
+				// Dans le cas ou il y a plus d'une cible ou aucune
+				else {
+					if (cibles.size() > 1)
+						System.err.println("Plusieurs cibles pour une action, pas normal");
 					else
-						propagationDirect(cibles,movingOne,memeAction);
+						if(Configurator.debugEntiteHandler)
+							System.out.println("Aucune cible pour une action");
+					actionDone = "Nope, Entite " + movingOne.getIndex()  + " Aucune(ou trop de) cible pour l'action" + memeAction.toFourCharString();
+					eventActionDone(movingOne, null, "NOTARGET " + actionDone);
 				}
-				// endregion
-
-				// evenement d'application d'une action
-				eventActionDone(movingOne, memeAction, actionDone);
 			}
 
-			// Dans le cas ou il y a plus d'une cible
-			else {
-				if (cibles.size() > 1) System.err.println("Plusieurs cibles pour une action, pas normal");
-				actionDone = "Nope, Entite " + movingOne.getIndex()  + " Aucune(ou trop de) cible pour l'action" + memeAction.toFourCharString();
-				eventActionDone(movingOne, null, "NOTARGET " + actionDone);
+			// Si le meme action est NULL
+			else
+			{
+				actionDone = "Nope, Entite " + movingOne.getIndex() + " Liste d'action vide ou aucune action sélectionnée";
+				eventActionDone(movingOne, null, "NOACTION");
 			}
+
+			actionsDone += actionDone;
 		}
 
-		// Si le meme action est NULL
-		else
-		{
-			actionDone = "Nope, Entite " + movingOne.getIndex() + " Liste d'action vide ou aucune action sélectionnée";
-			eventActionDone(movingOne, null, "NOACTION");
-		}
 
-		return actionDone;
+
+		return actionsDone;
 	}
 
 	/** Choix aléatoire d'une entité qui va faire une action.

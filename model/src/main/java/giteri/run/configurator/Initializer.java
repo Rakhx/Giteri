@@ -161,6 +161,7 @@ public class Initializer {
                 entiteHandler.suspend();
             }
 
+            //huhum
             if(Configurator.coupleVersion)
                 entiteHandler.giveCoupleMemeToEntite(memeFactory.getCoupleMemes());
             return 0.;
