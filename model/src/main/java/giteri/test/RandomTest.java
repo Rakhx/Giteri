@@ -9,6 +9,16 @@ import java.util.Optional;
 public class RandomTest {
     public static void main(String[] args)  {
 
+        // FONCTION RANDOM
+//        int ajout = 0;
+//        int nbIteration = 0;
+//        while(true){
+//            ajout += Toolz.rollDice(.5)? 1 : 0;
+//            nbIteration ++;
+//
+//            System.out.println((double)ajout/nbIteration);
+//        }
+
 
 //        for (int i = 0; i < 100; i++) {
 //            System.out.println(VOILA(.5));

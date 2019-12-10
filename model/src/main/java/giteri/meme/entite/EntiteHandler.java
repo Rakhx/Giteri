@@ -489,6 +489,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			if(iteCMeme.hasNext()){
 				cMeme = iteCMeme.next();
 				entite.setCoupleMeme(cMeme);
+				entite.setBreederOnCouple(true);
 				cMeme.forEach(	e -> eventMemeChanged(entite, e, Configurator.MemeActivityPossibility.AjoutMeme.toString()));
 
 			}else
@@ -751,7 +752,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		List<Meme> memesToApply = new ArrayList<>();
 
 		if(Configurator.coupleVersion){
-			movingOne.getCoupleMeme().forEach(memesToApply::add);
+			if(Configurator.rebranchementAction) // genre
+				movingOne.getCoupleMeme().forEach(memesToApply::add);
+			else
+				memesToApply.add(movingOne.getCoupleMeme().getOneMemeAtRandom());
 		}else{
 			memesToApply.add(memeAction);
 		}
@@ -859,23 +863,17 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @param movingOne
 	 */
 	private void propagationCasteNew(Entite movingOne) {
-		Meme memeReturned;
-		int indexCouple;
-
 		Set<Entite> availables = new HashSet<>(entites);
 		availables.remove(movingOne);
 
-		// Test d'une prédéfinition de la possibilité de propagation - Ici si pas testé pour chaque entité
-//		if(!Configurator.coupleProbaApplyEachEntity && Toolz.rollDice(movingOne.getCoupleMeme().getProbaPropagation())){
-
 		// On ajoute a chacun d'entre eux la pair d'action
 		for (Entite available : availables) {
-//				if(Configurator.coupleProbaApplyEachEntity)
-			// Si, apres vérification de la proba du couple d'action que porte l'entité, c'est okay
-			/*available.getCoupleMeme() == null ||*/
-			if (!available.isBreederOnCouple() && Toolz.rollDice
-					(probaPropaCoupleVersion(Math.abs(movingOne.getDegree() - available.getDegree()), movingOne.getCoupleMeme().getProbaPropagation()))
-					&& (available.getCoupleMeme() == null || movingOne.getCoupleMemeIndex() != available.getCoupleMemeIndex())) {
+			// si pas breeder && ( pas de couple || couple d'index différent )
+			if (!available.isBreederOnCouple() && (available.getCoupleMeme() == null || movingOne.getCoupleMemeIndex() != available.getCoupleMemeIndex())
+				&& Toolz.rollDice
+				// && roll sur un chiffre qui dépend de la distance en degré ainsi que de la proba de propagation
+				(probaPropaCoupleVersion(Math.abs(movingOne.getDegree() - available.getDegree()), movingOne.getCoupleMeme().getProbaPropagation())))
+			{
 				// S'il possédait un couple, event de retrait sur chacun des memes de ce couple
 				if (available.getCoupleMeme() != null)
 					for (Meme meme : available.getCoupleMeme())

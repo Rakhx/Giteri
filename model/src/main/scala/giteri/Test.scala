@@ -10,8 +10,14 @@ import scala.util.Random
 
 object Test {
   def main(args: Array[String]): Unit = {
-    serializNetworkTarget()
+   // serializNetworkTarget()
   }
+
+  def testRandomFn(): Unit = {
+
+  }
+
+
   /** Sérialize, après lecture, les propriétés d'un réseau, issu d'un fichier .txt sous forme
    * list des edges séparé par un espace (tabulation? )
    *
@@ -20,10 +26,8 @@ object Test {
 
     val trueReader = new WriteNRead
     val lineReader = new NetworkFileLoader(null, trueReader)
-
     val reader = trueReader.readAndCreateNetwork("default.txt", lineReader," ","#")
     reader.getNetworkProperties(false, true);
-
   }
 }
 

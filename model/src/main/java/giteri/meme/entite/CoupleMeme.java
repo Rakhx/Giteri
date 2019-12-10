@@ -1,5 +1,7 @@
 package giteri.meme.entite;
 
+import giteri.tool.math.Toolz;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -23,6 +25,10 @@ public class CoupleMeme implements Iterable<Meme> {
         this.index = index;
         this.setProbaPropagation(probaPropagation);
 
+    }
+
+    public Meme getOneMemeAtRandom(){
+        return Toolz.rollDice(.5) ? addAction : removeAction;
     }
 
     /**
@@ -56,10 +62,6 @@ public class CoupleMeme implements Iterable<Meme> {
         };
     }
 
-//    public String toString(){
-//
-//    }
-//
     public String getName(){
         String name = "";
         name+= addAction.getName() ;
@@ -78,7 +80,6 @@ public class CoupleMeme implements Iterable<Meme> {
         classe += "1" + removeAction.toFourCharString();
         return classe;
     }
-
 
     public double getProbaPropagation() {
         return probaPropagation;

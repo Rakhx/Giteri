@@ -59,9 +59,6 @@ public final class Configurator {
 	public static boolean useEntitySuccesProba = false; // Prend en compte la proba porté pour l'entité pour APPLY a meme. Actuellement l'index
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 
-	public static boolean coupleProbaApplyEachEntity = true; // utilise la proba de propagation portée par le meme
-
-
 
 	// SCORE
 	@toOutput ( yes = true )
