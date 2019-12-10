@@ -188,12 +188,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			// System.out.println("Propriété fichier source " + targetNetProperties.avgClust);
 		}
 
-		if(Configurator.prepareTheOpti){
-			boolean dog = (Configurator.typeOfConfig == Configurator.EnumLauncher.jarOpenMole) || (Configurator.typeOfConfig == Configurator.EnumLauncher.jarC);
-			System.out.println("FittingClass.Init() - Fin de lecture du fichier cible " + (dog? "serialise" : "non sériealisé"));
-			StopWatchFactory.getInstance().publishResult();
-		}
-
 		boolean doTheWrite = !Configurator.fullSilent;
 
 		// ECRITURE

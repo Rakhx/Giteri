@@ -31,7 +31,7 @@ public class Entite implements Comparable<Entite>{
 	private ArrayList<Meme> myMemes;
 	// Index du couple associé
 	private CoupleMeme coupleMeme;
-	private boolean breederOnCouple = false;
+	private boolean breederOnCouple;
 
 	// répartie sur 0 -> 1, réévalué a chaque ajout ou (retrait de meme)
 	Hashtable<Meme, Double> intervalOfSelection;
@@ -51,6 +51,7 @@ public class Entite implements Comparable<Entite>{
 		connectedNodes = new HashSet<>();
 		breederOn = new HashSet<>();
 		probaAppliying = 1;
+		breederOnCouple = false;
 	}
 
 	/** Défini les regles de sélection de facon équiprobable.
@@ -146,62 +147,66 @@ public class Entite implements Comparable<Entite>{
 		return needToBeReplaced ? memeReplaced : memeToAdd;
 	}
 
-
-	/** ajoute un meme ou remplace un meme déja existant,
-	 * avec une notion de slot pour meme d'ajout et meme de retrait.
+	/** Ajout ou retrait d'un des memes du couple.
+	 * Si on arrive la, c'est que l'entité ne possédait pas le meme couple C1 que l'acting.
+	 * Even if le meme d'ajout C1A ou retrait C1R était commun au deux couples ( ancien C2 et nouveau C1 )
+	 * on va remplacer le meme en question C2A ou C2R par celui du couple C1 de l'acting
 	 *
-	 * @param meme
-	 * @return true si le meme a bien été remplacé.
+	 * @param toAdd
 	 */
-	public boolean addOrReplaceSlotVersion(Meme meme){
-		boolean okToBeAdded = true;
-		boolean addedOrReplaced = false;
-		Meme memeToReplace = null ;
-
-		// On parcourt les meme existant et regarde si un meme de la meme catégorie existe
-		for (Meme possededMeme : getMyMemes())
-			if(meme.getAction().toString() == possededMeme.getAction().toString())
-			{
-				// si oui, il faudra que la configuration l'autorise pour remplacer
-				// l'ancien meme.
-				memeToReplace = possededMeme;
-				okToBeAdded = false;
-				break;
-			}
-
-		// Si il faut remplacer un meme pour pouvoir ajouter le meme courant,
-		// et que la configuration l'accepte, on supprime l'ancien meme.
-		if(memeToReplace != null && Configurator.memeCanBeReplaceByCategory)
-		{
-			// Un meme devrait etre remplacé, et la configuration l'autorise, masi on vérifie
-			// que l'entité n'est pas un breeder de ce comportement
-			if(Configurator.fixedSlotForBreeder && !breederOn.isEmpty()){
-				for (IAction iAction : breederOn) {
-					// Dans le cas ou il s'agit d'une action de breeder, donc à ne pas remplacer
-					if(memeToReplace.getAction().toString() == iAction.toString()){
-						return false;
-					}
-				}
-			}
-			synchronized(myMemes){
-				myMemes.remove(memeToReplace);
-			}
-
-			//eh.eventMemeChanged(this, memeToReplace, Configurator.MemeActivityPossibility.RetraitMeme.toString());
-			okToBeAdded = true;
-		}
-
-		// Dans le cas ou on ajoute effectivement le nouveau meme,
-		// soit apres remplacement soit parceque ca a été directement possible.
-		if(okToBeAdded)
-		{
-			addMeme(meme);
-			myMemes.sort(null);
-			addedOrReplaced = true;
-		}
-
-		return addedOrReplaced;
-	}
+//	public void addOrReplaceCoupleVersion(Meme toAdd){
+//		boolean okToBeAdded = true;
+//		boolean needToBeReplaced = false;
+//		boolean addedOrReplaced = false;
+//		Meme memeReplaced = null;
+//
+//		// On parcourt les meme existant et regarde si un meme of the same category exists
+//		for (Meme possededMeme : getMyMemes())
+//			if(memeToAdd.getAction().getActionType() == possededMeme.getAction().getActionType())
+//			{
+//				if(memeToAdd.compareTo(possededMeme) == 0) {
+//					okToBeAdded = false;
+//					break;
+//				}
+//				// si oui, il faudra que la configuration l'autorise pour remplacer l'ancien meme.
+//				memeReplaced = possededMeme;
+//				needToBeReplaced = true;
+//				break;
+//			}
+//
+//		// Si il faut remplacer un meme pour pouvoir ajouter le meme courant,
+//		// et que la configuration l'accepte, on supprime l'ancien meme.
+//		if(needToBeReplaced && Configurator.memeCanBeReplaceByCategory)
+//		{
+//			// Un meme devrait etre remplacé, et la configuration l'autorise, masi on vérifie
+//			// que l'entité n'est pas un breeder de ce comportement
+//			if(Configurator.fixedSlotForBreeder && !breederOn.isEmpty()){
+//				for (IAction iAction : breederOn) {
+//					// Dans le cas ou il s'agit d'une action de breeder, donc à ne pas remplacer
+//					if(memeReplaced.getAction().toString() == iAction.toString()){
+//						return null;
+//					}
+//				}
+//			}
+//			synchronized(myMemes){
+//				myMemes.remove(memeReplaced);
+//			}
+//
+//			okToBeAdded = true;
+//		}
+//
+//		// Dans le cas ou on ajoute effectivement le nouveau meme,
+//		// soit apres remplacement soit parceque ca a été directement possible.
+//		if(okToBeAdded)
+//		{
+//			addedOrReplaced = true;
+//			addMeme(memeToAdd);
+//			myMemes.sort(null);
+//		}
+//
+//		return needToBeReplaced ? memeReplaced : memeToAdd;
+//
+//	}
 
 	/** Choisi et renvoi l'action qu'il va réalisée.
 	 * Dans tout les cas, augmente d'un le temps depuis lequel une connection

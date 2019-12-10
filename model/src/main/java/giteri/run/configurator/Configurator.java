@@ -9,8 +9,9 @@ import java.util.ArrayList;
 
 public final class Configurator {
 
-	public static boolean prepareTheOpti = false;
 	public static boolean coupleVersion = true;
+	public static boolean fastDebug = true;
+
 
 	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
 	// TODO
@@ -38,7 +39,7 @@ public final class Configurator {
 	public static boolean autoPauseIfNexted = false; // AUTOPAUSE mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	@toOutput ( yes = true )
 	public static boolean initializeDefaultBehavior = true;	// ----FLUIDITE----
-	public static boolean initializeDefaultBehaviorToBreeder = true;	// ----FLUIDITE BREEDER----
+	// public static boolean initializeDefaultBehaviorToBreeder = true;	// ----FLUIDITE BREEDER----
 	@toOutput ( yes = true )
 	public static boolean rebranchementAction = false; // REWIRE Faire l'ajout et le retrait dans le meme temps
 	public static boolean limitlessAction;
@@ -58,9 +59,14 @@ public final class Configurator {
 	public static boolean useEntitySuccesProba = false; // Prend en compte la proba porté pour l'entité pour APPLY a meme. Actuellement l'index
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 
+	public static boolean coupleProbaApplyEachEntity = true; // utilise la proba de propagation portée par le meme
+
+
+
 	// SCORE
 	@toOutput ( yes = true )
-	public static int activationCodeForScore = 17; // Config "is max CC possible?"
+	public static int activationCodeForScore =
+			17; // Config "is max CC possible?"
 	// 153;// SCORE POUR SMALLWORLD DENSITY - DDARRAY - DDAVG - APL
 	// 170+512; // 170+512 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
 	// 16 + 512 Clust + third

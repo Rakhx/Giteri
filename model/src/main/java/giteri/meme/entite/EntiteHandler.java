@@ -26,6 +26,7 @@ import jdk.nashorn.internal.runtime.regexp.joni.Config;
 
 import java.util.*;
 
+import static giteri.run.configurator.Configurator.fastDebug;
 import static giteri.run.configurator.Configurator.fullSilent;
 
 /**
@@ -166,7 +167,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @return les actions qui ont été réalisé
 	 */
 	public void OneStep() {
-		runEntite();
+		if(fastDebug)
+			System.out.println(runEntite());
+		else
+			runEntite();
 		if(!Configurator.jarMode){
 			checkAPM();
 		}
@@ -849,45 +853,44 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	    return movingOne.chooseAction();
 	}
 
-	private void propagationCasteNew(Entite movingOne){
+	/** Version transmission aux autres de meme "caste".
+	 * Appelé qu'un meme du couple d'action soit joué ou non
+	 *
+	 * @param movingOne
+	 */
+	private void propagationCasteNew(Entite movingOne) {
 		Meme memeReturned;
 		int indexCouple;
 
 		Set<Entite> availables = new HashSet<>(entites);
 		availables.remove(movingOne);
 
-		// Test d'une prédéfinition de la possibilité de propagation
-		if(Toolz.rollDice(movingOne.getCoupleMeme().getProbaPropagation()))
+		// Test d'une prédéfinition de la possibilité de propagation - Ici si pas testé pour chaque entité
+//		if(!Configurator.coupleProbaApplyEachEntity && Toolz.rollDice(movingOne.getCoupleMeme().getProbaPropagation())){
+
 		// On ajoute a chacun d'entre eux la pair d'action
 		for (Entite available : availables) {
+//				if(Configurator.coupleProbaApplyEachEntity)
 			// Si, apres vérification de la proba du couple d'action que porte l'entité, c'est okay
-			if( available.getCoupleMeme() == null ||!available.isBreederOnCouple()&&
-					movingOne.getCoupleMemeIndex() != available.getCoupleMemeIndex()
-					&& Toolz.rollDice(probaPropaCoupleVersion(Math.abs(movingOne.getDegree()-available.getDegree()),
-					movingOne.getCoupleMeme().getProbaPropagation())))
-			{
+			/*available.getCoupleMeme() == null ||*/
+			if (!available.isBreederOnCouple() && Toolz.rollDice
+					(probaPropaCoupleVersion(Math.abs(movingOne.getDegree() - available.getDegree()), movingOne.getCoupleMeme().getProbaPropagation()))
+					&& (available.getCoupleMeme() == null || movingOne.getCoupleMemeIndex() != available.getCoupleMemeIndex())) {
+				// S'il possédait un couple, event de retrait sur chacun des memes de ce couple
+				if (available.getCoupleMeme() != null)
+					for (Meme meme : available.getCoupleMeme())
+						eventMemeChanged(available, meme, Configurator.MemeActivityPossibility.RetraitMeme.toString());
 
+				// Event d'ajout pour chacun des memes de couple de l'acting
+				for (Meme meme : movingOne.getCoupleMeme())
+					eventMemeChanged(available, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
+
+				// ajout effectif du couple
 				available.setCoupleMeme(movingOne.getCoupleMeme());
-				// On ajoute les memes un par un
-				for (Meme myMeme : movingOne.getMyMemes()) {
-					memeReturned = available.addOrReplaceFast(myMeme);
-					// Si retour du meme a ajouter
-					if (memeReturned == myMeme)
-						eventMemeChanged(available, myMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-
-					// alors il y a eu remplacement
-					if (memeReturned != null && memeReturned != myMeme) {
-						// un retrait
-						eventMemeChanged(available, memeReturned, Configurator.MemeActivityPossibility.RetraitMeme.toString());
-						// et un ajout
-						eventMemeChanged(available, myMeme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-					}
-				}
-				break;
-
 			}
 		}
 	}
+
 
 	/** Propagation direct a l'entité qui subit l'action
 	 *
@@ -1186,6 +1189,9 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, random);
 		memeFactory.registerMemeAction("AddEq",1, true, true, add,  attributs, KVAttributAgregator, false);
 
+		agregators.clear();index = 0;
+		agregators.put(index++, blank);
+		memeFactory.registerMemeAction("AddVoid",1, true, true, add,  attributs, KVAttributAgregator, false);
 
 		agregators.clear();index = 0;
 		agregators.put(0, linked);
@@ -1221,7 +1227,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, linked);
-		agregators.put(index++, theirEqual);
+		agregators.put(index++, mineEq);
 		agregators.put(index++, random);
 		memeFactory.registerMemeAction("RmvEq",1, true, true, remove,  attributs, KVAttributAgregator, false);
 
@@ -1233,9 +1239,17 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		index = 0;
 
 		// Creation des couples d'actions
-		 this.doubleRandom = memeFactory.extractAndAddCoupleMeme(-1,"AddØ","RmvØ",0);
-     //   memeFactory.extractAndAddCoupleMeme(index++,"AddØ-hop","rmv+",1);
-        memeFactory.extractAndAddCoupleMeme(index++,"AddEq","RmvVoid",1);
+
+		// Action fluidité.
+		this.doubleRandom = memeFactory.extractAndAddCoupleMeme(-1,"AddØ","RmvØ",0);
+		memeFactory.extractAndAddCoupleMeme(index++,"AddEq","Rmv-",.3);
+		memeFactory.extractAndAddCoupleMeme(index++,"AddØ-Hop","Rmv+",.3);
+
+		//memeFactory.extractAndAddCoupleMeme(index++,"AddØ-Hop","Rmv+",.3);
+
+
+		// memeFactory.extractAndAddCoupleMeme(index++,"AddEq","RmvVoid",1);
+
 
 //
 	}
