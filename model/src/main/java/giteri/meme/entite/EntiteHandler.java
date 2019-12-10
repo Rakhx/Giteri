@@ -26,8 +26,7 @@ import jdk.nashorn.internal.runtime.regexp.joni.Config;
 
 import java.util.*;
 
-import static giteri.run.configurator.Configurator.fastDebug;
-import static giteri.run.configurator.Configurator.fullSilent;
+import static giteri.run.configurator.Configurator.*;
 
 /**
  * Classe qui gère les entités du réseau.
@@ -872,7 +871,9 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			if (!available.isBreederOnCouple() && (available.getCoupleMeme() == null || movingOne.getCoupleMemeIndex() != available.getCoupleMemeIndex())
 				&& Toolz.rollDice
 				// && roll sur un chiffre qui dépend de la distance en degré ainsi que de la proba de propagation
-				(probaPropaCoupleVersion(Math.abs(movingOne.getDegree() - available.getDegree()), movingOne.getCoupleMeme().getProbaPropagation())))
+				(probaPropaCoupleVersion(Math.abs(movingOne.getDegree() - available.getDegree()), movingOne.getCoupleMeme().getProbaPropagation()))
+				&& Toolz.rollDice(1.0/getNbNode())
+			)
 			{
 				// S'il possédait un couple, event de retrait sur chacun des memes de ce couple
 				if (available.getCoupleMeme() != null)
@@ -1240,10 +1241,9 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		// Action fluidité.
 		this.doubleRandom = memeFactory.extractAndAddCoupleMeme(-1,"AddØ","RmvØ",0);
-		memeFactory.extractAndAddCoupleMeme(index++,"AddEq","Rmv-",.3);
-		memeFactory.extractAndAddCoupleMeme(index++,"AddØ-Hop","Rmv+",.3);
-
-		//memeFactory.extractAndAddCoupleMeme(index++,"AddØ-Hop","Rmv+",.3);
+		memeFactory.extractAndAddCoupleMeme(index++,"AddEq","Rmv-",.2);
+		memeFactory.extractAndAddCoupleMeme(index++,"AddØ-Hop","Rmv+",.2);
+		memeFactory.extractAndAddCoupleMeme(index++,"Add∞","Rmv-",.2);
 
 
 		// memeFactory.extractAndAddCoupleMeme(index++,"AddEq","RmvVoid",1);
