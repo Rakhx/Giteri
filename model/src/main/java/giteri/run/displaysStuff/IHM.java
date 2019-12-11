@@ -114,6 +114,20 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	private double densityValue;
 	private double temp = 0.;
 
+	// Partie fonction updateInformationDisplay
+	int lastAddCount ;
+	int lastEvapCount ;
+	int nbAppelInLast100;
+	int totalAppel;
+	int nbAppel;
+	String memeRef, memeString, memeFourChar;
+	boolean refreshDDArray;
+	Color associatedColor;
+	int indexCouple ;
+	int activator;
+	int nbNodesWithThisCouple;
+
+
 	private Hashtable<String, JLabel> times;
 	private JLabel time1, time2, time3, time4, time5;
 	private JLabel nbActionBySecond;
@@ -192,7 +206,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 	// Lorsque c'est la 1er fois qu'une fonction d'écriture est appelée, création des séries.
 	private boolean firstAppliance = true;
-
 
 	// Chart de l'IHM
 	private JFreeChart chart;
@@ -1445,11 +1458,9 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 			// on crée les série dans l'ordre a partir de 0 et regarde le meme associé a cet index dans MemeFactory
 			XYSeries aSerie = new XYSeries(labelSerie);
 			serieIndex = memeFactory.getIndexFromMeme(meme);
-			// label son petit nom
-			// Couleur associé a cet index
+			// label son petit nom Couleur associé a cet index
 			serieColor = drawerGraphStream.getColorAsColor(serieIndex);
 			chartMemeAppliance.getXYPlot().getRenderer().setSeriesPaint(serieIndex, serieColor);
-			// serie.setKey(labelSerie);
 			datasetMemeAppliance.addSeries(aSerie);
 			ArraySeriesMemeAppliances.add(aSerie);
 
@@ -1479,64 +1490,126 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		{
 			try
 			{
-				int lastAddCount = 0;
-				int lastEvapCount = 0;
-				int nbAppelInLast100;
-				int totalAppel = 0;
-				int nbAppel;
-				String memeRef = "";
-				boolean refreshDDArray = (compteurSerieDensity % 10 == 0);
-				boolean refreshMemeAppliance = refreshDDArray;
-				// densité seul
-				int activator = 1;
-				Color associatedColor;
-				int indexCouple ;
+				lastAddCount = 0;lastEvapCount = 0;totalAppel = 0;
+				nbAppelInLast100 = 0;String memeRef = "";
+				refreshDDArray = (compteurSerieDensity % 10 == 0);
 
+				// densité seul
+				activator = 1;
 				if(refreshDDArray)
-					activator = 9;//Configurator.AllAttribActivator;
+					activator = 9;
+
 				// TODO est ce que ca vaut le coup de mettre a jour l'information en direct?
 				netProp = modelController.getCurrentNetProperties(activator);
 
-				// On releve le compte des couples sur les entites
-				// C'est sale, devrait etre fait avec les event mais trop long
-				nodesHavingCoupleMemes.clear();
-				for (Entite entite : entiteHandler.getEntitesActive()) {
-					// on regarde le couple possédé
-					indexCouple = entite.getCoupleMemeIndex();
-					// et on met a jour au fur et a mesure la liste de.
-					Toolz.addElementInHashArray(nodesHavingCoupleMemes,
-							memeFactory.getCoupleMemeFromIndex(indexCouple).getName(),1);
+				if(Configurator.coupleVersion){
+					// On releve le compte des couples sur les entites
+					// devrait etre fait avec les event mais trop long
+					nodesHavingCoupleMemes.clear();
+					for (Entite entite : entiteHandler.getEntitesActive()) {
+						// on regarde le couple possédé
+						indexCouple = entite.getCoupleMemeIndex();
+						// et on met a jour au fur et a mesure la liste de.
+						Toolz.addElementInHashArray(nodesHavingCoupleMemes,
+								memeFactory.getCoupleMemeFromIndex(indexCouple).getName(),1);
+					}
+
+					JLabel lbl;
+					nbNodesWithThisCouple = 0;
+					for (CoupleMeme coupleMeme : memeFactory.getCoupleMemes()) {
+						// trouve une couleur indexé
+						associatedColor = drawerGraphStream.getColorAsColor(coupleMeme.getIndex());
+						// trouve le label associé au couple
+						lbl = nodesHavingCoupleMemesLabel.get(coupleMeme.getName());
+						memeRef = coupleMeme.getName() ;
+						String toPut = memeRef + ": [";
+						// Si tout les noeuds possede ce meme
+						if (nodesHavingCoupleMemes.get(coupleMeme.getName()) != null  && nodesHavingCoupleMemes.get(coupleMeme.getName()).size() == Configurator.getNbNode()){
+							toPut += "ALL]";
+						}
+						// Si tout les noeuds ne sont pas de ce type
+						else
+						{
+							nbNodesWithThisCouple = nodesHavingCoupleMemes.get(coupleMeme.getName()) == null? 0 :
+									nodesHavingCoupleMemes.get(coupleMeme.getName()).size();
+							toPut += nbNodesWithThisCouple;
+							toPut += "]";
+						}
+
+						if (lbl != null) {
+							lbl.setText(toPut);
+							lbl.setForeground(associatedColor);
+						}
+					}
+				}else {
+					// Pour chaque Meme disponible sur la simulation
+					for (Meme meme : selectedMemeOnSimulation) {
+						memeString = meme.toString();
+						memeFourChar = meme.toFourCharString();
+						associatedColor = drawerGraphStream.getColorAsColor(memeFactory.getIndexFromMemeFourChar(meme.toFourCharString()));
+
+						// NOMBRE DE POSSESSION DE MEME PAR LES ENTITES
+						// Trouver le label correspondant
+						JLabel lbl = nodesHavingXoxoMemesLabel.get(memeString);
+						// Nom sous forme "add+"
+						memeRef = memeFactory.translateMemeCombinaisonReadable(memeString) ;
+						String toPut = memeRef + ": [";
+						// Si tout les noeuds possede ce meme
+						if (nodesHavingXoxoMemes.get(memeString) != null
+								&& nodesHavingXoxoMemes.get(memeString).size() == Configurator.getNbNode()){
+							toPut += "ALL]";
+						}
+						// Si tout les noeuds ne sont pas de ce type
+						else
+						{
+							int nbNodesWithThisMeme = 0;
+
+							nbNodesWithThisMeme = nodesHavingXoxoMemes.get(memeString) == null? 0 :
+									nodesHavingXoxoMemes.get(memeString).size();
+							toPut += nbNodesWithThisMeme;
+							toPut += "]";
+						}
+
+						if (lbl != null) {
+							lbl.setText(toPut);
+							lbl.setForeground(associatedColor);
+
+							// NOMBRE D'APPEL DES MEMES DEPUIS LE DEBUT DE LA SIMULATION
+							// Savoir combien de fois le meme a été appelé depuis le début de la simulation
+							nbAppel = nbActivationByMemes.containsKey(memeString)? nbActivationByMemes.get(memeString) : 0;
+							// LABEL générique
+							nbActivationByMemesLabel.get(memeString).setText(memeRef + ":" + nbAppel );
+							nbActivationByMemesLabel.get(memeString).setForeground(associatedColor);
+							totalAppel += nbAppel;
+							nbAppelInLast100 = countOfLastMemeActivation.containsKey(memeString) ? countOfLastMemeActivation
+									.get(memeString) : 0;
+
+							// Partie last 100 compte du nombre
+							nbLastActivationByMemesLabel.get(memeString).setText(memeRef + ": "
+									+ nbAppelInLast100 + "("
+									+ nbAppelInLast100 * 100 / sizeOfCircularQueue
+									+"%)");
+							nbLastActivationByMemesLabel.get(memeString).setForeground(associatedColor);
+						}
+					}
+
+					String oldText;
+					// On refait une passe pour mettre a jour les % de possession
+					for (Meme meme : selectedMemeOnSimulation) {
+						memeString = meme.toString();
+						if(totalAppel != 0 && nbActivationByMemesLabel.containsKey(memeString)){
+							oldText = nbActivationByMemesLabel.get(memeString).getText();
+							nbActivationByMemesLabel.get(memeString).setText(oldText +
+									"(" + nbActivationByMemes.get(memeString) * 100 / totalAppel +"%)");
+						}
+					}
 				}
 
-				JLabel lbl;
-				int nbNodesWithThisCouple = 0;
-				for (CoupleMeme coupleMeme : memeFactory.getCoupleMemes()) {
-					// trouve une couleur indexé
-					associatedColor = drawerGraphStream.getColorAsColor(coupleMeme.getIndex());
-					// trouve le label associé au couple
-					lbl = nodesHavingCoupleMemesLabel.get(coupleMeme.getName());
-					memeRef = coupleMeme.getName() ;
-					String toPut = memeRef + ": [";
-					// Si tout les noeuds possede ce meme
-					if (nodesHavingCoupleMemes.get(coupleMeme.getName()) != null  && nodesHavingCoupleMemes.get(coupleMeme.getName()).size() == Configurator.getNbNode()){
-						toPut += "ALL]";
-					}
-					// Si tout les noeuds ne sont pas de ce type
-					else
-					{
-						nbNodesWithThisCouple = nodesHavingCoupleMemes.get(coupleMeme.getName()) == null? 0 :
-								nodesHavingCoupleMemes.get(coupleMeme.getName()).size();
-						toPut += nbNodesWithThisCouple;
-						toPut += "]";
-					}
 
-					if (lbl != null) {
-						lbl.setText(toPut);
-						lbl.setForeground(associatedColor);
-					}
-				}
 
-				String oldText;
+
+
+//				String oldText;
 				// On refait une passe pour mettre a jour les % de possession
 //				for (Meme meme : selectedMemeOnSimulation) {
 //					memeString = meme.toString();

@@ -13,7 +13,6 @@ public final class Configurator {
 	public static boolean fastDebug = false;
 
 	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
-	// TODO
 	public static boolean writInfo4OpnMol = true; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
 	public static String fittingTxtPath = "fittingInfo";
 
@@ -58,6 +57,7 @@ public final class Configurator {
 	public static boolean useEntitySuccesProba = false; // Prend en compte la proba porté pour l'entité pour APPLY a meme. Actuellement l'index
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 
+	public static boolean coupleDirectTransmission = true; // Transmet le couple a l'entité ayant recu l'action et pas plus
 
 	// SCORE
 	@toOutput ( yes = true )
@@ -105,6 +105,7 @@ public final class Configurator {
 	public static boolean displayMemePosessionDuringSimulation = true && !fullSilent; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
 	public static boolean writeNbActionPerSec = false; // pas de fichier nbline
 	public static boolean writeFailDensityLink = false; // fichier d'info sur les Fails X density variation
+	public static boolean writeFailMemeApply = false; // fichier d'info sur les Fails X density variation
 
 	public static String repByDefault = "DefaultRep";
 	public static String repForFitting = "Stability";

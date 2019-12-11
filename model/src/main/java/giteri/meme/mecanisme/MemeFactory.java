@@ -29,7 +29,7 @@ public class MemeFactory {
 	private ArrayList<Meme> memeFitting;
 	// association meme & index, pour coloration ET fitting
 	private Hashtable<Meme, Integer> kvMemeIndex;
-	// KV  fourCahr :: name
+	// KV  fourChar :: name
 	private Hashtable<String, String> memeTranslationReadable;
 
 	// Concernant les couples d'actions et leur probabilité de propagation
@@ -120,7 +120,7 @@ public class MemeFactory {
 	 * @param proba
 	 * @return
 	 */
-	private CoupleMeme registerCoupleMeme(int index,Meme add, Meme rmv, double proba){
+	private CoupleMeme registerCoupleMeme(int index, Meme add, Meme rmv, double proba){
 		CoupleMeme cm = new CoupleMeme(index, add, rmv, proba);
 		if(index >= 0)
 			this.coupleAction.put(index, cm);

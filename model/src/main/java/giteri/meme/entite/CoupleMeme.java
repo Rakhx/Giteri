@@ -70,6 +70,10 @@ public class CoupleMeme implements Iterable<Meme> {
         return name;
     }
 
+    public String toString(){
+        return getName();
+    }
+
     /**
      *
      * @return

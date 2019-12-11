@@ -356,16 +356,22 @@ public class Entite implements Comparable<Entite>{
 	public String getGraphStreamClass(){
 		String classe = "";
 		ArrayList<String> classes = new ArrayList<>();
-		for (Meme meme : getMyMemes()) {
-			classes.add(meme.toFourCharString());
-		}
 
+		if(Configurator.coupleVersion){
+			if(coupleMeme != null)
+				for (Meme meme : coupleMeme) {
+					classes.add(meme.toFourCharString());
+				}
+
+		}else {
+			for (Meme meme : getMyMemes()) {
+				classes.add(meme.toFourCharString());
+			}
+		}
 		classes.sort(null);
 		for (String string : classes) {
 			classe +=  string;
 		}
-
-
 
 
 		return classe;

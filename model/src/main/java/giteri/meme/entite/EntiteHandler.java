@@ -649,7 +649,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			if(Configurator.debugEntiteHandler)
 				System.out.println("[EH.runEntite]- entite choisie " + entiteActing.getIndex());
 			if (entiteActing == null) {
-				if(Configurator.debugEntiteHandler) System.err.println("[EH.runEntite()]- Aucune entité sélectionnée");
+				if(Configurator.debugEntiteHandler)
+					System.err.println("[EH.runEntite()]- Aucune entité sélectionnée");
 				return ("Nope pas d'entite prete");
 			}
 
@@ -657,7 +658,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			if(Configurator.rebranchementAction)
 				memeActions.addAll(entiteActing.getMyMemes());
 			else {
-				// Si version couple, inutile de selectionner une action en particulier.
+				// Si version couple, on selectionne l'action dnas le doAction plus loin. (...)
 				if(Configurator.coupleVersion){
 					if(Configurator.debugEntiteHandler) // la flemme de changer la structure d'afichage
 						entiteActing.getCoupleMeme().forEach(e -> memeActions.add(e));
@@ -711,10 +712,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 						memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez.get(i), cptModulo);
 
 					if (cptModulo % (Configurator.refreshInfoRate * 25) == 0) {
-
 						sumFailAction = memeProperties.lastFailAction(nbFail);
-						//vueController.displayInfo("FAILSTUFF", Arrays.asList("" + sumFailAction));
-
 						if (Configurator.writeFailDensityLink)
 							vueController.displayInfo(ViewMessageType.FAILXDENSITY, getFailXDensity(nbFail.getValue(),
 									networkConstruct.updatePreciseNetworkProperties
@@ -723,7 +721,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				}
 			}
 
-			if(!fullSilent && toDisplayForRatio.isEmpty())
+			if(!fullSilent && writeFailMemeApply &&toDisplayForRatio.isEmpty())
 				vueController.displayInfo(ViewMessageType.ECHECS, toDisplayForRatio);
 
 			// Dans le cas ou on veut les filtres en semi step, remis a zero des couleurs.
@@ -798,10 +796,14 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				if (cibles.size() == 1) {
 					actionDone += memeAction.getAction().applyAction(movingOne, cibles);
 
+					if(coupleVersion && !coupleDirectTransmission ){
+						cibles = entites;
+					}
+
 					// region PROPAGATION du meme
 					if (Configurator.usePropagation) {
 						if(Configurator.coupleVersion)
-							propagationCasteNew(movingOne);
+							propagationCasteNew(cibles, movingOne);
 						else
 							propagationDirect(cibles,movingOne,memeAction);
 					}
@@ -832,8 +834,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			actionsDone += actionDone;
 		}
 
-
-
 		return actionsDone;
 	}
 
@@ -861,8 +861,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 *
 	 * @param movingOne
 	 */
-	private void propagationCasteNew(Entite movingOne) {
-		Set<Entite> availables = new HashSet<>(entites);
+	private void propagationCasteNew(Set<Entite> cibles, Entite movingOne) {
+		Set<Entite> availables = new HashSet<>(cibles);
 		availables.remove(movingOne);
 
 		// On ajoute a chacun d'entre eux la pair d'action
@@ -872,7 +872,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				&& Toolz.rollDice
 				// && roll sur un chiffre qui dépend de la distance en degré ainsi que de la proba de propagation
 				(probaPropaCoupleVersion(Math.abs(movingOne.getDegree() - available.getDegree()), movingOne.getCoupleMeme().getProbaPropagation()))
-				&& Toolz.rollDice(1.0/getNbNode())
+				&& (coupleDirectTransmission || Toolz.rollDice(1.0/getNbNode()))
 			)
 			{
 				// S'il possédait un couple, event de retrait sur chacun des memes de ce couple
@@ -1240,10 +1240,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		// Creation des couples d'actions
 
 		// Action fluidité.
-		this.doubleRandom = memeFactory.extractAndAddCoupleMeme(-1,"AddØ","RmvØ",0);
+		this.doubleRandom = memeFactory.extractAndAddCoupleMeme(index++,"AddØ","RmvØ",0);
 		memeFactory.extractAndAddCoupleMeme(index++,"AddEq","Rmv-",.2);
 		memeFactory.extractAndAddCoupleMeme(index++,"AddØ-Hop","Rmv+",.2);
-		memeFactory.extractAndAddCoupleMeme(index++,"Add∞","Rmv-",.2);
+		memeFactory.extractAndAddCoupleMeme(index++,"Add∞","Rmv-",1);
 
 
 		// memeFactory.extractAndAddCoupleMeme(index++,"AddEq","RmvVoid",1);

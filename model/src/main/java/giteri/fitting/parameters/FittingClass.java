@@ -423,11 +423,13 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		List<Double> bla = new ArrayList<>(densites);
 		avgNSqrt = Toolz.getMeanAndSd(bla);
 		if (avgNSqrt[0] > .9 && avgNSqrt[1] < .001) {
-			com.view.displayInfo(Configurator.ViewMessageType.FITTINGSKIP, new ArrayList<String>(Arrays.asList("Full Network")));
+			if(Configurator.debugFittingClass)
+				com.view.displayInfo(Configurator.ViewMessageType.FITTINGSKIP, new ArrayList<String>(Arrays.asList("Full Network")));
 			return false;
 		}
 		if (avgNSqrt[0] < .001 && avgNSqrt[1] < .0001) {
-			com.view.displayInfo(Configurator.ViewMessageType.FITTINGSKIP, new ArrayList<String>(Arrays.asList("Empty Network")));
+			if(Configurator.debugFittingClass)
+				com.view.displayInfo(Configurator.ViewMessageType.FITTINGSKIP, new ArrayList<String>(Arrays.asList("Empty Network")));
 			return false;
 		}
 
