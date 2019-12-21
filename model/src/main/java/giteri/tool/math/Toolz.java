@@ -36,10 +36,11 @@ public class Toolz {
 		}
 	}
 
+	//region RANDOM STUFF
 
-	/** Obtient un integer aléatoire compris entre 0 et max, 
+	/** Obtient un integer aléatoire compris entre 0 et max,
 	 * 0 inclu max exclu
-	 * 
+	 *
 	 * @param max
 	 * @return int @ [0;max[
 	 */
@@ -50,25 +51,127 @@ public class Toolz {
 	public static int jureDistrib(double proba){
 		return 1 + (int)((Math.log(1.- Toolz.getProba()))/(Math.log(1.-proba)));
 	}
-	
+
+	/** [0;1] retourne un entier entre 0 et 1 avec une précision de
+	 * la valeur du champs précision de la giteri.meme classe Toolz.
+	 *
+	 * @return
+	 */
+	public static double getProba(){
+		return (double)getRandomNumber(precision+1) / precision;
+	}
+
+	/** [0;1[ retourne un entier entre 0 et 1 avec une précision de
+	 * la valeur du champs précision de la giteri.meme classe Toolz.
+	 *
+	 * @return
+	 */
+	public static double getProbaOneOut(){
+		return (double)getRandomNumber(precision) / precision;
+	}
+
+	/** [0;1[ retourne un entier entre 0 et 1 avec une précision de
+	 * la valeur du champs précision de la giteri.meme classe Toolz, de facon
+	 * non uniforme et paramétré par l'indicateur, qui est compris entre [0;1]
+	 *
+	 * @param indicateur
+	 * @return un double compris entre 0 et 1
+	 */
+	public static double getProbaNonUniform(double indicateur){
+		return (double)getRandomNumber(precision) / precision;
+	}
+
+	/**
+	 *
+	 * @param alphaParam
+	 * @param betaParam
+	 * @return
+	 */
+	public static double getProbaBetaDistribution(double alphaParam, double betaParam){
+		double x;
+		double b;
+		BetaDistribution beta = new BetaDistribution(alphaParam, betaParam);
+		x = Math.random();
+		b = beta.inverseCumulativeProbability(x);
+		return b;
+	}
+
+	/** Prend une proba en entrée et renvoi true avec cette probabilité.
+	 * Proba compris entre 0 et 1. La precision est de {@value #precision}, toute les probas
+	 * inférieur a 1 / {@value #precision} seront false.
+	 * @param proba
+	 * @return
+	 */
+	public static boolean rollDice(double proba){
+		return proba * precision > getRandomNumber(precision);
+	}
+
+	/** Prend une proba en entrée et renvoi true avec cette probabilité.
+	 * Proba compris entre 0 et 1. La precision est de {@value #precision}, toute les probas
+	 * inférieur a 1 / {@value #precision} seront false.
+	 * @param proba
+	 * @return
+	 */
+	public static boolean rollDiceWithThreshold(double proba, double threshold){
+		return proba * precision > getRandomNumber(precision);
+	}
+
+	/**
+	 *
+	 * @param maxValue
+	 * @return
+	 */
+	public static double getARandomNumber(double maxValue, int precision){
+		return ((double)getRandomNumber(precision+1) / precision) * maxValue;
+	}
+
+	/** Renvoi une distribution aléatoire de probabilité,
+	 * n double dont la somme vaut 1
+	 * @param nbElement Le nombre de nombre aléatoire a renvoyer
+	 * @return une arraylist de taille nbElement.
+	 */
+	public static ArrayList<Double> getRandomDistrib(int nbElement){
+		ArrayList<Double> distrib = new ArrayList<Double>();
+		int total = 0;
+		int oneInt;
+		//double rapport;
+
+
+		for (int i = 0; i < nbElement; i++) {
+			oneInt = Toolz.getRandomNumber(precision);
+			total += oneInt;
+			distrib.add((double)oneInt);
+		}
+
+		for (int i = 0; i < nbElement; i++) {
+			distrib.add(i, distrib.remove(i) / (double)total );
+		}
+
+		return distrib;
+	}
+
+	//endregion
+
+	//region COLLECTION STUFF
+
 	/** Renvoi un élément d'une liste choisi aléatoirement, après l'avoir
 	 *  retiré de la liste qui été donné en paramètre
-	 * 
+	 *
 	 * @param list une liste d'éléments
 	 * @return un éléments qui a été remove de cette liste aléatoirement.
 	 */
 	public static <T extends Object> T getRandomElementAndRemoveIt(ArrayList<T> list){
 		return list.remove(Toolz.getRandomNumber(list.size()));
 	}
-	
-	/** Renvoi un élément aléatoirement choisi d'une liste. Si la liste est vide, renvoi 
-	 * null. 
-	 * 
+
+	/** Renvoi un élément aléatoirement choisi d'une liste. Si la liste est vide, renvoi
+	 * null.
+	 *
 	 * @param list
-	 * @return Un élément de la liste ou null. 
+	 * @return Un élément de la liste ou null.
 	 */
 	public static <T extends Object> T getRandomElement(List<T> list){
-		return list.size() > 0 ? list.get(Toolz.getRandomNumber(list.size())) : null; 
+		return list.size() > 0 ? list.get(Toolz.getRandomNumber(list.size())) : null;
 	}
 
 	public static <T extends Object> T getRandomElement(Collection<T> set){
@@ -84,13 +187,13 @@ public class Toolz {
 		return null;
 	}
 
-	/** retourne la liste réduite à un élément. 
-	 * 
+	/** retourne la liste réduite à un élément.
+	 *
 	 * @param list
 	 * @return la liste réduite à un élément choisi aléatoirement.
 	 */
 	public static <T extends Object> ArrayList<T> getOneElementList(ArrayList<T> list){
-		T selectedElement = getRandomElement(list); 
+		T selectedElement = getRandomElement(list);
 //				list.size() > 0 ? list.get(Toolz.getRandomNumber(list.size())) : null;
 		list.clear();
 		list.add(selectedElement);
@@ -111,93 +214,18 @@ public class Toolz {
 		return null;
 	}
 
-
-	/** [0;1] retourne un entier entre 0 et 1 avec une précision de
-	 * la valeur du champs précision de la giteri.meme classe Toolz.
-	 * 
-	 * @return
-	 */
-	public static double getProba(){
-		return (double)getRandomNumber(precision+1) / precision;
-	}
-	
-	/** [0;1[ retourne un entier entre 0 et 1 avec une précision de
-	 * la valeur du champs précision de la giteri.meme classe Toolz.
-	 * 
-	 * @return
-	 */
-	public static double getProbaOneOut(){
-		return (double)getRandomNumber(precision) / precision;
-	}
-	
-	/** [0;1[ retourne un entier entre 0 et 1 avec une précision de
-	 * la valeur du champs précision de la giteri.meme classe Toolz, de facon
-	 * non uniforme et paramétré par l'indicateur, qui est compris entre [0;1]
-	 * 
-	 * @param indicateur
-	 * @return un double compris entre 0 et 1
-	 */
-	public static double getProbaNonUniform(double indicateur){
-		return (double)getRandomNumber(precision) / precision;
-	}
-
-	/**
-	 * 
-	 * @param alphaParam
-	 * @param betaParam
-	 * @return
-	 */
-	public static double getProbaBetaDistribution(double alphaParam, double betaParam){
-		double x;
-        double b;
-        BetaDistribution beta = new BetaDistribution(alphaParam, betaParam);
-        x = Math.random();
-        b = beta.inverseCumulativeProbability(x);
-        return b;
-	}
-	
-	/** Prend une proba en entrée et renvoi true avec cette probabilité.
-	 * Proba compris entre 0 et 1. La precision est de {@value #precision}, toute les probas
-	 * inférieur a 1 / {@value #precision} seront false.
-	 * @param proba
-	 * @return
-	 */
-	public static boolean rollDice(double proba){
-		return proba * precision > getRandomNumber(precision);
-	}
-	
-	/** Prend une proba en entrée et renvoi true avec cette probabilité.
-	 * Proba compris entre 0 et 1. La precision est de {@value #precision}, toute les probas
-	 * inférieur a 1 / {@value #precision} seront false.
-	 * @param proba
-	 * @return
-	 */
-	public static boolean rollDiceWithThreshold(double proba, double threshold){
-		return proba * precision > getRandomNumber(precision);
-	}
-	
-	/**
-	 * 
-	 * @param maxValue
-	 * @return
-	 */
-	public static double getARandomNumber(double maxValue, int precision){
-		return ((double)getRandomNumber(precision+1) / precision) * maxValue;
-	}
-	
 	/** Shuffle une arrayList
-	 * 
-	 * @param toUnsort 
-	 * @return l'arraylist shuffled avec des 5*size() de swap. 
+	 *
+	 * @param toUnsort
+	 * @return l'arraylist shuffled avec des 5*size() de swap.
 	 */
 	public static <T extends Object> ArrayList<T> unsortArray(ArrayList<T> toUnsort){
 		for (int i = 0; i < toUnsort.size() * 5; i++) {
-			toUnsort.add(toUnsort.remove(getRandomNumber(toUnsort.size())));			
-		}		
-		
+			toUnsort.add(toUnsort.remove(getRandomNumber(toUnsort.size())));
+		}
+
 		return toUnsort;
 	}
-
 
 	/** Shuffle les corespondances key et value d'une hashMap.
 	 *
@@ -231,10 +259,10 @@ public class Toolz {
 
 		return unSorted;
 	}
-	
+
 	/** Ajoute, dans une hashtable(key, arraylist<value>) une valeur, que la key existe
-	 * déjà ou non. 
-	 * 
+	 * déjà ou non.
+	 *
 	 * @param table
 	 * @param key
 	 * @param value
@@ -282,10 +310,9 @@ public class Toolz {
 		}
 	}
 
-
 	/** Ajoute, dans une hashtable(key, arraylist<value>) une valeur, que la key existe
-	 * déjà ou non. 
-	 * 
+	 * déjà ou non.
+	 *
 	 * @param table
 	 * @param key
 	 * @param value
@@ -299,8 +326,8 @@ public class Toolz {
 	}
 
 	/** Ajoute, dans une hashtable(key, arraylist<value>) une valeur, que la key existe
-	 * déjà ou non. 
-	 * 
+	 * déjà ou non.
+	 *
 	 * @param table
 	 * @param key
 	 * @param value
@@ -309,9 +336,9 @@ public class Toolz {
 	public static <T1 extends Object> Integer addCountToElementInHashArray(Map<T1,Integer> table,T1 key, Integer value){
 		Integer newValue;
 		if(table.containsKey(key)){
-			 newValue = table.get(key) + value;
-			 table.put(key, newValue);
-			 return newValue;
+			newValue = table.get(key) + value;
+			table.put(key, newValue);
+			return newValue;
 		}else
 		{
 			newValue = new Integer(value);
@@ -319,9 +346,9 @@ public class Toolz {
 			return newValue;
 		}
 	}
-	
+
 	/** Retire depuis une hash de <key, integer> une quantite value au compte.
-	 * Retourne la valeur de ce qui reste si la clef a été trouvé, null sinon. 
+	 * Retourne la valeur de ce qui reste si la clef a été trouvé, null sinon.
 	 * @param table
 	 * @param key
 	 * @param value
@@ -330,39 +357,16 @@ public class Toolz {
 	public static <T1 extends Object> Integer removeCountToElementInHashArray(Map<T1,Integer> table,T1 key, Integer value){
 		Integer newValue;
 		if(table.containsKey(key)){
-			 newValue = table.get(key) - value;
-			 if(newValue >= 0)
-				 table.put(key, newValue);
-			 return newValue;
+			newValue = table.get(key) - value;
+			if(newValue >= 0)
+				table.put(key, newValue);
+			return newValue;
 		}
 		else
 			return null;
 	}
-	
-	/** Renvoi une distribution aléatoire de probabilité, 
-	 * n double dont la somme vaut 1
-	 * @param nbElement Le nombre de nombre aléatoire a renvoyer
-	 * @return une arraylist de taille nbElement.
-	 */
-	public static ArrayList<Double> getRandomDistrib(int nbElement){
-		ArrayList<Double> distrib = new ArrayList<Double>();
-		int total = 0;
-		int oneInt;
-		//double rapport;
-		
-	
-		for (int i = 0; i < nbElement; i++) {
-			oneInt = Toolz.getRandomNumber(precision);
-			total += oneInt;
-			distrib.add((double)oneInt);
-		}
-		
-		for (int i = 0; i < nbElement; i++) {
-			distrib.add(i, distrib.remove(i) / (double)total );
-		}
-		
-		return distrib;
-	}	
+
+	//endregion
 
 	/** Renvoi la valeur moyenne des valeurs entrée dans le tableau.
 	 * 
@@ -717,6 +721,17 @@ public class Toolz {
     	
     }
 
-  
+	/** Methode de calcul de factoriel sur des petites valeurs de number
+	 *
+	 * @param number
+	 * @return
+	 */
+	public static int getLittleFactorial(int number){
+    	int resultat = 1;
+    	for (int i = 1; i<= number;i++)
+    		resultat *= i;
+    	return resultat;
+	}
+
 
 }

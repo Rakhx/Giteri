@@ -56,7 +56,7 @@ public class JarVersion {
 		System.exit(0);
 	}
 
-	/** Run lancé depuis openMole, ou depuis le main@JarVersion. Ordre au 4 décembre
+	/** Run lancé depuis openMole, ou depuis le main@JarVersion. Ordre au 4/12/19
 	 * [;.AddØ-Hop-0.0;.Add+-0.1;.Add--0.2;.Add∞-0.3;.AddØ-0.4;.RmvØ-2hop-0.5;.RmvØ-0.6;.Rmv+-0.7;.Rmv--0.8]
 	 * @param fileInput
 	 * @param param1
@@ -82,5 +82,6 @@ public class JarVersion {
 	public static Double run(File fileInput, List<Boolean> activation, List<Double> proba){
 		return Initializer.initialize(launcher, fileInput, activation , proba);
 	}
+
 
 }

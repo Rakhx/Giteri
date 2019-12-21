@@ -11,6 +11,7 @@ import giteri.run.displaysStuff.ConsoleView;
 import giteri.run.displaysStuff.FileView;
 import giteri.run.displaysStuff.IHM;
 import giteri.run.interfaces.Interfaces;
+import giteri.tool.math.Toolz;
 import giteri.tool.other.StopWatchFactory;
 import giteri.tool.other.WriteNRead;
 import org.graphstream.graph.Graph;
@@ -23,6 +24,8 @@ import java.util.Optional;
 
 import static giteri.run.configurator.Configurator.fullSilent;
 import static giteri.run.configurator.Configurator.withGraphicalDisplay;
+
+
 
 /** Classe d'initialisation des objets nécessaires à l'utilisation du framework
  * Commun à ttes les classes.
@@ -191,4 +194,42 @@ public class Initializer {
                     Optional.of(memeProba));
         }
     }
+
+    /** entier d'activation pour choisir les memes présents sur la simulation. Sur un total de
+     *
+     * @param addActivator
+     * @param rmvActivator
+     */
+    public static void setBooleanActivation(int addActivator, int rmvActivator){
+
+
+    }
+
+    // méthode sale mais osef
+    public boolean[] addActivation = new boolean[10];
+    public boolean[] rmvActivation = new boolean[10];
+
+
+    /** Le numero d'activator. Le Max défini le nombre de combinaison max, et le Nb le nombre
+     * d'élément qui constitue la combinaison considérée.
+     * Si choix de 3 meme sur 10 max possible, le nombre de combinaison est de 10!/7!
+     *
+     *
+     * @param activator
+     * @param nbActivator
+     * @param maxactivator
+     * @return
+     */
+    private boolean[] getActionActivation(int activator,int nbActivator, int maxactivator){
+        boolean[] resultat = new boolean[10];
+        int nbCombinaison = Toolz.getLittleFactorial(maxactivator) / (Toolz.getLittleFactorial(maxactivator-nbActivator)
+        *Toolz.getLittleFactorial(nbActivator));
+        // position de base des activators, i<j<k
+        int i= 1, j=2,k = 3;
+
+
+
+        return resultat;
+    }
+
 }

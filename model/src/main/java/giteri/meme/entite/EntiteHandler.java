@@ -1241,11 +1241,11 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		// Action fluidité.
 		this.doubleRandom = memeFactory.extractAndAddCoupleMeme(index++,"AddØ","RmvØ",0);
-		memeFactory.extractAndAddCoupleMeme(index++,"AddEq","Rmv-",.2);
-		memeFactory.extractAndAddCoupleMeme(index++,"AddØ-Hop","Rmv+",.2);
-		memeFactory.extractAndAddCoupleMeme(index++,"Add∞","Rmv-",1);
+		memeFactory.extractAndAddCoupleMeme(index++,"AddEq","Rmv-",.1);
+		memeFactory.extractAndAddCoupleMeme(index++,"AddØ-Hop","Rmv-",.8);
+		memeFactory.extractAndAddCoupleMeme(index++,"Add∞","Rmv-",.3);
 
-
+//		Integer.toBinaryString()
 		// memeFactory.extractAndAddCoupleMeme(index++,"AddEq","RmvVoid",1);
 
 
