@@ -15,6 +15,9 @@ public final class Main {
 	 */
 	public static void main(String[] args)  {
 		Initializer.initialize(Configurator.EnumLauncher.ihm, null, null ,null);
+
+
+
 	}
 }
 

@@ -201,13 +201,15 @@ public class Initializer {
      * @param rmvActivator
      */
     public static void setBooleanActivation(int addActivator, int rmvActivator){
-
+        int nbAdd = 3, nbRmv = 3, tailleTotal= 10;
+        addActivation = getActionActivation(addActivator, nbAdd, tailleTotal);
+        rmvActivation = getActionActivation(rmvActivator, nbRmv, tailleTotal);
 
     }
 
     // méthode sale mais osef
-    public boolean[] addActivation = new boolean[10];
-    public boolean[] rmvActivation = new boolean[10];
+    public static boolean[] addActivation = new boolean[10];
+    public static boolean[] rmvActivation = new boolean[10];
 
 
     /** Le numero d'activator. Le Max défini le nombre de combinaison max, et le Nb le nombre
@@ -215,20 +217,57 @@ public class Initializer {
      * Si choix de 3 meme sur 10 max possible, le nombre de combinaison est de 10!/7!
      *
      *
-     * @param activator
-     * @param nbActivator
-     * @param maxactivator
+     * @param activator Xeme  combinaison" effectivement choisi. i.e. la 56eme
+     * @param nbActivator 3
+     * @param maxactivator 10
      * @return
      */
-    private boolean[] getActionActivation(int activator,int nbActivator, int maxactivator){
-        boolean[] resultat = new boolean[10];
+    public static boolean[] getActionActivation(int activator, int nbActivator, int maxactivator){
+        System.out.println("CALL: " + activator);
+        boolean[] resultat = new boolean[maxactivator];
+        boolean again = true;
         int nbCombinaison = Toolz.getLittleFactorial(maxactivator) / (Toolz.getLittleFactorial(maxactivator-nbActivator)
         *Toolz.getLittleFactorial(nbActivator));
         // position de base des activators, i<j<k
-        int i= 1, j=2,k = 3;
+       // int i= 1, j=2,k = 3;
+        for (int i = 0; i < maxactivator; i++) {
+            for (int j = i+1; j < maxactivator; j++) {
+                for (int k = j+1; k < maxactivator ; k++) {
+                    if(activator > 0) {
+                        activator--;
+                    }
+                    else if(activator == 0){
+                        System.out.println("ijk- " + i + j + k);
+                        for (int i1 = 0; i1 < maxactivator; i1++) {
+                            if(( i == i1) || (j == i1) || (k==i1))
+                                resultat[i1] = true;
+                            else
+                                resultat[i1] = false;
+                        }
 
+                        again = false;
+                    }
 
+                    if(!again)
+                        break;
 
+                }
+                if(!again)
+                    break;
+            }
+
+            if(!again)
+                break;
+        }
+
+        String res = "[";
+        for (int i = 0; i < resultat.length; i++) {
+            res += ";";
+            res += resultat[i] ? "1" : "0";
+        }
+        res += "]";
+
+        System.out.println(res);
         return resultat;
     }
 

@@ -1,5 +1,6 @@
 package giteri.test;
 
+import giteri.run.configurator.Initializer;
 import giteri.tool.math.Toolz;
 
 import java.util.ArrayList;
@@ -8,6 +9,11 @@ import java.util.Optional;
 
 public class RandomTest {
     public static void main(String[] args)  {
+
+        Initializer balbla = new Initializer();
+        for (int i = 0; i < 120; i++) {
+            balbla.getActionActivation(i,3,10);
+        }
 
         // FONCTION RANDOM
 //        int ajout = 0;
