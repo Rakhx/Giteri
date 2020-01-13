@@ -44,6 +44,10 @@ run-main giteri.Run default.txt .0 .1 .2 .15 1 1 .6 .7 .8 .9 .91 .92 .93 0 0 0 1
 ".\default.txt", 1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2, ,2000
 
 
+
+run-main giteri.Test.testRandomFn 0 0 0
+run-main giteri.test.RandomTest 0 0 0
+
 SOUS SBT
 Verification des classes disponibles a appeler
  show compile:discoveredMainClasses

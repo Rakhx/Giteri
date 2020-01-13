@@ -24,13 +24,6 @@ import giteri.run.configurator.Configurator.ViewMessageType;
  *
  */
 public class Interfaces {
-	
-	/** Interface concernant 
-	 *
-	 */
-	public interface ISetValues{
-		void setValue(Double value);
-	}
 
 	/** Interface qui permet la lecture d'une ligne pour la création d'un
 	 * réseau depuis plusieurs lignes lues.
@@ -180,4 +173,11 @@ public class Interfaces {
 		 ArrayList<String> getNetworkEdges();
 	}
 
+	/** Interface qui contient les parametres donnés par l'utilisation d'openmole,
+	 * donc on oneshot, couple version ou non.
+	 *
+	 */
+	public interface IOpenMoleParameter {
+
+	}
 }

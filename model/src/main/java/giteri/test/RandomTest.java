@@ -155,14 +155,4 @@ public class RandomTest {
         System.out.println(xor);
     }
 }
- class Mother {
-    public void sayHello(){
-        System.out.println("Mother");
-    }
-}
- class Son extends Mother {
-    public void sayHello(){
-        System.out.println("Son");
-    }
 
-}

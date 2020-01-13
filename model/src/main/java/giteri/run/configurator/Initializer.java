@@ -35,7 +35,7 @@ import static giteri.run.configurator.Configurator.withGraphicalDisplay;
  *
  */
 public class Initializer {
-    public static Double initialize(Configurator.EnumLauncher launcher, File fileInput, List<Boolean> memeActication , List<Double> memeProba) {
+    public static Double initialize(Configurator.EnumLauncher launcher, List<Boolean> memeActication , List<Double> memeProba) {
 
         if(Configurator.timeEfficiency) {
             StopWatchFactory.getInstance().addWatch("", "perf");
@@ -188,10 +188,16 @@ public class Initializer {
             networkConstructor.start();
             entiteHandler.start();
 
-            return stat.fitNetwork(Configurator.EnumLauncher.jarC,
-                    Configurator.EnumExplorationMethod.oneShot,
-                    Optional.of(memeActication),
-                    Optional.of(memeProba));
+            if(Configurator.coupleVersion){return .0;
+            }else {
+                return stat.fitNetwork(Configurator.EnumLauncher.jarC,
+                        Configurator.EnumExplorationMethod.oneShot,
+                        Optional.of(memeActication),
+                        Optional.of(memeProba));
+            }
+
+
+
         }
     }
 
@@ -210,6 +216,18 @@ public class Initializer {
     // méthode sale mais osef
     public static boolean[] addActivation = new boolean[10];
     public static boolean[] rmvActivation = new boolean[10];
+
+    public static Double launchForClassic(){
+
+        return .0;
+    }
+
+    public static Double launchForCaste(){
+
+        return .0;
+    }
+
+
 
 
     /** Le numero d'activator. Le Max défini le nombre de combinaison max, et le Nb le nombre

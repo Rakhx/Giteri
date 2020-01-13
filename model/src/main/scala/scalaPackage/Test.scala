@@ -1,7 +1,9 @@
+package scalaPackage
+
 import giteri.network.networkStuff.NetworkFileLoader
 import giteri.tool.other.WriteNRead
 
-class Test {
+object Test {
   def main(args: Array[String]): Unit =
   {
     testRandomFn(args(0).toInt,args(1).toInt,args(2).toInt)
