@@ -14,10 +14,7 @@ public final class Main {
 	 * @param args
 	 */
 	public static void main(String[] args)  {
-		Initializer.initialize(Configurator.EnumLauncher.ihm, null, null ,null);
-
-
-
+		Initializer.initialize(Configurator.EnumLauncher.ihm, null);
 	}
 }
 

@@ -5,7 +5,6 @@ import giteri.meme.entite.Entite;
 import giteri.run.configurator.Configurator;
 import giteri.run.interfaces.Interfaces;
 import giteri.run.interfaces.Interfaces.IReadNetwork;
-import giteri.run.interfaces.Interfaces.ISetValues;
 import giteri.run.interfaces.Interfaces.IView;
 
 import java.awt.Color;

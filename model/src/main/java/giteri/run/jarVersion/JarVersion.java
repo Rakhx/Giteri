@@ -1,5 +1,6 @@
 package giteri.run.jarVersion;
 
+import giteri.run.configurator.ClassicOpenMoleParameter;
 import giteri.run.configurator.Initializer;
 import giteri.run.configurator.Configurator;
 
@@ -69,7 +70,10 @@ public class JarVersion {
 		ArrayList<Boolean> memeAtivation = new ArrayList<>();
 		memeAtivation.addAll(Arrays.asList(acti1,acti2,acti3,acti4,acti5, acti6, acti7, acti8, acti9, acti10, acti11, acti12, acti13));
 		probaBehavior.addAll(Arrays.asList(param1,param2,param3,param4,param5, param6, param7, param8, param9, param10, param11, param12, param13));
-		return Initializer.initialize(launcher, fileInput, memeAtivation ,probaBehavior);
+		ClassicOpenMoleParameter comp = new ClassicOpenMoleParameter();
+		comp.memeActication = memeAtivation;
+		comp.memeProba = probaBehavior;
+		return Initializer.initialize(launcher, comp);
 	}
 
 	/** depuis le main@JarVersion. ( main au dessus )
@@ -80,7 +84,10 @@ public class JarVersion {
 	 * @return
 	 */
 	public static Double run(File fileInput, List<Boolean> activation, List<Double> proba){
-		return Initializer.initialize(launcher, fileInput, activation , proba);
+		ClassicOpenMoleParameter comp = new ClassicOpenMoleParameter();
+		comp.memeActication = activation;
+		comp.memeProba = proba;
+		return Initializer.initialize(launcher, comp);
 	}
 
 

@@ -35,7 +35,7 @@ import static giteri.run.configurator.Configurator.withGraphicalDisplay;
  *
  */
 public class Initializer {
-    public static Double initialize(Configurator.EnumLauncher launcher, List<Boolean> memeActication , List<Double> memeProba) {
+    public static Double initialize(Configurator.EnumLauncher launcher, Interfaces.IOpenMoleParameter parameters) {
 
         if(Configurator.timeEfficiency) {
             StopWatchFactory.getInstance().addWatch("", "perf");
@@ -188,17 +188,12 @@ public class Initializer {
             networkConstructor.start();
             entiteHandler.start();
 
-            if(Configurator.coupleVersion){return .0;
+            if(Configurator.coupleVersion){
+                return launchForCaste(parameters);
             }else {
-                return stat.fitNetwork(Configurator.EnumLauncher.jarC,
-                        Configurator.EnumExplorationMethod.oneShot,
-                        Optional.of(memeActication),
-                        Optional.of(memeProba));
+                return launchForClassic(stat, parameters);
             }
-
-
-
-        }
+       }
     }
 
     /** entier d'activation pour choisir les memes présents sur la simulation. Sur un total de
@@ -217,12 +212,23 @@ public class Initializer {
     public static boolean[] addActivation = new boolean[10];
     public static boolean[] rmvActivation = new boolean[10];
 
-    public static Double launchForClassic(){
+    /** méthode pour lancement spécifique au cas classique.
+     *
+     * @param stat
+     * @param parameters
+     * @return
+     */
+    public static Double launchForClassic(StatAndPlotGeneric stat, Interfaces.IOpenMoleParameter parameters){
+        ClassicOpenMoleParameter comp = (ClassicOpenMoleParameter)parameters;
+        return stat.fitNetwork(Configurator.EnumLauncher.jarC,
+                Configurator.EnumExplorationMethod.oneShot,
+                Optional.of(comp.memeActication),
+                Optional.of(comp.memeProba));
 
-        return .0;
     }
 
-    public static Double launchForCaste(){
+    public static Double launchForCaste(Interfaces.IOpenMoleParameter parameters){
+        CasteOpenMoleParameter comp = (CasteOpenMoleParameter)parameters;
 
         return .0;
     }

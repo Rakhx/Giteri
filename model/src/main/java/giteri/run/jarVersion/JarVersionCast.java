@@ -1,8 +1,11 @@
 package giteri.run.jarVersion;
 
+import giteri.run.configurator.CasteOpenMoleParameter;
 import giteri.run.configurator.Configurator;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /** Jar version pour l'utilisation cast
@@ -28,7 +31,7 @@ public class JarVersionCast {
         filePath = args[0];
         inputFile = new File(filePath);
         if(debug)System.out.print("Fichier d'input: " + (inputFile.exists()? "exist" : "does not exist"));
-        run(inputFile,0,0,0,0,0,0, Double.parseDouble(args[8])
+        run(0,0,0,0,0,0, Double.parseDouble(args[8])
                 , Double.parseDouble(args[7]) , Double.parseDouble(args[7]));
 
 
@@ -37,9 +40,18 @@ public class JarVersionCast {
     /** Fonction appelée depuis openMole. Nombre de parametre en double étant addActi x rmvActi
      *
      */
-    public static Double run(File fileInput, int addActi, int addNb, int addTotal, int rmvActi, int rmvNb, int rmvTotal,
+    public static Double run(int addActi, int addNb, int addTotal, int rmvActi, int rmvNb, int rmvTotal,
                                Double... args){
+        CasteOpenMoleParameter comp = new CasteOpenMoleParameter();
 
+        comp.addActi = addActi;
+        comp.addNb = addNb;
+        comp.addTotal=addTotal;
+        comp.rmvActi = rmvActi;
+        comp.rmvNb = rmvNb;
+        comp.rmvTotal = rmvTotal;
+        comp.probaPropa = new ArrayList<>(Arrays.asList(args));
+        assert(comp.probaPropa.size() == addNb * rmvNb);
 
         return 0.;
     }

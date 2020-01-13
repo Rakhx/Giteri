@@ -9,8 +9,8 @@ import java.util.List;
  *
  */
 public class ClassicOpenMoleParameter implements Interfaces.IOpenMoleParameter {
-    List<Boolean> memeActication;
-    List<Double> memeProba;
+    public List<Boolean> memeActication;
+    public List<Double> memeProba;
 
 }
 
