@@ -1,6 +1,7 @@
 package giteri.run.configurator;
 
 import giteri.meme.entite.EntiteHandler;
+import giteri.meme.entite.Meme;
 import giteri.meme.mecanisme.ActionFactory;
 import giteri.meme.mecanisme.AttributFactory;
 import giteri.meme.mecanisme.FilterFactory;
@@ -140,6 +141,10 @@ public class Initializer {
             Interfaces.IReadNetwork nl = mControl.getReader();
             fenetre.setVisible(true);
             entiteHandler.setVueController(vControl);
+
+            entiteHandler.giveMemeToEntiteFitting(memeFactory.getMemeAvailable(Configurator.ActionType.ANYTHING,false, true));
+
+
 
             // fait le lien entre les entités d'action et de transmission de meme
             // avec l'IHM, pour permettre la mise a jour des affichages etc

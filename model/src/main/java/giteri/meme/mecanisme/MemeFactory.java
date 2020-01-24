@@ -190,15 +190,22 @@ public class MemeFactory {
 	 * @param action Type de l'action que les memes doivent appliqués
 	 * @return
 	 */
-	public ArrayList<Meme> getMemeAvailable(ActionType action, boolean forFitting){
+	public ArrayList<Meme> getMemeAvailable(ActionType action, boolean forFitting, boolean forNormal){
 		ArrayList<Meme> goodOne = new ArrayList<Meme>();
 		if(forFitting){
 			for (Meme meme : memeFitting)
-				if(meme.getAction().getActionType() == action)
+				if(meme.getAction().getActionType() == action || action == ActionType.ANYTHING)
 					goodOne.add(meme);
-		} else
+
+		}
+		else if(forNormal){
+			for (Meme meme : memeOnMap)
+				if(meme.getAction().getActionType() == action || action == ActionType.ANYTHING)
+					goodOne.add(meme);
+		}
+		else
 			for (Meme meme : memeExisting)
-				if(meme.getAction().getActionType() == action)
+				if(meme.getAction().getActionType() == action|| action == ActionType.ANYTHING)
 					goodOne.add(meme);
 
 		return goodOne;
