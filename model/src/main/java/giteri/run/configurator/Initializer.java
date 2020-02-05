@@ -153,6 +153,8 @@ public class Initializer {
             entiteHandler.addMemeListener(workerFactory.getDrawer());
             entiteHandler.addEntityListener(workerFactory.getCalculator());
 
+
+
             networkConstructor.start();
             if (!Configurator.isSystemPaused()) {
                 networkConstructor.start();
@@ -188,24 +190,14 @@ public class Initializer {
             networkConstructor.start();
             entiteHandler.start();
 
+
+            // ICI aucune différence?
             if(Configurator.coupleVersion){
-                return launchForCaste(parameters);
+                return launchForClassic(stat, parameters);
             }else {
                 return launchForClassic(stat, parameters);
             }
        }
-    }
-
-    /** entier d'activation pour choisir les memes présents sur la simulation. Sur un total de
-     *
-     * @param addActivator
-     * @param rmvActivator
-     */
-    public static void setBooleanActivation(int addActivator, int rmvActivator){
-        int nbAdd = 3, nbRmv = 3, tailleTotal= 10;
-        addActivation = getActionActivation(addActivator, nbAdd, tailleTotal);
-        rmvActivation = getActionActivation(rmvActivator, nbRmv, tailleTotal);
-
     }
 
     // méthode sale mais osef
@@ -222,8 +214,7 @@ public class Initializer {
         ClassicOpenMoleParameter comp = (ClassicOpenMoleParameter)parameters;
         return stat.fitNetwork(Configurator.EnumLauncher.jarC,
                 Configurator.EnumExplorationMethod.oneShot,
-                Optional.of(comp.memeActication),
-                Optional.of(comp.memeProba));
+                parameters);
 
     }
 
@@ -236,63 +227,5 @@ public class Initializer {
 
 
 
-    /** Le numero d'activator. Le Max défini le nombre de combinaison max, et le Nb le nombre
-     * d'élément qui constitue la combinaison considérée.
-     * Si choix de 3 meme sur 10 max possible, le nombre de combinaison est de 10!/7!
-     *
-     *
-     * @param activator Xeme  combinaison" effectivement choisi. i.e. la 56eme
-     * @param nbActivator 3
-     * @param maxactivator 10
-     * @return
-     */
-    public static boolean[] getActionActivation(int activator, int nbActivator, int maxactivator){
-        System.out.println("CALL: " + activator);
-        boolean[] resultat = new boolean[maxactivator];
-        boolean again = true;
-        int nbCombinaison = Toolz.getLittleFactorial(maxactivator) / (Toolz.getLittleFactorial(maxactivator-nbActivator)
-        *Toolz.getLittleFactorial(nbActivator));
-        // position de base des activators, i<j<k
-       // int i= 1, j=2,k = 3;
-        for (int i = 0; i < maxactivator; i++) {
-            for (int j = i+1; j < maxactivator; j++) {
-                for (int k = j+1; k < maxactivator ; k++) {
-                    if(activator > 0) {
-                        activator--;
-                    }
-                    else if(activator == 0){
-                        System.out.println("ijk- " + i + j + k);
-                        for (int i1 = 0; i1 < maxactivator; i1++) {
-                            if(( i == i1) || (j == i1) || (k==i1))
-                                resultat[i1] = true;
-                            else
-                                resultat[i1] = false;
-                        }
-
-                        again = false;
-                    }
-
-                    if(!again)
-                        break;
-
-                }
-                if(!again)
-                    break;
-            }
-
-            if(!again)
-                break;
-        }
-
-        String res = "[";
-        for (int i = 0; i < resultat.length; i++) {
-            res += ";";
-            res += resultat[i] ? "1" : "0";
-        }
-        res += "]";
-
-        System.out.println(res);
-        return resultat;
-    }
 
 }

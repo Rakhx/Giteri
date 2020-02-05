@@ -8,14 +8,19 @@ import giteri.fitting.parameters.IModelParameter.GenericBooleanParameter;
 import giteri.fitting.parameters.IModelParameter.GenericDoubleParameter;
 import giteri.fitting.parameters.IModelParameter.MemeAvailability;
 import giteri.fitting.parameters.IModelParameter.MemeDiffusionProba;
+import giteri.meme.entite.CoupleMeme;
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.network.NetworkProperties;
+import giteri.run.configurator.CasteOpenMoleParameter;
+import giteri.run.configurator.ClassicOpenMoleParameter;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.EnumExplorationMethod;
 import giteri.run.configurator.Configurator.MemeList;
 import giteri.run.configurator.Configurator.NetworkAttribType;
+import giteri.run.interfaces.Interfaces;
+import giteri.run.interfaces.Interfaces.IOpenMoleParameter;
 import giteri.run.interfaces.Interfaces.StatAndPlotInterface;
 import giteri.tool.math.Toolz;
 import giteri.tool.other.WriteNRead;
@@ -25,7 +30,9 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static giteri.run.configurator.Configurator.coupleVersion;
 import static giteri.run.configurator.Configurator.debugJarMode;
+
 
 /** Classe commune à tous les statAndPlot
  *
@@ -91,17 +98,38 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 * Lancement de thread qui va comparer un réseau lu et le réseau en cours par rapport a différente configuration
 	 *
 	 */
-	public Double fitNetwork(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
-							   Optional<List<Boolean>> memeActivation, Optional<List<Double>> memeProba) {
+	public Double fitNetwork(Configurator.EnumLauncher typeOfLaunch,
+							 Configurator.EnumExplorationMethod typeOfExplo,
+							 IOpenMoleParameter param) {
 
-		// appelé quand on lance en jar
+		// appelé quand on lance en jar.
+		// La version jar fourni tjrs des parametres en ligne de commande
 		if ((typeOfLaunch == Configurator.EnumLauncher.jarC || typeOfLaunch == Configurator.EnumLauncher.jarOpenMole)) {
-			return fittingLauncher(typeOfLaunch, typeOfExplo, memeActivation, memeProba);
+			if(coupleVersion) {
+				// List<CoupleMeme> couples =
+				memeFactory.generateCoupleFromActivation(((CasteOpenMoleParameter) param).addActivation,
+						((CasteOpenMoleParameter) param).rmvActivation);
+				memeFactory.associateProbaWithCouple(((CasteOpenMoleParameter) param).probaPropa);
+
+			}
+			return fittingLauncher(typeOfLaunch, typeOfExplo, param);
 		} else {
 			// appelé depuis IHM
+			final IOpenMoleParameter proxyParam;
+			// ICI Faire des proxy des param. optional etc car lancée depuis LIHM sans paramètre
+			if(Configurator.coupleVersion){
+				proxyParam = new CasteOpenMoleParameter(14,3,10,14, 3, 10);
+				memeFactory.generateCoupleFromActivation(((CasteOpenMoleParameter)proxyParam).addActivation,
+						((CasteOpenMoleParameter)proxyParam).rmvActivation);
+				memeFactory.associateProbaWithCouple(((CasteOpenMoleParameter) param).probaPropa);
+			}else{
+				proxyParam = new ClassicOpenMoleParameter();
+			}
+
+
 			(new Thread() {
 				public void run() {
-					fittingLauncher(typeOfLaunch, typeOfExplo, Optional.empty(), Optional.empty());
+					fittingLauncher(typeOfLaunch, typeOfExplo, proxyParam);
 				}
 			}).start();
 			return 0.;
@@ -187,16 +215,32 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 *
 	 * @return
 	 */
-	private IExplorationMethod callFromJar(FittingClass fitter, List<Boolean> activation, List<Double> proba){
+	private IExplorationMethod callFromJar(FittingClass fitter, IOpenMoleParameter parameter){
+
 		// appelle sec avec un seul jeu de parametre, aux probas fixés
 		Hashtable<Meme, GenericDoubleParameter> memeAndProba = new Hashtable<>();
+		// Selon si on travail en version couple ou non
+		Hashtable<CoupleMeme, GenericDoubleParameter> coupleMemeAndProba = new Hashtable<>();
+
 		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
 		ArrayList<String> memesSelectionnes = null;
+
 		Meme selectedMeme;
+		CoupleMeme selectedCouple;
+
+		// Creation
+		if(coupleVersion){
+
+		}
+
 		File toWrite = writeNRead.createAndGetDirFromString(Arrays.asList("."));
 		if(debugJarMode) {
 			memesSelectionnes = new ArrayList<>();
-			writeNRead.writeSmallFile(toWrite, "RezTemp", activation.stream().map(e -> e.toString()).collect(Collectors.toList()));
+			if(!coupleVersion)
+				writeNRead.writeSmallFile(toWrite, "RezTemp", ((ClassicOpenMoleParameter)parameter).memeActication.stream().map(e -> e.toString()).collect(Collectors.toList()));
+			else{
+				writeNRead.writeSmallFile(toWrite, "RezTemp", (memeFactory.getCoupleMemes().stream().map(e -> e.toString()).collect(Collectors.toList())));
+			}
 		}
 
 		// Parcourt la liste des memes
@@ -239,41 +283,54 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 * Refact. Fonction commune à tous les appels classiques, première de la série.
 	 *
 	 */
-	public double fittingLauncher(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
-								  Optional<List<Boolean>> memeActivationOpt, Optional<List<Double>> memeProbaOpt) {
-		double resultat;
+	// ICI Prend un IOpenMoleConfigurator à la place des memeActivations
+	public double fittingLauncher(Configurator.EnumLauncher typeOfLaunch, EnumExplorationMethod typeOfExplo,
+								  IOpenMoleParameter parameter) {
 
-		List<Boolean> memeActivation = memeActivationOpt.orElse(new ArrayList<>());
-		List<Double> memeProba = memeProbaOpt.orElse(new ArrayList<>());
+		double resultat;
+		List<Boolean> memeActivation;
+		List<Double> memeProba;
+		List<Double> probaPropa;
 
 		// Qui définira pour la classe de fitting l'espace de recherche
 		IExplorationMethod explorator = null;
-		FittingClass configuration = new FittingClass();
+		FittingClass fittingConfig = new FittingClass();
 
+		if(Configurator.coupleVersion){
+			probaPropa = ((CasteOpenMoleParameter)parameter).probaPropa;
+		}else{
+			memeActivation = ((ClassicOpenMoleParameter)parameter).memeActication;
+			memeProba = ((ClassicOpenMoleParameter)parameter).memeProba;
+		}
+
+
+		// ICI génération des proxyparameter avant l'appel du fitting si en mode IHM
 		// Pour les cas OneShot from IHM;JAR
-		if(typeOfExplo == EnumExplorationMethod.oneShot && !memeActivationOpt.isPresent())
-			generateProxyParam(memeActivation,memeProba);
+//		if(typeOfExplo == EnumExplorationMethod.oneShot && !memeActivationOpt.isPresent())
+//			generateProxyParam(memeActivation,memeProba);
 
-		// Si on veut plus d'une itération, besoin d'utiliser un explorator plus complet
+		// Si on veut plus d'une itération, besoin d'utiliser un explorator plus complet.
+		// NON MIS A JOUR POUR COUPLE VERSION
 		if(typeOfExplo != EnumExplorationMethod.oneShot)
-			explorator = callFromJava(configuration);
+			if(!coupleVersion)
+				explorator = callFromJava(fittingConfig);
 		// Si appelle oneShot, depuis IHM ou depuis JAR, explorator oneShot
 		else {
-			explorator = callFromJar(configuration, memeActivation, memeProba);
+			explorator = callFromJar(fittingConfig, parameter);
 		}
 
 		// Classe de configuration qui contient tout ce qu'il faut pour faire une simu
-		configuration.KindaConstructor(writeNRead, communicationModel,
+		fittingConfig.KindaConstructor(writeNRead, communicationModel,
 				memeFactory, networkFileLoader, workerFactory, entiteHandler, networkConstructor, explorator);
 
 		// ajout de la fitting classe au listener
-		entiteHandler.addEntityListener(configuration);
+		entiteHandler.addEntityListener(fittingConfig);
 
 		// Lancement d'une simulation
-		resultat = factorisation(configuration);
+		resultat = factorisation(fittingConfig);
 
 		// retrait de la fitting classe des listener
-		entiteHandler.removeEntityListener(configuration);
+		entiteHandler.removeEntityListener(fittingConfig);
 		return resultat;
 	}
 
@@ -366,9 +423,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		List<Integer> toConvert = new ArrayList<>(Arrays.asList(0,0,0,1,0,0,1,0,0,0,0,1,0));
 		proba.addAll(Arrays.asList(
 				0.9627720666747352,0.2559838797762375,0.7969203634094254,0.8580268727470562,0.3358543882264913,0.849136850072306,0.7667072298886954,0.18527085724031966,0.8605838516655864,0.743762583297914,0.5992868107380205,0.09960619627293377,0.6068812397689891
-
-
-
 		));
 
 		// A vérifier

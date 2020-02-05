@@ -2,6 +2,7 @@ package giteri.run.jarVersion;
 
 import giteri.run.configurator.CasteOpenMoleParameter;
 import giteri.run.configurator.Configurator;
+import giteri.run.configurator.Initializer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,17 +43,14 @@ public class JarVersionCast {
      */
     public static Double run(int addActi, int addNb, int addTotal, int rmvActi, int rmvNb, int rmvTotal,
                                Double... args){
-        CasteOpenMoleParameter comp = new CasteOpenMoleParameter();
 
-        comp.addActi = addActi;
-        comp.addNb = addNb;
-        comp.addTotal=addTotal;
-        comp.rmvActi = rmvActi;
-        comp.rmvNb = rmvNb;
-        comp.rmvTotal = rmvTotal;
+        CasteOpenMoleParameter comp = new CasteOpenMoleParameter(addActi,addNb,addTotal,rmvActi,rmvNb,rmvTotal);
         comp.probaPropa = new ArrayList<>(Arrays.asList(args));
         assert(comp.probaPropa.size() == addNb * rmvNb);
 
+
+        // Oui, non?
+        Initializer.initialize(launcher, comp);
         return 0.;
     }
 

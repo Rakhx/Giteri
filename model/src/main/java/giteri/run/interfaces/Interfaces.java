@@ -63,7 +63,7 @@ public class Interfaces {
 		// Fonction d'obtention des stats
 		 String getDDInfos();
 		 Double fitNetwork(Configurator.EnumLauncher typeOfLaunch, Configurator.EnumExplorationMethod typeOfExplo,
-								 Optional<List<Boolean>> memeActivation, Optional<List<Double>> memeProba);
+						   Interfaces.IOpenMoleParameter param);
 		 void fitNextStep();
 		 void exploFitting();
 		 void incrementNbAction();

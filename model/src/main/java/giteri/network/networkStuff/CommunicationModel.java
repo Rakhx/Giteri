@@ -110,15 +110,15 @@ public class CommunicationModel implements IModel {
 	public void fittingOnce(){
 		Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
 		Configurator.typeOfMemeUseForFitting = Configurator.MemeList.FITTING;
-		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.oneShot,Optional.empty(),Optional.empty());
+		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.oneShot,null);
 	}
 
-	/** Lancement du processus de fittage du réseau courant a celui
+	/** Lancement du processus de fittage du réseau courant à celui
 	 * en paramètre.
 	 *
 	 */
 	public void fittingNetworks(){
-		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.exhaustive, Optional.empty(), Optional.empty());
+		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.exhaustive, null);
 	}
 
 	/** Lorsqu'on fait du step by step pour le fitting.

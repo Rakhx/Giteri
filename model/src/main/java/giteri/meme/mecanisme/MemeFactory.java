@@ -34,6 +34,7 @@ public class MemeFactory {
 
 	// Concernant les couples d'actions et leur probabilité de propagation
 	private Map<Integer, CoupleMeme> coupleAction;
+	private Map<Integer, Double> coupleProbaPerIndex;
 
 	private Integer lastMemeIndexUsed = -1;
 	private boolean hasBeenSorted = false;
@@ -50,9 +51,12 @@ public class MemeFactory {
 		attributFactory = attributFac;
 		memeTranslationReadable = new Hashtable<>();
 		coupleAction = new HashMap<>();
+		coupleProbaPerIndex = new HashMap<>();
 	}
 
 	//endregion
+
+	//region meme stuff
 
 	/** Permet de créer un meme et de l'ajouter à la liste des memes dispos sur la map.
 	 *
@@ -113,43 +117,6 @@ public class MemeFactory {
 		return toReturn;
 	}
 
-	/**
-	 *
-	 * @param add
-	 * @param rmv
-	 * @param proba
-	 * @return
-	 */
-	private CoupleMeme registerCoupleMeme(int index, Meme add, Meme rmv, double proba){
-		CoupleMeme cm = new CoupleMeme(index, add, rmv, proba);
-		if(index >= 0)
-			this.coupleAction.put(index, cm);
-		return cm;
-	}
-
-	/** depuis le nom des memes d'jaout//retrait, associé a un index et une proba de T
-	 *
-	 * @param index
-	 * @param addName
-	 * @param rmvName
-	 * @param proba
-	 * @return
-	 */
-	public CoupleMeme extractAndAddCoupleMeme(int index, String addName, String rmvName, double proba){
-		Meme add, rmv;
-		add = this.getMemeFromName(addName);
-		rmv = this.getMemeFromName(rmvName);
-		return this.registerCoupleMeme(index, add, rmv, proba);
-	}
-
-	public CoupleMeme getCoupleMemeFromIndex(int index){
-		return coupleAction.get(index);
-	}
-
-	public ArrayList<CoupleMeme> getCoupleMemes(){
-		return new ArrayList<>(coupleAction.values());
-	}
-
 	/** pas opti mais plus rapide. ( espérons ).
 	 *
 	 * @param whichAction
@@ -205,10 +172,6 @@ public class MemeFactory {
 
 	}
 
-	public Collection<CoupleMeme> getCouple(){
-		return new ArrayList<>(coupleAction.values());
-	}
-
 	/**
 	 *
 	 * @param typeMeme
@@ -231,7 +194,7 @@ public class MemeFactory {
 	 * @return
 	 */
 	public ArrayList<Meme> getMemeAvailable(ActionType action, boolean forFitting){
-		ArrayList<Meme> goodOne = new ArrayList<Meme>();
+		ArrayList<Meme> goodOne = new ArrayList<>();
 		if(forFitting){
 			for (Meme meme : memeFitting)
 				if(meme.getAction().getActionType() == action)
@@ -302,6 +265,97 @@ public class MemeFactory {
 
 		return compo;
 	}
+	//endregion
+
+	//region couple meme Stuff
+
+	/**
+	 *
+	 * @param add
+	 * @param rmv
+	 * @param proba
+	 * @return
+	 */
+	private CoupleMeme registerCoupleMeme(int index, Meme add, Meme rmv, double proba){
+		CoupleMeme cm = new CoupleMeme(index, add, rmv, proba);
+		if(index >= 0)
+			this.coupleAction.put(index, cm);
+		return cm;
+	}
+
+	/** depuis le nom des memes d'ajout//retrait, associé à un index et une proba de T
+	 *
+	 * @param index
+	 * @param addName
+	 * @param rmvName
+	 * @param proba
+	 * @return
+	 */
+	public CoupleMeme extractAndAddCoupleMeme(int index, String addName, String rmvName, double proba){
+		Meme add, rmv;
+		add = this.getMemeFromName(addName);
+		rmv = this.getMemeFromName(rmvName);
+		return this.registerCoupleMeme(index, add, rmv, proba);
+	}
+
+	/** Génère une liste de coupleMeme depuis les deux tableaux d'activation d'add et rmv. Produit carthésien
+	 *
+	 * @param addActi
+	 * @param rmvActi
+	 * @return
+	 */
+	public List<CoupleMeme> generateCoupleFromActivation(boolean[] addActi, boolean[] rmvActi){
+		// int i = 0, j = 0;
+		List<CoupleMeme> selected = new ArrayList<>();
+		List<Meme> addz, rmvz;
+		Meme add, rmv;
+		CoupleMeme cree;
+		int index = -1;
+		addz = getMemes(MemeList.FITTING, ActionType.AJOUTLIEN);
+		rmvz = getMemes(MemeList.FITTING, ActionType.RETRAITLIEN);
+		for (int i = 0; i < addActi.length; i++) {
+			if(addActi[i]) {
+				add = addz.get(i);
+				for (int j = 0; j < rmvActi.length; j++) {
+					// A new combinaison is born
+					if(rmvActi[j]){
+						rmv = rmvz.get(j);
+						cree = extractAndAddCoupleMeme(++index, add.getName(), rmv.getName(), .1);
+						selected.add(cree);
+						this.coupleAction.put(index,cree);
+					}
+				}
+			}
+		}
+
+		return selected;
+	}
+
+	public void associateProbaWithCouple(List<Double> proba){
+		assert (coupleAction.size() == proba.size());
+		for (int i = 0; i < coupleAction.size(); i++) {
+			coupleAction.get(i).setProbaPropagation(proba.get(i));
+			coupleProbaPerIndex.put(i, proba.get(i));
+
+		}
+
+	}
+
+	public CoupleMeme getCoupleMemeFromIndex(int index){
+		return coupleAction.get(index);
+	}
+
+	public ArrayList<CoupleMeme> getCoupleMemes(){
+		return new ArrayList<>(coupleAction.values());
+	}
+
+	public Collection<CoupleMeme> getCouple(){
+		return new ArrayList<>(coupleAction.values());
+	}
+
+
+
+	//endregion
 
 	//region index stuff
 

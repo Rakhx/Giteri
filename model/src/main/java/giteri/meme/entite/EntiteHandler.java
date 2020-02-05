@@ -107,6 +107,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	public void initialisation(){
 		generateMemeAvailableForMap();
 		bindNodeWithEntite(networkConstruct.getNetwork());
+//		if(coupleVersion)
+//			memeFactory.
 	}
 
 	/**
@@ -494,7 +496,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			}else
 				if(Configurator.initializeDefaultBehavior){
 					entite.setCoupleMeme(ajoutRandom);
-					ajoutRandom.forEach(e -> eventMemeChanged(entite, e, Configurator.MemeActivityPossibility.AjoutMeme.toString()));
+					ajoutRandom.forEach(e ->
+							eventMemeChanged(entite, e, Configurator.MemeActivityPossibility.AjoutMeme.toString()));
 				}else
 					break;
 		}
@@ -1246,6 +1249,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		// Creation depuis les params qui ont été donné dans l'initializer
 		if(coupleVersion){
+			this.doubleRandom = memeFactory.extractAndAddCoupleMeme(index++, "AddØ", "RmvØ", 0);
 
 		}
 		else {
