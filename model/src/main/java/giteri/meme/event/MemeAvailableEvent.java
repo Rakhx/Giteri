@@ -1,6 +1,7 @@
 package giteri.meme.event;
 
 import giteri.meme.entite.Meme;
+import giteri.run.interfaces.Interfaces;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class MemeAvailableEvent extends MemeListEvent {
      * @param memes
      * @param message
      */
-    public MemeAvailableEvent(Object source, List<Meme> memes, String message){
+    public MemeAvailableEvent(Object source, List<Interfaces.IUnitOfTransfer> memes, String message){
         super(source, memes, message);
     }
 

@@ -8,28 +8,24 @@ import giteri.meme.mecanisme.ActionFactory.IAction;
 import giteri.meme.mecanisme.FilterFactory;
 import giteri.meme.mecanisme.FilterFactory.IFilter;
 import giteri.meme.mecanisme.AttributFactory.IAttribut;
+import giteri.run.configurator.Configurator;
+import giteri.run.interfaces.Interfaces;
 
 /** Classe qui va définir le type de comportement que peuvent avoir les agents.
  *  
  */
 @SuppressWarnings({ "rawtypes", "serial" })
-public class Meme implements Serializable, Comparable<Meme>{	
-		
+public class Meme implements Serializable, Interfaces.IUnitOfTransfer<Meme>,Comparable<Meme>{
 	// Liste des paramètres pour le giteri.meme en question
 	IAction action;
 	ArrayList<IAttribut> attributs;
 	private Hashtable<String, Hashtable<Integer, IFilter>> KVAttributLAgregator;
 	private double probaOfPropagation;
 	private String name;
-
-	public boolean isFluide() {
-		return fluide;
-	}
-
 	boolean fluide = false;
 
 	/** Constructeur avec une bardée de paramètre.
-	 * 
+	 *
 	 * @param name
 	 * @param probaOfTransmission
 	 * @param action
@@ -45,7 +41,8 @@ public class Meme implements Serializable, Comparable<Meme>{
 		probaOfPropagation = probaOfTransmission;
 		fluide = fluidite;
 	}
-	
+
+
 	//region Getter/Setter/toString
 
 	/**
@@ -71,11 +68,16 @@ public class Meme implements Serializable, Comparable<Meme>{
 	public String toFourCharString(){
 		return getMemeName(0);
 	}
-	
+
+	@Override
+	public Configurator.ActionType getActionType() {
+		return action.getActionType();
+	}
+
 	public String getName(){
 		return this.name;
 	}
-	
+
 	public IAction getAction() {
 		return action;
 	}
@@ -87,16 +89,14 @@ public class Meme implements Serializable, Comparable<Meme>{
 	public Hashtable<Integer, FilterFactory.IFilter> getFilter(String attribut){
 		return KVAttributLAgregator.get(attribut);
 	}
-	
+
 	public ArrayList<IAttribut> getAttributs(){
 		return this.attributs;
 	}
 
-	//endregion
-	
 	/** mode 0 : the shortest
-	 *  mode 1 : 
-	 *  mode 2: non complet. Action: 
+	 *  mode 1 :
+	 *  mode 2: non complet. Action:
 	 * @param mode
 	 * @return
 	 */
@@ -105,14 +105,14 @@ public class Meme implements Serializable, Comparable<Meme>{
 		String strAttribut = "";
 		String strAgregator ="";
 		Hashtable<Integer, FilterFactory.IFilter> aggregators;
-		
+
 		if(mode == 1)
 			resultat += ":";
 		if(mode == 2)
 			resultat += "Action: ";
-		
-		resultat += mode == 0 ? action.getFourCharName() : action.toString();   
-		
+
+		resultat += mode == 0 ? action.getFourCharName() : action.toString();
+
 		for (IAttribut attribut : attributs) {
 			strAttribut = mode == 0 ? attribut.getFourCharName() : attribut.toString();
 			if(mode == 1)
@@ -132,17 +132,15 @@ public class Meme implements Serializable, Comparable<Meme>{
 				resultat += strAgregator;
 			}
 		}
-		
+
 		return resultat;
 	}
-
 	@Override
 	public int compareTo(Meme o) {
 		return this.toFourCharString().compareTo(o.toFourCharString());
 	}
-
 	/**
-	 * 
+	 *
 	 * @param target
 	 */
 	public void setMyValues(Meme target){
@@ -152,15 +150,27 @@ public class Meme implements Serializable, Comparable<Meme>{
 		this.probaOfPropagation = target.probaOfPropagation;
 		this.name = target.name;
 	}
-
 	public double getProbaOfPropagation() {
 		return probaOfPropagation;
 	}
-
 	public void setProbaOfPropagation(double probaOfPropagation) {
 		if(probaOfPropagation >= 0 && probaOfPropagation <= 1 )
 			this.probaOfPropagation = probaOfPropagation;
 		else
 			this.probaOfPropagation = 0;
 	}
+	@Override
+	public void setProbaPropagation(double p) {
+		setProbaOfPropagation(p);
+	}
+	@Override
+	public double getProbaPropagation() {
+		return getProbaOfPropagation();
+
+	}
+	public boolean isFluide() {
+		return fluide;
+	}
+
+	//endregion
 }

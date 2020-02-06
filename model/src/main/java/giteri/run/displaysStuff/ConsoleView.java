@@ -61,7 +61,7 @@ public class ConsoleView implements Interfaces.IView {
     }
 
     @Override
-    public void setMemeAvailable(List<Meme> memes) {
+    public void setMemeAvailable(List<Interfaces.IUnitOfTransfer> memes) {
         System.out.println("Cht de liste de memes: " + memes.stream().map(e -> e.toFourCharString()).reduce("", String::concat));
     }
 

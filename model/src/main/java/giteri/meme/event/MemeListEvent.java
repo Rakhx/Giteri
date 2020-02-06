@@ -1,6 +1,7 @@
 package giteri.meme.event;
 
 import giteri.meme.entite.Meme;
+import giteri.run.interfaces.Interfaces;
 
 import java.util.EventObject;
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
  */
 public class MemeListEvent extends EventObject {
     private static final long serialVersionUID = 1L;
-    public List<Meme> listOfMeme;
+    public List<Interfaces.IUnitOfTransfer> listOfMeme;
     public String message;
 
     /** Constructeur pour un event qui va concerner une liste de meme.
@@ -18,7 +19,7 @@ public class MemeListEvent extends EventObject {
      * @param memes la liste de meme concerné
      * @param message message associé
      */
-    public MemeListEvent(Object source, List<Meme> memes, String message){
+    public MemeListEvent(Object source, List<Interfaces.IUnitOfTransfer> memes, String message){
         super(source);
         this.message = message;
         listOfMeme = memes;

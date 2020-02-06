@@ -7,6 +7,8 @@ import giteri.meme.event.MemeAvailableEvent;
 import giteri.network.event.INbNodeChangedListener;
 import giteri.network.event.NbNodeChangedEvent;
 import giteri.run.configurator.Configurator;
+import giteri.run.interfaces.Interfaces;
+import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
 import giteri.tool.math.Toolz;
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
@@ -291,9 +293,9 @@ public interface IModelParameter<T> {
 	 *
 	 * @param <P>
 	 */
-	 abstract class AbstractMapParameter<P extends AbstractModelParameter<?>> extends AbstractModelParameter<Hashtable<Meme, P>>{
+	 abstract class AbstractMapParameter<P extends AbstractModelParameter<?>> extends AbstractModelParameter<Hashtable<Interfaces.IUnitOfTransfer, P>>{
 		public void gotoMinValue(){
-			for (Meme meme : value.keySet()) {
+			for (Interfaces.IUnitOfTransfer meme : value.keySet()) {
 				value.get(meme).gotoMinValue();
 			}
 		}
@@ -311,13 +313,13 @@ public interface IModelParameter<T> {
 			ArrayList<String> res = new ArrayList<String>();
 
 			// Meme dont il est question
-			ArrayList<Meme> memes = new ArrayList<Meme>(value.keySet());
+			ArrayList<Interfaces.IUnitOfTransfer> memes = new ArrayList<Interfaces.IUnitOfTransfer>(value.keySet());
 			memes.sort(null);
 			if(debug)System.out.println("Memes " + memes);
 
 			// Avoir les IModelParameter associés à chaque meme
 			ArrayList<P> elements = new ArrayList<P>();
-			for (Meme meme : memes)
+			for (Interfaces.IUnitOfTransfer meme : memes)
 				elements.add(value.get(meme));
 			if(debug)System.out.println("Elements " + elements);
 
@@ -390,7 +392,7 @@ public interface IModelParameter<T> {
 
 			for (String aMeme : nMeme) {
 				oneMeme = aMeme.split(";");
-				for (Meme meme : value.keySet()) {
+				for (Interfaces.IUnitOfTransfer meme : value.keySet()) {
 					if(meme.toFourCharString().compareTo(oneMeme[0]) == 0){
 						value.get(meme).setPossibleValue(oneMeme[1]);
 						break;
@@ -402,7 +404,7 @@ public interface IModelParameter<T> {
 		public String getActualValue(){
 			String result = "";
 
-			for (Meme meme : value.keySet()) {
+			for (IUnitOfTransfer meme : value.keySet()) {
 				result += meme + "=" + value.get(meme).getActualValue() +":";
 			}
 
@@ -469,7 +471,7 @@ public interface IModelParameter<T> {
 	 *
 	 */
 	class MemeAvailability extends AbstractMapParameter<GenericBooleanParameter> {
-		private List<Meme> activatedMeme = new ArrayList<>();
+		private List<IUnitOfTransfer> activatedMeme = new ArrayList<>();
 		private List<IMemeAvailableListener> memeAvailableListeners = new ArrayList<>();
 
 		/** Constructeur le plus simple. Prend un set de Meme. Y associe un BooleanParam
@@ -490,7 +492,7 @@ public interface IModelParameter<T> {
 		 * /!\ valeur sera perdu en cas d'exploration exhaustive ou random.
 		 * @param p
 		 */
-		public MemeAvailability(Hashtable<Meme, GenericBooleanParameter> p ){
+		public MemeAvailability(Hashtable<IUnitOfTransfer, GenericBooleanParameter> p ){
 			value = p;
 		}
 
@@ -500,11 +502,11 @@ public interface IModelParameter<T> {
 		 */
 		public boolean gotoNext() {
 			hasChanged = true;
-			ArrayList<Meme> memes = new ArrayList<Meme>();
+			ArrayList<IUnitOfTransfer> memes = new ArrayList<IUnitOfTransfer>();
 			memes.addAll(value.keySet());
 			memes.sort(null); // TODO [Opti 1.0]- Peut etre inutile a sort, puisque le constructeur le fait déjà
 			// dans sa version la plus simple
-			for (Meme meme : memes) {
+			for (IUnitOfTransfer meme : memes) {
 				if(value.get(meme).gotoNext())
 					return true;
 				else
@@ -529,7 +531,7 @@ public interface IModelParameter<T> {
 		public void apply() {
 			if(hasChanged) {
 				activatedMeme.clear();
-				for (Meme meme : value.keySet()) {
+				for (IUnitOfTransfer meme : value.keySet()) {
 					if (value.get(meme).getValue())
 						activatedMeme.add(meme);
 				}
@@ -542,7 +544,7 @@ public interface IModelParameter<T> {
 		/** Pour lancer les évènements de type meme dispo changz .
 		 *
 		 */
-		private void memesAvailablesChange(List<Meme> listAvailableMemes, String message) {
+		private void memesAvailablesChange(List<IUnitOfTransfer> listAvailableMemes, String message) {
 
 			// On crée un événement rappelant l'état courant concernant les memes;
 			MemeAvailableEvent myEvent = new MemeAvailableEvent(this, listAvailableMemes, message);
@@ -579,7 +581,7 @@ public interface IModelParameter<T> {
 		 */
 		public String valueString(){
 			String res = "MemeActivated: ";
-			for (Meme meme : value.keySet()) {
+			for (IUnitOfTransfer meme : value.keySet()) {
 				if(value.get(meme).getValue())
 					res += "&" + entiteHandler.translateMemeCombinaisonReadable(meme.toFourCharString()) + " ";
 			}
@@ -611,7 +613,7 @@ public interface IModelParameter<T> {
 		 */
 		public MemeDiffusionProba(Hashtable<Meme, GenericDoubleParameter> kvMemesParameter){
 			this();
-			ArrayList<Meme> memesSorted = new ArrayList<Meme>(kvMemesParameter.keySet());
+			ArrayList<Meme> memesSorted = new ArrayList<>(kvMemesParameter.keySet());
 			memesSorted.sort(null);
 			for (Meme meme: memesSorted) {
 				value.put(meme, kvMemesParameter.get(meme));
@@ -638,7 +640,7 @@ public interface IModelParameter<T> {
 		 */
 		public boolean gotoNext() {
 			// les memes d'available sont sort()
-			for (Meme meme : value.keySet()) {
+			for (IUnitOfTransfer meme : value.keySet()) {
 				if(value.get(meme).gotoNext())
 					return true;
 				else
@@ -652,9 +654,9 @@ public interface IModelParameter<T> {
 		 * Devrait etre en mesure de juste changer la proba de propagation d'un meme sans les réallouer
 		 */
 		public void apply() {
-			ArrayList<Meme> memeo = new ArrayList<>();
-			for (Meme meme : value.keySet()) {
-				meme.setProbaOfPropagation( value.get(meme).value);
+			ArrayList<IUnitOfTransfer> memeo = new ArrayList<>();
+			for (IUnitOfTransfer meme : value.keySet()) {
+				meme.setProbaPropagation( value.get(meme).value);
 				memeo.add(meme);
 			}
 
@@ -665,18 +667,18 @@ public interface IModelParameter<T> {
 		 * aléatoire.
 		 */
 		public void gotoRandom(){
-			Meme meme = new ArrayList<>(value.keySet()).get(Toolz.getRandomNumber(value.keySet().size()));
+			IUnitOfTransfer meme = new ArrayList<>(value.keySet()).get(Toolz.getRandomNumber(value.keySet().size()));
 			value.get(meme).gotoRandom();
 		}
 
-		public void setValue(Hashtable<Meme, GenericDoubleParameter> value){
+		public void setValue(Hashtable<IUnitOfTransfer, GenericDoubleParameter> value){
 			this.value = value;
 		}
 
 		@Override
 		public String valueString() {
 			String rez = "ProbaPropagation: ";
-			for (Meme meme : value.keySet()) {
+			for (IUnitOfTransfer meme : value.keySet()) {
 				rez += entiteHandler.translateMemeCombinaisonReadable(meme.toFourCharString()) + ":" + value.get(meme).value + " ";
 			}
 
@@ -695,7 +697,7 @@ public interface IModelParameter<T> {
 		@Override
 		public void handlerMemeAvailable(MemeAvailableEvent e) {
 			value.clear();
-			for (Meme meme:e.listOfMeme) {
+			for (IUnitOfTransfer meme:e.listOfMeme) {
 				value.put(meme, defautDoubleParam.copyMe());
 			}
 		}

@@ -4,6 +4,7 @@ import giteri.meme.entite.CoupleMeme;
 import giteri.meme.entite.Entite;
 import giteri.run.configurator.Configurator;
 import giteri.run.interfaces.Interfaces;
+import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
 import giteri.run.interfaces.Interfaces.IReadNetwork;
 import giteri.run.interfaces.Interfaces.IView;
 
@@ -176,7 +177,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	private Hashtable<String, JLabel> nodesHavingXoxoMemesLabel;
 	private Hashtable<String, JLabel> nbActivationByMemesLabel;
 	private Hashtable<String, JLabel> nbLastActivationByMemesLabel;
-	private Hashtable<String, Meme> memesTitle; // correspondance nom & meme
+	private Hashtable<String, IUnitOfTransfer> memesTitle; // correspondance nom & meme
 	private JLabel lastActionRatioLabel;
 
 	// Meme version pour les couples de memes
@@ -212,7 +213,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	private JFreeChart chartMemeAppliance;
 	int compteurSerieDensity = 0;
 
-	private ArrayList<Meme> selectedMemeOnSimulation;
+	private ArrayList<IUnitOfTransfer> selectedMemeOnSimulation;
 	private ArrayList<CoupleMeme> selectedCoupleMemeOnSimulation;
 
 	// à voir avec le reste
@@ -257,7 +258,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		jlScore = new JLabel();
 		// densityValues = new ArrayList<>();
 		densityValuesLast = new CircularFifoQueue<>(sizeOfCircularQueue);
-		memesTitle = new Hashtable<String, Meme>();
+		memesTitle = new Hashtable<String, IUnitOfTransfer>();
 		if(Configurator.coupleVersion)
 			this.setCoupleMemeAvailable(memeFactory.getCoupleMemes());
 		else
@@ -289,7 +290,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	 *            la liste des memes utilisés
 	 */
 	@Override
-	public void setMemeAvailable(List<Meme> memes) {
+	public void setMemeAvailable(List<IUnitOfTransfer> memes) {
 		this.selectedMemeOnSimulation = new ArrayList<>(memes);
 		resetHashTableKeys();
 		if(memeInfoPanel != null) // sale mais fonctionnel
@@ -864,7 +865,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		nbLastActivationByMemesLabel.clear();
 		memeInfoPanel.setLayout(new BoxLayout(memeInfoPanel, BoxLayout.X_AXIS));
 
-		for (Meme meme : selectedMemeOnSimulation) {
+		for (IUnitOfTransfer meme : selectedMemeOnSimulation) {
 			// Création du label pour la série de noeud possédant tel meme
 			memesTitle.put(meme.toString(), meme);
 			JLabel li = new JLabel();
@@ -902,7 +903,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		nbLastActivationByMemesLabel.clear();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
-		for (Meme meme : selectedMemeOnSimulation) {
+		for (IUnitOfTransfer meme : selectedMemeOnSimulation) {
 			// Création du label pour la série de noeud possédant tel meme
 			memesTitle.put(meme.toString(), meme);
 			JLabel li = new JLabel();
@@ -1368,14 +1369,14 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	/** Retire et ajouter X serie d'un coup
 	 *
 	 */
-	private void addXYseriesMemeApplianceWMeme(Set<Meme> memes){
+	private void addXYseriesMemeApplianceWMeme(Set<IUnitOfTransfer> memes){
 		datasetMemeAppliance.removeAllSeries();
 		String labelSerie;
 		Color serieColor;
 		int serieIndex;
 
 		// Pour chaque série qu'on veut ajouter
-		for (Meme meme : memes) {
+		for (IUnitOfTransfer meme : memes) {
 			labelSerie = memeFactory.translateMemeCombinaisonReadable(meme.toFourCharString());
 
 			// on crée les série dans l'ordre a partir de 0 et regarde le meme associé a cet index dans MemeFactory
@@ -1466,7 +1467,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 					}
 				}else {
 					// Pour chaque Meme disponible sur la simulation
-					for (Meme meme : selectedMemeOnSimulation) {
+					for (IUnitOfTransfer meme : selectedMemeOnSimulation) {
 						memeString = meme.toString();
 						memeFourChar = meme.toFourCharString();
 						associatedColor = drawerGraphStream.getColorAsColor(memeFactory.getIndexFromMemeFourChar(meme.toFourCharString()));
@@ -1518,7 +1519,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 					String oldText;
 					// On refait une passe pour mettre a jour les % de possession
-					for (Meme meme : selectedMemeOnSimulation) {
+					for (IUnitOfTransfer meme : selectedMemeOnSimulation) {
 						memeString = meme.toString();
 						if(totalAppel != 0 && nbActivationByMemesLabel.containsKey(memeString)){
 							oldText = nbActivationByMemesLabel.get(memeString).getText();
@@ -1598,7 +1599,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	 * @param time timestamp d'affichage
 	 * @param kvIndexValue k: meme, v: pourcentage de possession sur la map. mise à jour dans l'entité handler.OneStep()
 	 */
-	public void addValueToApplianceSerie(double time, Map<Meme, Double> kvIndexValue){
+	public void addValueToApplianceSerie(double time, Map<IUnitOfTransfer, Double> kvIndexValue){
 		if(firstAppliance){
 			addXYseriesMemeApplianceWMeme(kvIndexValue.keySet());
 			firstAppliance = false;
@@ -1607,7 +1608,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		String keyMeme;
 
 		// Pour chaque meme, on trouve la traduction en langage lisible, et on cherche la série correspondante.
-		for (Meme meme : kvIndexValue.keySet()) {
+		for (IUnitOfTransfer meme : kvIndexValue.keySet()) {
 			keyMeme = memeFactory.translateMemeCombinaisonReadable((meme.toFourCharString()));
 			for (XYSeries arraySeriesMemeAppliance : ArraySeriesMemeAppliances) {
 				if(keyMeme.compareToIgnoreCase((String)arraySeriesMemeAppliance.getKey()) == 0)
@@ -1633,7 +1634,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 				nodesHavingCoupleMemes.put(cMeme.toString(), new ArrayList<>());
 			}
 		}else{
-			for (Meme meme : selectedMemeOnSimulation) {
+			for (IUnitOfTransfer meme : selectedMemeOnSimulation) {
 				nodesHavingXoxoMemes.put(meme.toString(), new ArrayList<>());
 				nbActivationByMemes.put(meme.toString(), 0);
 				countOfLastMemeActivation.put(meme.toString(), 0);

@@ -7,6 +7,7 @@ import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.FittingBehavior;
 import giteri.run.configurator.Configurator.NetworkAttribType;
 import giteri.run.controller.Controller.VueController;
+import giteri.run.interfaces.Interfaces;
 import giteri.run.interfaces.Interfaces.IModel;
 import giteri.run.interfaces.Interfaces.IReadNetwork;
 import giteri.run.interfaces.Interfaces.StatAndPlotInterface;
@@ -151,7 +152,7 @@ public class CommunicationModel implements IModel {
 	 *
 	 * @param memes
 	 */
-	public void setViewMemeAvailable(List<Meme> memes){
+	public void setViewMemeAvailable(List<Interfaces.IUnitOfTransfer> memes){
 		view.setMemeAvailable(memes);
 	}
 

@@ -10,6 +10,8 @@ import giteri.run.configurator.Configurator.AttributType;
 import giteri.meme.entite.Meme;
 
 import giteri.run.configurator.Configurator.MemeList;
+import giteri.run.interfaces.Interfaces;
+import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
 
 /** Permet de gérer les meme du graph
  *
@@ -21,7 +23,7 @@ public class MemeFactory {
 	private FilterFactory filterFactory;
 	private AttributFactory attributFactory;
 
-	// Liste de meme qui sont instancié de abse sur la map. Pas nécessairement utilisé.
+	// Liste de meme qui sont instancié de base sur la map. Pas nécessairement utilisé.
 	private ArrayList<Meme> memeOnMap;
 	// Liste des memes existant dans la simulation
 	private ArrayList<Meme> memeExisting;
@@ -193,8 +195,8 @@ public class MemeFactory {
 	 * @param action Type de l'action que les memes doivent appliqués
 	 * @return
 	 */
-	public ArrayList<Meme> getMemeAvailable(ActionType action, boolean forFitting){
-		ArrayList<Meme> goodOne = new ArrayList<>();
+	public ArrayList<IUnitOfTransfer> getMemeAvailable(ActionType action, boolean forFitting){
+		ArrayList<IUnitOfTransfer> goodOne = new ArrayList<>();
 		if(forFitting){
 			for (Meme meme : memeFitting)
 				if(meme.getAction().getActionType() == action)

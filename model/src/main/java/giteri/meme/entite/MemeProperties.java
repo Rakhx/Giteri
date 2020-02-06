@@ -5,6 +5,8 @@ import giteri.fitting.parameters.IModelParameter;
 import giteri.meme.event.IMemeAvailableListener;
 import giteri.meme.event.MemeAvailableEvent;
 import giteri.run.configurator.Configurator;
+import giteri.run.interfaces.Interfaces;
+import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
 import giteri.tool.math.Toolz;
 import giteri.tool.objects.ObjectRef;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
@@ -22,21 +24,21 @@ public class MemeProperties {
     //region properties & constructeur
 
     // Meme actif sur la map
-    List<Meme> memeOnMap;
+    List<Interfaces.IUnitOfTransfer> memeOnMap;
     // Nombre d'appel depuis le début de la simu
-    private Map<Meme, Integer> nbActivationByMemes;
+    private Map<Interfaces.IUnitOfTransfer, Integer> nbActivationByMemes;
     // Compte sur les X derniers appels des memes
-    Map<Meme, Integer> countOfLastMemeActivation;
+    Map<Interfaces.IUnitOfTransfer, Integer> countOfLastMemeActivation;
     // k:meme v:nb entity with this meme
-    Map<Meme, Integer> countOfEntitiesHavingMeme;
+    Map<Interfaces.IUnitOfTransfer, Integer> countOfEntitiesHavingMeme;
 
     // Sur les 100 dernières actions, quel meme a été appelé
-    final CircularFifoQueue<Meme> lastHundredActionDone;
+    final CircularFifoQueue<Interfaces.IUnitOfTransfer> lastHundredActionDone;
 
     List<Integer> lastFailActionTried;
 
     // Combinaison de meme disponible
-    Map<Integer, ArrayList<Meme>> memeCombinaisonFittingAvailable;
+    Map<Integer, ArrayList<Interfaces.IUnitOfTransfer>> memeCombinaisonFittingAvailable;
 
     int cptActionRmvFail = 0, cptActionAddFail = 0;
 
@@ -73,7 +75,7 @@ public class MemeProperties {
         // SUCCES: En cas de réussite de l'action
         if (memeApply != null && !message.contains("Nope"))
         {
-            Meme elementRemoveOfCircular = null;
+            Interfaces.IUnitOfTransfer elementRemoveOfCircular = null;
             Toolz.addCountToElementInHashArray(nbActivationByMemes, memeApply, 1);
             synchronized (lastHundredActionDone) {
                 // partie last twenty
@@ -154,7 +156,7 @@ public class MemeProperties {
         // CALCUL DES INDICATEURS A ECRIRE
 
         // La liste des memes courant devrait etre a jour, apply fait avant dans la fitting classe
-        for (Meme meme:memeOnMap) {
+        for (Interfaces.IUnitOfTransfer meme:memeOnMap) {
             header += ";Meme[";
             header += meme.toFourCharString() +":";
             header += "]-nbEntiteOwning";
@@ -174,9 +176,9 @@ public class MemeProperties {
             header += ";" + model.nameString();
 
         // combinaison de meme présent sur le run, classé par type d'action
-        Hashtable<Configurator.ActionType, ArrayList<Meme>> memesByCategory = new Hashtable<>();
-        for (Meme meme: memeOnMap)
-            Toolz.addElementInHashArray(memesByCategory,meme.getAction().getActionType(),meme);
+        Hashtable<Configurator.ActionType, ArrayList<IUnitOfTransfer>> memesByCategory = new Hashtable<>();
+        for (Interfaces.IUnitOfTransfer meme: memeOnMap)
+            Toolz.addElementInHashArray(memesByCategory,meme.getActionType(),meme);
        // memeCombinaisonFittingAvailable = this.getMemeAvailable(Configurator.FittingBehavior.simpleAndComplex, Optional.of(memesByCategory));
 
         // La liste des memes courant devrait etre a jour, apply fait avant dans la fitting classe
@@ -205,7 +207,7 @@ public class MemeProperties {
             toWrite += ";" + model.valueString();
 
         // detail sur les memes
-        List<Meme> combinaisonLookedAt;
+        List<IUnitOfTransfer> combinaisonLookedAt;
         int nbEntitesOwning;
         for (Integer i: memeCombinaisonFittingAvailable.keySet()){
             nbEntitesOwning = 0;
@@ -217,7 +219,7 @@ public class MemeProperties {
             }
 
             toWrite += ";Meme[";
-            for (Meme meme:memeCombinaisonFittingAvailable.get(i)) {
+            for (IUnitOfTransfer meme:memeCombinaisonFittingAvailable.get(i)) {
                 toWrite += meme.toFourCharString() +":";
             }
 
@@ -229,7 +231,7 @@ public class MemeProperties {
 
     // endregion
 
-    Map<Meme, Integer> getNbActivationByMemes() {
+    Map<Interfaces.IUnitOfTransfer, Integer> getNbActivationByMemes() {
         return nbActivationByMemes;
     }
 

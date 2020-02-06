@@ -11,6 +11,8 @@ import giteri.fitting.algo.ResultSet;
 import giteri.meme.event.*;
 import giteri.network.event.INbNodeChangedListener;
 import giteri.network.event.NbNodeChangedEvent;
+import giteri.run.interfaces.Interfaces;
+import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
 import giteri.tool.math.Toolz;
 import giteri.meme.mecanisme.MemeFactory;
 import giteri.network.network.NetworkProperties;
@@ -85,19 +87,20 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public long currentSeed ;
 
 	public int circularSize = 200;
-	// Cette liste est changée pendant le fitting a chaque event action
-	public CircularFifoQueue<Meme> cqLastXActionDone;
+	// Cette liste est changée pendant le fitting à chaque event action
+	public CircularFifoQueue<IUnitOfTransfer> cqLastXActionDone;
+
 	// Ces deux listes sont utilisées dans la boucle la plus interne du fitting, donc chaque nbActionByStep
-	private Hashtable<Meme, Integer> kvLastActionDone;
-	private Hashtable<Meme, Double> kvOverallProportionActionDone;
-	private Hashtable<Meme, Integer> kvOverallNumberOfActionDone;
+	private Hashtable<IUnitOfTransfer, Integer> kvLastActionDone;
+	private Hashtable<IUnitOfTransfer, Double> kvOverallProportionActionDone;
+	private Hashtable<IUnitOfTransfer, Integer> kvOverallNumberOfActionDone;
 
 	// Liste qui sont utilisées pour définir si on s'arrete de fitter sur une configuration ou non
-	private CircularFifoQueue<Hashtable<Meme, Double>> cfqMemeAppliancePropOnFitting;
-	private CircularFifoQueue<Hashtable<Meme, Integer>> cfqMemeApplianceNumberOnFitting;
+	private CircularFifoQueue<Hashtable<IUnitOfTransfer, Double>> cfqMemeAppliancePropOnFitting;
+	private CircularFifoQueue<Hashtable<IUnitOfTransfer, Integer>> cfqMemeApplianceNumberOnFitting;
 	private int nbEltCircularQFitting = 15;
 
-	private ArrayList<Meme> memesAvailables;
+	private ArrayList<IUnitOfTransfer> memesAvailables;
 	private int nbCallContinuOnThisConfig = 0;
 
 	// RESULTATS DE SIMULATION
@@ -162,7 +165,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		kvOverallNumberOfActionDone = new Hashtable<>();
 		cfqMemeAppliancePropOnFitting = new CircularFifoQueue<>(nbEltCircularQFitting);
 		cfqMemeApplianceNumberOnFitting = new CircularFifoQueue<>(nbEltCircularQFitting);
-		//memesAvailables = memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING);
 		currentNetProperties.createStub();
 	}
 
@@ -531,7 +533,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public void computeMemeAppliance(){
 		int nbAction = 0;
 		synchronized(cqLastXActionDone){
-			for (Meme meme : cqLastXActionDone) {
+			for (IUnitOfTransfer meme : cqLastXActionDone) {
 				Toolz.addCountToElementInHashArray(kvLastActionDone, meme, 1);
 				nbAction++;
 			}
@@ -541,7 +543,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			cqLastXActionDone.clear();
 		}
 
-		for (Meme meme : kvLastActionDone.keySet()) {
+		for (IUnitOfTransfer meme : kvLastActionDone.keySet()) {
 			kvOverallProportionActionDone.put(meme, (double)kvLastActionDone.get(meme) / nbAction);
 			kvOverallNumberOfActionDone.put(meme, kvLastActionDone.get(meme));
 		}

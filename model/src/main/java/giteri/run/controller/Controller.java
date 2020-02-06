@@ -43,7 +43,7 @@ public class Controller {
 
 
 		//region iview part
-		public void setMemeAvailable(List<Meme> memes) {
+		public void setMemeAvailable(List<Interfaces.IUnitOfTransfer> memes) {
 			for (Interfaces.IView vue : vues) {
 				vue.setMemeAvailable(memes);
 			}
@@ -111,7 +111,7 @@ public class Controller {
 		 * @param time
 		 * @param values
 		 */
-		public void addValueToApplianceSerie(double time, Map<Meme, Double> values){
+		public void addValueToApplianceSerie(double time, Map<Interfaces.IUnitOfTransfer, Double> values){
 			for (Interfaces.IView vue:  vues) {
 				vue.addValueToApplianceSerie(time, values);
 			}

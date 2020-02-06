@@ -17,6 +17,7 @@ import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.IBehaviorTransmissionListener;
 
 import giteri.run.configurator.Configurator.ViewMessageType;
+import org.omg.PortableServer.IdUniquenessPolicy;
 
 /** Ensemble des interfaces utilisées dans le programme.
  * 
@@ -86,8 +87,8 @@ public class Interfaces {
 		void resetDensityOverProbaChart();
 		void toggleEnableInterface();
 		void toggleWkProgress(String message);
-		void addValueToApplianceSerie(double time, Map<Meme, Double> kvIndexValue);
-		void setMemeAvailable(List<Meme> memes);
+		void addValueToApplianceSerie(double time, Map<IUnitOfTransfer, Double> kvIndexValue);
+		void setMemeAvailable(List<IUnitOfTransfer> memes);
 		void setCoupleMemeAvailable(List<CoupleMeme> cMemes);
 		JFreeChart getDDChart(); // Pour prendre les screenshot. Pas propre.
 		JFreeChart getDensityChart();
@@ -107,7 +108,7 @@ public class Interfaces {
 		void fittingOnce();
 		void exploFitting();
 		void rdmConfig();
-		void setViewMemeAvailable(List<Meme> memes);
+		void setViewMemeAvailable(List<IUnitOfTransfer> memes);
 		void takeSnapshot(long seed, Optional<ArrayList<String>> simulationPath);
 
 
@@ -172,6 +173,19 @@ public class Interfaces {
 		 */
 		 ArrayList<String> getNetworkEdges();
 	}
+
+	/** Element qui sera passé d'entité en entité.
+	 * Peut etre un meme ou un couple de meme.
+	 *
+	 * @param <T>
+	 */
+	public interface IUnitOfTransfer <T extends IUnitOfTransfer>  extends Comparable<T> {
+		void setProbaPropagation(double p);
+		double getProbaPropagation();
+		String toFourCharString();
+		Configurator.ActionType getActionType();
+	}
+
 
 	/** Interface qui contient les parametres donnés par l'utilisation d'openmole,
 	 * donc on oneshot, couple version ou non.

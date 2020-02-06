@@ -19,6 +19,8 @@ import giteri.run.ThreadHandler;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.*;
 import giteri.run.controller.Controller.VueController;
+import giteri.run.interfaces.Interfaces;
+import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
 import giteri.tool.math.Toolz;
 import giteri.tool.objects.ObjectRef;
 import giteri.tool.other.StopWatchFactory;
@@ -46,7 +48,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 	// Entite possedant des actions
 	private ArrayList<Entite> entitesActive;
-	private List<Meme> memeFittingApplied;
+	private List<Interfaces.IUnitOfTransfer> memeFittingApplied;
 
 	private boolean allTransmitted = false;
 	private boolean allAddTransmitted = false;
@@ -74,7 +76,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private double lastDensity;
 	private int sumFailAction;
 	private ObjectRef<Integer> nbFail = new ObjectRef<>(0);
-	private Map<Meme, Double> kvMemeCodeNbEntities;
+	private Map<IUnitOfTransfer, Double> kvMemeCodeNbEntities;
 
 	// Variable utilisé dans la fonction doAction - fn appelée a chaque step
 	Set<Entite> cibles;
@@ -115,12 +117,13 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 *
 	 */
 	public void updateMemeAvailableForProperties(){
+
 		memeProperties.memeOnMap = this.memeFittingApplied;
 
 		//combinaison de meme présent sur le run, classé par type d'action
-		Hashtable<ActionType, ArrayList<Meme>> memesByCategory = new Hashtable<>();
-		for (Meme meme: this.memeFittingApplied)
-			Toolz.addElementInHashArray(memesByCategory,meme.getAction().getActionType(),meme);
+		Hashtable<ActionType, ArrayList<Interfaces.IUnitOfTransfer>> memesByCategory = new Hashtable<>();
+		for (Interfaces.IUnitOfTransfer meme: this.memeFittingApplied)
+			Toolz.addElementInHashArray(memesByCategory,meme.getActionType(),meme);
 
 		memeProperties.memeCombinaisonFittingAvailable =
 				this.getMemeAvailable(FittingBehavior.simpleAndComplex, Optional.of(memesByCategory));
@@ -190,7 +193,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 					memeProperties.lastHundredActionDone); }
 		if(Configurator.displayMemePossessionEvolution && cptModulo % (Configurator.refreshInfoRate * 200) == 0){
 			kvMemeCodeNbEntities.clear();
-			for (Meme meme : memeProperties.countOfEntitiesHavingMeme.keySet()) {
+			for (IUnitOfTransfer meme : memeProperties.countOfEntitiesHavingMeme.keySet()) {
 				kvMemeCodeNbEntities.put(meme, (double)memeProperties.countOfEntitiesHavingMeme.get(meme) / entites.size());
 			}
 
@@ -361,7 +364,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * crée un evenement pour la mise a jour de l'interface Il s'agit d'un
 	 * evenement de type acquisition ou perte d'un meme.
 	 */
-	public void eventMemeChanged(Entite entiteConcernee, Meme ajoutOrR, String message) {
+	public void eventMemeChanged(Entite entiteConcernee, IUnitOfTransfer ajoutOrR, String message) {
 
 		// Devrait se trouver dans le handler de cet event, de la meme classe.
 	    if(!Configurator.rebranchementAction || entiteConcernee.getMyMemes().size() > 1)
@@ -459,13 +462,13 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * Utilisé par l'apply du IModelParameter
 	 * @param memes
 	 */
-	public void giveMemeToEntiteFitting(List<Meme> memes) {
+	public void giveMemeToEntiteFitting(List<Interfaces.IUnitOfTransfer> memes) {
 		ArrayList<Entite> entiteContente = new ArrayList<>();
 		Iterator<Entite> entitees = entites.iterator();
 		Entite actual;
 		ArrayList<Entite> others = new ArrayList<>(entites);
 		memeFittingApplied = memes;
-		for (Meme meme : memes) {
+		for (Interfaces.IUnitOfTransfer meme : memes) {
 			actual = entitees.next();
 			eventMemeChanged(actual, actual.addMeme(meme, true), Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			entiteContente.add(actual);
@@ -510,9 +513,9 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 *            ou les deux.
 	 * @return
 	 */
-	public Hashtable<Integer, ArrayList<Meme>> getMemeAvailable(FittingBehavior setAsked,
-																Optional<Hashtable<ActionType, ArrayList<Meme>>> memeByC) {
-		Hashtable<Integer, ArrayList<Meme>> memes = new Hashtable<>();
+	public Hashtable<Integer, ArrayList<Interfaces.IUnitOfTransfer>> getMemeAvailable(FittingBehavior setAsked,
+																					  Optional<Hashtable<ActionType, ArrayList<IUnitOfTransfer>>> memeByC) {
+		Hashtable<Integer, ArrayList<IUnitOfTransfer>> memes = new Hashtable<>();
 		if (setAsked == FittingBehavior.onlyComplex || setAsked == FittingBehavior.simpleAndComplex) {
 			memes = getMemeCombinaisonAvailable(memeByC);
 		}
@@ -532,13 +535,13 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	public ArrayList<String> getMemeAvailableAsString(FittingBehavior setAsked) {
 		ArrayList<String> memesAsString = new ArrayList<String>();
-		Hashtable<Integer, ArrayList<Meme>> memes = getMemeAvailable(setAsked, Optional.empty());
+		Hashtable<Integer, ArrayList<IUnitOfTransfer>> memes = getMemeAvailable(setAsked, Optional.empty());
 		ArrayList<String> classes = new ArrayList<String>();
 		String classe;
 
-		for (ArrayList<Meme> combinaison : memes.values()) {
+		for (ArrayList<IUnitOfTransfer> combinaison : memes.values()) {
 			classes.clear();
-			for (Meme meme : combinaison)
+			for (IUnitOfTransfer meme : combinaison)
 				classes.add(meme.toFourCharString());
 
 			classes.sort(null);
@@ -1274,10 +1277,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @return une hash Int ( qui n'a pas de signification ), combinaison de
 	 *         meme.
 	 */
-	private Hashtable<Integer, ArrayList<Meme>> getMemeCombinaisonAvailable(
-			Optional<Hashtable<ActionType, ArrayList<Meme>>> memeByC) {
-		Hashtable<ActionType, ArrayList<Meme>> memesByCategory = new Hashtable<>();
-		ArrayList<Meme> memeOfOneCategory;
+	private Hashtable<Integer, ArrayList<IUnitOfTransfer>> getMemeCombinaisonAvailable(
+			Optional<Hashtable<ActionType, ArrayList<IUnitOfTransfer>>> memeByC) {
+		Hashtable<ActionType, ArrayList<IUnitOfTransfer>> memesByCategory = new Hashtable<>();
+		ArrayList<IUnitOfTransfer> memeOfOneCategory;
 		ArrayList<ActionType> key = new ArrayList<>();
 
 		if(memeByC.isPresent()) {
@@ -1303,8 +1306,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		for (int i = 0; i < key.size(); i++)
 			keyz[i] = key.get(i);
 
-		Hashtable<Integer, ArrayList<Meme>> composition = new Hashtable<>();
-		ArrayList<Meme> memez = new ArrayList<>();
+		Hashtable<Integer, ArrayList<IUnitOfTransfer>> composition = new Hashtable<>();
+		ArrayList<IUnitOfTransfer> memez = new ArrayList<>();
 		indexOfMemesCombinaisonRecursion = -1;
 		recursive(memesByCategory, memez, keyz, composition, -1);
 
