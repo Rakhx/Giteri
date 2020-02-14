@@ -95,7 +95,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	//region Interface stat&plot
 
 	/**
-	 * Lancement de thread qui va comparer un réseau lu et le réseau en cours par rapport a différente configuration
+	 * Lancement de thread qui va comparer un réseau lu et le réseau en cours par rapport à différente configuration
 	 *
 	 */
 	public Double fitNetwork(Configurator.EnumLauncher typeOfLaunch,
@@ -111,6 +111,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 				memeFactory.associateProbaWithCouple(((CasteOpenMoleParameter) param).probaPropa);
 
 			}
+
 			return fittingLauncher(typeOfLaunch, typeOfExplo, param);
 		} else {
 			// appelé depuis IHM

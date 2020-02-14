@@ -23,6 +23,9 @@ public class CasteOpenMoleParameter implements IOpenMoleParameter {
 
     /** Si lancé depuis l'IHM, nécessite des valeurs pars défault
      *
+     * @param addA Ajout Activation ( 110 )
+     * @param addN Ajout numbre ( 3)
+     * @param addT Ajout Total (10)
       */
     public CasteOpenMoleParameter(int addA, int addN, int addT, int rmvA, int rmvN, int rmvT){
         addActi = addA;

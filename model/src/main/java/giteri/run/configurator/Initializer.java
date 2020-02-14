@@ -153,8 +153,6 @@ public class Initializer {
             entiteHandler.addMemeListener(workerFactory.getDrawer());
             entiteHandler.addEntityListener(workerFactory.getCalculator());
 
-
-
             networkConstructor.start();
             if (!Configurator.isSystemPaused()) {
                 networkConstructor.start();
@@ -191,18 +189,10 @@ public class Initializer {
             entiteHandler.start();
 
 
-            // ICI aucune différence?
-            if(Configurator.coupleVersion){
-                return launchForClassic(stat, parameters);
-            }else {
-                return launchForClassic(stat, parameters);
-            }
+            return launchForClassic(stat, parameters);
+
        }
     }
-
-    // méthode sale mais osef
-    public static boolean[] addActivation = new boolean[10];
-    public static boolean[] rmvActivation = new boolean[10];
 
     /** méthode pour lancement spécifique au cas classique.
      *
@@ -211,21 +201,11 @@ public class Initializer {
      * @return
      */
     public static Double launchForClassic(StatAndPlotGeneric stat, Interfaces.IOpenMoleParameter parameters){
-        ClassicOpenMoleParameter comp = (ClassicOpenMoleParameter)parameters;
         return stat.fitNetwork(Configurator.EnumLauncher.jarC,
                 Configurator.EnumExplorationMethod.oneShot,
                 parameters);
 
     }
-
-    public static Double launchForCaste(Interfaces.IOpenMoleParameter parameters){
-        CasteOpenMoleParameter comp = (CasteOpenMoleParameter)parameters;
-
-        return .0;
-    }
-
-
-
 
 
 }

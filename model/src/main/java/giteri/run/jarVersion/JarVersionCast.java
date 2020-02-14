@@ -32,9 +32,16 @@ public class JarVersionCast {
         filePath = args[0];
         inputFile = new File(filePath);
         if(debug)System.out.print("Fichier d'input: " + (inputFile.exists()? "exist" : "does not exist"));
-        run(0,0,0,0,0,0, Double.parseDouble(args[8])
-                , Double.parseDouble(args[7]) , Double.parseDouble(args[7]));
+        int decalage = 7;
 
+        Double[] proba = new Double[args.length -decalage];
+        for (int i = decalage; i < args.length; i++) {
+            proba[i-decalage] = Double.parseDouble(args[i]);
+        }
+
+
+        run(Integer.parseInt(args[1]),Integer.parseInt(args[2]),Integer.parseInt(args[3]),
+                Integer.parseInt(args[4]),Integer.parseInt(args[5]),Integer.parseInt(args[6]) , proba);
 
     }
 
@@ -48,8 +55,6 @@ public class JarVersionCast {
         comp.probaPropa = new ArrayList<>(Arrays.asList(args));
         assert(comp.probaPropa.size() == addNb * rmvNb);
 
-
-        // Oui, non?
         Initializer.initialize(launcher, comp);
         return 0.;
     }

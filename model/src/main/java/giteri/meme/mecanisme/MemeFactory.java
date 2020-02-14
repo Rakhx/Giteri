@@ -348,7 +348,6 @@ public class MemeFactory {
 		assert (coupleAction.size() == proba.size());
 		for (int i = 0; i < coupleAction.size(); i++) {
 			coupleAction.get(i).setProbaPropagation(proba.get(i));
-		//	coupleProbaPerIndex.put(i, proba.get(i));
 		}
 	}
 
