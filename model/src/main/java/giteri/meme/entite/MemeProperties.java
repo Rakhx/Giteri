@@ -2,8 +2,6 @@ package giteri.meme.entite;
 
 import giteri.fitting.algo.IExplorationMethod;
 import giteri.fitting.parameters.IModelParameter;
-import giteri.meme.event.IMemeAvailableListener;
-import giteri.meme.event.MemeAvailableEvent;
 import giteri.run.configurator.Configurator;
 import giteri.run.interfaces.Interfaces;
 import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
@@ -11,7 +9,6 @@ import giteri.tool.math.Toolz;
 import giteri.tool.objects.ObjectRef;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
-import java.io.File;
 import java.util.*;
 
 /**
@@ -133,7 +130,7 @@ public class MemeProperties {
      * @param meme Le meme qui a recu ou perdu une entité associée
      * @param added Si true, une entité a recu le mail, sinon elle l'a perdu
      */
-    void updateMemePossession(Meme meme, boolean added ){
+    void updateMemePossession(IUnitOfTransfer meme, boolean added ){
         if(added)
             Toolz.addCountToElementInHashArray(countOfEntitiesHavingMeme,meme,1);
         else
@@ -176,7 +173,7 @@ public class MemeProperties {
             header += ";" + model.nameString();
 
         // combinaison de meme présent sur le run, classé par type d'action
-        Hashtable<Configurator.ActionType, ArrayList<IUnitOfTransfer>> memesByCategory = new Hashtable<>();
+        Hashtable<Configurator.TypeOfUOT, ArrayList<IUnitOfTransfer>> memesByCategory = new Hashtable<>();
         for (Interfaces.IUnitOfTransfer meme: memeOnMap)
             Toolz.addElementInHashArray(memesByCategory,meme.getActionType(),meme);
        // memeCombinaisonFittingAvailable = this.getMemeAvailable(Configurator.FittingBehavior.simpleAndComplex, Optional.of(memesByCategory));
@@ -213,7 +210,7 @@ public class MemeProperties {
             nbEntitesOwning = 0;
             combinaisonLookedAt = memeCombinaisonFittingAvailable.get(i);
             for (Entite entite: entitesActive) {
-                if(entite.getMyMemes().containsAll(combinaisonLookedAt)){
+                if(entite.getMyUnitOfT().containsAll(combinaisonLookedAt)){
                     nbEntitesOwning++;
                 }
             }

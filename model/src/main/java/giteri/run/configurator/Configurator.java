@@ -39,7 +39,6 @@ public final class Configurator {
 	public static boolean initializeDefaultBehavior = true;	// ----FLUIDITE----
 	// public static boolean initializeDefaultBehaviorToBreeder = true;	// ----FLUIDITE BREEDER----
 	@toOutput ( yes = true )
-	public static boolean rebranchementAction = false; // REWIRE Faire l'ajout et le retrait dans le meme temps
 	public static boolean limitlessAction;
 
 	// MEME
@@ -47,7 +46,6 @@ public final class Configurator {
 	public static boolean strictEqualityInComparaison = true; // FALSE : >= || TRUE : >
 
 	// PROPAGATION
-	public static boolean usePropagation = true; // utilisation de la propagation
 	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
 	@toOutput ( yes = true )
 	public static boolean autoMemeForBreeder = false;	// Les breeder ont associé un meme complémement, rmd ajout ou retrait.
@@ -57,7 +55,8 @@ public final class Configurator {
 	public static boolean useEntitySuccesProba = false; // Prend en compte la proba porté pour l'entité pour APPLY a meme. Actuellement l'index
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 
-	public static boolean coupleDirectTransmission = true; // Transmet le couple a l'entité ayant recu l'action et pas plus
+	public static boolean coupleSingleTransmission = true; // Transmet le couple à l'entité ayant recu l'action et pas plus
+
 
 	// SCORE
 	@toOutput ( yes = true )
@@ -155,7 +154,6 @@ public final class Configurator {
 	private static int nbNode = lotOfNodes ? 500 : 100;
 	public static int refreshInfoRate = 10;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
-	public static boolean memeCanBeReplaceByCategory = true;
 	public final static int semiAutoWaitingTime = 3000;
 
 	public static boolean oneAddForOneRmv = false; // ONEforONE Joue tour a tour un ajout d'un retrait
@@ -265,13 +263,12 @@ public final class Configurator {
 	/** Ajout lien...
 	 *
 	 */
-	public enum ActionType {
-		AJOUTLIEN,
-		RETRAITLIEN,
-		COPIERANDOMMEME,
-		EVAPORATION,
-		REFRESH,
-		ANYTHING;
+	public enum TypeOfUOT {
+		AJOUTLIEN, // ajout d'un lien
+		RETRAITLIEN, // retrait d'un lien
+		BASIC, // ajout ou retrait
+		COUPLE, // couple d'action
+		ANYTHING; // tout confondu
 	}
 
 
@@ -415,5 +412,7 @@ public final class Configurator {
 		boolean yes();
 	}
 
+	// Diviseur appliqué a la propagation d'un couple meme ( un couple meme peut se proposer a tout les cibles? )
+	public static double coupleDividerTransmission = nbNode; //
 }
 

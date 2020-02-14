@@ -11,7 +11,6 @@ import giteri.run.interfaces.Interfaces;
 import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
 import giteri.tool.math.Toolz;
 import giteri.meme.entite.EntiteHandler;
-import giteri.meme.entite.Meme;
 
 /** INTERFACE des paramètres pour le modèle, qui sera cycle automatiquement. 
  *
@@ -479,10 +478,10 @@ public interface IModelParameter<T> {
 		 *
 		 * @param memes
 		 */
-		public MemeAvailability(List<Meme> memes){
+		public MemeAvailability(List<IUnitOfTransfer> memes){
 			value = new Hashtable<>();
 			memes.sort(null);
-			for (Meme meme : memes) {
+			for (IUnitOfTransfer meme : memes) {
 				value.put(meme, new GenericBooleanParameter());
 			}
 		}
@@ -611,11 +610,11 @@ public interface IModelParameter<T> {
 		/** Prend un hashmap de meme associé a un doubleParameter
 		 *
 		 */
-		public MemeDiffusionProba(Hashtable<Meme, GenericDoubleParameter> kvMemesParameter){
+		public MemeDiffusionProba(Hashtable<IUnitOfTransfer, GenericDoubleParameter> kvMemesParameter){
 			this();
-			ArrayList<Meme> memesSorted = new ArrayList<>(kvMemesParameter.keySet());
+			ArrayList<IUnitOfTransfer> memesSorted = new ArrayList<>(kvMemesParameter.keySet());
 			memesSorted.sort(null);
-			for (Meme meme: memesSorted) {
+			for (IUnitOfTransfer meme: memesSorted) {
 				value.put(meme, kvMemesParameter.get(meme));
 			}
 		}
@@ -625,10 +624,10 @@ public interface IModelParameter<T> {
 		 * @param memes
 		 * @param defautParam
 		 */
-		public MemeDiffusionProba(ArrayList<Meme> memes, GenericDoubleParameter defautParam){
+		public MemeDiffusionProba(ArrayList<IUnitOfTransfer> memes, GenericDoubleParameter defautParam){
 			this();
 			memes.sort(null);
-			for (Meme meme : memes)
+			for (IUnitOfTransfer meme : memes)
 				value.put(meme, defautParam.copyMe());
 
 			defautDoubleParam = defautParam;

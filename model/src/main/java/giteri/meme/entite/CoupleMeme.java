@@ -1,8 +1,10 @@
 package giteri.meme.entite;
 
 import giteri.run.configurator.Configurator;
-import giteri.run.interfaces.Interfaces;
+import giteri.run.configurator.Configurator.TypeOfUOT;
+import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
 import giteri.tool.math.Toolz;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -10,10 +12,12 @@ import java.util.NoSuchElementException;
 /** Classe qui est composé de deux memes
  *
  */
-public class CoupleMeme implements Iterable<Meme>, Interfaces.IUnitOfTransfer<CoupleMeme> {
+public class CoupleMeme implements Iterable<Meme>, IUnitOfTransfer<CoupleMeme> {
     private Meme addAction,removeAction;
     private double probaPropagation;
     private int index;
+    private boolean fluidite;
+    private TypeOfUOT myType = Configurator.TypeOfUOT.COUPLE;
 
     /** Constructeur
      *
@@ -40,7 +44,6 @@ public class CoupleMeme implements Iterable<Meme>, Interfaces.IUnitOfTransfer<Co
      */
     @Override
     public Iterator<Meme> iterator() {
-
         return new Iterator<Meme>() {
             int currentIndex = 0;
             int maxIndex = 2;
@@ -67,7 +70,9 @@ public class CoupleMeme implements Iterable<Meme>, Interfaces.IUnitOfTransfer<Co
     public String getName(){
         String name = "";
         name+= addAction.getName() ;
-        name += "&";
+        // TODO [CV] - n'aime pas trop le & pour les classes graphstream?
+        //name += "&";
+        name += ".";
         name+= removeAction.getName();
         return name;
     }
@@ -87,8 +92,15 @@ public class CoupleMeme implements Iterable<Meme>, Interfaces.IUnitOfTransfer<Co
         return classe;
     }
 
+    //region implementation d'interface
+
+    /** Si on est en single transmission on renvoie que la proba sinon on
+     * lisse par le nombre de cible c a d tte les entités
+     * @return
+     */
     public double getProbaPropagation() {
-        return probaPropagation;
+        return Configurator.coupleSingleTransmission? probaPropagation :
+                probaPropagation / Configurator.coupleDividerTransmission;
     }
 
     @Override
@@ -96,16 +108,19 @@ public class CoupleMeme implements Iterable<Meme>, Interfaces.IUnitOfTransfer<Co
         return this.getColorClass();
     }
 
+    /**
+     * add+ pour les singles
+     * add+.rmv- pour les couples.
+     *
+     * @return
+     */
+    @Override
+    public String toNameString() {
+        return getName();
+    }
+
     public void setProbaPropagation(double probaPropagation) {
         this.probaPropagation = probaPropagation;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
     }
 
     /**
@@ -152,7 +167,21 @@ public class CoupleMeme implements Iterable<Meme>, Interfaces.IUnitOfTransfer<Co
 
     }
 
-    public Configurator.ActionType getActionType() {
-        return Configurator.ActionType.ANYTHING;
+    public TypeOfUOT getActionType() {
+        return TypeOfUOT.COUPLE;
     }
+
+    public boolean isFluide(){
+        throw new NotImplementedException();
+    }
+    //endregion
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
 }

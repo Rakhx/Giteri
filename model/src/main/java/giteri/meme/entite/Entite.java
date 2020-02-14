@@ -1,19 +1,12 @@
 package giteri.meme.entite;
 
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Set;
+import java.util.*;
 
-import giteri.meme.mecanisme.MemeFactory;
 import giteri.tool.math.Toolz;
-import giteri.meme.mecanisme.ActionFactory;
-import giteri.meme.mecanisme.ActionFactory.IAction;
 import giteri.network.network.Node;
 import giteri.run.configurator.Configurator;
-import giteri.run.configurator.Configurator.ActionType;
-import giteri.tool.objects.ObjectRef;
+import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /** Entitée conteneur des memes.
  *
@@ -27,31 +20,30 @@ public class Entite implements Comparable<Entite>{
 	double probaLearning;
 	double probaAppliying;
 
-	// Liste de memes
-	private ArrayList<Meme> myMemes;
-	// Index du couple associé
-	private CoupleMeme coupleMeme;
-	private boolean breederOnCouple;
+	// Liste de memes - should be a set
+	private List<IUnitOfTransfer> myMemes;
 
 	// répartie sur 0 -> 1, réévalué a chaque ajout ou (retrait de meme)
+	// TODO [CV] - Faire en sorte qu'en cas de couple meme chacun des meme soit representés ici
 	Hashtable<Meme, Double> intervalOfSelection;
 	//	Hashtable<Entite, Integer> connectedTimeNodes;
 	Set<Entite> connectedNodes;
 	// défini sur quels memes l'entité fourni le réseau
-	Set<IAction> breederOn;
+	IUnitOfTransfer breederOn;
+	boolean isBreeder;
 
 	//endregion
+
 	/** Constructeur d'entite.
 	 *
 	 */
 	public Entite(){
 		associatedNode = null;
-		myMemes = new ArrayList<>();
+		myMemes = new ArrayList<IUnitOfTransfer>();
 		intervalOfSelection = new Hashtable<>();
 		connectedNodes = new HashSet<>();
-		breederOn = new HashSet<>();
 		probaAppliying = 1;
-		breederOnCouple = false;
+		isBreeder = false;
 	}
 
 	/** Défini les regles de sélection de facon équiprobable.
@@ -61,32 +53,62 @@ public class Entite implements Comparable<Entite>{
 	public void defineRulesProbaLimited(){
 		double roll;
 		intervalOfSelection.clear();
-		for (Meme meme : getMyMemes()) {
-			roll = 1.0 / getMyMemes().size();
+		List<Meme> memes = new ArrayList<>();
+		Iterator<Meme> it;
+
+		// pour chaque UnitOfTransfer de l'entité. En gros 2 meme ou 1 coupleMeme
+		for (IUnitOfTransfer Iu : getMyUnitOfT()) {
+			// Iterator sur meme. En gros 2 meme dans le cas d'un couple ou 1 meme dans le cas d'un meme
+			it = Iu.iterator();
+			while(it.hasNext())
+				memes.add(it.next());
+		}
+
+		// En gros tjrs divisé par 2
+		for (Meme meme : memes) {
+			roll = 1.0 / memes.size();
 			intervalOfSelection.put(meme, roll);
 		}
+
 	}
 
-	/** Apres application d'une action, l'entité apprend de cette action
-	 * qu'il a vu.
-	 *
-	 * @Return Null si aucun ajout, l'ancien meme si remplacement, le nouveau meme si ajout sans remplacement
-	 */
-	public Meme receiveMeme(Meme subMeme){
 
-		// (!A || B) && (!A || C) <=> !A && !A || !A && C || !A && B || B && C
-		boolean ok;
-		ok = !getMyMemes().contains(subMeme);
-		ok = ok && (!Configurator.useMemePropagationProba || Toolz.rollDice(subMeme.getProbaOfPropagation()));
-		ok = ok && (!Configurator.useEntitePropagationProba || Toolz.rollDice(this.probaLearning));
 
-		if(ok) {
-			return addOrReplaceFast(subMeme);
-		}
+	public IUnitOfTransfer takeMyMeme(IUnitOfTransfer toReceive){
+		boolean ok = true;
+		// S'il le possede déjà
+		ok &= !getMyUnitOfT().contains(toReceive);
+		// s'il est breeder sur l'action
+		ok &= (breederOn == toReceive );
 
-		// null si aucun ajout a l'entité
-		return null;
+		return addOrReplaceFast(toReceive);
+
 	}
+
+
+
+
+
+//	/** Apres application d'une action, l'entité apprend de cette action
+//	 * qu'il a vu.
+//	 *
+//	 * @Return Null si aucun ajout, l'ancien meme si remplacement, le nouveau meme si ajout sans remplacement
+//	 */
+//	public IUnitOfTransfer receiveMeme(IUnitOfTransfer subMeme){
+//
+//		// (!A || B) && (!A || C) <=> !A && !A || !A && C || !A && B || B && C
+//		boolean ok;
+//		ok = !getMyMemes().contains(subMeme);
+//		ok = ok && (!Configurator.useMemePropagationProba || Toolz.rollDice(subMeme.getProbaPropagation()));
+//		ok = ok && (!Configurator.useEntitePropagationProba || Toolz.rollDice(this.probaLearning));
+//
+//		if(ok) {
+//			return addOrReplaceFast(subMeme);
+//		}
+//
+//		// null si aucun ajout a l'entité
+//		return null;
+//	}
 
 	/** ajoute un meme ou remplace un meme déja existant,
 	 * avec une notion de slot pour meme d'ajout et meme de retrait.
@@ -94,19 +116,21 @@ public class Entite implements Comparable<Entite>{
 	 * @param memeToAdd
 	 * @return memetoAdd si ajout, l'ancien meme si remplacement, null si rien
 	 */
-	public Meme addOrReplaceFast(Meme memeToAdd){
+	public IUnitOfTransfer addOrReplaceFast(IUnitOfTransfer memeToAdd){
 		boolean okToBeAdded = true;
 		boolean needToBeReplaced = false;
 		boolean addedOrReplaced = false;
-		Meme memeReplaced = null;
+		IUnitOfTransfer memeReplaced = null;
 
 		// On parcourt les meme existant et regarde si un meme of the same category exists
-		for (Meme possededMeme : getMyMemes())
-			if(memeToAdd.getAction().getActionType() == possededMeme.getAction().getActionType())
+		for (IUnitOfTransfer possededMeme : getMyUnitOfT())
+			if(memeToAdd.getActionType() == possededMeme.getActionType())
 			{
+				// n'est pas censé arriver
 				if(memeToAdd.compareTo(possededMeme) == 0) {
 					okToBeAdded = false;
-					break;
+					System.err.println("[entite.addOrReplaceFast] - Le meme est déjà possede. la verification aurait du avoir deja exclu ce cas");
+					throw new NotImplementedException();
 				}
 				// si oui, il faudra que la configuration l'autorise pour remplacer l'ancien meme.
 				memeReplaced = possededMeme;
@@ -114,35 +138,15 @@ public class Entite implements Comparable<Entite>{
 				break;
 			}
 
-		// Si il faut remplacer un meme pour pouvoir ajouter le meme courant,
-		// et que la configuration l'accepte, on supprime l'ancien meme.
-		if(needToBeReplaced && Configurator.memeCanBeReplaceByCategory)
-		{
-			// Un meme devrait etre remplacé, et la configuration l'autorise, masi on vérifie
-			// que l'entité n'est pas un breeder de ce comportement
-			if(Configurator.fixedSlotForBreeder && !breederOn.isEmpty()){
-				for (IAction iAction : breederOn) {
-					// Dans le cas ou il s'agit d'une action de breeder, donc à ne pas remplacer
-					if(memeReplaced.getAction().toString() == iAction.toString()){
-						return null;
-					}
-				}
-			}
+		// TODO regulariser les synchronize etc. Y compris pour le sort
+		// Si on est dans le cas d'un remplacement
+		if(needToBeReplaced)
 			synchronized(myMemes){
 				myMemes.remove(memeReplaced);
 			}
 
-			okToBeAdded = true;
-		}
-
-		// Dans le cas ou on ajoute effectivement le nouveau meme,
-		// soit apres remplacement soit parceque ca a été directement possible.
-		if(okToBeAdded)
-		{
-			addedOrReplaced = true;
-			addMeme(memeToAdd);
-			myMemes.sort(null);
-		}
+		addMeme(memeToAdd);
+		myMemes.sort(null);
 
 		return needToBeReplaced ? memeReplaced : memeToAdd;
 	}
@@ -212,44 +216,28 @@ public class Entite implements Comparable<Entite>{
 	 * Dans tout les cas, augmente d'un le temps depuis lequel une connection
 	 * existe
 	 * @return le meme action sélectionné
+	 * // TODO [CV] - Verifier que la sélection sur couple ne pose pas de probleme
 	 */
 	public Meme chooseAction(){
 
 		// On cherche l'élément qui est dans l'interval
-		// ProbaEntite [.5=evapo, 0.7=action1, 1.0=action2]
-		// si toSelect renvoi .4, evapo doit etre choisit.
+		// ProbaEntite [.5=evapo, 0.7=action1, 1.0=action2]  si toSelect renvoi .4, evapo doit etre choisit.
 		Meme resultat = null;
 		double toSelect = Toolz.getProbaOneOut();
 		double borneInf = 0;
 
-		for (Meme looked : intervalOfSelection.keySet()) {
+		for (Meme looked : intervalOfSelection.keySet())
 			if(toSelect >= borneInf && toSelect < borneInf + intervalOfSelection.get(looked) ) {
 				resultat = looked;
 				break;
-			}else {
+			}else
 				borneInf += intervalOfSelection.get(looked);
-			}
-		}
 
 		if(Configurator.debugEntite)
-			if(resultat == null ){
+			if(resultat == null )
 				System.out.println("Choose action null on cherchait un toSelect a: " + toSelect + "et on avait de dispo " + intervalOfSelection.keySet().toString() + " avec un interval "+intervalOfSelection.values());
-			}
+
 		return resultat;
-	}
-
-	/** Choix d'une action en excluant l'option de celle
-	 *
-	 *
-	 */
-	public Meme chooseActionExclusionVersion(ActionType notToTake){
-		ArrayList<Meme> restant = new ArrayList<Meme>();
-		for(Meme meme : intervalOfSelection.keySet()) {
-			if(!meme.action.getActionType().equals(notToTake))
-				restant.add(meme);
-		}
-
-		return Toolz.getRandomElement(restant);
 	}
 
 	/** Reset l'état du noeud, garde son node associé mais oubli
@@ -257,7 +245,7 @@ public class Entite implements Comparable<Entite>{
 	 *
 	 */
 	public void resetStat(){
-		getMyMemes().clear();
+		getMyUnitOfT().clear();
 		intervalOfSelection.clear();
 		associatedNode.resetStat();
 		connectedNodes.clear();
@@ -265,32 +253,6 @@ public class Entite implements Comparable<Entite>{
 
 	public void resetEntiteStuff(){
 		connectedNodes.clear();
-	}
-
-	/** Remet le temps des links a zero.
-	 *
-	 * @param entites
-	 * @return si tout les liens sont rafraichis, false sinon
-	 */
-	public ArrayList<Boolean> refreshLinks(ArrayList<Entite> entites){
-		ArrayList<Boolean> succes = new ArrayList<Boolean>();
-		synchronized (connectedNodes) {
-			for (Entite entite : entites) {
-				if(!isConnectedTo(entite)){
-					succes.add(false);
-				}
-				else{
-					connectedNodes.add(entite);
-					succes.add(true);
-				}
-			}
-		}
-
-		for (Entite entity : connectedNodes) {
-			connectedNodes.add(entity);
-		}
-
-		return succes;
 	}
 
 	//region Getter/Setter
@@ -303,7 +265,7 @@ public class Entite implements Comparable<Entite>{
 		// LA FLEMME
 		synchronized (myMemes) {
 			if (this.myMemes.size() == 2) {
-				for (Meme meme : myMemes) {
+				for (IUnitOfTransfer meme : myMemes) {
 					if (meme.isFluide())
 						return false;
 				}
@@ -357,17 +319,10 @@ public class Entite implements Comparable<Entite>{
 		String classe = "";
 		ArrayList<String> classes = new ArrayList<>();
 
-		if(Configurator.coupleVersion){
-			if(coupleMeme != null)
-				for (Meme meme : coupleMeme) {
-					classes.add(meme.toFourCharString());
-				}
-
-		}else {
-			for (Meme meme : getMyMemes()) {
-				classes.add(meme.toFourCharString());
-			}
+		for (IUnitOfTransfer meme : getMyUnitOfT()) {
+			classes.add(meme.toFourCharString());
 		}
+
 		classes.sort(null);
 		for (String string : classes) {
 			classe +=  string;
@@ -417,22 +372,23 @@ public class Entite implements Comparable<Entite>{
 		return index;
 	}
 
-	public ArrayList<Meme> getMyMemes(){
+	public List<IUnitOfTransfer> getMyUnitOfT(){
 		synchronized(myMemes){
 			return myMemes;
 		}
 	}
 
-	public Meme addMeme(Meme e, boolean fixed){
+	public IUnitOfTransfer addMeme(IUnitOfTransfer e, boolean fixed){
 		if(fixed) {
-			breederOn.add(addMeme(e).getAction());
+			breederOn = addMeme(e);
+			isBreeder = true;
 		}
 		else
 			addMeme(e);
 		return e;
 	}
 
-	public Meme addMeme(Meme e){
+	public IUnitOfTransfer addMeme(IUnitOfTransfer e){
 		synchronized(myMemes){
 			myMemes.add(e);
 		}
@@ -446,39 +402,28 @@ public class Entite implements Comparable<Entite>{
 		resultat += "Index: "+getIndex();
 		resultat += "\nDegree: "+getDegree();
 		resultat += "\nMeme: ";
-		if(Configurator.coupleVersion)
-			resultat += "\n \t "+ coupleMeme.getName();
-		else
-			for (Meme memeAction : getMyMemes()) {
-				resultat += "\n \t "+ memeAction;
-			}
+
+		for (IUnitOfTransfer memeAction : getMyUnitOfT()) {
+			resultat += "\n \t "+ memeAction;
+		}
 		return resultat;
 	}
+
+
+	public boolean isBreeder() {
+		return isBreeder;
+	}
+
+	public void setBreeder(boolean breeder) {
+		isBreeder = breeder;
+	}
+
 
 	/** Comparaison sur l'index.
 	 *
 	 */
 	public int compareTo(Entite o) {
 		return Integer.compare(this.index, o.index);
-	}
-
-	public int getCoupleMemeIndex() {
-		return coupleMeme.getIndex();
-	}
-
-	public CoupleMeme getCoupleMeme() {
-		return coupleMeme;
-	}
-	public void setCoupleMeme(CoupleMeme coupleMeme) {
-		this.coupleMeme = coupleMeme;
-	}
-
-	public boolean isBreederOnCouple() {
-		return breederOnCouple;
-	}
-
-	public void setBreederOnCouple(boolean breederOnCouple) {
-		this.breederOnCouple = breederOnCouple;
 	}
 
 	//endregion

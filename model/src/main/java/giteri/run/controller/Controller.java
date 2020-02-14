@@ -5,6 +5,7 @@ import giteri.meme.entite.Meme;
 import giteri.run.configurator.Configurator;
 import giteri.run.interfaces.Interfaces;
 import giteri.run.interfaces.Interfaces.IModel;
+import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
 import giteri.run.interfaces.Interfaces.IReadNetwork;
 import giteri.run.interfaces.Interfaces.IView;
 
@@ -49,14 +50,6 @@ public class Controller {
 			}
 		}
 
-
-		public void setCoupleMemeAvailable(List<CoupleMeme> cMemes) {
-			for (Interfaces.IView vue : vues) {
-				vue.setCoupleMemeAvailable(cMemes);
-			}
-		}
-
-
 		public void displayInfo(Configurator.ViewMessageType type, List<String> info) {
 			for (Interfaces.IView vue:  vues) {
 				vue.displayInfo(type, info);
@@ -82,9 +75,9 @@ public class Controller {
 		 * @param countOfLastMemeActivation ?
 		 * @param lastHundredActionDone une fenetre glissante des 100 dernier meme appliqué
 		 */
-		public void displayMemeUsage(int nbAction, Map<Meme, Integer> nbActivationByMemes,
-									 Map<Meme, Integer> countOfLastMemeActivation,
-									 CircularFifoQueue<Meme> lastHundredActionDone ){
+		public void displayMemeUsage(int nbAction, Map<IUnitOfTransfer, Integer> nbActivationByMemes,
+									 Map<IUnitOfTransfer, Integer> countOfLastMemeActivation,
+									 CircularFifoQueue<IUnitOfTransfer> lastHundredActionDone ){
 			Map<String, Integer> nbActiByMeme = new Hashtable<>();
 			Map<String, Integer> nbLastActivByMeme = new Hashtable<>();
 			List<String> lastHundred = new ArrayList<>();

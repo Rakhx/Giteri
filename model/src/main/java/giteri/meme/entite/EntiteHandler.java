@@ -4,7 +4,6 @@ import giteri.meme.event.ActionApplyEvent;
 import giteri.meme.event.BehavTransmEvent;
 import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.IBehaviorTransmissionListener;
-import giteri.meme.mecanisme.ActionFactory;
 import giteri.meme.mecanisme.FilterFactory;
 import giteri.meme.mecanisme.FilterFactory.IFilter;
 import giteri.meme.mecanisme.AttributFactory.IAttribut;
@@ -24,7 +23,7 @@ import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
 import giteri.tool.math.Toolz;
 import giteri.tool.objects.ObjectRef;
 import giteri.tool.other.StopWatchFactory;
-import jdk.nashorn.internal.runtime.regexp.joni.Config;
+
 
 import java.util.*;
 
@@ -62,7 +61,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private ArrayList<IBehaviorTransmissionListener> memeListeners;
 
 	private Meme addRandom = null, removeRandom = null;
-	private CoupleMeme doubleRandom = null;
+	private IUnitOfTransfer<CoupleMeme> doubleRandom = null;
 
 	// Variable d'utilisation
 	private static int indexOfMemesCombinaisonRecursion;
@@ -70,7 +69,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private int cptModulo;
 	private int cptMemePossession;
 	private int cptActionAddTried = 1, cptActionRmvTried = 1;
-	private ActionType lastAction = ActionType.RETRAITLIEN;
+	private TypeOfUOT lastAction = TypeOfUOT.RETRAITLIEN;
 	private int nbActionBySecond;
 	private List<String> toDisplayForRatio; // String pour affichage en utilisant la vueManager
 	private double lastDensity;
@@ -121,7 +120,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		memeProperties.memeOnMap = this.memeFittingApplied;
 
 		//combinaison de meme présent sur le run, classé par type d'action
-		Hashtable<ActionType, ArrayList<Interfaces.IUnitOfTransfer>> memesByCategory = new Hashtable<>();
+		Hashtable<TypeOfUOT, ArrayList<Interfaces.IUnitOfTransfer>> memesByCategory = new Hashtable<>();
 		for (Interfaces.IUnitOfTransfer meme: this.memeFittingApplied)
 			Toolz.addElementInHashArray(memesByCategory,meme.getActionType(),meme);
 
@@ -367,7 +366,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	public void eventMemeChanged(Entite entiteConcernee, IUnitOfTransfer ajoutOrR, String message) {
 
 		// Devrait se trouver dans le handler de cet event, de la meme classe.
-	    if(!Configurator.rebranchementAction || entiteConcernee.getMyMemes().size() > 1)
+	    if( entiteConcernee.getMyUnitOfT().size() > 1)
             synchronized (entitesActive) {
                 if(!entitesActive.contains(entiteConcernee))
                     entitesActive.add(entiteConcernee);
@@ -462,13 +461,13 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * Utilisé par l'apply du IModelParameter
 	 * @param memes
 	 */
-	public void giveMemeToEntiteFitting(List<Interfaces.IUnitOfTransfer> memes) {
+	public void giveMemeToEntiteFitting(List<IUnitOfTransfer> memes) {
 		ArrayList<Entite> entiteContente = new ArrayList<>();
 		Iterator<Entite> entitees = entites.iterator();
 		Entite actual;
 		ArrayList<Entite> others = new ArrayList<>(entites);
 		memeFittingApplied = memes;
-		for (Interfaces.IUnitOfTransfer meme : memes) {
+		for (IUnitOfTransfer meme : memes) {
 			actual = entitees.next();
 			eventMemeChanged(actual, actual.addMeme(meme, true), Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			entiteContente.add(actual);
@@ -481,31 +480,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 	}
 
-	/** Donne aux entités, apres avoir réinitialisé les possessions, des couples de meme disponibles
-	 *
-	 */
-	public void giveCoupleMemeToEntite(List<CoupleMeme> cMemes){
-		Iterator<CoupleMeme> iteCMeme = cMemes.iterator();
-		CoupleMeme cMeme;
-		CoupleMeme ajoutRandom = this.getDoubleRandom();
-		resetStat();
-		for (Entite entite : entites) {
-			if(iteCMeme.hasNext()){
-				cMeme = iteCMeme.next();
-				entite.setCoupleMeme(cMeme);
-				entite.setBreederOnCouple(true);
-				cMeme.forEach(	e -> eventMemeChanged(entite, e, Configurator.MemeActivityPossibility.AjoutMeme.toString()));
-
-			}else
-				if(Configurator.initializeDefaultBehavior){
-					entite.setCoupleMeme(ajoutRandom);
-					ajoutRandom.forEach(e ->
-							eventMemeChanged(entite, e, Configurator.MemeActivityPossibility.AjoutMeme.toString()));
-				}else
-					break;
-		}
-	}
-
 	/** Obtention de la liste des memes disponibles sur la map, soit les simples,
 	 * soit les combinaisons de deux memes existantes, en fonction du param de configuration.
 	 * @param setAsked
@@ -513,15 +487,16 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 *            ou les deux.
 	 * @return
 	 */
-	public Hashtable<Integer, ArrayList<Interfaces.IUnitOfTransfer>> getMemeAvailable(FittingBehavior setAsked,
-																					  Optional<Hashtable<ActionType, ArrayList<IUnitOfTransfer>>> memeByC) {
+	public Hashtable<Integer, ArrayList<IUnitOfTransfer>>
+		getMemeAvailable(FittingBehavior setAsked, Optional<Hashtable<TypeOfUOT, ArrayList<IUnitOfTransfer>>> memeByC) {
+
 		Hashtable<Integer, ArrayList<IUnitOfTransfer>> memes = new Hashtable<>();
 		if (setAsked == FittingBehavior.onlyComplex || setAsked == FittingBehavior.simpleAndComplex) {
 			memes = getMemeCombinaisonAvailable(memeByC);
 		}
 		if (setAsked == FittingBehavior.onlySimple || setAsked == FittingBehavior.simpleAndComplex) {
 			int lastIndex = memes.size();
-			for (Meme meme : memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING))
+			for (IUnitOfTransfer meme : memeFactory.getMemes(Configurator.MemeList.ONMAP, TypeOfUOT.ANYTHING))
 				Toolz.addElementInHashArray(memes, ++lastIndex, meme);
 		}
 
@@ -534,7 +509,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @return
 	 */
 	public ArrayList<String> getMemeAvailableAsString(FittingBehavior setAsked) {
-		ArrayList<String> memesAsString = new ArrayList<String>();
+		ArrayList<String> memesAsString = new ArrayList<>();
 		Hashtable<Integer, ArrayList<IUnitOfTransfer>> memes = getMemeAvailable(setAsked, Optional.empty());
 		ArrayList<String> classes = new ArrayList<String>();
 		String classe;
@@ -581,7 +556,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			// On classe les entités par combinaison de memes qu'elles possedent
 			for (Entite entite : toExamine) {
 				memes = "";
-				for (Meme meme : entite.getMyMemes())
+				for (IUnitOfTransfer meme : entite.getMyUnitOfT())
 					memes += "." + meme.toFourCharString();
 				if (memes == "")
 					memes = "AUCUN";
@@ -641,8 +616,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private String runEntite() {
 
 		List<String> rez = new ArrayList<>();
-		boolean actionMe;
-		List<Meme> memeActions = new ArrayList<>();
+		//List<IUnitOfTransfer> memeActions = new ArrayList<>();
 		Meme oneAction = null;
 		CoupleMeme coupleAction;
 
@@ -661,70 +635,53 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			}
 
 			// CHOIX DE L'ACTION POUR CETTE ENTITE
-			if(Configurator.rebranchementAction)
-				memeActions.addAll(entiteActing.getMyMemes());
-			else {
-				// Si version couple, on selectionne l'action dnas le doAction plus loin. (...)
-				if(Configurator.coupleVersion){
-					if(Configurator.debugEntiteHandler) // la flemme de changer la structure d'afichage
-						entiteActing.getCoupleMeme().forEach(e -> memeActions.add(e));
-				}
-				else
-					oneAction = actionSelectionRulesVersion(entiteActing);
-				if (Configurator.debugEntiteHandler)
-					System.out.println("[EH.runEntite]- action choisie " + memeActions.stream().map(e->e.toFourCharString()).reduce("",(added, e)-> added +" : "+e));
-			}
+
+			// Se démerder pour tjrs avoir un meme ici
+			oneAction = entiteActing.chooseAction();
+			if (Configurator.debugEntiteHandler)
+				System.out.println("[EH.runEntite]- action choisie " + oneAction);
+				//System.out.println("[EH.runEntite]- action choisie " + memeActions.stream().map(e->e.toFourCharString()).reduce("",(added, e)-> added +" : "+e));
 
 			// APPLICATION ET PROPAGATION DE L'ACTION
-			actionMe = !Configurator.useEntitySuccesProba || Toolz.rollDice(entiteActing.getProbaAppliying());
-			if(actionMe){
-				if(Configurator.coupleVersion)
-					rez.add(doAction(entiteActing, null));
-				else
-					rez.add(doAction(entiteActing, oneAction));
-
-			}else {
-				rez.add("Nope, entite ne veux pas agir");
-				if (Configurator.debugEntiteHandler)
-					System.out.println("[EH.runEntite]- resultat de l'action" + rez);
-			}
+			rez.add(doAction(entiteActing, oneAction));
 
 			// AFFICHAGE ET DEBUGGUAGE
 			if (Configurator.displayLogRatioTryAddOverTryRmv) {
-				for (Meme memeAction : memeActions) {
-					if (memeAction != null) {
-						if (memeAction.action.getActionType() == ActionType.AJOUTLIEN)
-							cptActionAddTried++;
-						else if (memeAction.action.getActionType() == ActionType.RETRAITLIEN)
-							cptActionRmvTried++;
 
-						toDisplayForRatio.add(memeAction.action.getActionType().name());
-						toDisplayForRatio.add("AddTried/rmvTried;" + (double) cptActionAddTried / cptActionRmvTried);
-					}
+				//for (IUnitOfTransfer memeAction : memeActions) {
+				if (oneAction != null) {
+					if (oneAction.getActionType() == TypeOfUOT.AJOUTLIEN)
+						cptActionAddTried++;
+					else if (oneAction.getActionType() == TypeOfUOT.RETRAITLIEN)
+						cptActionRmvTried++;
+
+					toDisplayForRatio.add(oneAction.getActionType().name());
+					toDisplayForRatio.add("AddTried/rmvTried;" + (double) cptActionAddTried / cptActionRmvTried);
 				}
+				//}
 			}
 
 			// Si on veut afficher les X dernieres actions entreprises & action depuis le début
 			if (Configurator.displayMemePosessionDuringSimulation) {
 
 				int i = -1;
-				for (Meme memeAction : memeActions) {
-					i++;
-					if (Configurator.displayLogRatioLogFailOverFail || Configurator.displayLogRatioLogFailOverSuccess) {
-						List<String> temp = memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez.get(i), cptModulo);
-						if (temp != null)
-							toDisplayForRatio.addAll(temp);
-					} else
-						memeProperties.updateActionCount(memeAction, entiteActing.getIndex(), rez.get(i), cptModulo);
+				//for (Meme memeAction : memeActions) {
+				i++;
+				if (Configurator.displayLogRatioLogFailOverFail || Configurator.displayLogRatioLogFailOverSuccess) {
+					List<String> temp = memeProperties.updateActionCount(oneAction, entiteActing.getIndex(), rez.get(i), cptModulo);
+					if (temp != null)
+						toDisplayForRatio.addAll(temp);
+				} else
+					memeProperties.updateActionCount(oneAction, entiteActing.getIndex(), rez.get(i), cptModulo);
 
-					if (cptModulo % (Configurator.refreshInfoRate * 25) == 0) {
-						sumFailAction = memeProperties.lastFailAction(nbFail);
-						if (Configurator.writeFailDensityLink)
-							vueController.displayInfo(ViewMessageType.FAILXDENSITY, getFailXDensity(nbFail.getValue(),
-									networkConstruct.updatePreciseNetworkProperties
-											(Configurator.getIndicateur(NetworkAttribType.DENSITY)).getDensity(), sumFailAction));
-					}
+				if (cptModulo % (Configurator.refreshInfoRate * 25) == 0) {
+					sumFailAction = memeProperties.lastFailAction(nbFail);
+					if (Configurator.writeFailDensityLink)
+						vueController.displayInfo(ViewMessageType.FAILXDENSITY, getFailXDensity(nbFail.getValue(),
+								networkConstruct.updatePreciseNetworkProperties
+										(Configurator.getIndicateur(NetworkAttribType.DENSITY)).getDensity(), sumFailAction));
 				}
+				//}
 			}
 
 			if(!fullSilent && writeFailMemeApply &&toDisplayForRatio.isEmpty())
@@ -750,24 +707,17 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	@SuppressWarnings("unchecked")
 	private String doAction(Entite movingOne, Meme memeAction) {
-		String actionDone, actionsDone = "";String memeApply = "";Set<Entite> cibles ;Set<Integer> ciblesIndex = new HashSet<>();
+		String actionDone, actionsDone = "";String memeApply = "";Set<Entite> cibles; Set<Integer> ciblesIndex = new HashSet<>();
 		IFilter currentFilter = null; Iterator<Entite> ite; Entite one; Meme memeReturned;
 		List<Meme> memesToApply = new ArrayList<>();
 
-		if(Configurator.coupleVersion){
-			if(Configurator.rebranchementAction) // genre
-				movingOne.getCoupleMeme().forEach(memesToApply::add);
-			else
-				memesToApply.add(movingOne.getCoupleMeme().getOneMemeAtRandom());
-		}else{
-			memesToApply.add(memeAction);
-		}
+		// humhum utilité d'une liste?
+		memesToApply.add(memeAction);
 
-		// Un seul élément si classique, les 2 actions du couple sinon
+		// Tjrs un seul élément?
 		for (Meme meme : memesToApply) {
 			actionDone = "";
-			memeAction = meme; // la flemme
-			if (memeAction != null) {
+			if (meme != null) {
 				cibles = new HashSet<>(entites);
 				cibles.remove(movingOne);
 				// actionDone = "";
@@ -802,17 +752,16 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				if (cibles.size() == 1) {
 					actionDone += memeAction.getAction().applyAction(movingOne, cibles);
 
-					if(coupleVersion && !coupleDirectTransmission ){
+					// hum. TODO [CV] réfléchir ici
+
+					// Si on reste sur l'ancienne facon de faire par une unque transmission direct
+					if(coupleVersion && !coupleSingleTransmission){
 						cibles = entites;
 					}
 
-					// region PROPAGATION du meme
-					if (Configurator.usePropagation) {
-						if(Configurator.coupleVersion)
-							propagationCasteNew(cibles, movingOne);
-						else
-							propagationDirect(cibles,movingOne,memeAction);
-					}
+					// TODO[CV] - ici a eu lieu un chg
+					propagation(cibles, movingOne, memeAction);
+
 					// endregion
 
 					// evenement d'application d'une action
@@ -853,116 +802,56 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				entitesActive.get(Toolz.getRandomNumber(entitesActive.size()));
 	}
 
-	/** Selection d'une action pour l'entité en action rules version
-	 *
-	 * @param movingOne
-	 * @return le meme sélectionné
-	 */
-	private Meme actionSelectionRulesVersion(Entite movingOne) {
-	    return movingOne.chooseAction();
-	}
-
-	/** Version transmission aux autres de meme "caste".
-	 * Appelé qu'un meme du couple d'action soit joué ou non
-	 *
-	 * @param movingOne
-	 */
-	private void propagationCasteNew(Set<Entite> cibles, Entite movingOne) {
-		Set<Entite> availables = new HashSet<>(cibles);
-		availables.remove(movingOne);
-
-		// On ajoute a chacun d'entre eux la pair d'action
-		for (Entite available : availables) {
-			// si pas breeder && ( pas de couple || couple d'index différent )
-			if (!available.isBreederOnCouple() && (available.getCoupleMeme() == null || movingOne.getCoupleMemeIndex() != available.getCoupleMemeIndex())
-				&& Toolz.rollDice
-				// && roll sur un chiffre qui dépend de la distance en degré ainsi que de la proba de propagation
-				(probaPropaCoupleVersion(Math.abs(movingOne.getDegree() - available.getDegree()), movingOne.getCoupleMeme().getProbaPropagation()))
-				&& (coupleDirectTransmission || Toolz.rollDice(1.0/getNbNode()))
-			)
-			{
-				// S'il possédait un couple, event de retrait sur chacun des memes de ce couple
-				if (available.getCoupleMeme() != null)
-					for (Meme meme : available.getCoupleMeme())
-						eventMemeChanged(available, meme, Configurator.MemeActivityPossibility.RetraitMeme.toString());
-
-				// Event d'ajout pour chacun des memes de couple de l'acting
-				for (Meme meme : movingOne.getCoupleMeme())
-					eventMemeChanged(available, meme, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-
-				// ajout effectif du couple
-				available.setCoupleMeme(movingOne.getCoupleMeme());
-			}
-		}
-	}
-
-
-	/** Propagation direct a l'entité qui subit l'action
+	/**
 	 *
 	 * @param cibles les cibles qui ont subi l'action, souvent unitaire
 	 * @param movingOne L'entité agissante
 	 * @param memeAction L'action appliquée
 	 */
-	private void propagationDirect(Set<Entite> cibles, Entite movingOne, Meme memeAction){
-		Iterator<Entite> ite; Entite one; Meme memeReturned;
-		// Si on a appliquer à plus d'une entité l'action, mais qu'on ne veut qu'une seule propagation
-		if(cibles.size() > 1 && Configurator.onlyOneToPropagate) {
-			ite = cibles.iterator();
-			for (int i = 0; i < Toolz.getRandomNumber(cibles.size()); i++) {
-				ite.next();
-			}
+	private void propagation(Set<Entite> cibles, Entite movingOne, IUnitOfTransfer memeAction){
 
-			one = ite.next();
-			cibles.clear();
-			cibles.add(one);
-		}
+		// proba portée par l'IUnitOfTransfer
+		double probaAction = memeAction.getProbaPropagation();
+		IUnitOfTransfer removedAction;
 
-		for (Entite entite : cibles)
-		{
-			// region Transmission de l'un de behavior possédé par l'acting.
-			if (Configurator.usePropagationSecondGeneration)
-			{
-				Meme selectedMeme = movingOne.chooseAction();
-				if(selectedMeme == null){
-					if(Configurator.debugEntiteHandler) System.out.println("Meme joué par " + movingOne.toString() + " disparu");
-				}
-				memeReturned = entite.receiveMeme(selectedMeme);
-				// Si retour du meme a ajouter
-				if(memeReturned == selectedMeme)
-					eventMemeChanged(entite, selectedMeme,Configurator.MemeActivityPossibility.AjoutMeme.toString());
+		for (Entite entite : cibles) {
 
-				// alors il y a eu remplacement
-				if(memeReturned != null && memeReturned != selectedMeme){
-					// un retrait
-					eventMemeChanged(entite, memeReturned, Configurator.MemeActivityPossibility.RetraitMeme.toString());
-					// et un ajout
-					eventMemeChanged(entite, selectedMeme,Configurator.MemeActivityPossibility.AjoutMeme.toString());
-				}
-			}
-			// endregion
+			// Proba de propagation - si on veut ajouter le meme
+			if(Toolz.rollDice(probaPropaDegree(movingOne, entite, probaAction))) {
+				removedAction = entite.addOrReplaceFast(memeAction);
 
-			// ou transmission du behavior appliqué
-			else {
-				memeReturned = entite.receiveMeme(memeAction);
-				// Si retour du meme a a jouter
-				if(memeReturned == memeAction)
+				// Si retour du meme a ajouter, il n'y a pas eu de remplacement
+				if(removedAction == memeAction)
 					eventMemeChanged(entite, memeAction, Configurator.MemeActivityPossibility.AjoutMeme.toString());
 
-				// alors il y a eu remplacement
-				if(memeReturned != null && memeReturned != memeAction){
+				// Si un remplacement à eu lieu
+				if(removedAction != null && removedAction != memeAction) {
 					// un retrait
-					eventMemeChanged(entite, memeReturned, Configurator.MemeActivityPossibility.RetraitMeme.toString());
+					eventMemeChanged(entite, removedAction, Configurator.MemeActivityPossibility.RetraitMeme.toString());
 					// et un ajout
 					eventMemeChanged(entite, memeAction,Configurator.MemeActivityPossibility.AjoutMeme.toString());
 				}
 			}
 		}
+
+
 	}
 
-	private double probaPropaCoupleVersion(double distance, double paramCouple){
-		// return 1;
-		return Math.min(1, 1 / (1*distance)) * paramCouple;
 
+	/** Dans le cas de la version coule, prends en compte la distance de degrée pour
+	 * pondérer la propagation d'un meme.
+	 *
+	 * @param distance
+	 * @param paramCouple
+	 * @return
+	 */
+	private double probaPropaDegree(Entite acting, Entite cible, double proba){
+
+		if(coupleVersion) {
+			proba /= 1. / (1 + Math.abs(acting.getDegree() - cible.getDegree()));
+		}
+
+		return proba;
 	}
 
 	//endregion
@@ -1002,11 +891,11 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			if(add || rmv)
 			{
 				addtmp = rmvtmp = false;
-				for (Meme myMeme : entite.getMyMemes()) {
-					if (add && myMeme.getAction().getActionType() == ActionType.AJOUTLIEN && !myMeme.isFluide()) {
+				for (IUnitOfTransfer myMeme : entite.getMyUnitOfT()) {
+					if (add && myMeme.getActionType() == TypeOfUOT.AJOUTLIEN && !myMeme.isFluide()) {
 						addtmp = true;
 					}
-					if (rmv && myMeme.getAction().getActionType() == ActionType.RETRAITLIEN && !myMeme.isFluide()) {
+					if (rmv && myMeme.getActionType() == TypeOfUOT.RETRAITLIEN && !myMeme.isFluide()) {
 						rmvtmp = true;
 					}
 				}
@@ -1042,11 +931,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	private void giveFluideMemeBreeder(List<Entite> breederToBeApplied) {
 		for (Entite entite : breederToBeApplied) {
-
-			if (entite.getMyMemes().stream().allMatch(e -> e.action.getActionType() == ActionType.AJOUTLIEN)) {
+			if (entite.getMyUnitOfT().stream().allMatch(e -> e.getActionType() == TypeOfUOT.AJOUTLIEN)) {
 				if (removeRandom != null)
 					eventMemeChanged(entite, entite.addMeme(removeRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
-			} else if (entite.getMyMemes().stream().allMatch(e -> e.action.getActionType() == ActionType.RETRAITLIEN)) {
+			} else if (entite.getMyUnitOfT().stream().allMatch(e -> e.getActionType() == TypeOfUOT.RETRAITLIEN)) {
 				if (addRandom != null)
 					eventMemeChanged(entite, entite.addMeme(addRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			}
@@ -1130,8 +1018,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		int index;
 
-		ActionType add = ActionType.AJOUTLIEN;
-		ActionType remove = ActionType.RETRAITLIEN;
+		TypeOfUOT add = TypeOfUOT.AJOUTLIEN;
+		TypeOfUOT remove = TypeOfUOT.RETRAITLIEN;
 
 		@SuppressWarnings("unused")
 		AttributType degree = AttributType.DEGREE;
@@ -1252,15 +1140,15 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		// Creation depuis les params qui ont été donné dans l'initializer
 		if(coupleVersion){
-			this.doubleRandom = memeFactory.extractAndAddCoupleMeme(index++, "AddØ", "RmvØ", 0);
+			this.doubleRandom = memeFactory.extractAndAddCoupleMeme("AddØ", "RmvØ", 0);
 
 		}
 		else {
 			// Action fluidité.
-			this.doubleRandom = memeFactory.extractAndAddCoupleMeme(index++, "AddØ", "RmvØ", 0);
-			memeFactory.extractAndAddCoupleMeme(index++, "AddEq", "Rmv-", .1);
-			memeFactory.extractAndAddCoupleMeme(index++, "AddØ-Hop", "Rmv-", .8);
-			memeFactory.extractAndAddCoupleMeme(index++, "Add∞", "Rmv-", .3);
+			this.doubleRandom = memeFactory.extractAndAddCoupleMeme( "AddØ", "RmvØ", 0);
+			memeFactory.extractAndAddCoupleMeme( "AddEq", "Rmv-", .1);
+			memeFactory.extractAndAddCoupleMeme( "AddØ-Hop", "Rmv-", .8);
+			memeFactory.extractAndAddCoupleMeme( "Add∞", "Rmv-", .3);
 		}
 //		Integer.toBinaryString()
 		// memeFactory.extractAndAddCoupleMeme(index++,"AddEq","RmvVoid",1);
@@ -1278,21 +1166,21 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 *         meme.
 	 */
 	private Hashtable<Integer, ArrayList<IUnitOfTransfer>> getMemeCombinaisonAvailable(
-			Optional<Hashtable<ActionType, ArrayList<IUnitOfTransfer>>> memeByC) {
-		Hashtable<ActionType, ArrayList<IUnitOfTransfer>> memesByCategory = new Hashtable<>();
+			Optional<Hashtable<TypeOfUOT, ArrayList<IUnitOfTransfer>>> memeByC) {
+
+		Hashtable<TypeOfUOT, ArrayList<IUnitOfTransfer>> memesByCategory = new Hashtable<>();
 		ArrayList<IUnitOfTransfer> memeOfOneCategory;
-		ArrayList<ActionType> key = new ArrayList<>();
+		ArrayList<TypeOfUOT> key = new ArrayList<>();
 
 		if(memeByC.isPresent()) {
 			memesByCategory = memeByC.get();
-			for (ActionType actionT:
-				 memesByCategory.keySet()) {
+			for (TypeOfUOT actionT: memesByCategory.keySet()) {
 				key.add(actionT);
 			}
 		}
 		else {
-			for (ActionType action : Configurator.ActionType.values()) {
-				if (action == ActionType.AJOUTLIEN || action == ActionType.RETRAITLIEN) {
+			for (TypeOfUOT action : TypeOfUOT.values()) {
+				if (action == TypeOfUOT.AJOUTLIEN || action == TypeOfUOT.RETRAITLIEN) {
 					memeOfOneCategory = memeFactory.getMemeAvailable(action, false);
 					if (memeOfOneCategory.size() > 0) {
 						memesByCategory.put(action, memeOfOneCategory);
@@ -1302,7 +1190,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			}
 		}
 
-		ActionType[] keyz = new ActionType[memesByCategory.keySet().size()];
+		TypeOfUOT[] keyz = new TypeOfUOT[memesByCategory.keySet().size()];
 		for (int i = 0; i < key.size(); i++)
 			keyz[i] = key.get(i);
 
@@ -1322,20 +1210,20 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private void recursive(Hashtable<ActionType, ArrayList<Meme>> memesByCategory,
-						   ArrayList<Meme> memes, ActionType[] actions,
-						   Hashtable<Integer, ArrayList<Meme>> selection, int indexAction) {
+	private void recursive(Hashtable<TypeOfUOT, ArrayList<IUnitOfTransfer>> memesByCategory,
+						   ArrayList<IUnitOfTransfer> memes, TypeOfUOT[] actions,
+						   Hashtable<Integer, ArrayList<IUnitOfTransfer>> selection, int indexAction) {
 
 		if ((++indexAction) < actions.length) {
-			for (Meme meme : memesByCategory.get(actions[indexAction])) {
-				ArrayList<Meme> copy = (ArrayList<Meme>) memes.clone();
+			for (IUnitOfTransfer meme : memesByCategory.get(actions[indexAction])) {
+				ArrayList<IUnitOfTransfer> copy = (ArrayList<IUnitOfTransfer>) memes.clone();
 				copy.add(meme);
 				recursive(memesByCategory, copy, actions, selection, indexAction);
 			}
 		} else {
 			indexOfMemesCombinaisonRecursion++;
 			selection.put(Integer.parseInt("" + indexOfMemesCombinaisonRecursion),
-					(ArrayList<Meme>) memes.clone());
+					(ArrayList<IUnitOfTransfer>) memes.clone());
 		}
 	}
 
@@ -1443,8 +1331,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		String resultat = "";
 		for (Entite entitee : getEntites()) {
 			resultat += "\n né" + entitee.getIndex();
-			for (Meme meme : entitee.getMyMemes()) {
-				resultat += "\n \t meme " + meme.toShortString();
+			for (IUnitOfTransfer meme : entitee.getMyUnitOfT()) {
+				resultat += "\n \t meme " + meme.toNameString();
 			}
 		}
 		return resultat;
@@ -1454,7 +1342,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		return entitesActive;
 	}
 
-	public CoupleMeme getDoubleRandom() {
+	public IUnitOfTransfer<CoupleMeme> getDoubleRandom() {
 		return doubleRandom;
 	}
 
@@ -1463,17 +1351,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	//endregion
 
 	//region deprecated
-
-	private void checkConsistency(){
-		ArrayList<Meme> myMemes;
-		for (Entite entite: getEntites()) {
-			myMemes = entite.getMyMemes();
-			if(myMemes.size() > 2)
-				System.out.println("TROP DE COMPORTEMENT");
-			if(myMemes.size() == 2 && myMemes.get(0).equals(myMemes.get(1)))
-				System.out.println("Scandale deux fois le meme");
-		}
-	}
 
 	public List<Entite> getEntites() {
 		return new ArrayList<Entite>(entites);
@@ -1507,33 +1384,16 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 *
 	 * @return la liste des memes possédés par les agents
 	 */
-	public ArrayList<Meme> getMemeOnMap() {
-		ArrayList<Meme> memes = new ArrayList<Meme>();
+	public ArrayList<IUnitOfTransfer> getMemeOnMap() {
+		ArrayList<IUnitOfTransfer> memes = new ArrayList<>();
 		for (Entite entite : getEntites()) {
-			for (Meme meme : entite.getMyMemes()) {
+			for (IUnitOfTransfer meme : entite.getMyUnitOfT()) {
 				if (!memes.contains(meme))
 					memes.add(meme);
 			}
 		}
 
 		return memes;
-	}
-
-	/** Selection d'une action, en excluant la derniere choisi si il s'agit d'un
-	 * ajout ou d'un retrait, et mis a jour de la dernier action faite.
-	 *
-	 * @param movingOne
-	 * @return
-	 */
-	private Meme actionSelectionControlledVersion(Entite movingOne) {
-		Meme selected = null;
-		selected = movingOne.chooseActionExclusionVersion(lastAction);
-		if (selected != null)
-			if (selected.action.getActionType() == ActionType.RETRAITLIEN
-					|| selected.action.getActionType() == ActionType.AJOUTLIEN)
-				lastAction = selected.action.getActionType();
-
-		return selected;
 	}
 
 	//endregion

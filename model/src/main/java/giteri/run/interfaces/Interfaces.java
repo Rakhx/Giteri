@@ -17,7 +17,6 @@ import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.IBehaviorTransmissionListener;
 
 import giteri.run.configurator.Configurator.ViewMessageType;
-import org.omg.PortableServer.IdUniquenessPolicy;
 
 /** Ensemble des interfaces utilisées dans le programme.
  * 
@@ -89,7 +88,6 @@ public class Interfaces {
 		void toggleWkProgress(String message);
 		void addValueToApplianceSerie(double time, Map<IUnitOfTransfer, Double> kvIndexValue);
 		void setMemeAvailable(List<IUnitOfTransfer> memes);
-		void setCoupleMemeAvailable(List<CoupleMeme> cMemes);
 		JFreeChart getDDChart(); // Pour prendre les screenshot. Pas propre.
 		JFreeChart getDensityChart();
 		JFreeChart getDensityOverProbaChart();
@@ -111,12 +109,10 @@ public class Interfaces {
 		void setViewMemeAvailable(List<IUnitOfTransfer> memes);
 		void takeSnapshot(long seed, Optional<ArrayList<String>> simulationPath);
 
-
 		void suspend();
 		void resume();
 		void oneStep();
-		
-		Hashtable<Integer, ArrayList<Meme>>  getMemesAvailables(Configurator.FittingBehavior setAsked);
+
 		double getDensity();
 		String getDDInfos();
 		NetworkProperties getCurrentNetProperties(int activator);
@@ -176,14 +172,28 @@ public class Interfaces {
 
 	/** Element qui sera passé d'entité en entité.
 	 * Peut etre un meme ou un couple de meme.
-	 *
+	 * Extends comparable pour les sort, Iterable pour pouvoir appliquer les memes fonctions
+	 * aux couples<Meme> ou aux Meme simple.
 	 * @param <T>
 	 */
-	public interface IUnitOfTransfer <T extends IUnitOfTransfer>  extends Comparable<T> {
+	public interface IUnitOfTransfer <T extends IUnitOfTransfer> extends Comparable<T>, Iterable<Meme> {
 		void setProbaPropagation(double p);
 		double getProbaPropagation();
+		Configurator.TypeOfUOT getActionType();
+		boolean isFluide();
+
+		/** ADLKRDM etc etc
+		 *
+		 * @return
+		 */
 		String toFourCharString();
-		Configurator.ActionType getActionType();
+
+		/** add+ pour les singles
+		 * add+.rmv- pour les couples.
+		 *
+		 * @return
+		 */
+		String toNameString();
 	}
 
 

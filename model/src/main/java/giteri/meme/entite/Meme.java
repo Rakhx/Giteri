@@ -3,19 +3,21 @@ package giteri.meme.entite;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import giteri.meme.mecanisme.ActionFactory.IAction;
 import giteri.meme.mecanisme.FilterFactory;
 import giteri.meme.mecanisme.FilterFactory.IFilter;
 import giteri.meme.mecanisme.AttributFactory.IAttribut;
 import giteri.run.configurator.Configurator;
-import giteri.run.interfaces.Interfaces;
+import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
 
 /** Classe qui va définir le type de comportement que peuvent avoir les agents.
  *  
  */
 @SuppressWarnings({ "rawtypes", "serial" })
-public class Meme implements Serializable, Interfaces.IUnitOfTransfer<Meme>,Comparable<Meme>{
+public class Meme implements Serializable, IUnitOfTransfer<Meme>, Comparable<Meme>{
 	// Liste des paramètres pour le giteri.meme en question
 	IAction action;
 	ArrayList<IAttribut> attributs;
@@ -42,6 +44,73 @@ public class Meme implements Serializable, Interfaces.IUnitOfTransfer<Meme>,Comp
 		fluide = fluidite;
 	}
 
+	//region implementation de l'interface.
+
+	/**
+	 *
+	 * @return ADLKDGRDMMNIFNTLK
+	 */
+	public String toFourCharString(){
+		return getMemeName(0);
+	}
+	/**
+	 * add+ pour les singles
+	 * add+.rmv- pour les couples.
+	 *
+	 * @return
+	 */
+	@Override
+	public String toNameString() {
+		return getName();
+	}
+	@Override
+	public Configurator.TypeOfUOT getActionType() {
+		return action.getActionType();
+	}
+	/**
+	 * Returns an iterator over elements of type {@code T}.
+	 *
+	 * @return an Iterator.
+	 */
+	@Override
+	public Iterator<Meme> iterator() {
+		return new Iterator<Meme>() {
+			int currentIndex = 0;
+			int maxIndex = 1;
+			@Override
+			public boolean hasNext() {
+				return currentIndex < maxIndex;
+			}
+			@Override
+			public Meme next() {
+				if(currentIndex == 0) {
+					currentIndex++;
+					return Meme.this;
+				}
+				else
+					throw new NoSuchElementException();
+			}
+		};
+	}
+	@Override
+	public void setProbaPropagation(double p) {
+		setProbaOfPropagation(p);
+	}
+	@Override
+	public double getProbaPropagation() {
+		return getProbaOfPropagation();
+
+	}
+	@Override
+	public boolean isFluide() {
+		return fluide;
+	}
+	@Override
+	public int compareTo(Meme o) {
+		return this.toFourCharString().compareTo(o.toFourCharString());
+	}
+
+	//endregion
 
 	//region Getter/Setter/toString
 
@@ -61,19 +130,10 @@ public class Meme implements Serializable, Interfaces.IUnitOfTransfer<Meme>,Comp
 		return getMemeName(1);
 	}
 
-	/**
+	/**Add+ etc
 	 *
-	 * @return ADLKDGRDMMNIFNTLK
+	 * @return
 	 */
-	public String toFourCharString(){
-		return getMemeName(0);
-	}
-
-	@Override
-	public Configurator.ActionType getActionType() {
-		return action.getActionType();
-	}
-
 	public String getName(){
 		return this.name;
 	}
@@ -89,11 +149,9 @@ public class Meme implements Serializable, Interfaces.IUnitOfTransfer<Meme>,Comp
 	public Hashtable<Integer, FilterFactory.IFilter> getFilter(String attribut){
 		return KVAttributLAgregator.get(attribut);
 	}
-
 	public ArrayList<IAttribut> getAttributs(){
 		return this.attributs;
 	}
-
 	/** mode 0 : the shortest
 	 *  mode 1 :
 	 *  mode 2: non complet. Action:
@@ -135,10 +193,6 @@ public class Meme implements Serializable, Interfaces.IUnitOfTransfer<Meme>,Comp
 
 		return resultat;
 	}
-	@Override
-	public int compareTo(Meme o) {
-		return this.toFourCharString().compareTo(o.toFourCharString());
-	}
 	/**
 	 *
 	 * @param target
@@ -158,18 +212,6 @@ public class Meme implements Serializable, Interfaces.IUnitOfTransfer<Meme>,Comp
 			this.probaOfPropagation = probaOfPropagation;
 		else
 			this.probaOfPropagation = 0;
-	}
-	@Override
-	public void setProbaPropagation(double p) {
-		setProbaOfPropagation(p);
-	}
-	@Override
-	public double getProbaPropagation() {
-		return getProbaOfPropagation();
-
-	}
-	public boolean isFluide() {
-		return fluide;
 	}
 
 	//endregion

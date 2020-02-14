@@ -118,22 +118,16 @@ public class FileView implements Interfaces.IView {
     }
 
     @Override
-    public void addValueToApplianceSerie(double time, Map<Meme, Double> value) {
+    public void addValueToApplianceSerie(double time, Map<Interfaces.IUnitOfTransfer, Double> value) {
 
     }
 
     @Override
-    public void setMemeAvailable(List<Meme> memes) {
+    public void setMemeAvailable(List<Interfaces.IUnitOfTransfer> memes) {
         addLine("Configuration", Collections.singletonList(memes.stream().map(e -> e.toFourCharString()).reduce("", String::concat)));
     }
 
-    @Override
-    public void setCoupleMemeAvailable(List<CoupleMeme> cMemes) {
-        addLine("Configuration", Collections.singletonList(cMemes.stream().map(e -> e.getName()).reduce("", String::concat)));
-
-    }
-
-    @Override
+ @Override
     public JFreeChart getDDChart() {
         return null;
     }

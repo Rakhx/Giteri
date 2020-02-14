@@ -83,7 +83,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 			Node noeud = graph.getNode(""+e.entite.getIndex());
 			setNodeClass(noeud, e.entite.getGraphStreamClass());
 			if(Configurator.displayLogMemeTransmission)
-				System.out.println(noeud+" "+e.meme.getName());
+				System.out.println(noeud+" "+e.meme.toNameString());
 		}
 	}
 
@@ -270,70 +270,35 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 	 * Parcourt les combinaisons de meme existants dispo sur la map.
 	 * @param graph
 	 */
+	// TODO [CV] -
+
 	private void defineGraphAttributes(Graph graph){
 
-		if(Configurator.coupleVersion){
-			String classe ;
-			ArrayList<String> classes = new ArrayList<>();
-			List<CoupleMeme> couples;
-			String attribut = "";
-			Integer officialIndex;
-			couples = memeFactory.getCoupleMemes();
-			int nbMemeSolo = couples.size();
-			int aAppliquer;
-			String combi; int test = 0;
-			for (CoupleMeme couple : couples) {
-				classes.clear();
-				classe = "";
-				for (Meme meme : couple) {
-					classes.add(meme.toFourCharString());
-				}
+		String attribut = "";
+		Integer officialIndex;
+		int nbMemeSolo = memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.BASIC).size();
+		nbMemeSolo--;
+		int aAppliquer;
 
-				classes.sort(null);
-				for (String string : classes) {
-					classe +=  string;
-				}
+		for (String combi : entiteHandler.getMemeAvailableAsString(Configurator.FittingBehavior.simpleAndComplex)) {
+			officialIndex = memeFactory.getIndexFromMemeFourChar(combi);
 
+			if (officialIndex != null)
+				aAppliquer = officialIndex;
+			else
+				aAppliquer = ++nbMemeSolo;
 
-				combi = classe;
-				aAppliquer = couple.getIndex();
-				attribut += "node. " + combi + " {fill-color: " + colorPieAsString.get(aAppliquer) + ";}";
-				if (Configurator.DisplayLogBehaviorColors) {
-					System.out.println(memeFactory.translateMemeCombinaisonReadable(combi) + ":" + colorPieAsString.get(aAppliquer));
-				}
+			attribut += "node. " + combi + " {fill-color: " + colorPieAsString.get(aAppliquer) + ";}";
+			if (Configurator.DisplayLogBehaviorColors) {
+				System.out.println(memeFactory.translateMemeCombinaisonReadable(combi) + ":" + colorPieAsString.get(aAppliquer));
 			}
-
-			// utilisé pour le step by step
-			attribut += "node.TARGET {fill-color: " + colorPieAsString.get(100) + ";}";
-			attribut += "node.NONTARGET {fill-color: " + colorPieAsString.get(101) + ";}";
-			graph.addAttribute("ui.stylesheet", attribut);
-		}else {
-			String attribut = "";
-			Integer officialIndex;
-			int nbMemeSolo = memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.ActionType.ANYTHING).size();
-			nbMemeSolo--;
-			int aAppliquer;
-
-			for (String combi : entiteHandler.getMemeAvailableAsString(Configurator.FittingBehavior.simpleAndComplex)) {
-				officialIndex = memeFactory.getIndexFromMemeFourChar(combi);
-
-				if (officialIndex != null)
-					aAppliquer = officialIndex;
-				else
-					aAppliquer = ++nbMemeSolo;
-
-				attribut += "node. " + combi + " {fill-color: " + colorPieAsString.get(aAppliquer) + ";}";
-				if (Configurator.DisplayLogBehaviorColors) {
-					System.out.println(memeFactory.translateMemeCombinaisonReadable(combi) + ":" + colorPieAsString.get(aAppliquer));
-				}
-			}
-
-			// utilisé pour le step by step
-			attribut += "node.TARGET {fill-color: " + colorPieAsString.get(100) + ";}";
-			attribut += "node.NONTARGET {fill-color: " + colorPieAsString.get(101) + ";}";
-
-			graph.addAttribute("ui.stylesheet", attribut);
 		}
+
+		// utilisé pour le step by step
+		attribut += "node.TARGET {fill-color: " + colorPieAsString.get(100) + ";}";
+		attribut += "node.NONTARGET {fill-color: " + colorPieAsString.get(101) + ";}";
+
+		graph.addAttribute("ui.stylesheet", attribut);
 	}
 
 	/** Retourne la couleur correspondant a l'index en param

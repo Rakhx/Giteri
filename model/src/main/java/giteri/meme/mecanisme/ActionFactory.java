@@ -1,13 +1,11 @@
 package giteri.meme.mecanisme;
-import java.util.ArrayList;
 import java.util.Set;
 
 import giteri.tool.math.Toolz;
-import giteri.run.configurator.Configurator;
-import giteri.run.configurator.Configurator.ActionType;
+import giteri.run.configurator.Configurator.TypeOfUOT;
 import giteri.meme.entite.Entite;
 import giteri.meme.entite.EntiteHandler;
-import giteri.meme.entite.Meme;
+
 /** Distributeur d'action
  *
  */
@@ -28,18 +26,12 @@ public class ActionFactory{
 	 * @param actionName
 	 * @return une instance de la classe action
 	 */
-	public IAction getAction(Configurator.ActionType actionName){
+	public IAction getAction(TypeOfUOT actionName){
 		switch (actionName) {
 			case AJOUTLIEN:
 				return new ActionAddLink(entiteHandler);
-			case COPIERANDOMMEME:
-				return new ActionCopyRandomMeme(entiteHandler);
 			case RETRAITLIEN:
 				return new ActionRemoveLink(entiteHandler);
-			case EVAPORATION:
-				return new ActionEvaporation(entiteHandler);
-			case REFRESH:
-				return new ActionRefreshLinks(entiteHandler);
 			default:
 				return null;
 		}
@@ -58,13 +50,9 @@ public class ActionFactory{
 		 */
 		String applyAction(Entite asker, Set<Entite> cibles);
 
-		ActionType getActionType();
+		TypeOfUOT getActionType();
 
 		String getFourCharName();
-
-		/** Intance d'entite handler pour faire les actions.
-		 *
-		 */
 
 	}
 
@@ -77,92 +65,6 @@ public class ActionFactory{
 		public EntiteHandler applier;
 		protected ActionBase(EntiteHandler eh){
 			applier = eh;
-		}
-	}
-
-	/** CLASSE d'action qui copie un meme // Objectif pour l'agent
-	 * Le choix du meme est parfaitement aléatoire.
-	 */
-	private class ActionCopyRandomMeme extends ActionBase implements IAction{
-
-		public ActionCopyRandomMeme(EntiteHandler eh){
-			super(eh);
-		}
-
-		/** L'apply action qui permet de copier un meme.
-		 *  Les conditions//aggrégation associées et propriétés définissent l'objectif.
-		 *  La fonction va choisir un meme de la liste des entitées et le copier.
-		 */
-		public String applyAction(Entite asker, Set<Entite> cibles) {
-			ArrayList<Meme> memesOfTarget ;
-			ArrayList<Meme> memesOfTargetNotPosseded = new ArrayList<Meme>();
-
-			Meme memeToCopy = null;
-			Entite modele;
-			String resultat = "ApplyAction de actionCopyRandomMeme";
-
-			// Si des cibles existent pour essayer de leur copier un meme
-			if(cibles.size() > 0){
-
-				// On choisit une cible au hasard dans la liste
-				modele = Toolz.getRandomElement(cibles);
-//						cibles.get(Toolz.getRandomNumber(cibles.size()));
-				memesOfTarget = modele.getMyMemes();
-				resultat += " Modèle trouvé pour copier sur lui "+ modele.getIndex();
-
-				// Si il posséde des memes
-				if(memesOfTarget.size() > 0)
-				{
-					ArrayList<String> memeAsString = new ArrayList<String>();
-					for (Meme meme : asker.getMyMemes())
-						memeAsString.add(meme.toString());
-
-					// Vérification que ce meme n'est pas déja acquis
-					for (Meme meme : memesOfTarget)
-						if(!memeAsString.contains(meme.toString()))
-							memesOfTargetNotPosseded.add(meme);
-
-					// des memes que l'asker ne possede pas déja
-					if(memesOfTargetNotPosseded.size() > 0)
-					{
-						memeToCopy = memesOfTargetNotPosseded.get(Toolz.getRandomNumber(memesOfTargetNotPosseded.size()));
-						asker.addMeme(memeToCopy);
-						resultat += " COPIE du meme " + memeToCopy;
-					}
-					else
-						resultat += " RIEN le modèle ne posséde aucun meme non déjà acquis";
-
-				}
-				else
-					resultat += " RIEN Un modèle mais qui n'a pas de meme dans sa liste";
-
-			}
-			else
-				resultat += "RIEN Aucun modèle sur qui copier un meme fourni en paramètre";
-
-			System.out.println(resultat);
-			if(memeToCopy != null)
-				return "Meme copied :"+memeToCopy.toString();
-			return "Aucune copie de meme";
-		}
-
-		/** To string de l'action.
-		 *
-		 */
-		public String toString(){
-			return "CopieRandomMeme";
-		}
-
-		/** Type de l'action en question.
-		 *
-		 */
-		public ActionType getActionType() {
-			return ActionType.COPIERANDOMMEME;
-		}
-
-		@Override
-		public String getFourCharName() {
-			return "CRDM";
 		}
 	}
 
@@ -195,8 +97,8 @@ public class ActionFactory{
 		/** Type de l'action en question.
 		 *
 		 */
-		public ActionType getActionType() {
-			return ActionType.AJOUTLIEN;
+		public TypeOfUOT getActionType() {
+			return TypeOfUOT.AJOUTLIEN;
 		}
 
 		/** Le to string de cette action.
@@ -243,8 +145,8 @@ public class ActionFactory{
 		/** Type de l'action en question.
 		 *
 		 */
-		public ActionType getActionType() {
-			return ActionType.RETRAITLIEN;
+		public TypeOfUOT getActionType() {
+			return TypeOfUOT.RETRAITLIEN;
 		}
 
 		/** Le to string de cette action.
@@ -260,84 +162,5 @@ public class ActionFactory{
 		}
 	}
 
-	/** Action de type évaporation de lien, comparable a retrait de lien.
-	 *
-	 *
-	 */
-	private class ActionEvaporation extends ActionBase implements IAction {
-		public ActionEvaporation(EntiteHandler eh){
-			super(eh);
-		}
-		/** Methode d'action de l'application de l'évaporation.
-		 * Fait la meme chose que la supression de lien...
-		 *
-		 */
-		public String applyAction(Entite asker, Set<Entite> cibles) {
-			String actionDone = "";
-
-			for (Entite cible : cibles) {
-				if (applier.removeLink(asker, cible)) {
-					actionDone += this.toString() + " " + asker.getIndex() + " => " + cible.getIndex();
-				}
-			}
-
-			return actionDone;
-		}
-
-		/** Type de l'action en question.
-		 *
-		 */
-		public ActionType getActionType() {
-			return ActionType.EVAPORATION;
-		}
-
-		/** Le to string de cette action.
-		 *
-		 */
-		public String toString(){
-			return "Evaporation";
-		}
-
-		@Override
-		public String getFourCharName() {
-			return "EVAP";
-		}
-	}
-
-	/** Action permettant le rafraichissement des liens avec
-	 * ceux déjà linké
-	 *
-	 */
-	private class ActionRefreshLinks extends ActionBase implements IAction {
-		public ActionRefreshLinks(EntiteHandler eh){
-			super(eh);
-		}
-		/** Application de l'action refresh links.
-		 *
-		 */
-		public String applyAction(Entite asker, Set<Entite> cibles) {
-
-			return "NOPE not implement";
-		}
-
-		/** Type de l'action en question.
-		 *
-		 */
-		public ActionType getActionType() {
-			return ActionType.REFRESH;
-		}
-
-		/** Le to string de cette action.
-		 *
-		 */
-		public String toString(){
-			return "Refresh";
-		}
-
-		@Override
-		public String getFourCharName() {
-			return "RHLK";
-		}
-	}
 
 }

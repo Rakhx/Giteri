@@ -12,7 +12,7 @@ public class RandomTest {
 
         Initializer balbla = new Initializer();
         for (int i = 0; i < 120; i++) {
-            balbla.getActionActivation(i,3,10);
+         //   balbla.getActionActivation(i,3,10);
         }
 
         // FONCTION RANDOM

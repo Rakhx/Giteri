@@ -12,14 +12,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.*;
-import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -41,7 +38,6 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.text.DefaultFormatter;
 
 import giteri.tool.math.Toolz;
 import giteri.meme.mecanisme.MemeFactory;
@@ -64,7 +60,6 @@ import giteri.tool.other.WriteNRead;
 import giteri.fitting.parameters.FittingClass;
 import giteri.run.controller.Controller.ModelController;
 import giteri.meme.entite.EntiteHandler;
-import giteri.meme.entite.Meme;
 import giteri.meme.event.ActionApplyEvent;
 import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.BehavTransmEvent;
@@ -214,7 +209,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	int compteurSerieDensity = 0;
 
 	private ArrayList<IUnitOfTransfer> selectedMemeOnSimulation;
-	private ArrayList<CoupleMeme> selectedCoupleMemeOnSimulation;
 
 	// à voir avec le reste
 	private ModelController modelController;
@@ -260,9 +254,9 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		densityValuesLast = new CircularFifoQueue<>(sizeOfCircularQueue);
 		memesTitle = new Hashtable<String, IUnitOfTransfer>();
 		if(Configurator.coupleVersion)
-			this.setCoupleMemeAvailable(memeFactory.getCoupleMemes());
+			this.setMemeAvailable(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.COUPLE));
 		else
-			this.setMemeAvailable(memeFactory.getMemes(Configurator.MemeList.ONMAP,Configurator.ActionType.ANYTHING));
+			this.setMemeAvailable(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.ANYTHING));
 		densityMaxValue = 0.0;
 		otherSymbols = new DecimalFormatSymbols(Locale.US);
 		decimal = new DecimalFormat("",otherSymbols);
@@ -297,19 +291,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 			resetComponentLabelMemeInformation();
 	}
 
-	/**
-	 * Met en place la liste des memes qui seront utilisés lors de la
-	 * simulation.
-	 *
-	 * @param selectedMeme
-	 *            la liste des memes utilisés
-	 */
-	public void setCoupleMemeAvailable(List<CoupleMeme> cMemes) {
-		selectedCoupleMemeOnSimulation = new ArrayList<>(cMemes);
-		resetHashTableKeys();
-		if(memeInfoPanel != null) // sale mais fonctionnel
-			resetComponentLabelMemeInformation();
-	}
 
 
 	/**
@@ -513,10 +494,10 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		JPanel memeAndDensities = new JPanel();
 		memeAndDensities.setLayout(new BoxLayout(memeAndDensities,BoxLayout.X_AXIS));
 
-	//	memeAndDensities.add(createComponentLabelMemeInformation());
-		if(Configurator.coupleVersion)
-			memeAndDensities.add(createComponentLabelCoupleInformation());
-		else
+
+//		if(Configurator.coupleVersion)
+//			memeAndDensities.add(createComponentLabelCoupleInformation());
+//		else
 			memeAndDensities.add(createComponentLabelMemeInformation());
         memeAndDensities.add(createComponentLabelNetworkInformation());
 
@@ -930,48 +911,48 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		return panel;
 	}
 
-
-    /** génération du panneau contenant les informations sur les nodes.
-     *
-     * @return
-     */
-    private JPanel createComponentLabelCoupleInformation() {
-        JPanel panel = new JPanel();
-        nodesHavingCoupleMemesLabel.clear();
-        String nameCombi;
-
-//		nbActivationByMemesLabel.clear();
-//		nbLastActivationByMemesLabel.clear();
-
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-
-        for (CoupleMeme couple : selectedCoupleMemeOnSimulation) {
-        	// Création du label pour la série de noeud possédant tel meme
-            couplesTitle.put(couple.getName(), couple);
-            JLabel li = new JLabel();
-//			JLabel la = new JLabel();
-//			JLabel lol = new JLabel();
-            JPanel memePane = new JPanel();
-            BoxLayout box = new BoxLayout(memePane, BoxLayout.Y_AXIS);
-            memePane.setLayout(box);
-            nodesHavingCoupleMemesLabel.put(couple.getName(), li);
-            // Creation du label pour la série de noeud du nombre d'activation
-            // total
-//			nbActivationByMemesLabel.put(meme.toString(), la);
-            // Creation des labels pour le nombre d'activation sur les 20
-            // dernieres fois
-//			nbLastActivationByMemesLabel.put(meme.toString(), lol);
-            memePane.add(li);
-//			memePane.add(la);
-//			memePane.add(lol);
-            panel.add(memePane);
-        }
-
-        panel.add(lastActionRatioLabel);
-        memeInfoPanel = panel;
-        return panel;
-    }
-
+//
+//    /** génération du panneau contenant les informations sur les nodes.
+//     *
+//     * @return
+//     */
+//    private JPanel createComponentLabelCoupleInformation() {
+//        JPanel panel = new JPanel();
+//        nodesHavingCoupleMemesLabel.clear();
+//        String nameCombi;
+//
+////		nbActivationByMemesLabel.clear();
+////		nbLastActivationByMemesLabel.clear();
+//
+//        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+//
+//        for (CoupleMeme couple : selectedCoupleMemeOnSimulation) {
+//        	// Création du label pour la série de noeud possédant tel meme
+//            couplesTitle.put(couple.getName(), couple);
+//            JLabel li = new JLabel();
+////			JLabel la = new JLabel();
+////			JLabel lol = new JLabel();
+//            JPanel memePane = new JPanel();
+//            BoxLayout box = new BoxLayout(memePane, BoxLayout.Y_AXIS);
+//            memePane.setLayout(box);
+//            nodesHavingCoupleMemesLabel.put(couple.getName(), li);
+//            // Creation du label pour la série de noeud du nombre d'activation
+//            // total
+////			nbActivationByMemesLabel.put(meme.toString(), la);
+//            // Creation des labels pour le nombre d'activation sur les 20
+//            // dernieres fois
+////			nbLastActivationByMemesLabel.put(meme.toString(), lol);
+//            memePane.add(li);
+////			memePane.add(la);
+////			memePane.add(lol);
+//            panel.add(memePane);
+//        }
+//
+//        panel.add(lastActionRatioLabel);
+//        memeInfoPanel = panel;
+//        return panel;
+//    }
+//
 
 
 	/**
@@ -1377,7 +1358,10 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		// Pour chaque série qu'on veut ajouter
 		for (IUnitOfTransfer meme : memes) {
-			labelSerie = memeFactory.translateMemeCombinaisonReadable(meme.toFourCharString());
+
+			// TODO [CV] - Ancienne méthode avec les translates, on va tenter en passant par le toNameString
+			//labelSerie = memeFactory.translateMemeCombinaisonReadable(meme.toFourCharString());
+			labelSerie = meme.toNameString();
 
 			// on crée les série dans l'ordre a partir de 0 et regarde le meme associé a cet index dans MemeFactory
 			XYSeries aSerie = new XYSeries(labelSerie);
@@ -1387,7 +1371,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 			chartMemeAppliance.getXYPlot().getRenderer().setSeriesPaint(serieIndex, serieColor);
 			datasetMemeAppliance.addSeries(aSerie);
 			ArraySeriesMemeAppliances.add(aSerie);
-
 		}
 	}
 
@@ -1426,123 +1409,67 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 				// TODO est ce que ca vaut le coup de mettre a jour l'information en direct?
 				netProp = modelController.getCurrentNetProperties(activator);
 
-				if(Configurator.coupleVersion){
-					// On releve le compte des couples sur les entites
-					// devrait etre fait avec les event mais trop long
-					nodesHavingCoupleMemes.clear();
-					for (Entite entite : entiteHandler.getEntitesActive()) {
-						// on regarde le couple possédé
-						indexCouple = entite.getCoupleMemeIndex();
-						// et on met a jour au fur et a mesure la liste de.
-						Toolz.addElementInHashArray(nodesHavingCoupleMemes,
-								memeFactory.getCoupleMemeFromIndex(indexCouple).getName(),1);
+				// Pour chaque Meme disponible sur la simulation
+				for (IUnitOfTransfer meme : selectedMemeOnSimulation) {
+					memeString = meme.toString();
+					memeFourChar = meme.toFourCharString();
+					associatedColor = drawerGraphStream.getColorAsColor(memeFactory.getIndexFromMemeFourChar(meme.toFourCharString()));
+
+					// NOMBRE DE POSSESSION DE MEME PAR LES ENTITES
+					// Trouver le label correspondant
+					JLabel lbl = nodesHavingXoxoMemesLabel.get(memeString);
+					// Nom sous forme "add+"
+					memeRef = memeFactory.translateMemeCombinaisonReadable(memeString) ;
+					String toPut = memeRef + ": [";
+					// Si tout les noeuds possede ce meme
+					if (nodesHavingXoxoMemes.get(memeString) != null
+							&& nodesHavingXoxoMemes.get(memeString).size() == Configurator.getNbNode()){
+						toPut += "ALL]";
+					}
+					// Si tout les noeuds ne sont pas de ce type
+					else
+					{
+						int nbNodesWithThisMeme = 0;
+
+						nbNodesWithThisMeme = nodesHavingXoxoMemes.get(memeString) == null? 0 :
+								nodesHavingXoxoMemes.get(memeString).size();
+						toPut += nbNodesWithThisMeme;
+						toPut += "]";
 					}
 
-					JLabel lbl;
-					nbNodesWithThisCouple = 0;
-					for (CoupleMeme coupleMeme : memeFactory.getCoupleMemes()) {
-						// trouve une couleur indexé
-						associatedColor = drawerGraphStream.getColorAsColor(coupleMeme.getIndex());
-						// trouve le label associé au couple
-						lbl = nodesHavingCoupleMemesLabel.get(coupleMeme.getName());
-						memeRef = coupleMeme.getName() ;
-						String toPut = memeRef + ": [";
-						// Si tout les noeuds possede ce meme
-						if (nodesHavingCoupleMemes.get(coupleMeme.getName()) != null  && nodesHavingCoupleMemes.get(coupleMeme.getName()).size() == Configurator.getNbNode()){
-							toPut += "ALL]";
-						}
-						// Si tout les noeuds ne sont pas de ce type
-						else
-						{
-							nbNodesWithThisCouple = nodesHavingCoupleMemes.get(coupleMeme.getName()) == null? 0 :
-									nodesHavingCoupleMemes.get(coupleMeme.getName()).size();
-							toPut += nbNodesWithThisCouple;
-							toPut += "]";
-						}
+					if (lbl != null) {
+						lbl.setText(toPut);
+						lbl.setForeground(associatedColor);
 
-						if (lbl != null) {
-							lbl.setText(toPut);
-							lbl.setForeground(associatedColor);
-						}
-					}
-				}else {
-					// Pour chaque Meme disponible sur la simulation
-					for (IUnitOfTransfer meme : selectedMemeOnSimulation) {
-						memeString = meme.toString();
-						memeFourChar = meme.toFourCharString();
-						associatedColor = drawerGraphStream.getColorAsColor(memeFactory.getIndexFromMemeFourChar(meme.toFourCharString()));
+						// NOMBRE D'APPEL DES MEMES DEPUIS LE DEBUT DE LA SIMULATION
+						// Savoir combien de fois le meme a été appelé depuis le début de la simulation
+						nbAppel = nbActivationByMemes.containsKey(memeString)? nbActivationByMemes.get(memeString) : 0;
+						// LABEL générique
+						nbActivationByMemesLabel.get(memeString).setText(memeRef + ":" + nbAppel );
+						nbActivationByMemesLabel.get(memeString).setForeground(associatedColor);
+						totalAppel += nbAppel;
+						nbAppelInLast100 = countOfLastMemeActivation.containsKey(memeString) ? countOfLastMemeActivation
+								.get(memeString) : 0;
 
-						// NOMBRE DE POSSESSION DE MEME PAR LES ENTITES
-						// Trouver le label correspondant
-						JLabel lbl = nodesHavingXoxoMemesLabel.get(memeString);
-						// Nom sous forme "add+"
-						memeRef = memeFactory.translateMemeCombinaisonReadable(memeString) ;
-						String toPut = memeRef + ": [";
-						// Si tout les noeuds possede ce meme
-						if (nodesHavingXoxoMemes.get(memeString) != null
-								&& nodesHavingXoxoMemes.get(memeString).size() == Configurator.getNbNode()){
-							toPut += "ALL]";
-						}
-						// Si tout les noeuds ne sont pas de ce type
-						else
-						{
-							int nbNodesWithThisMeme = 0;
-
-							nbNodesWithThisMeme = nodesHavingXoxoMemes.get(memeString) == null? 0 :
-									nodesHavingXoxoMemes.get(memeString).size();
-							toPut += nbNodesWithThisMeme;
-							toPut += "]";
-						}
-
-						if (lbl != null) {
-							lbl.setText(toPut);
-							lbl.setForeground(associatedColor);
-
-							// NOMBRE D'APPEL DES MEMES DEPUIS LE DEBUT DE LA SIMULATION
-							// Savoir combien de fois le meme a été appelé depuis le début de la simulation
-							nbAppel = nbActivationByMemes.containsKey(memeString)? nbActivationByMemes.get(memeString) : 0;
-							// LABEL générique
-							nbActivationByMemesLabel.get(memeString).setText(memeRef + ":" + nbAppel );
-							nbActivationByMemesLabel.get(memeString).setForeground(associatedColor);
-							totalAppel += nbAppel;
-							nbAppelInLast100 = countOfLastMemeActivation.containsKey(memeString) ? countOfLastMemeActivation
-									.get(memeString) : 0;
-
-							// Partie last 100 compte du nombre
-							nbLastActivationByMemesLabel.get(memeString).setText(memeRef + ": "
-									+ nbAppelInLast100 + "("
-									+ nbAppelInLast100 * 100 / sizeOfCircularQueue
-									+"%)");
-							nbLastActivationByMemesLabel.get(memeString).setForeground(associatedColor);
-						}
-					}
-
-					String oldText;
-					// On refait une passe pour mettre a jour les % de possession
-					for (IUnitOfTransfer meme : selectedMemeOnSimulation) {
-						memeString = meme.toString();
-						if(totalAppel != 0 && nbActivationByMemesLabel.containsKey(memeString)){
-							oldText = nbActivationByMemesLabel.get(memeString).getText();
-							nbActivationByMemesLabel.get(memeString).setText(oldText +
-									"(" + nbActivationByMemes.get(memeString) * 100 / totalAppel +"%)");
-						}
+						// Partie last 100 compte du nombre
+						nbLastActivationByMemesLabel.get(memeString).setText(memeRef + ": "
+								+ nbAppelInLast100 + "("
+								+ nbAppelInLast100 * 100 / sizeOfCircularQueue
+								+"%)");
+						nbLastActivationByMemesLabel.get(memeString).setForeground(associatedColor);
 					}
 				}
 
-
-
-
-
-//				String oldText;
+				String oldText;
 				// On refait une passe pour mettre a jour les % de possession
-//				for (Meme meme : selectedMemeOnSimulation) {
-//					memeString = meme.toString();
-//					if(totalAppel != 0 && nbActivationByMemesLabel.containsKey(memeString)){
-//						oldText = nbActivationByMemesLabel.get(memeString).getText();
-//						nbActivationByMemesLabel.get(memeString).setText(oldText +
-//								"(" + nbActivationByMemes.get(memeString) * 100 / totalAppel +"%)");
-//					}
-//				}
+				for (IUnitOfTransfer meme : selectedMemeOnSimulation) {
+					memeString = meme.toString();
+					if(totalAppel != 0 && nbActivationByMemesLabel.containsKey(memeString)){
+						oldText = nbActivationByMemesLabel.get(memeString).getText();
+						nbActivationByMemesLabel.get(memeString).setText(oldText +
+								"(" + nbActivationByMemes.get(memeString) * 100 / totalAppel +"%)");
+					}
+				}
 
 				densityValue = netProp.getDensity();
 				jlDensityLabel.setText("Density: " + Double.parseDouble(decimal.format(densityValue)));
@@ -1628,18 +1555,12 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		nbActivationByMemes.clear();
 		countOfLastMemeActivation.clear();
 		nodesHavingXoxoMemes.clear();
-
-		if(Configurator.coupleVersion){
-			for (CoupleMeme cMeme : selectedCoupleMemeOnSimulation) {
-				nodesHavingCoupleMemes.put(cMeme.toString(), new ArrayList<>());
-			}
-		}else{
-			for (IUnitOfTransfer meme : selectedMemeOnSimulation) {
-				nodesHavingXoxoMemes.put(meme.toString(), new ArrayList<>());
-				nbActivationByMemes.put(meme.toString(), 0);
-				countOfLastMemeActivation.put(meme.toString(), 0);
-			}
+		for (IUnitOfTransfer meme : selectedMemeOnSimulation) {
+			nodesHavingXoxoMemes.put(meme.toString(), new ArrayList<>());
+			nbActivationByMemes.put(meme.toString(), 0);
+			countOfLastMemeActivation.put(meme.toString(), 0);
 		}
+
 	}
 
 	/**

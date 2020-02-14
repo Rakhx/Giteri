@@ -1,17 +1,18 @@
 package giteri.meme.mecanisme;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import giteri.meme.entite.CoupleMeme;
 import giteri.run.configurator.Configurator;
-import giteri.run.configurator.Configurator.ActionType;
+import giteri.run.configurator.Configurator.TypeOfUOT;
 import giteri.run.configurator.Configurator.AgregatorType;
 import giteri.run.configurator.Configurator.AttributType;
 import giteri.meme.entite.Meme;
 
 import giteri.run.configurator.Configurator.MemeList;
-import giteri.run.interfaces.Interfaces;
 import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
+import sun.nio.ch.IOUtil;
 
 /** Permet de gérer les meme du graph
  *
@@ -23,37 +24,40 @@ public class MemeFactory {
 	private FilterFactory filterFactory;
 	private AttributFactory attributFactory;
 
-	// Liste de meme qui sont instancié de base sur la map. Pas nécessairement utilisé.
-	private ArrayList<Meme> memeOnMap;
-	// Liste des memes existant dans la simulation
+	// Liste des memes de base existant dans la simulation
 	private ArrayList<Meme> memeExisting;
-	// Liste des memes existant et qui seront utlisé pour le fitting
-	private ArrayList<Meme> memeFitting;
+	// Liste de IUnitOfTransfer qui sont instancié de base sur la map au démarrage
+	private ArrayList<IUnitOfTransfer> uOTOnMap;
+	// Liste de IUnitOfTransfer existant et qui seront utilisé pour le fitting
+	private ArrayList<IUnitOfTransfer> uOTFitting;
+
 	// association meme & index, pour coloration ET fitting
-	private Hashtable<Meme, Integer> kvMemeIndex;
+	private Hashtable<IUnitOfTransfer, Integer> kvMemeIndex;
 	// KV  fourChar :: name
 	private Hashtable<String, String> memeTranslationReadable;
 
 	// Concernant les couples d'actions et leur probabilité de propagation
-	private Map<Integer, CoupleMeme> coupleAction;
-	private Map<Integer, Double> coupleProbaPerIndex;
+	// private Map<Integer, CoupleMeme> coupleAction;
+	//private Map<Integer, Double> coupleProbaPerIndex;
 
 	private Integer lastMemeIndexUsed = -1;
 	private boolean hasBeenSorted = false;
+
+	private static int indexOfIOT = -1;
 	//endregion
 
 	//region  Constructor & Co
 	public MemeFactory(ActionFactory actionFac, FilterFactory agregatorFac, AttributFactory attributFac ){
 		memeExisting = new ArrayList<>();
-		memeFitting = new ArrayList<>();
-		memeOnMap = new ArrayList<>();
+		uOTFitting = new ArrayList<>();
+		uOTOnMap = new ArrayList<>();
 		kvMemeIndex = new Hashtable<>();
 		actionFactory = actionFac;
 		filterFactory = agregatorFac;
 		attributFactory = attributFac;
 		memeTranslationReadable = new Hashtable<>();
-		coupleAction = new HashMap<>();
-		coupleProbaPerIndex = new HashMap<>();
+//		coupleAction = new HashMap<>();
+//		coupleProbaPerIndex = new HashMap<>();
 	}
 
 	//endregion
@@ -72,7 +76,7 @@ public class MemeFactory {
 	 * @param fluidite meme considéré comme fluidité ~~
 	 * @return Le meme nouvellement créé
 	 */
-	public Meme registerMemeAction(String name, double probaOfPropa, boolean addForMap, boolean addForFitting, ActionType actionAsked,
+	public Meme registerMemeAction(String name, double probaOfPropa, boolean addForMap, boolean addForFitting, TypeOfUOT actionAsked,
 								   ArrayList<AttributType> attributs,
 								   Hashtable<AttributType, Hashtable<Integer ,AgregatorType>> KVAttributAgregator, boolean fluidite){
 
@@ -110,30 +114,31 @@ public class MemeFactory {
 
 		memeExisting.add(toReturn);
 		if(addForFitting)
-			memeFitting.add(toReturn);
+			uOTFitting.add(toReturn);
 		if(addForMap)
-			memeOnMap.add(toReturn);
+			uOTOnMap.add(toReturn);
 
 		kvMemeIndex.put(toReturn, ++lastMemeIndexUsed);
 		memeTranslationReadable.put(toReturn.toFourCharString(),toReturn.getName());
 		return toReturn;
 	}
 
-	/** pas opti mais plus rapide. ( espérons ).
+	/** Permet d'obtenir les unité d'action disponibles. Les couples action on été enregistré en type anything.
 	 *
-	 * @param whichAction
+	 * @param memeUsage : onMap, Existing, Fitting
+	 * @param typeAction : AJOUTLIEN, RETRAITLIEN, ANYTHING
 	 * @return
 	 */
-	public ArrayList<Meme> getMemes(Configurator.MemeList typeMeme, ActionType whichAction){
+	public ArrayList<IUnitOfTransfer> getMemes(Configurator.MemeList memeUsage, TypeOfUOT typeAction){
 
 		//region maps
-		if(typeMeme == Configurator.MemeList.ONMAP) {
-			if (whichAction == ActionType.ANYTHING)
-				return memeOnMap;
+		if(memeUsage == Configurator.MemeList.ONMAP) {
+			if (typeAction == TypeOfUOT.ANYTHING)
+				return uOTOnMap;
 			else {
-				ArrayList<Meme> toReturn = new ArrayList<>();
-				for (Meme meme : memeOnMap) {
-					if (meme.getAction().getActionType() == whichAction)
+				ArrayList<IUnitOfTransfer> toReturn = new ArrayList<>();
+				for (IUnitOfTransfer meme : uOTOnMap) {
+					if (meme.getActionType() == typeAction)
 						toReturn.add(meme);
 				}
 
@@ -142,13 +147,13 @@ public class MemeFactory {
 		}
 		//endregion
 		//region fitting
-		else if (typeMeme == Configurator.MemeList.FITTING){
-			if(whichAction == ActionType.ANYTHING)
-				return memeFitting;
+		else if (memeUsage == Configurator.MemeList.FITTING){
+			if(typeAction == TypeOfUOT.ANYTHING)
+				return uOTFitting;
 			else {
-				ArrayList<Meme> toReturn = new ArrayList<>();
-				for (Meme meme : memeFitting) {
-					if (meme.getAction().getActionType() == whichAction)
+				ArrayList<IUnitOfTransfer> toReturn = new ArrayList<>();
+				for (IUnitOfTransfer meme : uOTFitting) {
+					if (meme.getActionType() == typeAction)
 						toReturn.add(meme);
 				}
 
@@ -158,12 +163,17 @@ public class MemeFactory {
 		//endregion
 		//region existing
 		else {
-			if(whichAction == ActionType.ANYTHING)
-				return memeExisting;
-			else {
-				ArrayList<Meme> toReturn = new ArrayList<>();
+			ArrayList<IUnitOfTransfer> toReturn = new ArrayList<>();
+			if(typeAction == TypeOfUOT.ANYTHING) {
+
 				for (Meme meme : memeExisting) {
-					if (meme.getAction().getActionType() == whichAction)
+					toReturn.add(meme);
+				}
+				return toReturn;
+			}
+			else {
+				for (Meme meme : memeExisting) {
+					if (meme.getAction().getActionType() == typeAction)
 						toReturn.add(meme);
 				}
 
@@ -180,10 +190,10 @@ public class MemeFactory {
 	 * @param whichAction
 	 * @return
 	 */
-	public String getMemesAsString(Configurator.MemeList typeMeme, ActionType whichAction){
+	public String getMemesAsString(Configurator.MemeList typeMeme, TypeOfUOT whichAction){
 		String resultat = "";
-		for (Meme meme : getMemes(typeMeme, whichAction)) {
-			resultat += ":" + meme.toFourCharString() + "%" + meme.getProbaOfPropagation();
+		for (IUnitOfTransfer meme : getMemes(typeMeme, whichAction)) {
+			resultat += ":" + meme.toFourCharString() + "%" + meme.getProbaPropagation();
 		}
 
 		return resultat;
@@ -195,11 +205,11 @@ public class MemeFactory {
 	 * @param action Type de l'action que les memes doivent appliqués
 	 * @return
 	 */
-	public ArrayList<IUnitOfTransfer> getMemeAvailable(ActionType action, boolean forFitting){
+	public ArrayList<IUnitOfTransfer> getMemeAvailable(TypeOfUOT action, boolean forFitting){
 		ArrayList<IUnitOfTransfer> goodOne = new ArrayList<>();
 		if(forFitting){
-			for (Meme meme : memeFitting)
-				if(meme.getAction().getActionType() == action)
+			for (IUnitOfTransfer meme : uOTFitting)
+				if(meme.getActionType() == action)
 					goodOne.add(meme);
 		} else
 			for (Meme meme : memeExisting)
@@ -214,8 +224,8 @@ public class MemeFactory {
 	 */
 	public String getMemeAvailableAsString(Configurator.MemeList usage){
 		String resultat = "";
-		for (Meme meme : getMemes(usage, ActionType.ANYTHING)) {
-			resultat += ":" + meme.toFourCharString() + "-ProbaPropagation:" + meme.getProbaOfPropagation();
+		for (IUnitOfTransfer meme : getMemes(usage, TypeOfUOT.ANYTHING)) {
+			resultat += ":" + meme.toFourCharString() + "-ProbaPropagation:" + meme.getProbaPropagation();
 		}
 
 		return resultat;
@@ -226,8 +236,8 @@ public class MemeFactory {
 	 * @param foursizeName
 	 * @return
 	 */
-	public Meme getMemeFromFourString(String foursizeName){
-		for (Meme meme: getMemes(MemeList.EXISTING, ActionType.ANYTHING)) {
+	public IUnitOfTransfer getMemeFromFourString(String foursizeName){
+		for (IUnitOfTransfer meme: getMemes(MemeList.EXISTING, TypeOfUOT.ANYTHING)) {
 			if(meme.toFourCharString().compareTo(foursizeName)==0)
 				return meme;
 		}
@@ -241,7 +251,7 @@ public class MemeFactory {
 	 * @param name
 	 * @return
 	 */
-	public Meme getMemeFromName(String name){
+	public IUnitOfTransfer getMemeFromName(String name){
 		for (Map.Entry<String, String> ssEntry : memeTranslationReadable.entrySet()) {
 			if(ssEntry.getValue().compareToIgnoreCase(name) == 0)
 				return getMemeFromFourString(ssEntry.getKey());
@@ -278,11 +288,12 @@ public class MemeFactory {
 	 * @param proba
 	 * @return
 	 */
-	private CoupleMeme registerCoupleMeme(int index, Meme add, Meme rmv, double proba){
-		CoupleMeme cm = new CoupleMeme(index, add, rmv, proba);
-		if(index >= 0)
-			this.coupleAction.put(index, cm);
-		return cm;
+	private IUnitOfTransfer<CoupleMeme> registerCoupleMeme(Meme add, Meme rmv, double proba){
+		indexOfIOT++;
+		IUnitOfTransfer<CoupleMeme> icm = new CoupleMeme(indexOfIOT, add, rmv, proba);
+		this.uOTFitting.add(icm);
+		kvMemeIndex.put(icm, indexOfIOT);
+		return icm;
 	}
 
 	/** depuis le nom des memes d'ajout//retrait, associé à un index et une proba de T
@@ -293,11 +304,11 @@ public class MemeFactory {
 	 * @param proba
 	 * @return
 	 */
-	public CoupleMeme extractAndAddCoupleMeme(int index, String addName, String rmvName, double proba){
+	public IUnitOfTransfer<CoupleMeme> extractAndAddCoupleMeme(String addName, String rmvName, double proba){
 		Meme add, rmv;
-		add = this.getMemeFromName(addName);
-		rmv = this.getMemeFromName(rmvName);
-		return this.registerCoupleMeme(index, add, rmv, proba);
+		add = (Meme)this.getMemeFromName(addName);
+		rmv = (Meme)this.getMemeFromName(rmvName);
+		return this.registerCoupleMeme(add, rmv, proba);
 	}
 
 	/** Génère une liste de coupleMeme depuis les deux tableaux d'activation d'add et rmv. Produit carthésien
@@ -306,15 +317,15 @@ public class MemeFactory {
 	 * @param rmvActi
 	 * @return
 	 */
-	public List<CoupleMeme> generateCoupleFromActivation(boolean[] addActi, boolean[] rmvActi){
+	public List<IUnitOfTransfer<CoupleMeme>> generateCoupleFromActivation(boolean[] addActi, boolean[] rmvActi){
 		// int i = 0, j = 0;
-		List<CoupleMeme> selected = new ArrayList<>();
+		List<IUnitOfTransfer<CoupleMeme>> selected = new ArrayList<>();
 		List<Meme> addz, rmvz;
 		Meme add, rmv;
-		CoupleMeme cree;
+		IUnitOfTransfer<CoupleMeme> cree;
 		int index = -1;
-		addz = getMemes(MemeList.FITTING, ActionType.AJOUTLIEN);
-		rmvz = getMemes(MemeList.FITTING, ActionType.RETRAITLIEN);
+		addz = getMemes(MemeList.FITTING, TypeOfUOT.AJOUTLIEN).stream().map(e -> (Meme)e).collect(Collectors.toList());
+		rmvz = getMemes(MemeList.FITTING, TypeOfUOT.RETRAITLIEN).stream().map(e -> (Meme)e).collect(Collectors.toList());;
 		for (int i = 0; i < addActi.length; i++) {
 			if(addActi[i]) {
 				add = addz.get(i);
@@ -322,9 +333,8 @@ public class MemeFactory {
 					// A new combinaison is born
 					if(rmvActi[j]){
 						rmv = rmvz.get(j);
-						cree = extractAndAddCoupleMeme(++index, add.getName(), rmv.getName(), .1);
+						cree = extractAndAddCoupleMeme(add.getName(), rmv.getName(), .1);
 						selected.add(cree);
-						this.coupleAction.put(index,cree);
 					}
 				}
 			}
@@ -334,39 +344,24 @@ public class MemeFactory {
 	}
 
 	public void associateProbaWithCouple(List<Double> proba){
+		List<IUnitOfTransfer> coupleAction = this.getMemes(MemeList.FITTING,TypeOfUOT.COUPLE);
 		assert (coupleAction.size() == proba.size());
 		for (int i = 0; i < coupleAction.size(); i++) {
 			coupleAction.get(i).setProbaPropagation(proba.get(i));
-			coupleProbaPerIndex.put(i, proba.get(i));
-
+		//	coupleProbaPerIndex.put(i, proba.get(i));
 		}
-
 	}
-
-	public CoupleMeme getCoupleMemeFromIndex(int index){
-		return coupleAction.get(index);
-	}
-
-	public ArrayList<CoupleMeme> getCoupleMemes(){
-		return new ArrayList<>(coupleAction.values());
-	}
-
-	public Collection<CoupleMeme> getCouple(){
-		return new ArrayList<>(coupleAction.values());
-	}
-
-
 
 	//endregion
 
 	//region index stuff
 
-	/** pour l'affichage. récupération apres association d'une couleur a un meme
+	/** pour l'affichage. récupération apres association d'une couleur à un IUnitOfTransfer
 	 *
 	 * @param thismeme
 	 * @return
 	 */
-	public Integer getIndexFromMeme(Meme thismeme){
+	public Integer getIndexFromMeme(IUnitOfTransfer thismeme){
 		return kvMemeIndex.get(thismeme);
 	}
 
@@ -376,36 +371,36 @@ public class MemeFactory {
 	 * @return
 	 */
 	public Integer getIndexFromMemeFourChar(String memeAsString){
-		for (Meme meme : kvMemeIndex.keySet()) {
+		for (IUnitOfTransfer meme : kvMemeIndex.keySet()) {
 			if(meme.toFourCharString().compareTo(memeAsString) == 0)
 				return kvMemeIndex.get(meme);
 		}
 		return null;
 	}
 
-	/**
-	 *
-	 * @param numero
-	 * @return
-	 */
-	public Meme getMemeFromIndex(int numero){
-		for (Meme meme : kvMemeIndex.keySet()) {
-			if(kvMemeIndex.get(meme) == numero)
-				return meme;
-		}
-		return null;
-	}
+//	/**
+//	 *
+//	 * @param numero
+//	 * @return
+//	 */
+//	public Meme getMemeFromIndex(int numero){
+//		for (IUnitOfTransfer meme : kvMemeIndex.keySet()) {
+//			if(kvMemeIndex.get(meme) == numero)
+//				return meme;
+//		}
+//		return null;
+//	}
 
-	public Meme getIemeMemeFromSpecList(MemeList list, int ieme){
+	public IUnitOfTransfer getIemeMemeFromSpecList(MemeList list, int ieme){
 		if(!hasBeenSorted){
 			memeExisting.sort(null);
-			memeFitting.sort(null);
-			memeOnMap.sort(null);
+			uOTFitting.sort(null);
+			uOTOnMap.sort(null);
 			hasBeenSorted = true;
 		}
 
 		int position = 0;
-		for (Meme meme: getMemes(list, ActionType.ANYTHING )) {
+		for (IUnitOfTransfer meme: getMemes(list, TypeOfUOT.ANYTHING)) {
 			if(ieme == position++){
 				return meme;
 			}

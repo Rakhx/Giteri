@@ -3,6 +3,7 @@ package giteri.run.displaysStuff;
 import giteri.meme.entite.CoupleMeme;
 import giteri.meme.entite.Meme;
 import giteri.run.configurator.Configurator;
+import giteri.run.interfaces.Interfaces;
 import giteri.run.interfaces.Interfaces.IView;
 
 import java.util.Hashtable;
@@ -48,17 +49,12 @@ public class IHMStub implements IView {
 
 
 	@Override
-	public void addValueToApplianceSerie(double time, Map<Meme, Double> value) {
+	public void addValueToApplianceSerie(double time, Map<Interfaces.IUnitOfTransfer, Double> value) {
 		
 	}
 
 	@Override
-	public void setMemeAvailable(List<Meme> memes) {
-
-	}
-
-	@Override
-	public void setCoupleMemeAvailable(List<CoupleMeme> cMemes) {
+	public void setMemeAvailable(List<Interfaces.IUnitOfTransfer> memes) {
 
 	}
 

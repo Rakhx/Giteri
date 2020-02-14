@@ -19,8 +19,8 @@ import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.EnumExplorationMethod;
 import giteri.run.configurator.Configurator.MemeList;
 import giteri.run.configurator.Configurator.NetworkAttribType;
-import giteri.run.interfaces.Interfaces;
 import giteri.run.interfaces.Interfaces.IOpenMoleParameter;
+import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
 import giteri.run.interfaces.Interfaces.StatAndPlotInterface;
 import giteri.tool.math.Toolz;
 import giteri.tool.other.WriteNRead;
@@ -106,7 +106,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		// La version jar fourni tjrs des parametres en ligne de commande
 		if ((typeOfLaunch == Configurator.EnumLauncher.jarC || typeOfLaunch == Configurator.EnumLauncher.jarOpenMole)) {
 			if(coupleVersion) {
-				// List<CoupleMeme> couples =
 				memeFactory.generateCoupleFromActivation(((CasteOpenMoleParameter) param).addActivation,
 						((CasteOpenMoleParameter) param).rmvActivation);
 				memeFactory.associateProbaWithCouple(((CasteOpenMoleParameter) param).probaPropa);
@@ -190,18 +189,18 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 */
 	private IExplorationMethod callFromJava(FittingClass fitter){
 		// Tout le trala des explorateurs qui enchaine les IModelParameter
-		Hashtable<Meme, GenericBooleanParameter> memeDispo = new Hashtable<>(); // Meme sur map
+		Hashtable<IUnitOfTransfer, GenericBooleanParameter> memeDispo = new Hashtable<>(); // Meme sur map
 		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>(); // List de config
 
 		// Rempli la liste des memes que l'on veut pour lancer le fitting.
-		for (Meme meme : memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING))
+		for (IUnitOfTransfer meme : memeFactory.getMemes(Configurator.MemeList.FITTING, Configurator.TypeOfUOT.ANYTHING))
 			memeDispo.put(meme, new GenericBooleanParameter());
 
 		MemeAvailability memeProvider = new MemeAvailability(memeDispo);
 		memeProvider.setEntiteHandler(entiteHandler);
 		providers.put(1,memeProvider); // Détermine si on va aussi cycler sur l'existence des memes sur la map
 
-		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeFactory.getMemes(Configurator.MemeList.FITTING,Configurator.ActionType.ANYTHING),
+		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeFactory.getMemes(Configurator.MemeList.FITTING, Configurator.TypeOfUOT.ANYTHING),
 				new GenericDoubleParameter(.0,.0,1.,.5));
 		memeDiffu.setEntiteHandler(entiteHandler);
 		providers.put(0,memeDiffu);
@@ -218,20 +217,14 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	private IExplorationMethod callFromJar(FittingClass fitter, IOpenMoleParameter parameter){
 
 		// appelle sec avec un seul jeu de parametre, aux probas fixés
-		Hashtable<Meme, GenericDoubleParameter> memeAndProba = new Hashtable<>();
-		// Selon si on travail en version couple ou non
-		Hashtable<CoupleMeme, GenericDoubleParameter> coupleMemeAndProba = new Hashtable<>();
-
+		Hashtable<IUnitOfTransfer, GenericDoubleParameter> unitAndProba = new Hashtable<>();
 		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
 		ArrayList<String> memesSelectionnes = null;
-
+		List<IUnitOfTransfer> unitToRun = new ArrayList<>();
 		Meme selectedMeme;
 		CoupleMeme selectedCouple;
 
 		// Creation
-		if(coupleVersion){
-
-		}
 
 		File toWrite = writeNRead.createAndGetDirFromString(Arrays.asList("."));
 		if(debugJarMode) {
@@ -239,33 +232,41 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			if(!coupleVersion)
 				writeNRead.writeSmallFile(toWrite, "RezTemp", ((ClassicOpenMoleParameter)parameter).memeActication.stream().map(e -> e.toString()).collect(Collectors.toList()));
 			else{
-				writeNRead.writeSmallFile(toWrite, "RezTemp", (memeFactory.getCoupleMemes().stream().map(e -> e.toString()).collect(Collectors.toList())));
+				writeNRead.writeSmallFile(toWrite, "RezTemp", (memeFactory.getMemes(MemeList.FITTING, Configurator.TypeOfUOT.COUPLE).stream().map(e -> e.toString()).collect(Collectors.toList())));
 			}
 		}
 
-		// Parcourt la liste des memes
-		for (int i = 0; i < activation.size(); i++) {
-			if(activation.get(i)) {
-				selectedMeme = memeFactory.getIemeMemeFromSpecList(MemeList.FITTING, i);
-				if(selectedMeme != null) {
-					memeAndProba.put(selectedMeme, new GenericDoubleParameter(proba.get(i)));
-					if (debugJarMode)
-						memesSelectionnes.add(";" + memeFactory.translateMemeCombinaisonReadable(selectedMeme.toString()) + "-" + proba.get(i));
-				}else {
-					System.err.println("[StatAndPlotGeneric.CallFromJar]- Pas assez de meme dans la liste de fitting pour le nombre de param appelé");
-				}
-			}
+		unitToRun = coupleVersion? memeFactory.getMemes(MemeList.FITTING, Configurator.TypeOfUOT.COUPLE):
+				memeFactory.getMemes(MemeList.FITTING, Configurator.TypeOfUOT.BASIC);
+		
+		unitToRun.sort(null);
+
+		List<Double> proba;
+		if(coupleVersion){
+			proba = ((CasteOpenMoleParameter)parameter).probaPropa;
+		}else {
+			proba = ((ClassicOpenMoleParameter)parameter).memeProba;
+
 		}
+		// Associer une proba de propagation
+		int compte = 0;
+		for (IUnitOfTransfer iUnitOfTransfer : unitToRun) {
+			unitAndProba.put(iUnitOfTransfer, new GenericDoubleParameter(proba.get(compte++)));
+			if (debugJarMode)
+				memesSelectionnes.add(";" + memeFactory.translateMemeCombinaisonReadable(iUnitOfTransfer.toString()) + "-" + proba.get(compte - 1));
+
+		}
+
 		if(debugJarMode)
 //			writeNRead.writeSmallFile(toWrite, "RezTemp",
 //		memeAndProba.entrySet().stream().map(( v -> v.getKey().toFourCharString().concat(v.getValue().valueString()))).collect(Collectors.toList()));
 			writeNRead.writeSmallFile(toWrite, "RezTemp", memesSelectionnes);
 
-		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(memeAndProba);
+		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(unitAndProba);
 		memeDiffu.setEntiteHandler(entiteHandler);
 		providers.put(0,memeDiffu);
 
-		MemeAvailability memeProvider = new MemeAvailability(memeAndProba.keySet().stream().collect(Collectors.toList()));
+		MemeAvailability memeProvider = new MemeAvailability(unitAndProba.keySet().stream().collect(Collectors.toList()));
 		memeProvider.setEntiteHandler(entiteHandler);
 		providers.put(1,memeProvider); // Détermine si on va aussi cycler sur l'existence des memes sur la map
 

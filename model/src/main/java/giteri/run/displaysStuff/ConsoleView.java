@@ -56,7 +56,7 @@ public class ConsoleView implements Interfaces.IView {
     }
 
     @Override
-    public void addValueToApplianceSerie(double time, Map<Meme, Double> value) {
+    public void addValueToApplianceSerie(double time, Map<Interfaces.IUnitOfTransfer, Double> value) {
 
     }
 
@@ -65,11 +65,6 @@ public class ConsoleView implements Interfaces.IView {
         System.out.println("Cht de liste de memes: " + memes.stream().map(e -> e.toFourCharString()).reduce("", String::concat));
     }
 
-    @Override
-    public void setCoupleMemeAvailable(List<CoupleMeme> cMemes) {
-        System.out.println("Cht de liste de memes: " + cMemes.stream().map(e -> e.getName()).reduce("", String::concat));
-
-    }
 
     @Override
     public JFreeChart getDDChart() {
