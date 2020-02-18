@@ -20,22 +20,22 @@ public class MemeProperties {
 
     //region properties & constructeur
 
-    // Meme actif sur la map
-    List<Interfaces.IUnitOfTransfer> memeOnMap;
+    // iUnitOfTransfers sur la map
+    List<IUnitOfTransfer> iUnitOfTransfers;
     // Nombre d'appel depuis le début de la simu
-    private Map<Interfaces.IUnitOfTransfer, Integer> nbActivationByMemes;
+    private Map<IUnitOfTransfer, Integer> nbActivationByMemes;
     // Compte sur les X derniers appels des memes
-    Map<Interfaces.IUnitOfTransfer, Integer> countOfLastMemeActivation;
+    Map<IUnitOfTransfer, Integer> countOfLastMemeActivation;
     // k:meme v:nb entity with this meme
-    Map<Interfaces.IUnitOfTransfer, Integer> countOfEntitiesHavingMeme;
+    Map<IUnitOfTransfer, Integer> countOfEntitiesHavingMeme;
 
     // Sur les 100 dernières actions, quel meme a été appelé
-    final CircularFifoQueue<Interfaces.IUnitOfTransfer> lastHundredActionDone;
+    final CircularFifoQueue<IUnitOfTransfer> lastHundredActionDone;
 
     List<Integer> lastFailActionTried;
 
     // Combinaison de meme disponible
-    Map<Integer, ArrayList<Interfaces.IUnitOfTransfer>> memeCombinaisonFittingAvailable;
+    Map<Integer, ArrayList<IUnitOfTransfer>> memeCombinaisonFittingAvailable;
 
     int cptActionRmvFail = 0, cptActionAddFail = 0;
 
@@ -153,7 +153,7 @@ public class MemeProperties {
         // CALCUL DES INDICATEURS A ECRIRE
 
         // La liste des memes courant devrait etre a jour, apply fait avant dans la fitting classe
-        for (Interfaces.IUnitOfTransfer meme:memeOnMap) {
+        for (Interfaces.IUnitOfTransfer meme: iUnitOfTransfers) {
             header += ";Meme[";
             header += meme.toFourCharString() +":";
             header += "]-nbEntiteOwning";
@@ -174,7 +174,7 @@ public class MemeProperties {
 
         // combinaison de meme présent sur le run, classé par type d'action
         Hashtable<Configurator.TypeOfUOT, ArrayList<IUnitOfTransfer>> memesByCategory = new Hashtable<>();
-        for (Interfaces.IUnitOfTransfer meme: memeOnMap)
+        for (Interfaces.IUnitOfTransfer meme: iUnitOfTransfers)
             Toolz.addElementInHashArray(memesByCategory,meme.getActionType(),meme);
        // memeCombinaisonFittingAvailable = this.getMemeAvailable(Configurator.FittingBehavior.simpleAndComplex, Optional.of(memesByCategory));
 

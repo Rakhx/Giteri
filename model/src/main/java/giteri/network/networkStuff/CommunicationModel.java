@@ -185,11 +185,7 @@ public class CommunicationModel implements IModel {
 		eh.synchronizeNodeConnectionWithEntiteConnection();
 
 		wf.getDrawer().drawThisNetwork(nc.networkInstance, false);
-		// eh.giveMemeToEntite(Configurator.methodOfGeneration);
 
-		// Reste en pause après avoir générer les graphes depuis l'interface
-//		synchronized (nc) {				nc.resume();			}
-//		synchronized (eh) {				eh.resume();			}
 	}
 
 	/**

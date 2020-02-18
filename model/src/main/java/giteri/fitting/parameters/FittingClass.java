@@ -294,6 +294,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		Toolz.setSeed(currentSeed);
 
 		com.generateGraph(Configurator.initialNetworkForFitting);
+
 		explorator.apply();
 
 		// Mise à jour des indicateurs de l'interface ( meme disponible a afficher )

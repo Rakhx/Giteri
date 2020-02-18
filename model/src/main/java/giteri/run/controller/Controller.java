@@ -82,13 +82,14 @@ public class Controller {
 			Map<String, Integer> nbLastActivByMeme = new Hashtable<>();
 			List<String> lastHundred = new ArrayList<>();
 
+			// TODO [CV] Ici question des fenetres glissantes de derniere apply de Meme
 			nbActivationByMemes.entrySet().stream().
-					forEach(kv -> nbActiByMeme.put(kv.getKey().toFourCharString(),kv.getValue()));
+					forEach(kv -> nbActiByMeme.put(kv.getKey().toNameString(),kv.getValue()));
 			countOfLastMemeActivation.entrySet().stream().
-					forEach(kv -> nbLastActivByMeme.put(kv.getKey().toFourCharString(),kv.getValue()));
+					forEach(kv -> nbLastActivByMeme.put(kv.getKey().toNameString(),kv.getValue()));
 			synchronized (lastHundredActionDone) {
 				lastHundredActionDone.stream().
-						forEach(l -> lastHundred.add(l.toFourCharString()));
+						forEach(l -> lastHundred.add(l.toNameString()));
 			}
 
 			for (Interfaces.IView vue: vues) {

@@ -10,10 +10,21 @@ import java.util.Optional;
 public class RandomTest {
     public static void main(String[] args)  {
 
-        Initializer balbla = new Initializer();
-        for (int i = 0; i < 120; i++) {
-         //   balbla.getActionActivation(i,3,10);
-        }
+
+        int i = 0;
+        changed(i);
+        System.out.println(i);
+
+
+
+
+
+//        Initializer balbla = new Initializer();
+//        for (int i = 0; i < 120; i++) {
+//         //   balbla.getActionActivation(i,3,10);
+//        }
+
+
 
         // FONCTION RANDOM
 //        int ajout = 0;
@@ -101,6 +112,9 @@ public class RandomTest {
         return 1 + (int)((Math.log(1.- Toolz.getProba()))/(Math.log(1.-proba)));
     }
 
+    public static void changed(int parvaleur){
+        parvaleur++;
+    }
 
     static public Double lolade(){
         return  new Double(10.0);
@@ -112,7 +126,6 @@ public class RandomTest {
     }
 
     static int add(int x, int y)
-
     {
 
         int carry;

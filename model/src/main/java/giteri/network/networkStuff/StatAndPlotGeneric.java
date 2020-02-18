@@ -109,7 +109,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 				memeFactory.generateCoupleFromActivation(((CasteOpenMoleParameter) param).addActivation,
 						((CasteOpenMoleParameter) param).rmvActivation);
 				memeFactory.associateProbaWithCouple(((CasteOpenMoleParameter) param).probaPropa);
-
 			}
 
 			return fittingLauncher(typeOfLaunch, typeOfExplo, param);
@@ -117,15 +116,15 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			// appelé depuis IHM
 			final IOpenMoleParameter proxyParam;
 			// ICI Faire des proxy des param. optional etc car lancée depuis LIHM sans paramètre
+			// TODO [CV] Proxy COUPLE
 			if(Configurator.coupleVersion){
-				proxyParam = new CasteOpenMoleParameter(14,3,10,14, 3, 10);
+				proxyParam = new CasteOpenMoleParameter(9,2,10,10, 2, 10);
 				memeFactory.generateCoupleFromActivation(((CasteOpenMoleParameter)proxyParam).addActivation,
 						((CasteOpenMoleParameter)proxyParam).rmvActivation);
-				memeFactory.associateProbaWithCouple(((CasteOpenMoleParameter) param).probaPropa);
+				memeFactory.associateProbaWithCouple(((CasteOpenMoleParameter) proxyParam).probaPropa);
 			}else{
 				proxyParam = new ClassicOpenMoleParameter();
 			}
-
 
 			(new Thread() {
 				public void run() {
@@ -254,7 +253,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		for (IUnitOfTransfer iUnitOfTransfer : unitToRun) {
 			unitAndProba.put(iUnitOfTransfer, new GenericDoubleParameter(proba.get(compte++)));
 			if (debugJarMode)
-				memesSelectionnes.add(";" + memeFactory.translateMemeCombinaisonReadable(iUnitOfTransfer.toString()) + "-" + proba.get(compte - 1));
+				memesSelectionnes.add(";" + iUnitOfTransfer.toNameString() + "-" + proba.get(compte - 1));
 
 		}
 
@@ -313,11 +312,11 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		// Si on veut plus d'une itération, besoin d'utiliser un explorator plus complet.
 		// NON MIS A JOUR POUR COUPLE VERSION
-		if(typeOfExplo != EnumExplorationMethod.oneShot)
-			if(!coupleVersion)
+		if(typeOfExplo != EnumExplorationMethod.oneShot) {
+			if (!coupleVersion)
 				explorator = callFromJava(fittingConfig);
-		// Si appelle oneShot, depuis IHM ou depuis JAR, explorator oneShot
-		else {
+			// Si appelle oneShot, depuis IHM ou depuis JAR, explorator oneShot
+		}else {
 			explorator = callFromJar(fittingConfig, parameter);
 		}
 

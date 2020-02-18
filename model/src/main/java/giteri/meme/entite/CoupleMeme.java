@@ -88,7 +88,7 @@ public class CoupleMeme implements Iterable<Meme>, IUnitOfTransfer<CoupleMeme> {
     public String getColorClass(){
         String classe = "";
         classe += addAction.toFourCharString();
-        classe += "1" + removeAction.toFourCharString();
+        classe += /*"1" +*/ removeAction.toFourCharString();
         return classe;
     }
 
@@ -99,7 +99,7 @@ public class CoupleMeme implements Iterable<Meme>, IUnitOfTransfer<CoupleMeme> {
      * @return
      */
     public double getProbaPropagation() {
-        return Configurator.coupleSingleTransmission? probaPropagation :
+        return Configurator.coupleSingleTransmission ? probaPropagation :
                 probaPropagation / Configurator.coupleDividerTransmission;
     }
 

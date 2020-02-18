@@ -311,6 +311,21 @@ public class MemeFactory {
 		return this.registerCoupleMeme(add, rmv, proba);
 	}
 
+	/** depuis le nom des memes d'ajout//retrait, associé à un index et une proba de T
+	 *
+	 * @param index
+	 * @param addName
+	 * @param rmvName
+	 * @param proba
+	 * @return
+	 */
+	public IUnitOfTransfer<CoupleMeme> extractAndDoNotRegister(String addName, String rmvName, double proba){
+		Meme add, rmv;
+		add = (Meme)this.getMemeFromName(addName);
+		rmv = (Meme)this.getMemeFromName(rmvName);
+		return new CoupleMeme(-1, add, rmv, proba);
+	}
+
 	/** Génère une liste de coupleMeme depuis les deux tableaux d'activation d'add et rmv. Produit carthésien
 	 *
 	 * @param addActi
@@ -346,6 +361,7 @@ public class MemeFactory {
 	public void associateProbaWithCouple(List<Double> proba){
 		List<IUnitOfTransfer> coupleAction = this.getMemes(MemeList.FITTING,TypeOfUOT.COUPLE);
 		assert (coupleAction.size() == proba.size());
+		// TODO [CV] a faire plus proprement. 1 couple action de trop a cause du double random pour fluidité
 		for (int i = 0; i < coupleAction.size(); i++) {
 			coupleAction.get(i).setProbaPropagation(proba.get(i));
 		}

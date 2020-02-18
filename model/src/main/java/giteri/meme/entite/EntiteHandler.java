@@ -117,15 +117,25 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	public void updateMemeAvailableForProperties(){
 
-		memeProperties.memeOnMap = this.memeFittingApplied;
+		memeProperties.iUnitOfTransfers = this.memeFittingApplied;
 
 		//combinaison de meme présent sur le run, classé par type d'action
-		Hashtable<TypeOfUOT, ArrayList<Interfaces.IUnitOfTransfer>> memesByCategory = new Hashtable<>();
+		Hashtable<TypeOfUOT, ArrayList<Interfaces.IUnitOfTransfer>> iOTByCategory = new Hashtable<>();
 		for (Interfaces.IUnitOfTransfer meme: this.memeFittingApplied)
-			Toolz.addElementInHashArray(memesByCategory,meme.getActionType(),meme);
+			Toolz.addElementInHashArray(iOTByCategory,meme.getActionType(),meme);
 
-		memeProperties.memeCombinaisonFittingAvailable =
-				this.getMemeAvailable(FittingBehavior.simpleAndComplex, Optional.of(memesByCategory));
+		// Quand version classique, on crée les couples disponibles sur la map
+		if(!coupleVersion)
+			memeProperties.memeCombinaisonFittingAvailable =
+				this.getMemeAvailable(FittingBehavior.simpleAndComplex, Optional.of(iOTByCategory));
+		else{
+			memeProperties.memeCombinaisonFittingAvailable = new HashMap<>();
+			int i = 0;
+			for (IUnitOfTransfer iUnitOfTransfer : this.memeFittingApplied) {
+				memeProperties.memeCombinaisonFittingAvailable.put(i++, new ArrayList<IUnitOfTransfer>(Arrays.asList(iUnitOfTransfer)));
+			}
+		}
+
 	}
 
 	//endregion
@@ -365,12 +375,22 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	public void eventMemeChanged(Entite entiteConcernee, IUnitOfTransfer ajoutOrR, String message) {
 
-		// Devrait se trouver dans le handler de cet event, de la meme classe.
-	    if( entiteConcernee.getMyUnitOfT().size() > 1)
-            synchronized (entitesActive) {
-                if(!entitesActive.contains(entiteConcernee))
-                    entitesActive.add(entiteConcernee);
-            }
+		/* Les évenements de retrait n'arrivent que lors d'un remplacement, il n'est donc pas utile de retirer de la lsite
+		des entités actives l'entités qui subit le retrait.
+		*/
+
+		// Dans le cas ou ttes les entites ne sont pas encore actives.
+		if(entitesActive.size() < entites.size()) {
+
+			if (entiteConcernee.getMyUnitOfT().size() < 1){
+				System.err.println("[EH-EventMemeChanged] NE DEVRAIT PAS ARRIVER");
+			}
+
+			synchronized (entitesActive) {
+				if (!entitesActive.contains(entiteConcernee))
+					entitesActive.add(entiteConcernee);
+			}
+		}
 
 		BehavTransmEvent myEvent = new BehavTransmEvent(this, entiteConcernee, ajoutOrR, message);
 
@@ -457,22 +477,22 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	//region Meme
 
 	/** Applique directement depuis une liste de meme au X premier agents pour les
-	 * recevoir. Si option de défault behavior, donne des memes fluides aux autres agent.
+	 * recevoir. Si option de défault behavior, donne des UOT fluides aux autres agent.
 	 * Utilisé par l'apply du IModelParameter
-	 * @param memes
+	 * @param UOT
 	 */
-	public void giveMemeToEntiteFitting(List<IUnitOfTransfer> memes) {
+	public void giveMemeToEntiteFitting(List<IUnitOfTransfer> UOT) {
 		ArrayList<Entite> entiteContente = new ArrayList<>();
 		Iterator<Entite> entitees = entites.iterator();
 		Entite actual;
 		ArrayList<Entite> others = new ArrayList<>(entites);
-		memeFittingApplied = memes;
-		for (IUnitOfTransfer meme : memes) {
+		memeFittingApplied = UOT;
+		for (IUnitOfTransfer meme : UOT) {
 			actual = entitees.next();
-			eventMemeChanged(actual, actual.addMeme(meme, true), Configurator.MemeActivityPossibility.AjoutMeme.toString());
+			eventMemeChanged(actual, actual.addUOT(meme, true), Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			entiteContente.add(actual);
 		}
-		// On file des memes d'ajout et retrait random aux entités qui n'ont pas eu de comportement de base a l'initialisation
+		// On file des UOT d'ajout et retrait random aux entités qui n'ont pas eu de comportement de base a l'initialisation
 		// TODO a deplacer avnt l'appel de cette fonction pour que tout les giveMeme puisse faire de la fluidité?
 		if(Configurator.initializeDefaultBehavior) {
 			others.removeAll(entiteContente);
@@ -504,7 +524,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	}
 	/** Renvoi la liste des memes dispo sur la map en liste de string.
 	 * Utilisé pour les couleurs sur le graphe
-	 *
+	 * TODO [WAYPOINT] - creation des classes pour graphstream
 	 * @param setAsked Voir @getMemeAvailable
 	 * @return
 	 */
@@ -526,17 +546,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 			memesAsString.add(classe);
 		}
+
 		return memesAsString;
-	}
-
-
-	/** la flemme de changer IModelParameter pour y mettre un factory
-	 *
-	 * @param memeCombinaison
-	 * @return
-	 */
-	public String translateMemeCombinaisonReadable(String memeCombinaison) {
-		return memeFactory.translateMemeCombinaisonReadable(memeCombinaison);
 	}
 
 	/** Regarde le propriété des éléments du réseau, en fonction de la
@@ -760,7 +771,13 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 					}
 
 					// TODO[CV] - ici a eu lieu un chg
-					propagation(cibles, movingOne, memeAction);
+					// Si couple version, que l'action jouée soit un ajout ou un retrait, c'est tout le couple qui est transmis
+					if(coupleVersion)
+						propagation(cibles, movingOne, movingOne.getMyUnitOfT().get(0));
+					// Sinon c'est l'action en question
+					else
+						propagation(cibles, movingOne, memeAction);
+
 
 					// endregion
 
@@ -807,18 +824,23 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @param cibles les cibles qui ont subi l'action, souvent unitaire
 	 * @param movingOne L'entité agissante
 	 * @param memeAction L'action appliquée
+	 * @param proba la proba est prise ici car la proba d'un couple est portée par la classe CoupleMeme
 	 */
-	private void propagation(Set<Entite> cibles, Entite movingOne, IUnitOfTransfer memeAction){
+	private void propagation(Set<Entite> cibles, Entite movingOne, IUnitOfTransfer memeAction ){
 
-		// proba portée par l'IUnitOfTransfer
-		double probaAction = memeAction.getProbaPropagation();
 		IUnitOfTransfer removedAction;
+		double probaAction = 0 ;
 
 		for (Entite entite : cibles) {
 
+			probaAction = memeAction.getProbaPropagation();
+			probaAction = probaPropaDegree(movingOne, entite, probaAction);
+
 			// Proba de propagation - si on veut ajouter le meme
-			if(Toolz.rollDice(probaPropaDegree(movingOne, entite, probaAction))) {
-				removedAction = entite.addOrReplaceFast(memeAction);
+			if(Toolz.rollDice(probaAction)) {
+
+				// Si le retour est nul c'est que l'entité a refuser le transfert
+				removedAction = entite.takeMyMeme(memeAction);
 
 				// Si retour du meme a ajouter, il n'y a pas eu de remplacement
 				if(removedAction == memeAction)
@@ -848,7 +870,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private double probaPropaDegree(Entite acting, Entite cible, double proba){
 
 		if(coupleVersion) {
-			proba /= 1. / (1 + Math.abs(acting.getDegree() - cible.getDegree()));
+			proba /=  (1 + Math.abs(acting.getDegree() - cible.getDegree())) * 4;
 		}
 
 		return proba;
@@ -918,10 +940,23 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	private void giveFluideMeme(ArrayList<Entite> entitesToBeApplied){
 		for (Entite entite : entitesToBeApplied) {
-				if(addRandom != null)
-					eventMemeChanged(entite, entite.addMeme(addRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
-				if(removeRandom != null)
-					eventMemeChanged(entite, entite.addMeme(removeRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
+		if(!coupleVersion) {
+			if (addRandom != null)
+				eventMemeChanged(entite, entite.addUOT(addRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
+			if (removeRandom != null)
+				eventMemeChanged(entite, entite.addUOT(removeRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
+		}else{
+			entite.addUOT(getDoubleRandom());
+			for (Meme meme : getDoubleRandom()) {
+				if(meme.getActionType() == TypeOfUOT.AJOUTLIEN)
+					eventMemeChanged(entite, meme, MemeActivityPossibility.AjoutMeme.toString());
+				else
+					eventMemeChanged(entite, meme, MemeActivityPossibility.RetraitMeme.toString());
+
+			}
+
+
+			}
 		}
 	}
 
@@ -933,10 +968,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		for (Entite entite : breederToBeApplied) {
 			if (entite.getMyUnitOfT().stream().allMatch(e -> e.getActionType() == TypeOfUOT.AJOUTLIEN)) {
 				if (removeRandom != null)
-					eventMemeChanged(entite, entite.addMeme(removeRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
+					eventMemeChanged(entite, entite.addUOT(removeRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			} else if (entite.getMyUnitOfT().stream().allMatch(e -> e.getActionType() == TypeOfUOT.RETRAITLIEN)) {
 				if (addRandom != null)
-					eventMemeChanged(entite, entite.addMeme(addRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
+					eventMemeChanged(entite, entite.addUOT(addRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
 			}
 		}
 	}
@@ -1140,7 +1175,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		// Creation depuis les params qui ont été donné dans l'initializer
 		if(coupleVersion){
-			this.doubleRandom = memeFactory.extractAndAddCoupleMeme("AddØ", "RmvØ", 0);
+			this.doubleRandom = memeFactory.extractAndDoNotRegister("AddØ", "RmvØ", 0);
 
 		}
 		else {

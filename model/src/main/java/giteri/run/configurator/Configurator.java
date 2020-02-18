@@ -55,7 +55,7 @@ public final class Configurator {
 	public static boolean useEntitySuccesProba = false; // Prend en compte la proba porté pour l'entité pour APPLY a meme. Actuellement l'index
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 
-	public static boolean coupleSingleTransmission = true; // Transmet le couple à l'entité ayant recu l'action et pas plus
+	public static boolean coupleSingleTransmission = false; // Transmet le couple à l'entité ayant recu l'action et pas plus
 
 
 	// SCORE
@@ -68,7 +68,6 @@ public final class Configurator {
 	// 170+512 = THIRD APL EDGES ARRAY DDAVG
 
 	public static int activationCodeAllAttrib = 255 + 512;
-
 	public static int initialnetworkForBase = 0; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 3- SF 4-SW
 
 	// endregion
@@ -88,7 +87,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
 	@toOutput ( yes = true )
-	public static int multiplicatorNbAction  = 2000; //  Par combein on multiplie le nombdre de noeud sur la simulation
+	public static int multiplicatorNbAction  = 200000; //  Par combein on multiplie le nombdre de noeud sur la simulation
 
 	// endregion
 
@@ -135,7 +134,6 @@ public final class Configurator {
 
 	// region affichage de debug
 	public static boolean debugStatAndPlot = false;
-	public static boolean debugFittingClassFast = false;
 	public static boolean debugFittingClass = false;
 	public static boolean debugEntite = false;
 	public static boolean debugEntiteHandler = false;
@@ -151,7 +149,7 @@ public final class Configurator {
 	//region ancien boolean, osef, etc
 	// moyen osef
 	public static final boolean lotOfNodes = false;
-	private static int nbNode = lotOfNodes ? 500 : 100;
+	private static int nbNode = lotOfNodes ? 500 : 200;
 	public static int refreshInfoRate = 10;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
 	public final static int semiAutoWaitingTime = 3000;

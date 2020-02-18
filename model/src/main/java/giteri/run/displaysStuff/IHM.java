@@ -183,7 +183,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 	// Correspondance entre un meme et les memes le possédant
 	private Hashtable<String, ArrayList<Integer>> nodesHavingXoxoMemes;
-	private Hashtable<String, ArrayList<Integer>> nodesHavingCoupleMemes;
 
 	// Nombre de fois ou le meme a été appelé
 	private Map<String, Integer> nbActivationByMemes;
@@ -241,7 +240,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		nbActivationByMemes = new Hashtable<String, Integer>();
 		countOfLastMemeActivation = new Hashtable<String, Integer>();
 		nodesHavingXoxoMemes = new Hashtable<String, ArrayList<Integer>>();
-		nodesHavingCoupleMemes = new Hashtable<String, ArrayList<Integer>>();
 
 		nbLastActivationByMemesLabel = new Hashtable<String, JLabel>();
 		nbActivationByMemesLabel = new Hashtable<String, JLabel>();
@@ -286,12 +284,10 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 	@Override
 	public void setMemeAvailable(List<IUnitOfTransfer> memes) {
 		this.selectedMemeOnSimulation = new ArrayList<>(memes);
-		resetHashTableKeys();
+		// resetHashTableKeys(); //TODO [CV] humhum on reset plus ici les memes?
 		if(memeInfoPanel != null) // sale mais fonctionnel
 			resetComponentLabelMemeInformation();
 	}
-
-
 
 	/**
 	 * Lorsqu'une entité fait une action, fonction appelée. Mise à jour des
@@ -1419,7 +1415,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 					// Trouver le label correspondant
 					JLabel lbl = nodesHavingXoxoMemesLabel.get(memeString);
 					// Nom sous forme "add+"
-					memeRef = memeFactory.translateMemeCombinaisonReadable(memeString) ;
+					memeRef = memeString ;
 					String toPut = memeRef + ": [";
 					// Si tout les noeuds possede ce meme
 					if (nodesHavingXoxoMemes.get(memeString) != null
@@ -1431,7 +1427,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 					{
 						int nbNodesWithThisMeme = 0;
 
-						nbNodesWithThisMeme = nodesHavingXoxoMemes.get(memeString) == null? 0 :
+						nbNodesWithThisMeme = nodesHavingXoxoMemes.get(memeString) == null ? 0 :
 								nodesHavingXoxoMemes.get(memeString).size();
 						toPut += nbNodesWithThisMeme;
 						toPut += "]";
@@ -1536,7 +1532,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 		// Pour chaque meme, on trouve la traduction en langage lisible, et on cherche la série correspondante.
 		for (IUnitOfTransfer meme : kvIndexValue.keySet()) {
-			keyMeme = memeFactory.translateMemeCombinaisonReadable((meme.toFourCharString()));
+			keyMeme = meme.toNameString();
 			for (XYSeries arraySeriesMemeAppliance : ArraySeriesMemeAppliances) {
 				if(keyMeme.compareToIgnoreCase((String)arraySeriesMemeAppliance.getKey()) == 0)
 					arraySeriesMemeAppliance.add(time, kvIndexValue.get(meme));
@@ -1555,11 +1551,12 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		nbActivationByMemes.clear();
 		countOfLastMemeActivation.clear();
 		nodesHavingXoxoMemes.clear();
-		for (IUnitOfTransfer meme : selectedMemeOnSimulation) {
-			nodesHavingXoxoMemes.put(meme.toString(), new ArrayList<>());
-			nbActivationByMemes.put(meme.toString(), 0);
-			countOfLastMemeActivation.put(meme.toString(), 0);
-		}
+
+//		for (IUnitOfTransfer meme : selectedMemeOnSimulation) {
+//			nodesHavingXoxoMemes.put(meme.toString(), new ArrayList<>());
+//			nbActivationByMemes.put(meme.toNameString(), 0);
+//			countOfLastMemeActivation.put(meme.toString(), 0);
+//		}
 
 	}
 

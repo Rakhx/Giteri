@@ -24,7 +24,6 @@ public class Entite implements Comparable<Entite>{
 	private List<IUnitOfTransfer> myMemes;
 
 	// répartie sur 0 -> 1, réévalué a chaque ajout ou (retrait de meme)
-	// TODO [CV] - Faire en sorte qu'en cas de couple meme chacun des meme soit representés ici
 	Hashtable<Meme, Double> intervalOfSelection;
 	//	Hashtable<Entite, Integer> connectedTimeNodes;
 	Set<Entite> connectedNodes;
@@ -73,16 +72,31 @@ public class Entite implements Comparable<Entite>{
 	}
 
 
-
+	/** Fait ses vérification internes avant d'accepter de prendre un meme
+	 *
+	 * @param toReceive
+	 * @return
+	 */
 	public IUnitOfTransfer takeMyMeme(IUnitOfTransfer toReceive){
-		boolean ok = true;
-		// S'il le possede déjà
-		ok &= !getMyUnitOfT().contains(toReceive);
-		// s'il est breeder sur l'action
-		ok &= (breederOn == toReceive );
+		boolean ok = false;
 
-		return addOrReplaceFast(toReceive);
+		if(
+				!getMyUnitOfT().contains(toReceive) &&
+				(	breederOn == null ||
+						breederOn.getActionType() != toReceive.getActionType())
+		)
+			ok = true;
 
+
+
+
+//		// S'il le possede déjà
+//		ok &= !getMyUnitOfT().contains(toReceive);
+//		// s'il est breeder sur l'action
+//		ok &= (breederOn != toReceive);
+		if(ok)
+			return addOrReplaceFast(toReceive);
+		return null;
 	}
 
 
@@ -116,7 +130,7 @@ public class Entite implements Comparable<Entite>{
 	 * @param memeToAdd
 	 * @return memetoAdd si ajout, l'ancien meme si remplacement, null si rien
 	 */
-	public IUnitOfTransfer addOrReplaceFast(IUnitOfTransfer memeToAdd){
+	private IUnitOfTransfer addOrReplaceFast(IUnitOfTransfer memeToAdd){
 		boolean okToBeAdded = true;
 		boolean needToBeReplaced = false;
 		boolean addedOrReplaced = false;
@@ -145,8 +159,12 @@ public class Entite implements Comparable<Entite>{
 				myMemes.remove(memeReplaced);
 			}
 
-		addMeme(memeToAdd);
-		myMemes.sort(null);
+		addUOT(memeToAdd);
+		try {
+			myMemes.sort(null);
+		}catch ( ClassCastException cce){
+			System.out.println(cce);
+		}
 
 		return needToBeReplaced ? memeReplaced : memeToAdd;
 	}
@@ -378,17 +396,17 @@ public class Entite implements Comparable<Entite>{
 		}
 	}
 
-	public IUnitOfTransfer addMeme(IUnitOfTransfer e, boolean fixed){
+	public IUnitOfTransfer addUOT(IUnitOfTransfer e, boolean fixed){
 		if(fixed) {
-			breederOn = addMeme(e);
+			breederOn = addUOT(e);
 			isBreeder = true;
 		}
 		else
-			addMeme(e);
+			addUOT(e);
 		return e;
 	}
 
-	public IUnitOfTransfer addMeme(IUnitOfTransfer e){
+	public IUnitOfTransfer addUOT(IUnitOfTransfer e){
 		synchronized(myMemes){
 			myMemes.add(e);
 		}

@@ -582,7 +582,8 @@ public interface IModelParameter<T> {
 			String res = "MemeActivated: ";
 			for (IUnitOfTransfer meme : value.keySet()) {
 				if(value.get(meme).getValue())
-					res += "&" + entiteHandler.translateMemeCombinaisonReadable(meme.toFourCharString()) + " ";
+				//	res += "&" + entiteHandler.translateMemeCombinaisonReadable(meme.toFourCharString()) + " ";
+					res += "&" + meme.toNameString() + " ";
 			}
 
 			return res;
@@ -678,7 +679,8 @@ public interface IModelParameter<T> {
 		public String valueString() {
 			String rez = "ProbaPropagation: ";
 			for (IUnitOfTransfer meme : value.keySet()) {
-				rez += entiteHandler.translateMemeCombinaisonReadable(meme.toFourCharString()) + ":" + value.get(meme).value + " ";
+				//rez += entiteHandler.translateMemeCombinaisonReadable(meme.toFourCharString()) + ":" + value.get(meme).value + " ";
+				rez += meme.toNameString() + ":" + value.get(meme).value + " ";
 			}
 
 			return rez;

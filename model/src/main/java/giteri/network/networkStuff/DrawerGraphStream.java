@@ -28,6 +28,8 @@ import giteri.meme.entite.EntiteHandler;
 import giteri.meme.event.ActionApplyEvent;
 import giteri.meme.event.BehavTransmEvent;
 
+import static giteri.run.configurator.Configurator.coupleVersion;
+
 /** Classe de dessin pour graphStream
  *
  */
@@ -279,8 +281,10 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 		int nbMemeSolo = memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.BASIC).size();
 		nbMemeSolo--;
 		int aAppliquer;
+		List<String> combinaisons = coupleVersion? entiteHandler.getMemeAvailableAsString(Configurator.FittingBehavior.onlyComplex) :
+				entiteHandler.getMemeAvailableAsString(Configurator.FittingBehavior.simpleAndComplex);
 
-		for (String combi : entiteHandler.getMemeAvailableAsString(Configurator.FittingBehavior.simpleAndComplex)) {
+		for (String combi : combinaisons) {
 			officialIndex = memeFactory.getIndexFromMemeFourChar(combi);
 
 			if (officialIndex != null)
