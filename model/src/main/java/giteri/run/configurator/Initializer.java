@@ -145,13 +145,13 @@ public class Initializer {
 
             // fait le lien entre les entités d'action et de transmission de meme
             // avec l'IHM, pour permettre la mise a jour des affichages etc
-            entiteHandler.addEntityListener(fenetre);
+//            entiteHandler.addEntityListener(fenetre);
             entiteHandler.addMemeListener(fenetre);
 
             // De meme, le dessinateur graphique s'abonne aux évènements de type transmission de meme
             // Dans le but de faire changer la couleur du noeud en fonction des memes possédés par ce dernier
             entiteHandler.addMemeListener(workerFactory.getDrawer());
-            entiteHandler.addEntityListener(workerFactory.getCalculator());
+           // entiteHandler.addEntityListener(workerFactory.getCalculator());
 
             networkConstructor.start();
             if (!Configurator.isSystemPaused()) {
@@ -179,7 +179,7 @@ public class Initializer {
             entiteHandler.setVueController(vControl);
             entiteHandler.initialisation();
             entiteHandler.addMemeListener(workerFactory.getDrawer());
-            entiteHandler.addEntityListener(workerFactory.getCalculator());
+          //  entiteHandler.addEntityListener(workerFactory.getCalculator());
 
             Interfaces.IReadNetwork nl = mControl.getReader();
 

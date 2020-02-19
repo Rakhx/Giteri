@@ -65,12 +65,14 @@ import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.BehavTransmEvent;
 import giteri.meme.event.IBehaviorTransmissionListener;
 
+import static giteri.run.configurator.Configurator.coupleVersion;
+
 /**
  * JFrame qui gère l'affichage de l'application.
  *
  */
 @SuppressWarnings("unused")
-public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransmissionListener, IView {
+public class IHM extends JFrame implements  IBehaviorTransmissionListener, IView {
 
 	//<editor-fold desc="Properties">
 
@@ -251,7 +253,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		// densityValues = new ArrayList<>();
 		densityValuesLast = new CircularFifoQueue<>(sizeOfCircularQueue);
 		memesTitle = new Hashtable<String, IUnitOfTransfer>();
-		if(Configurator.coupleVersion)
+		if(coupleVersion)
 			this.setMemeAvailable(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.COUPLE));
 		else
 			this.setMemeAvailable(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.ANYTHING));
@@ -289,13 +291,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 			resetComponentLabelMemeInformation();
 	}
 
-	/**
-	 * Lorsqu'une entité fait une action, fonction appelée. Mise à jour des
-	 * indicateurs
-	 *
-	 */
-	public void handlerActionApply(ActionApplyEvent e) {
-	}
 
 	/** On change au niveau des memes possédées par les entités.
 	 * Mise a jour des hashTable de données
@@ -1394,7 +1389,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 			try
 			{
 				lastAddCount = 0;lastEvapCount = 0;totalAppel = 0;
-				nbAppelInLast100 = 0;String memeRef = "";
+				nbAppelInLast100 = 0;
 				refreshDDArray = (compteurSerieDensity % 10 == 0);
 
 				// densité seul
@@ -1414,9 +1409,8 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 					// NOMBRE DE POSSESSION DE MEME PAR LES ENTITES
 					// Trouver le label correspondant
 					JLabel lbl = nodesHavingXoxoMemesLabel.get(memeString);
-					// Nom sous forme "add+"
-					memeRef = memeString ;
-					String toPut = memeRef + ": [";
+					String toPut = memeString + ": [";
+
 					// Si tout les noeuds possede ce meme
 					if (nodesHavingXoxoMemes.get(memeString) != null
 							&& nodesHavingXoxoMemes.get(memeString).size() == Configurator.getNbNode()){
@@ -1426,7 +1420,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 					else
 					{
 						int nbNodesWithThisMeme = 0;
-
 						nbNodesWithThisMeme = nodesHavingXoxoMemes.get(memeString) == null ? 0 :
 								nodesHavingXoxoMemes.get(memeString).size();
 						toPut += nbNodesWithThisMeme;
@@ -1439,7 +1432,10 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 						// NOMBRE D'APPEL DES MEMES DEPUIS LE DEBUT DE LA SIMULATION
 						// Savoir combien de fois le meme a été appelé depuis le début de la simulation
-						nbAppel = nbActivationByMemes.containsKey(memeString)? nbActivationByMemes.get(memeString) : 0;
+						if(!coupleVersion)
+							nbAppel = nbActivationByMemes.containsKey(memeString)? nbActivationByMemes.get(memeString) : 0;
+						else
+							nbAppel = countOfLastMemeActivation.containsKey(memeString)? countOfLastMemeActivation.get(memeString) : 0;
 						// LABEL générique
 						nbActivationByMemesLabel.get(memeString).setText(memeRef + ":" + nbAppel );
 						nbActivationByMemesLabel.get(memeString).setForeground(associatedColor);
@@ -1457,16 +1453,18 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 				}
 
 				String oldText;
+				if(!coupleVersion)
 				// On refait une passe pour mettre a jour les % de possession
-				for (IUnitOfTransfer meme : selectedMemeOnSimulation) {
-					memeString = meme.toString();
-					if(totalAppel != 0 && nbActivationByMemesLabel.containsKey(memeString)){
-						oldText = nbActivationByMemesLabel.get(memeString).getText();
-						nbActivationByMemesLabel.get(memeString).setText(oldText +
-								"(" + nbActivationByMemes.get(memeString) * 100 / totalAppel +"%)");
+					for (IUnitOfTransfer meme : selectedMemeOnSimulation) {
+						memeString = meme.toString();
+						if(totalAppel != 0 && nbActivationByMemesLabel.containsKey(memeString)){
+							oldText = nbActivationByMemesLabel.get(memeString).getText();
+							nbActivationByMemesLabel.get(memeString).setText(oldText +
+									"(" + nbActivationByMemes.get(memeString) * 100 / totalAppel +"%)");
+						}
 					}
-				}
 
+				//region DENSITY
 				densityValue = netProp.getDensity();
 				jlDensityLabel.setText("Density: " + Double.parseDouble(decimal.format(densityValue)));
 
@@ -1487,6 +1485,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 					jlDensitySD.setText("SD density: " + temp);
 				}
 			}
+			//endregion
 			catch(NullPointerException npe){
 				if(Configurator.overallDebug)
 					System.err.println("[IHM-updateInformationDisplay()]-" + npe.getMessage());

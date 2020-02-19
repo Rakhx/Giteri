@@ -1,5 +1,4 @@
 package giteri.meme.entite;
-
 import giteri.fitting.algo.IExplorationMethod;
 import giteri.fitting.parameters.IModelParameter;
 import giteri.run.configurator.Configurator;
@@ -8,7 +7,6 @@ import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
 import giteri.tool.math.Toolz;
 import giteri.tool.objects.ObjectRef;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
-
 import java.util.*;
 
 /**
@@ -22,15 +20,23 @@ public class MemeProperties {
 
     // iUnitOfTransfers sur la map
     List<IUnitOfTransfer> iUnitOfTransfers;
+
     // Nombre d'appel depuis le début de la simu
     private Map<IUnitOfTransfer, Integer> nbActivationByMemes;
+
     // Compte sur les X derniers appels des memes
     Map<IUnitOfTransfer, Integer> countOfLastMemeActivation;
+
     // k:meme v:nb entity with this meme
     Map<IUnitOfTransfer, Integer> countOfEntitiesHavingMeme;
 
+    // K V
+   public Map<IUnitOfTransfer, Integer> degreeMeanOfIOT;
+
     // Sur les 100 dernières actions, quel meme a été appelé
     final CircularFifoQueue<IUnitOfTransfer> lastHundredActionDone;
+
+    Map<IUnitOfTransfer, Integer> KVDegreeByIOT ;
 
     List<Integer> lastFailActionTried;
 
@@ -44,7 +50,8 @@ public class MemeProperties {
         countOfLastMemeActivation = new Hashtable<>();
         countOfEntitiesHavingMeme = new Hashtable<>();
         lastHundredActionDone = new CircularFifoQueue<>(Configurator.sizeOfCircularForLastActionDone);
-        lastFailActionTried = new ArrayList<>();
+        lastFailActionTried = new ArrayList<>(); KVDegreeByIOT = new HashMap<>();
+         degreeMeanOfIOT = new Hashtable<>();
     }
 
     public void clear(){
@@ -226,10 +233,29 @@ public class MemeProperties {
         return toWrite;
     }
 
+
+    public void updateDegree(Map<IUnitOfTransfer, Integer> degreeRounded){
+
+
+    }
+
+
+    public Map<IUnitOfTransfer, Integer> getMeanDegreeByUOT(){
+        Map<IUnitOfTransfer, Integer> couille = new HashMap<>();
+
+
+        return couille;
+    }
+
+
     // endregion
 
-    Map<Interfaces.IUnitOfTransfer, Integer> getNbActivationByMemes() {
+    Map<IUnitOfTransfer, Integer> getNbActivationByMemes() {
         return nbActivationByMemes;
     }
+
+
+
+
 
 }

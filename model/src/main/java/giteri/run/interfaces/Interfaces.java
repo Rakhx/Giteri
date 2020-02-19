@@ -58,7 +58,7 @@ public class Interfaces {
 	/** Interface des classes permettant de calculer les différentes
 	 * stats sur le graph.
 	 */
-	public interface StatAndPlotInterface extends IActionApplyListener {
+	public interface StatAndPlotInterface  {
 		
 		// Fonction d'obtention des stats
 		 String getDDInfos();

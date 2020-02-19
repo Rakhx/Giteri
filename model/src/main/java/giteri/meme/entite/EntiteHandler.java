@@ -33,7 +33,7 @@ import static giteri.run.configurator.Configurator.*;
  * Classe qui gère les entités du réseau.
  *
  */
-public class EntiteHandler extends ThreadHandler implements INbNodeChangedListener,IBehaviorTransmissionListener {
+public class EntiteHandler extends ThreadHandler implements INbNodeChangedListener,IBehaviorTransmissionListener{
 
 	//region properties & constructeur
 	private VueController vueController;
@@ -47,7 +47,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 	// Entite possedant des actions
 	private ArrayList<Entite> entitesActive;
-	private List<Interfaces.IUnitOfTransfer> memeFittingApplied;
+	private List<IUnitOfTransfer> memeFittingApplied;
 
 	private boolean allTransmitted = false;
 	private boolean allAddTransmitted = false;
@@ -108,8 +108,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	public void initialisation(){
 		generateMemeAvailableForMap();
 		bindNodeWithEntite(networkConstruct.getNetwork());
-//		if(coupleVersion)
-//			memeFactory.
+
 	}
 
 	/**
@@ -196,10 +195,40 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		// Indicateur meme repartition, etc.
 		if(Configurator.displayMemePosessionDuringSimulation && (cptModulo % (Configurator.refreshInfoRate * 25) == 0) ) {
+			// affichage sur l'IHM de la distribution des memes
+			if(!coupleVersion)
 			vueController.displayMemeUsage(cptModulo,
 					memeProperties.getNbActivationByMemes(),
 					memeProperties.countOfLastMemeActivation,
-					memeProperties.lastHundredActionDone); }
+					memeProperties.lastHundredActionDone);
+			// Cas ou on s'interesse au degrée moyen des possesseurs des couples
+			else {
+				Map<IUnitOfTransfer, Integer> means = memeProperties.degreeMeanOfIOT;
+				Map<IUnitOfTransfer, Integer> nbParti = new Hashtable<>();
+				means.clear();
+				for (Entite entite : entitesActive) {
+					Toolz.addCountToElementInHashArray(means,entite.getMyUnitOfT().get(0),entite.getDegree() );
+					Toolz.addCountToElementInHashArray(nbParti,entite.getMyUnitOfT().get(0),1 );
+				}
+
+				int nbDudy;
+				for (IUnitOfTransfer iUnitOfTransfer : means.keySet()) {
+					nbDudy = nbParti.get(iUnitOfTransfer);
+					if(nbDudy != 0)
+						means.put(iUnitOfTransfer, means.get(iUnitOfTransfer) / nbDudy);
+					else
+						means.put(iUnitOfTransfer, 0);
+				}
+
+
+
+
+				vueController.displayMemeUsage(cptModulo,
+						memeProperties.getNbActivationByMemes(),
+						means,
+						memeProperties.lastHundredActionDone);
+			}
+		}
 		if(Configurator.displayMemePossessionEvolution && cptModulo % (Configurator.refreshInfoRate * 200) == 0){
 			kvMemeCodeNbEntities.clear();
 			for (IUnitOfTransfer meme : memeProperties.countOfEntitiesHavingMeme.keySet()) {
@@ -627,7 +656,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private String runEntite() {
 
 		List<String> rez = new ArrayList<>();
-		//List<IUnitOfTransfer> memeActions = new ArrayList<>();
 		Meme oneAction = null;
 		CoupleMeme coupleAction;
 
@@ -1344,6 +1372,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		bindNodeWithEntite(networkConstruct.getNetwork());
 	}
 
+	/** Event lorsqu'un meme est transmis
+	 *
+	 * @param e Meme transmis
+	 */
 	@Override
 	public void handlerBehavTransm(BehavTransmEvent e) {
 		if(e.message.compareToIgnoreCase(Configurator.MemeActivityPossibility.RetraitMeme.toString()) == 0){
@@ -1390,6 +1422,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	public List<Entite> getEntites() {
 		return new ArrayList<Entite>(entites);
 	}
+
 
 	public class memeComparatorAscending implements Comparator<Meme> {
 		@Override

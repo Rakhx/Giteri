@@ -150,7 +150,7 @@ public final class Configurator {
 	// moyen osef
 	public static final boolean lotOfNodes = false;
 	private static int nbNode = lotOfNodes ? 500 : 200;
-	public static int refreshInfoRate = 10;
+	public static int refreshInfoRate = 100;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
 	public final static int semiAutoWaitingTime = 3000;
 

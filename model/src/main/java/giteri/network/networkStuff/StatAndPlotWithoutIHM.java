@@ -21,8 +21,4 @@ public class StatAndPlotWithoutIHM extends StatAndPlotGeneric {
         super(entiteHandler, memeFactory, networkConstructor, wnr, nfl, wf);
     }
 
-    @Override
-    public void handlerActionApply(ActionApplyEvent e) {
-
-    }
 }

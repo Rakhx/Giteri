@@ -89,24 +89,6 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 		}
 	}
 
-	/** En tte logique c'est ici que devrait etre géré
-	 * l'évoluation du réseau graphique par rapport a celui
-	 * du programme.
-	 *
-	 */
-	public void handlerActionApply(ActionApplyEvent e) {
-//		nbAction++;
-//		if(getDensity() == 1){
-//			System.out.println(nbAction);
-//			CommunicationModel.getInstance().suspend();
-//		}
-		// TODO En toute logique, c'est en fonction de ces events que des éléments
-		// du graphe devrait etre ajouté et retiré. Néanmoins, déjà fait dans la classe network,
-		// la flemme de le refaire.
-		// Si fait, retirer les ajouts et retrait de lien des appeles addNodes etc du network,
-		// le faire ici a la reception des events. Ca donnera une meilleur dissociation entre la partie
-		// Réseau et affichage de ce dernier.
-	}
 
 	//endregion
 
