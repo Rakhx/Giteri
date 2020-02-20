@@ -49,13 +49,11 @@ public final class Configurator {
 	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
 	@toOutput ( yes = true )
 	public static boolean autoMemeForBreeder = false;	// Les breeder ont associé un meme complémement, rmd ajout ou retrait.
-	public static boolean onlyOneToPropagate = true; // Dans le cas ou une action s'applique sur plusieurs entités
-	public static boolean usePropagationSecondGeneration = false; // transmet un des memes du porteur, pas forcement celui applied
 
 	public static boolean useEntitySuccesProba = false; // Prend en compte la proba porté pour l'entité pour APPLY a meme. Actuellement l'index
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 
-	public static boolean coupleSingleTransmission = false; // Transmet le couple à l'entité ayant recu l'action et pas plus
+	public static boolean coupleSingleTransmission = true; // Transmet le couple à l'entité ayant recu l'action et pas plus
 
 
 	// SCORE
@@ -307,8 +305,6 @@ public final class Configurator {
 	public static ArrayList<String> getConfig(){
 		ArrayList<String> elements = new ArrayList<String>();
 		elements.add("Nombre de noeuds: "+ nbNode);
-		elements.add("Méthode de propagation" + (usePropagationSecondGeneration ?
-				"Transmet l'un des meme portée":"Transmission direct du meme joué"));
 		return elements;
 	}
 

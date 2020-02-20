@@ -23,10 +23,7 @@ import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
 import giteri.tool.math.Toolz;
 import giteri.tool.objects.ObjectRef;
 import giteri.tool.other.StopWatchFactory;
-
-
 import java.util.*;
-
 import static giteri.run.configurator.Configurator.*;
 
 /**
@@ -551,6 +548,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		return memes;
 	}
+
 	/** Renvoi la liste des memes dispo sur la map en liste de string.
 	 * Utilisé pour les couleurs sur le graphe
 	 * TODO [WAYPOINT] - creation des classes pour graphstream
@@ -898,7 +896,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private double probaPropaDegree(Entite acting, Entite cible, double proba){
 
 		if(coupleVersion) {
-			proba /=  (1 + Math.abs(acting.getDegree() - cible.getDegree())) * 4;
+
+			proba /=  (1 + Math.abs(acting.getDegree() - cible.getDegree()));
 		}
 
 		return proba;
@@ -1109,7 +1108,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, notLinked);
 		agregators.put(index++, random);
 		ajouts.add(
-		memeFactory.registerMemeAction("AddØ",0.15, true, true, add, attributs, KVAttributAgregator, false)
+		memeFactory.registerMemeAction("AddØ",0.15, false, false, add, attributs, KVAttributAgregator, false)
 		);
 		agregators.put(index++, random);
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, false, false, add, attributs, KVAttributAgregator, true);
@@ -1157,7 +1156,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();index = 0;
 		agregators.put(0, linked);
 		agregators.put(1, random);
-		retraits.add(memeFactory.registerMemeAction("RmvØ",.7, true, true, remove,  attributs, KVAttributAgregator, false));
+		retraits.add(memeFactory.registerMemeAction("RmvØ",.7, false, false, remove,  attributs, KVAttributAgregator, false));
 		agregators.put(2, random);
 		removeRandom = memeFactory.registerMemeAction("RmvØ-neutral",0, false, false, remove,  attributs, KVAttributAgregator, true);
 
@@ -1204,14 +1203,16 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		// Creation depuis les params qui ont été donné dans l'initializer
 		if(coupleVersion){
 			this.doubleRandom = memeFactory.extractAndDoNotRegister("AddØ", "RmvØ", 0);
-
+			memeFactory.extractAndAddCoupleMeme( "AddEq", "Rmv-", .4, false);
+			//memeFactory.extractAndAddCoupleMeme( "AddØ-Hop", "Rmv-", .8, false);
+			memeFactory.extractAndAddCoupleMeme( "Add∞", "RmvEq", 1., false);
 		}
 		else {
 			// Action fluidité.
-			this.doubleRandom = memeFactory.extractAndAddCoupleMeme( "AddØ", "RmvØ", 0);
-			memeFactory.extractAndAddCoupleMeme( "AddEq", "Rmv-", .1);
-			memeFactory.extractAndAddCoupleMeme( "AddØ-Hop", "Rmv-", .8);
-			memeFactory.extractAndAddCoupleMeme( "Add∞", "Rmv-", .3);
+			this.doubleRandom = memeFactory.extractAndAddCoupleMeme( "AddØ", "RmvØ", 0, false);
+			memeFactory.extractAndAddCoupleMeme( "AddEq", "Rmv-", .1, false);
+			memeFactory.extractAndAddCoupleMeme( "AddØ-Hop", "Rmv-", .8, false);
+			memeFactory.extractAndAddCoupleMeme( "Add∞", "Rmv-", .3, false);
 		}
 //		Integer.toBinaryString()
 		// memeFactory.extractAndAddCoupleMeme(index++,"AddEq","RmvVoid",1);
@@ -1228,8 +1229,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @return une hash Int ( qui n'a pas de signification ), combinaison de
 	 *         meme.
 	 */
-	private Hashtable<Integer, ArrayList<IUnitOfTransfer>> getMemeCombinaisonAvailable(
-			Optional<Hashtable<TypeOfUOT, ArrayList<IUnitOfTransfer>>> memeByC) {
+	private Hashtable<Integer, ArrayList<IUnitOfTransfer>> getMemeCombinaisonAvailable
+				(Optional<Hashtable<TypeOfUOT, ArrayList<IUnitOfTransfer>>> memeByC) {
 
 		Hashtable<TypeOfUOT, ArrayList<IUnitOfTransfer>> memesByCategory = new Hashtable<>();
 		ArrayList<IUnitOfTransfer> memeOfOneCategory;

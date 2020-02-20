@@ -165,8 +165,8 @@ public class Initializer {
             }
 
             //huhum
-//            if(Configurator.coupleVersion)
-//                entiteHandler.giveCoupleMemeToEntite(memeFactory.getCoupleMemes());
+            if(Configurator.coupleVersion)
+                entiteHandler.giveMemeToEntiteFitting(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.COUPLE));
             return 0.;
         }
 

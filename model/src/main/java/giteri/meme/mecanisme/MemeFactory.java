@@ -184,21 +184,6 @@ public class MemeFactory {
 
 	}
 
-	/**
-	 *
-	 * @param typeMeme
-	 * @param whichAction
-	 * @return
-	 */
-	public String getMemesAsString(Configurator.MemeList typeMeme, TypeOfUOT whichAction){
-		String resultat = "";
-		for (IUnitOfTransfer meme : getMemes(typeMeme, whichAction)) {
-			resultat += ":" + meme.toFourCharString() + "%" + meme.getProbaPropagation();
-		}
-
-		return resultat;
-	}
-
 	/** Retourne les memes disponibles qui font un certain type d'action
 	 * en paramètre.
 	 *
@@ -217,18 +202,6 @@ public class MemeFactory {
 					goodOne.add(meme);
 
 		return goodOne;
-	}
-
-	/** Retourne la liste des memes dispos en string.
-	 *
-	 */
-	public String getMemeAvailableAsString(Configurator.MemeList usage){
-		String resultat = "";
-		for (IUnitOfTransfer meme : getMemes(usage, TypeOfUOT.ANYTHING)) {
-			resultat += ":" + meme.toFourCharString() + "-ProbaPropagation:" + meme.getProbaPropagation();
-		}
-
-		return resultat;
 	}
 
 	/** obtenir un meme depuis son fourcharname, sinon null.
@@ -260,6 +233,33 @@ public class MemeFactory {
 		return null;
 	}
 
+	/**
+	 *
+	 * @param typeMeme
+	 * @param whichAction
+	 * @return
+	 */
+	public String getMemesAsString(Configurator.MemeList typeMeme, TypeOfUOT whichAction){
+		String resultat = "";
+		for (IUnitOfTransfer meme : getMemes(typeMeme, whichAction)) {
+			resultat += ":" + meme.toFourCharString() + "%" + meme.getProbaPropagation();
+		}
+
+		return resultat;
+	}
+
+	/** Retourne la liste des memes dispos en string.
+	 *
+	 */
+	public String getMemeAvailableAsString(Configurator.MemeList usage){
+		String resultat = "";
+		for (IUnitOfTransfer meme : getMemes(usage, TypeOfUOT.ANYTHING)) {
+			resultat += ":" + meme.toFourCharString() + "-ProbaPropagation:" + meme.getProbaPropagation();
+		}
+
+		return resultat;
+	}
+
 	/** Transforme les adlkminesup en add+;
 	 * TODO [WayPoint]- traduction .add+ <= ADLKMTNTSPMN etc
 	 * @param memeCombinaison
@@ -281,21 +281,6 @@ public class MemeFactory {
 
 	//region couple meme Stuff
 
-	/**
-	 *
-	 * @param add
-	 * @param rmv
-	 * @param proba
-	 * @return
-	 */
-	private IUnitOfTransfer<CoupleMeme> registerCoupleMeme(Meme add, Meme rmv, double proba){
-		indexOfIOT++;
-		IUnitOfTransfer<CoupleMeme> icm = new CoupleMeme(indexOfIOT, add, rmv, proba);
-		this.uOTFitting.add(icm);
-		kvMemeIndex.put(icm, indexOfIOT);
-		return icm;
-	}
-
 	/** depuis le nom des memes d'ajout//retrait, associé à un index et une proba de T
 	 *
 	 * @param index
@@ -304,14 +289,15 @@ public class MemeFactory {
 	 * @param proba
 	 * @return
 	 */
-	public IUnitOfTransfer<CoupleMeme> extractAndAddCoupleMeme(String addName, String rmvName, double proba){
+	public IUnitOfTransfer<CoupleMeme> extractAndAddCoupleMeme(String addName, String rmvName, double proba, boolean forFitting){
 		Meme add, rmv;
 		add = (Meme)this.getMemeFromName(addName);
 		rmv = (Meme)this.getMemeFromName(rmvName);
-		return this.registerCoupleMeme(add, rmv, proba);
+		return this.registerCoupleMeme(add, rmv, proba, forFitting);
 	}
 
-	/** depuis le nom des memes d'ajout//retrait, associé à un index et une proba de T
+	/** depuis le nom des memes d'ajout//retrait, associé à un index et une proba de T. Ne l'enregistre pas dans la liste
+	 * des memes disponibles sur la map pour fitting
 	 *
 	 * @param index
 	 * @param addName
@@ -339,6 +325,8 @@ public class MemeFactory {
 		Meme add, rmv;
 		IUnitOfTransfer<CoupleMeme> cree;
 		int index = -1;
+		clearExistingCouple();
+
 		addz = getMemes(MemeList.FITTING, TypeOfUOT.AJOUTLIEN).stream().map(e -> (Meme)e).collect(Collectors.toList());
 		rmvz = getMemes(MemeList.FITTING, TypeOfUOT.RETRAITLIEN).stream().map(e -> (Meme)e).collect(Collectors.toList());;
 		for (int i = 0; i < addActi.length; i++) {
@@ -348,7 +336,7 @@ public class MemeFactory {
 					// A new combinaison is born
 					if(rmvActi[j]){
 						rmv = rmvz.get(j);
-						cree = extractAndAddCoupleMeme(add.getName(), rmv.getName(), .1);
+						cree = extractAndAddCoupleMeme(add.getName(), rmv.getName(), .1, true);
 						selected.add(cree);
 					}
 				}
@@ -358,15 +346,41 @@ public class MemeFactory {
 		return selected;
 	}
 
+	/** Prends les couples d'action disponibles utilisable pour le fitting et y associe dans l'ordre des prba
+	 * de transmission.
+	 *
+	 * @param proba
+	 */
 	public void associateProbaWithCouple(List<Double> proba){
 		List<IUnitOfTransfer> coupleAction = this.getMemes(MemeList.FITTING,TypeOfUOT.COUPLE);
 		assert (coupleAction.size() == proba.size());
-		// TODO [CV] a faire plus proprement. 1 couple action de trop a cause du double random pour fluidité
 		for (int i = 0; i < coupleAction.size(); i++) {
 			coupleAction.get(i).setProbaPropagation(proba.get(i));
 		}
 	}
 
+	private void clearExistingCouple(){
+		this.uOTFitting.clear();
+	}
+
+	/** Register d'un couple meme avec les memes d'ajout, de retrait, et la proba de probagation.
+	 *
+	 *
+	 * @param add
+	 * @param rmv
+	 * @param proba
+	 * @return
+	 */
+	private IUnitOfTransfer<CoupleMeme> registerCoupleMeme(Meme add, Meme rmv, double proba, boolean forFitting){
+		indexOfIOT++;
+		IUnitOfTransfer<CoupleMeme> icm = new CoupleMeme(indexOfIOT, add, rmv, proba);
+		if(forFitting)
+		this.uOTFitting.add(icm);
+		else
+			this.uOTOnMap.add(icm);
+		kvMemeIndex.put(icm, indexOfIOT);
+		return icm;
+	}
 	//endregion
 
 	//region index stuff
