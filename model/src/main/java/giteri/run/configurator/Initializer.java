@@ -153,7 +153,8 @@ public class Initializer {
             entiteHandler.addMemeListener(workerFactory.getDrawer());
            // entiteHandler.addEntityListener(workerFactory.getCalculator());
 
-            networkConstructor.start();
+           // networkConstructor.start();
+
             if (!Configurator.isSystemPaused()) {
                 networkConstructor.start();
                 entiteHandler.start();
@@ -184,12 +185,15 @@ public class Initializer {
             Interfaces.IReadNetwork nl = mControl.getReader();
 
             entiteHandler.suspend();
-            networkConstructor.suspend();
-            networkConstructor.start();
+           // networkConstructor.suspend();
+          //  networkConstructor.start();
             entiteHandler.start();
 
+            Double score = launchForClassic(stat, parameters);
 
-            return launchForClassic(stat, parameters);
+            entiteHandler.stop();
+            entiteHandler.resume();
+            return score;
 
        }
     }

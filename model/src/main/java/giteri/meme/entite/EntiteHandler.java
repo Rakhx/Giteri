@@ -176,10 +176,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @return les actions qui ont été réalisé
 	 */
 	public void OneStep() {
-		if(fastDebug)
-			System.out.println(runEntite());
-		else
-			runEntite();
+		runEntite();
 		if(!Configurator.jarMode){
 			checkAPM();
 		}
@@ -595,7 +592,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			for (Entite entite : toExamine) {
 				memes = "";
 				for (IUnitOfTransfer meme : entite.getMyUnitOfT())
-					memes += "." + meme.toFourCharString();
+					memes += "." + meme.toNameString();
 				if (memes == "")
 					memes = "AUCUN";
 
@@ -606,6 +603,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 
 		resultat += "-----------------------------------------------------\n";
+
 		for (String memeCombinaison : entiteByMemePossession.keySet()) {
 			SelfDegrees.clear();
 			othersDegrees.clear();
@@ -626,7 +624,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 					+ entiteByMemePossession.get(memeCombinaison).size()
 					+ ") - "
 					+ "Degree for nodes1@"
-					+ memeFactory.translateMemeCombinaisonReadable(memeCombinaison)
+					+ (memeCombinaison)
 					+ ": "
 					+ Toolz.getAvg(SelfDegrees)
 					+ " Degree for nodes connected to nodes1 : "
@@ -1321,7 +1319,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			atmLastTime = System.nanoTime();
 		} else {
 			nbActionBySecond++;
-
 		}
 	}
 

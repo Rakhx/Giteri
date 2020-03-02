@@ -10,51 +10,37 @@ import java.util.ArrayList;
 public final class Configurator {
 
 	public static boolean coupleVersion = true;
-	public static boolean fastDebug = false;
-
 	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
-	public static boolean writInfo4OpnMol = true; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
-	public static String fittingTxtPath = "fittingInfo";
 
 	// region initializer stuff
-	// VALEURS DONNEES A TITRE INDICATIF, set définitif dans l'initializer
-	// La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
-	// depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent
-	// cette configuration initiale
+	// set dans l'initializer
 	public static boolean withGraphicalDisplay;// = true;
 	public static boolean jarMode; // = true; // Si vrai, affiche le score resultat de simu
 	public static boolean systemPaused;// = false;
-	public static boolean writeNetworkResultOnFitting ; //= !fullSilent; // Screenshot, network.csv...
-	public static boolean writeMemeResultOnFitting ; //= writeNetworkResultOnFitting; // NetworkDetails.csv
-	public static EnumLauncher typeOfConfig ;
+	public static boolean writeNetworkResultOnFitting; //= !fullSilent; // Screenshot, network.csv...
+	public static boolean writeMemeResultOnFitting; //= writeNetworkResultOnFitting; // NetworkDetails.csv
+	public static EnumLauncher typeOfConfig;
 
 	// endregion
 
 	// region Modèle
 
 	// FONCTIONNEMENT
-	public static boolean manuelNextStep = false; // NO-AUTOSKIP pas de passage au run suivant, il faut appuyer sur next
-	public static boolean autoPauseIfNexted = false; // AUTOPAUSE mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	@toOutput ( yes = true )
 	public static boolean initializeDefaultBehavior = true;	// ----FLUIDITE----
-	// public static boolean initializeDefaultBehaviorToBreeder = true;	// ----FLUIDITE BREEDER----
 	@toOutput ( yes = true )
 	public static boolean limitlessAction;
+	public static int initialnetworkForBase = 0; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 3- SF 4-SW
 
 	// MEME
 	@toOutput ( yes = true )
 	public static boolean strictEqualityInComparaison = true; // FALSE : >= || TRUE : >
 
 	// PROPAGATION
-	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
-	@toOutput ( yes = true )
-	public static boolean autoMemeForBreeder = false;	// Les breeder ont associé un meme complémement, rmd ajout ou retrait.
-
-	public static boolean useEntitySuccesProba = false; // Prend en compte la proba porté pour l'entité pour APPLY a meme. Actuellement l'index
-	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
-
 	public static boolean coupleSingleTransmission = true; // Transmet le couple à l'entité ayant recu l'action et pas plus
 
+	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
+	public static boolean useEntitySuccesProba = false; // Prend en compte la proba porté pour l'entité pour APPLY a meme. Actuellement l'index
 
 	// SCORE
 	@toOutput ( yes = true )
@@ -64,16 +50,13 @@ public final class Configurator {
 	// 170+512; // 170+512 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
 	// 16 + 512 Clust + third
 	// 170+512 = THIRD APL EDGES ARRAY DDAVG
-
 	public static int activationCodeAllAttrib = 255 + 512;
-	public static int initialnetworkForBase = 0; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 3- SF 4-SW
 
 	// endregion
 
 	// region Fitting
 
 	public static EnumExplorationMethod explorator = EnumExplorationMethod.exhaustive; // Type d'exploration de fitting
-	public static MemeList typeOfMemeUseForFitting = MemeList.FITTING; // Peut etre ONMAP, EXISTING, FITTING
 
 	@toOutput ( yes = true )
 	public static int initialNetworkForFitting = 0; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
@@ -85,7 +68,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
 	@toOutput ( yes = true )
-	public static int multiplicatorNbAction  = 200000; //  Par combein on multiplie le nombdre de noeud sur la simulation
+	public static int multiplicatorNbAction  = 500; //  Par combein on multiplie le nombdre de noeud sur la simulation
 
 	// endregion
 
@@ -116,7 +99,6 @@ public final class Configurator {
 	// region Affichage log
 	public static boolean DisplayLogBehaviorColors = false; // correspondance meme <=> code couleur
 
-	public static boolean displayLogMemeApplication = false; // Chaque application de meme
 	public static boolean displayLogAvgDegreeByMeme = false; // combinaisons de meme et leur degré + derniere application + application from start
 	public static boolean displayLogMemeTransmission = false; // qui recoit quel meme
 
@@ -131,15 +113,17 @@ public final class Configurator {
 	//endregion
 
 	// region affichage de debug
+
+	public static boolean debugJarMode = true;
+
 	public static boolean debugStatAndPlot = false;
 	public static boolean debugFittingClass = false;
 	public static boolean debugEntite = false;
 	public static boolean debugEntiteHandler = false;
+	public static boolean debugParameterCouple = false;
 
 	public static boolean overallDebug = !jarMode;
 	public static boolean debugHopAway = false;
-
-	public static boolean debugJarMode = false;
 	public static boolean timeEfficiency = false;
 
 	// endregion
@@ -152,20 +136,18 @@ public final class Configurator {
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
 	public final static int semiAutoWaitingTime = 3000;
 
-	public static boolean oneAddForOneRmv = false; // ONEforONE Joue tour a tour un ajout d'un retrait
 	public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-d_HH'h'mm'm'ss's'");
 	public static File defaultPathForReadingNetwork = new File("model"+File.separator+"default.txt");
 	public static Integer baseSleepTimeMulti = 0;
 	private static Integer threadSleepMultiplicateur = baseSleepTimeMulti;
 
+	public static boolean manuelNextStep = false; // NO-AUTOSKIP pas de passage au run suivant, il faut appuyer sur next
+	public static boolean autoPauseIfNexted = false; // AUTOPAUSE mise en pause automatique avant un changement de run. Il faut appuyer sur next
 
 	public static int sizeOfCircularForLastActionDone = 100;
 
 	// Construction aléatoire du réseau ou non // systeme en pause au lancement
 	private static Object lockOnPause = new Object();
-
-	// Ancien mecanismes
-	public static boolean useEntitePropagationProba = false;
 
 	//endregion
 

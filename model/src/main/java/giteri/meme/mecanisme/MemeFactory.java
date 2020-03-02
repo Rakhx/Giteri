@@ -325,7 +325,9 @@ public class MemeFactory {
 		Meme add, rmv;
 		IUnitOfTransfer<CoupleMeme> cree;
 		int index = -1;
-		clearExistingCouple();
+
+		if(!Configurator.jarMode)
+			clearExistingCouple();
 
 		addz = getMemes(MemeList.FITTING, TypeOfUOT.AJOUTLIEN).stream().map(e -> (Meme)e).collect(Collectors.toList());
 		rmvz = getMemes(MemeList.FITTING, TypeOfUOT.RETRAITLIEN).stream().map(e -> (Meme)e).collect(Collectors.toList());;
@@ -360,7 +362,13 @@ public class MemeFactory {
 	}
 
 	private void clearExistingCouple(){
-		this.uOTFitting.clear();
+		List<IUnitOfTransfer> toRemove = new ArrayList<>();
+		for (IUnitOfTransfer iUnitOfTransfer : uOTFitting) {
+			if(iUnitOfTransfer.getActionType() == TypeOfUOT.COUPLE)
+				toRemove.add(iUnitOfTransfer);
+		}
+
+		uOTFitting.removeAll(toRemove);
 	}
 
 	/** Register d'un couple meme avec les memes d'ajout, de retrait, et la proba de probagation.

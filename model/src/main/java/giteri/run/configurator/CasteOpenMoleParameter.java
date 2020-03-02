@@ -134,7 +134,9 @@ public class CasteOpenMoleParameter implements IOpenMoleParameter {
      * @return un tableau de boolean a true pour les slots activé.
      */
     public boolean[] getActionActivation2(int activator, int nbActivator, int maxactivator) {
-        System.out.println("CALL: " + activator);
+        boolean debug = Configurator.debugParameterCouple;
+
+       if(debug) System.out.println("CALL: " + activator);
         boolean[] resultat = new boolean[maxactivator];
         boolean again = true;
         int nbCombinaison = Toolz.getLittleFactorial(maxactivator) / (Toolz.getLittleFactorial(maxactivator - nbActivator)
@@ -199,7 +201,7 @@ public class CasteOpenMoleParameter implements IOpenMoleParameter {
         } while (--activator > 0);
 
 
-        System.out.println("ijk- " + kvIndexerIndex.get(0) + kvIndexerIndex.get(1) + kvIndexerIndex.get(2));
+      if(debug)  System.out.println("ijk- " + kvIndexerIndex.get(0) + kvIndexerIndex.get(1) + kvIndexerIndex.get(2));
 
         for (int i = 0; i < resultat.length; i++) {
             resultat[i] = false;
@@ -215,10 +217,9 @@ public class CasteOpenMoleParameter implements IOpenMoleParameter {
         }
         res += "]";
 
-        System.out.println(res);
+       if(debug) System.out.println(res);
         return resultat;
     }
-
 
     public int getAddTotal() {
         return addTotal;

@@ -185,11 +185,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		// CHEAT CODE
 		else // Sinon, les lire depuis le fichier donné en paramètre dans l'interface
 			targetNetProperties = networkFileLoader.getNetworkProperties(true,false);
-
-		if(Configurator.writInfo4OpnMol){
-			// System.out.println("Propriété fichier source " + targetNetProperties.avgClust);
-		}
-
 		boolean doTheWrite = !Configurator.fullSilent;
 
 		// ECRITURE
@@ -348,9 +343,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 		// TODO [WayPoint]- Score distance entre deux network
 		currentNetworkScore = getNetworksDistanceDumb(Configurator.activationCodeForScore, targetNetProperties, currentNetProperties);
-
-		if(Configurator.writInfo4OpnMol)
-			System.out.println("endRepet:" + targetNetProperties.avgClust);
 
 		// Ajout a la classe des resultSet un score et propriété d'un réseau
 		resultNetwork.addScore(numeroRun, currentNetworkScore, currentNetProperties);

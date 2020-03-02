@@ -23,7 +23,7 @@ public class JarVersionCast {
      * @param args
      */
     public static void main(String[] args) {
-        boolean debug = true;
+        boolean debug = false;
 
         String filePath;
         File inputFile;

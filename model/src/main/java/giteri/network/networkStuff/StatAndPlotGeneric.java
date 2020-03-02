@@ -58,7 +58,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	public boolean autoPauseIfNexted = Configurator.autoPauseIfNexted;
 	public boolean goNextStepInManuelMode = !Configurator.manuelNextStep;
 
-	boolean debugBeforeSkip = true;
+	boolean continuFitting = true;
 	boolean debug = Configurator.debugStatAndPlot;
 
 	//region structure de données
@@ -95,7 +95,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	//region Interface stat&plot
 
 	/**
-	 * Lancement de thread qui va comparer un réseau lu et le réseau en cours par rapport à différente configuration
+	 * Lancement de thread qui va comparer un réseau lu et le réseau en cours par rapport à différentes configurations
 	 *
 	 */
 	public Double fitNetwork(Configurator.EnumLauncher typeOfLaunch,
@@ -104,7 +104,8 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		// appelé quand on lance en jar.
 		// La version jar fourni tjrs des parametres en ligne de commande
-		if ((typeOfLaunch == Configurator.EnumLauncher.jarC || typeOfLaunch == Configurator.EnumLauncher.jarOpenMole)) {
+		if ((typeOfLaunch == Configurator.EnumLauncher.jarC || typeOfLaunch == Configurator.EnumLauncher.jarOpenMole))
+		{
 			if(coupleVersion) {
 				memeFactory.generateCoupleFromActivation(((CasteOpenMoleParameter) param).addActivation,
 						((CasteOpenMoleParameter) param).rmvActivation);
@@ -112,10 +113,11 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			}
 
 			return fittingLauncher(typeOfLaunch, typeOfExplo, param);
-		} else {
-			// appelé depuis IHM
+		}
+		// appelé depuis IHM
+		else {
 			final IOpenMoleParameter proxyParam;
-			// ICI Faire des proxy des param. optional etc car lancée depuis LIHM sans paramètre
+			// ICI Faire des proxy des param. optional etc car lancée depuis L'IHM sans paramètre
 			// TODO [CV] Proxy COUPLE
 			if(Configurator.coupleVersion){
 				proxyParam = new CasteOpenMoleParameter(9,2,10,10, 2, 10);
@@ -216,27 +218,26 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 */
 	private IExplorationMethod callFromJar(FittingClass fitter, IOpenMoleParameter parameter){
 
-		// appelle sec avec un seul jeu de parametre, aux probas fixés
+		// appelle sec avec un seul jeu de parametre, aux probas fixées
 		Hashtable<IUnitOfTransfer, GenericDoubleParameter> unitAndProba = new Hashtable<>();
 		Hashtable<Integer, IModelParameter<?>>  providers = new Hashtable<>();
 		ArrayList<String> memesSelectionnes = null;
 		List<IUnitOfTransfer> unitToRun = new ArrayList<>();
-		Meme selectedMeme;
-		CoupleMeme selectedCouple;
 
 		// Creation
 
 		File toWrite = writeNRead.createAndGetDirFromString(Arrays.asList("."));
 		if(debugJarMode) {
 			memesSelectionnes = new ArrayList<>();
-			if(!coupleVersion)
-				writeNRead.writeSmallFile(toWrite, "RezTemp", ((ClassicOpenMoleParameter)parameter).memeActication.stream().map(e -> e.toString()).collect(Collectors.toList()));
-			else{
-				writeNRead.writeSmallFile(toWrite, "RezTemp", (memeFactory.getMemes(MemeList.FITTING, Configurator.TypeOfUOT.COUPLE).stream().map(e -> e.toString()).collect(Collectors.toList())));
-			}
 		}
+//			if(!coupleVersion)
+//				writeNRead.writeSmallFile(toWrite, "ActivatedMeme", ((ClassicOpenMoleParameter)parameter).memeActication.stream().map(e -> e.toString()).collect(Collectors.toList()));
+//			else{
+//				writeNRead.writeSmallFile(toWrite, "ActivatedMeme", (memeFactory.getMemes(MemeList.FITTING, Configurator.TypeOfUOT.COUPLE).stream().map(e -> e.toString()).collect(Collectors.toList())));
+//			}
+//		}
 
-		unitToRun = coupleVersion? memeFactory.getMemes(MemeList.FITTING, Configurator.TypeOfUOT.COUPLE):
+		unitToRun = coupleVersion ? memeFactory.getMemes(MemeList.FITTING, Configurator.TypeOfUOT.COUPLE):
 				memeFactory.getMemes(MemeList.FITTING, Configurator.TypeOfUOT.BASIC);
 		
 		unitToRun.sort(null);
@@ -246,7 +247,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			proba = ((CasteOpenMoleParameter)parameter).probaPropa;
 		}else {
 			proba = ((ClassicOpenMoleParameter)parameter).memeProba;
-
 		}
 		// Associer une proba de propagation
 		int compte = 0;
@@ -257,10 +257,10 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		}
 
-		if(debugJarMode)
-//			writeNRead.writeSmallFile(toWrite, "RezTemp",
-//		memeAndProba.entrySet().stream().map(( v -> v.getKey().toFourCharString().concat(v.getValue().valueString()))).collect(Collectors.toList()));
-			writeNRead.writeSmallFile(toWrite, "RezTemp", memesSelectionnes);
+		// Ecriture dans un fichier rapide des meme acitvés et leurp roba de promagation
+		if(debugJarMode) {
+			writeNRead.writeSmallFile(toWrite, "ActivatedMeme", memesSelectionnes);
+		}
 
 		MemeDiffusionProba memeDiffu = new MemeDiffusionProba(unitAndProba);
 		memeDiffu.setEntiteHandler(entiteHandler);
@@ -372,13 +372,13 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 						resetNbAction();
 					}
 
-					debugBeforeSkip = fittingConfig.continuFitting(cfqDensityOnFitting);
-					if(!debugBeforeSkip){
+					continuFitting = Configurator.limitlessAction || fittingConfig.continuFitting(cfqDensityOnFitting);
+					if(!continuFitting){
 						if(debug) System.out.println("Voudrait passer au step suivant");
 					}
 
 					// Si la condition d'arret est ok et si on a pas activé le mode manual skip
-				} while( debugBeforeSkip || !goNextStepInManuelMode );
+				} while( continuFitting || !goNextStepInManuelMode );
 
 				if(Configurator.manuelNextStep)
 					goNextStepInManuelMode = false;
@@ -434,17 +434,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 	//region others
 
-	private void computingMemeAppliance(){
-//		// contient les prop. d'application ou l'écart type de l'application d'un meme
-//		Hashtable<Meme, Double> kvEcartTypeOrPropMemeAppliance = new Hashtable<Meme, Double>();
-//
-//		// Affichage dans la fenetre de l'évolution des meme appliances
-//		Hashtable<Integer, Double>  kvMemeValue = new Hashtable<>() ;
-//		for (Meme meme : kvEcartTypeOrPropMemeAppliance.keySet())
-//			kvMemeValue.put(memeFactory.getIndexFromMeme(meme), kvEcartTypeOrPropMemeAppliance.get(meme));
-//		communicationModel.view.addValueToApplianceSerie(getNbAction(), kvMemeValue);
-	}
-
 	/** avg;dispersion
 	 *
 	 */
@@ -496,12 +485,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 	//region GARBAGE
 
-	/** lancement de thread pour la fonction de stabilité d'un réseau.
-	 *
-	 */
-	public void testStability(){
-
-	}
 
 	//endregion
 

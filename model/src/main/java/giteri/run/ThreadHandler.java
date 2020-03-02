@@ -31,7 +31,9 @@ public abstract class ThreadHandler implements Runnable {
     	catch (InterruptedException e) {
             System.out.println("Thread interrupted.");
     	}
-    }
+	}
+
+
 
 	@SuppressWarnings("WeakerAccess")
 	public void start(){

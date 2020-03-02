@@ -3,7 +3,6 @@ package giteri.meme.entite;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.TypeOfUOT;
 import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
-import giteri.tool.math.Toolz;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Iterator;
@@ -16,8 +15,6 @@ public class CoupleMeme implements Iterable<Meme>, IUnitOfTransfer<CoupleMeme> {
     private Meme addAction,removeAction;
     private double probaPropagation;
     private int index;
-    private boolean fluidite;
-    private TypeOfUOT myType = Configurator.TypeOfUOT.COUPLE;
 
     /** Constructeur
      *
@@ -31,10 +28,6 @@ public class CoupleMeme implements Iterable<Meme>, IUnitOfTransfer<CoupleMeme> {
         this.index = index;
         this.setProbaPropagation(probaPropagation);
 
-    }
-
-    public Meme getOneMemeAtRandom(){
-        return Toolz.rollDice(.5) ? addAction : removeAction;
     }
 
     /**
@@ -70,8 +63,6 @@ public class CoupleMeme implements Iterable<Meme>, IUnitOfTransfer<CoupleMeme> {
     public String getName(){
         String name = "";
         name+= addAction.getName() ;
-        // TODO [CV] - n'aime pas trop le & pour les classes graphstream?
-        //name += "&";
         name += ".";
         name+= removeAction.getName();
         return name;
@@ -90,6 +81,14 @@ public class CoupleMeme implements Iterable<Meme>, IUnitOfTransfer<CoupleMeme> {
         classe += addAction.toFourCharString();
         classe += /*"1" +*/ removeAction.toFourCharString();
         return classe;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     //region implementation d'interface
@@ -170,18 +169,10 @@ public class CoupleMeme implements Iterable<Meme>, IUnitOfTransfer<CoupleMeme> {
     public TypeOfUOT getActionType() {
         return TypeOfUOT.COUPLE;
     }
-
     public boolean isFluide(){
         throw new NotImplementedException();
     }
+
     //endregion
-
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
-    }
 
 }
