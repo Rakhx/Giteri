@@ -17,13 +17,30 @@ object Test {
     one * 3
   }
 
+  def perdu(n:Int, m:Int ):Int = {
+    n*m
+  }
+
   def factorial(n: Int): Int = {
     var f : Int = 1
-    for(i <- 1 to 10) {
-     // f = f * i
+    for(i <- 1 to n) {
+      f = f * i
     }
+
     f
   }
+
+  /** Renvoi une combinaison sans répétition de k éléments parmis n.
+   *
+   * @param k
+   * @param parmiN
+   * @return
+   */
+  def combinaisonSansRep(k:Int, parmiN:Int) : Int =
+  {
+    return factorial(parmiN) / (factorial(k)*factorial(parmiN - k))
+  }
+
 
   /** Sérialize, après lecture, les propriétés d'un réseau, issu d'un fichier .txt sous forme
    * list des edges séparé par un espace (tabulation? )
