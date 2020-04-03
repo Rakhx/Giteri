@@ -48,11 +48,12 @@ object Run{
 
   /** Sérialize, après lecture, les propriétés d'un réseau, issu d'un fichier .txt sous forme
    * list des edges séparé par un espace (tabulation? )
-   *
+   * Si appeler depuis OpenMole, rep. courant: C:/soft/openMole
    */
   def serializNetworkTarget(): Unit = {
     val trueReader = new WriteNRead
     val lineReader = new NetworkFileLoader(null, trueReader)
+    print(System.getProperty("user.dir"))
     val reader = trueReader.readAndCreateNetwork("default.txt", lineReader," ","#")
     reader.getNetworkProperties(false, true);
   }

@@ -1,3 +1,4 @@
+package giteri
 import giteri.network.networkStuff.NetworkFileLoader
 import giteri.tool.other.WriteNRead
 
@@ -13,14 +14,6 @@ class Test {
 
   def compute(one:Int ) : Int = {
     one * 3
-  }
-
-  def factorial(n: Int): Int = {
-    var f : Int = 1
-    for(i <- 1 to 10) {
-     // f = f * i
-    }
-    f
   }
 
   /** Sérialize, après lecture, les propriétés d'un réseau, issu d'un fichier .txt sous forme
