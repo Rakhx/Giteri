@@ -262,6 +262,12 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			explorator = callFromJar(configuration, memeActivation, memeProba);
 		}
 
+		boolean jesaisjesais = false;
+		if(jesaisjesais){
+			memeActivation = new ArrayList<Boolean>(Arrays.asList(true,false,true,true,false,false,true,true,false,true,false,true,false));
+			memeProba = new ArrayList<Double>(Arrays.asList(0.6243914647012152,0.43335913567288065,0.43133148963256873,0.28554328666680345,0.3684688043879141,0.2858391149048476,0.4017778864043732,1.0,0.6298269460366629,0.5670929715380624,0.23197565577258714,0.2963476445399518,0.17390335560570958));
+		}
+
 		// Classe de configuration qui contient tout ce qu'il faut pour faire une simu
 		configuration.KindaConstructor(writeNRead, communicationModel,
 				memeFactory, networkFileLoader, workerFactory, entiteHandler, networkConstructor, explorator);
@@ -341,7 +347,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			}
 
 			fittingConfig.endRun();
-
 			// Configuration distribution suivante
 		} while(fittingConfig.explorator.gotoNext());
 

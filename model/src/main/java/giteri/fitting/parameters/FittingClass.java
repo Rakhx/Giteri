@@ -352,8 +352,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		// TODO [WayPoint]- Score distance entre deux network
 		currentNetworkScore = getNetworksDistanceDumb(Configurator.activationCodeForScore, targetNetProperties, currentNetProperties);
 
-		if(Configurator.writInfo4OpnMol)
-			System.out.println("endRepet:" + targetNetProperties.avgClust);
+//		if(Configurator.writInfo4OpnMol)
+//			System.out.println("endRepet:" + targetNetProperties.avgClust);
 
 		// Ajout a la classe des resultSet un score et propriété d'un réseau
 		resultNetwork.addScore(numeroRun, currentNetworkScore, currentNetProperties);

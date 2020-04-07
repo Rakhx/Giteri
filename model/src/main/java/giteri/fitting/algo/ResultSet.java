@@ -69,6 +69,7 @@ public class ResultSet extends Hashtable<Integer, Result> {
 				System.out.println("Configuration " + get(numeroRun).getCurrentConfig());
 			}
 		}
+
 		return resOfSimu;
 	}
 

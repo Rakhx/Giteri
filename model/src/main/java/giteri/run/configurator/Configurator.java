@@ -11,7 +11,7 @@ public final class Configurator {
 
 	public static boolean prepareTheOpti = false;
 
-	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
+	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
 	// TODO
 	public static boolean writInfo4OpnMol = true; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
 	public static String fittingTxtPath = "fittingInfo";
@@ -44,7 +44,7 @@ public final class Configurator {
 
 	// MEME
 	@toOutput ( yes = true )
-	public static boolean strictEqualityInComparaison = false; // FALSE : >= || TRUE : >
+	public static boolean strictEqualityInComparaison = true; // FALSE : >= || TRUE : >
 
 	// PROPAGATION
 	public static boolean usePropagation = true; // utilisation de la propagation
@@ -59,9 +59,9 @@ public final class Configurator {
 
 	// SCORE
 	@toOutput ( yes = true )
-	public static int activationCodeForScore = 17; // Config "is max CC possible?"
+	public static int activationCodeForScore = //17; // Config "is max CC possible?"
 	// 153;// SCORE POUR SMALLWORLD DENSITY - DDARRAY - DDAVG - APL
-	// 170+512; // 170+512 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
+	 170+512; // 170+512 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
 	// 16 + 512 Clust + third
 	// 170+512 = THIRD APL EDGES ARRAY DDAVG
 
@@ -86,7 +86,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
 	@toOutput ( yes = true )
-	public static int multiplicatorNbAction  = 2000; //  Par combein on multiplie le nombdre de noeud sur la simulation
+	public static int multiplicatorNbAction  = 3000; //  Par combein on multiplie le nombdre de noeud sur la simulation
 
 	// endregion
 
@@ -115,7 +115,6 @@ public final class Configurator {
 
 	// region Affichage log
 	public static boolean DisplayLogBehaviorColors = false; // correspondance meme <=> code couleur
-
 	public static boolean displayLogMemeApplication = false; // Chaque application de meme
 	public static boolean displayLogAvgDegreeByMeme = false; // combinaisons de meme et leur degré + derniere application + application from start
 	public static boolean displayLogMemeTransmission = false; // qui recoit quel meme
@@ -159,7 +158,6 @@ public final class Configurator {
 	public static File defaultPathForReadingNetwork = new File("model"+File.separator+"default.txt");
 	public static Integer baseSleepTimeMulti = 0;
 	private static Integer threadSleepMultiplicateur = baseSleepTimeMulti;
-
 
 	public static int sizeOfCircularForLastActionDone = 100;
 
