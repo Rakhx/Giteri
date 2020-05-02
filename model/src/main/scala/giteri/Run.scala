@@ -39,14 +39,14 @@ object Run{
     val thirteenA: Integer = args(26).toInt
     val seed: Long = Random.nextLong()
 
-    println( run(network, one, oneA, two, twoA,
-      three, threeA, four, fourA,
-      five, fiveA, six, sixA,
-      seven, sevenA, eight, eightA,
-      nine, nineA, ten, tenA,
-      eleven, elevenA, twelve, twelveA,
-      thirteen, thirteenA,
-      seed))
+//    println( run(network, one, oneA, two, twoA,
+//      three, threeA, four, fourA,
+//      five, fiveA, six, sixA,
+//      seven, sevenA, eight, eightA,
+//      nine, nineA, ten, tenA,
+//      eleven, elevenA, twelve, twelveA,
+//      thirteen, thirteenA,
+//      seed))
   }
 
   /** Sérialize, après lecture, les propriétés d'un réseau, issu d'un fichier .txt sous forme
@@ -67,12 +67,21 @@ object Run{
           nine: Double, nineActi: Integer, ten: Double, tenActi:Integer,
           eleven: Double, elevenActi: Integer, twelve: Double, twelveActi: Integer,
           thirteen: Double, thirteenActi: Integer,
+          fourteen: Double, fourteenActi: Integer, fiveteen: Double, fiveteenActi: Integer,
+          sixteen: Double, sixteenActi: Integer,
           seed: Long):Double = { //region Param
     val rand = new java.util.Random(seed)
     JarVersion.run(network,
       oneActi.==(1),twoActi.==(1), threeActi.==(1), fourActi.==(1), fiveActi.==(1), sixActi.==(1), sevnActi.==(1),
       heiActi.==(1), nineActi.==(1),tenActi.==(1), elevenActi.==(1), twelveActi.==(1), thirteenActi.==(1),
-      one, two, three, four, five, six, sevn, hei, nine, ten, eleven, twelve, thirteen)
+      fourteenActi.==(1), fiveteenActi.==(1), sixteenActi.==(1),
+      one, two, three, four, five, six, sevn, hei, nine, ten, eleven, twelve, thirteen, fourteen, fiveteen, sixteen)
+  }
 
+  def formula(one:Double, two:Double, three:Double) : Double = {
+//    print(System.getProperty("user.dir"))
+//    print(new java.io.File(".").getCanonicalPath)
+    val four = (one * two) / ( two + three )
+    four
   }
 }

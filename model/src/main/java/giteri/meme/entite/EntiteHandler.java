@@ -1069,6 +1069,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		AgregatorType theirSupSix = AgregatorType.THEIRSUPSIX;
 		AgregatorType theirEqual = AgregatorType.THEIREQUAL;
 		AgregatorType theMost = AgregatorType.THEMOST;
+		AgregatorType theLeast = AgregatorType.THELEAST;
 		AgregatorType selfSup = AgregatorType.SELFSUP;
 		KVAttributAgregator.put(degree, agregators);
 		attributs.add(degree);
@@ -1096,6 +1097,11 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, theMost);
 		agregators.put(index++, random);
 		memeFactory.registerMemeAction("Add∞", 1, false, true, add, attributs, KVAttributAgregator,false);
+
+		agregators.clear(); index = 0;
+		agregators.put(index++, theLeast);
+		agregators.put(index++, random);
+		memeFactory.registerMemeAction("Add°", 1, false, true, add, attributs, KVAttributAgregator,false);
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, hopAWay);
@@ -1129,10 +1135,22 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		memeFactory.registerMemeAction("Rmv-", 1, false, true, remove, attributs, KVAttributAgregator ,false);
 
 		agregators.clear();index = 0;
-		agregators.put(0, linked);
-		agregators.put(1, mineInf);
-		agregators.put(2, random);
+		agregators.put(index++, linked);
+		agregators.put(index++, mineInf);
+		agregators.put(index++, random);
 		memeFactory.registerMemeAction("Rmv+", 1, true, true, remove, attributs, KVAttributAgregator ,false);
+
+		agregators.clear(); index = 0;
+		agregators.put(index++, theMost);
+		agregators.put(index++, random);
+		memeFactory.registerMemeAction("Rmv∞", 1, false, true, remove, attributs, KVAttributAgregator,false);
+
+		agregators.clear(); index = 0;
+		agregators.put(index++, linked);
+		agregators.put(index++, theLeast);
+		agregators.put(index++, random);
+		memeFactory.registerMemeAction("Rmv°", 1, false, true, remove, attributs, KVAttributAgregator,false);
+
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, linked);

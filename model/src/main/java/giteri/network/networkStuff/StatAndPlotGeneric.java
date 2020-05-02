@@ -262,10 +262,21 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			explorator = callFromJar(configuration, memeActivation, memeProba);
 		}
 
-		boolean jesaisjesais = false;
+		boolean jesaisjesais = true;
 		if(jesaisjesais){
-			memeActivation = new ArrayList<Boolean>(Arrays.asList(true,false,true,true,false,false,true,true,false,true,false,true,false));
-			memeProba = new ArrayList<Double>(Arrays.asList(0.6243914647012152,0.43335913567288065,0.43133148963256873,0.28554328666680345,0.3684688043879141,0.2858391149048476,0.4017778864043732,1.0,0.6298269460366629,0.5670929715380624,0.23197565577258714,0.2963476445399518,0.17390335560570958));
+			memeActivation = new ArrayList<Boolean>(Arrays.asList(
+					true,false,false,true,false,false,true,true,false,false,false,false,false,false,true,true
+
+			));
+
+			memeProba = new ArrayList<Double>(Arrays.asList(
+					0.22380161025487205,0.22629436669860364,0.42688889518102785,0.5790234786489331,0.4310511301169438,0.9168190433023808,0.22989880757748155,0.4208471227112343,0.12929744927262993,0.0,0.18239071695979722,0.3043418373724804,0.21218649589021615,1.0,0.6000289473974884
+
+			));
+
+
+
+
 		}
 
 		// Classe de configuration qui contient tout ce qu'il faut pour faire une simu
@@ -370,7 +381,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	private void generateProxyParam(List<Boolean> activator, List<Double> proba) {
 		List<Integer> toConvert = new ArrayList<>(Arrays.asList(0,0,0,1,0,0,1,0,0,0,0,1,0));
 		proba.addAll(Arrays.asList(
-				0.9627720666747352,0.2559838797762375,0.7969203634094254,0.8580268727470562,0.3358543882264913,0.849136850072306,0.7667072298886954,0.18527085724031966,0.8605838516655864,0.743762583297914,0.5992868107380205,0.09960619627293377,0.6068812397689891
+				0.36428345569016246,0.9259845265194451,0.5053801414886911,0.2589468394646743,0.9165201850419845,0.0,0.2945136950484953,0.4551581307867684,0.7328367646124856,0.6769722633444669,0.0,0.6715130252202258,0.0,0.4775546116715207,0.504447069382873,0.8988602835056816
 
 
 

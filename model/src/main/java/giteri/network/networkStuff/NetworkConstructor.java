@@ -434,6 +434,11 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		return this.networkInstanceProperties;
 	}
 
+	// La flemme
+	public int getNbNodeAlone(){
+		return (int)this.networkInstance.getNodes().stream().filter(e -> e.getDegree() == 0).count();
+	}
+
 	/**
 	 *
 	 * @return

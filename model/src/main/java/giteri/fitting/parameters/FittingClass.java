@@ -180,6 +180,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		if(Configurator.typeOfConfig == Configurator.EnumLauncher.jarOpenMole ||
 		Configurator.typeOfConfig == Configurator.EnumLauncher.jarC)
 			targetNetProperties = networkFileLoader.getNetworkProperties(true,false);
+
+
 		// CHEAT CODE
 		else // Sinon, les lire depuis le fichier donné en paramètre dans l'interface
 			targetNetProperties = networkFileLoader.getNetworkProperties(true,false);
@@ -197,7 +199,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		boolean doTheWrite = !Configurator.fullSilent;
 
 		// ECRITURE
-		repertoires = new ArrayList<>(Arrays.asList("Stability"));
+		repertoires = new ArrayList<>(Arrays.asList(Configurator.repForFitting));
 		DateFormat dateFormat = Configurator.getDateFormat();
 		repertoires.add(dateFormat.format(new Date()));
 		repOfTheSearch = null;
@@ -352,8 +354,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		// TODO [WayPoint]- Score distance entre deux network
 		currentNetworkScore = getNetworksDistanceDumb(Configurator.activationCodeForScore, targetNetProperties, currentNetProperties);
 
-//		if(Configurator.writInfo4OpnMol)
-//			System.out.println("endRepet:" + targetNetProperties.avgClust);
+		// LA FLEMME // TODO [WayPoint]- Prise en compte des noeuds seuls
+		currentNetworkScore += networkConstructor.getNbNodeAlone();
 
 		// Ajout a la classe des resultSet un score et propriété d'un réseau
 		resultNetwork.addScore(numeroRun, currentNetworkScore, currentNetProperties);
@@ -609,6 +611,14 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 				nbAttribActivated++;
 			}
 		}
+
+		//
+		if(Configurator.considereNodeAlone){
+			int nbNode=0;
+
+		}
+
+
 
 		// Normalise par rapport aux nombres d'éléments pris en compte pour renvoyer un pourcentage
 		return totalDistance / nbAttribActivated;

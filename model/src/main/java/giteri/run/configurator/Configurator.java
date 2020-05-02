@@ -11,7 +11,9 @@ public final class Configurator {
 
 	public static boolean prepareTheOpti = false;
 
+
 	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
+	public static boolean noOuputOpenMole = true; // Aucun affichage, aucun fichier output
 	// TODO
 	public static boolean writInfo4OpnMol = true; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
 	public static String fittingTxtPath = "fittingInfo";
@@ -65,6 +67,9 @@ public final class Configurator {
 	// 16 + 512 Clust + third
 	// 170+512 = THIRD APL EDGES ARRAY DDAVG
 
+	public static boolean considereNodeAlone = true;
+
+
 	public static int activationCodeAllAttrib = 255 + 512;
 
 	public static int initialnetworkForBase = 0; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 3- SF 4-SW
@@ -109,6 +114,8 @@ public final class Configurator {
 	public static String fileNameCsvDetail = "NetworkDetailsCSV";
 	public static String fileNameMeme = "memeCSV";
 	public static String fileNameSerialisation = "serialization.se";
+	public static String fileNameSerialisationOpen = "../../../../../../../serialization.se";
+
 
 	public static boolean displayOnIHMDensitySD = true;
 	// endregion

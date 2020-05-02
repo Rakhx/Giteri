@@ -55,6 +55,34 @@ run-main giteri.Run default.txt .0 .1 .2 .15 1 1 .6 .7 .8 .9 .91 .92 .93 0 0 0 1
 ".\default.txt", 1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2, ,2000
 
 
+Il n'est pas obligatoire de spécifier la mémoire nécessaire par CPU dans le batch.
+Par défaut, chaque Job dispose automatiquement d'une allocation RAM qui est
+variable suivant la partition utilisée
+
+
+
+
+
+OSIRIM
+val envDistant =
+  SLURMEnvironment(
+    "bouadjio",
+    "osirim-slurm.irit.fr",
+    // optional parameters
+    workDirectory = "/users/smac/bouadjio",
+	threads = 4,
+	queue = "24CPUNodes"
+)
+
+
+queue: the name of the queue on which jobs will be submitted, for instance queue = "longjobs",
+memory: the memory for the job, for instance memory = 2 gigabytes,
+nodes: Number of nodes requested,
+threads: the number of threads for concurrent execution of tasks on the worker node, for instance threads = 4,
+coresByNodes: An alternative to specifying the number of threads. coresByNodes takes the value of the threads: the number of threads for concurrent execution of tasks on the worker node, for instance threads = 4 when not specified, or 1 if none of them is specified.
+
+
+
 SOUS SBT
 Verification des classes disponibles a appeler
  show compile:discoveredMainClasses
