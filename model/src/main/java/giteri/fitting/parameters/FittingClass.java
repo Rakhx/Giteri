@@ -612,14 +612,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			}
 		}
 
-		//
-		if(Configurator.considereNodeAlone){
-			int nbNode=0;
-
-		}
-
-
-
 		// Normalise par rapport aux nombres d'éléments pris en compte pour renvoyer un pourcentage
 		return totalDistance / nbAttribActivated;
 	}
@@ -656,6 +648,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 	/** retourne une distance entre deux attributs
 	 * Comprise entre 0 et 100
+	 * TODO [CheckPoint] calcul du score propriété par propriété
 	 * @param type
 	 * @param valueFrom
 	 * @param valueTarget

@@ -189,8 +189,10 @@ public class NetworkProperties implements Cloneable, Serializable {
 				break;
 			case APL:
 				this.APL = (double) value;
+				break;
 			case thirdMoment:
 				this.thirdMoment = (double) value;
+				break;
 			default:
 				break;
 		}
@@ -320,6 +322,7 @@ public class NetworkProperties implements Cloneable, Serializable {
 		result.activator = this.activator;
 		result.dd = new int[this.dd.length];
 		result.APL = this.APL;
+		result.thirdMoment = this.thirdMoment;
 		for (int i = 0; i < dd.length; i++) {
 			result.dd[i] = this.dd[i];
 			result.furDurchschnitt.put(i, (double)dd[i]);

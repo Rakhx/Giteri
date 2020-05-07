@@ -1099,9 +1099,21 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		memeFactory.registerMemeAction("Add∞", 1, false, true, add, attributs, KVAttributAgregator,false);
 
 		agregators.clear(); index = 0;
+		agregators.put(index++, notLinked);
+		agregators.put(index++, theMost);
+		agregators.put(index++, random);
+		memeFactory.registerMemeAction("Add∞!", 1, false, true, add, attributs, KVAttributAgregator,false);
+
+		agregators.clear(); index = 0;
 		agregators.put(index++, theLeast);
 		agregators.put(index++, random);
 		memeFactory.registerMemeAction("Add°", 1, false, true, add, attributs, KVAttributAgregator,false);
+
+		agregators.clear(); index = 0;
+		agregators.put(index++, notLinked);
+		agregators.put(index++, theLeast);
+		agregators.put(index++, random);
+		memeFactory.registerMemeAction("Add°!", 1, false, true, add, attributs, KVAttributAgregator,false);
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, hopAWay);
@@ -1147,9 +1159,20 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, linked);
+		agregators.put(index++, theMost);
+		agregators.put(index++, random);
+		memeFactory.registerMemeAction("Rmv∞!", 1, false, true, remove, attributs, KVAttributAgregator,false);
+
+		agregators.clear(); index = 0;
 		agregators.put(index++, theLeast);
 		agregators.put(index++, random);
 		memeFactory.registerMemeAction("Rmv°", 1, false, true, remove, attributs, KVAttributAgregator,false);
+
+		agregators.clear(); index = 0;
+		agregators.put(index++, linked);
+		agregators.put(index++, theLeast);
+		agregators.put(index++, random);
+		memeFactory.registerMemeAction("Rmv°!", 1, false, true, remove, attributs, KVAttributAgregator,false);
 
 
 		agregators.clear(); index = 0;

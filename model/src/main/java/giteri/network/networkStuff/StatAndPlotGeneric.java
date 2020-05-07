@@ -246,6 +246,28 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		List<Boolean> memeActivation = memeActivationOpt.orElse(new ArrayList<>());
 		List<Double> memeProba = memeProbaOpt.orElse(new ArrayList<>());
 
+		boolean jesaisjesais = true;
+		if(Configurator.fullBullshi){
+			if(jesaisjesais){
+				memeActivation = new ArrayList<Boolean>(Arrays.asList(
+						true,true,false,true,false,true,false,true,false,true,false,true,false,true,false,false,false,false,true,true
+
+				));
+				memeProba = new ArrayList<Double>(Arrays.asList(
+						0.6546421359315961,0.03901552745300526,0.0,0.0,0.5479791065851423,0.0,1.0,0.35555962129227386,0.4006943368121888,1.0,0.22052660816526456,0.5114843522431657,0.40121060099696326,0.8209811569972506,0.6878364585697896,1.0,0.11380054019154154,0.19038518141395727,1.0,0.5758139808361781
+				));
+			} else
+				{
+				memeActivation = new ArrayList<Boolean>(Arrays.asList(
+						true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true
+				));
+				memeProba = new ArrayList<Double>(Arrays.asList(
+						0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16
+				));}
+		}
+
+
+
 		// Qui définira pour la classe de fitting l'espace de recherche
 		IExplorationMethod explorator = null;
 		FittingClass configuration = new FittingClass();
@@ -262,22 +284,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			explorator = callFromJar(configuration, memeActivation, memeProba);
 		}
 
-		boolean jesaisjesais = true;
-		if(jesaisjesais){
-			memeActivation = new ArrayList<Boolean>(Arrays.asList(
-					true,false,false,true,false,false,true,true,false,false,false,false,false,false,true,true
 
-			));
-
-			memeProba = new ArrayList<Double>(Arrays.asList(
-					0.22380161025487205,0.22629436669860364,0.42688889518102785,0.5790234786489331,0.4310511301169438,0.9168190433023808,0.22989880757748155,0.4208471227112343,0.12929744927262993,0.0,0.18239071695979722,0.3043418373724804,0.21218649589021615,1.0,0.6000289473974884
-
-			));
-
-
-
-
-		}
 
 		// Classe de configuration qui contient tout ce qu'il faut pour faire une simu
 		configuration.KindaConstructor(writeNRead, communicationModel,

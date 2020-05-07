@@ -69,15 +69,15 @@ public class JarVersion {
 	public static Double run(File fileInput,
 							 boolean acti1,boolean acti2,boolean acti3,boolean acti4,boolean acti5,
 							 boolean acti6,boolean acti7,boolean acti8,boolean acti9, boolean acti10, boolean acti11, boolean acti12, boolean acti13,
-							 boolean acti14,boolean acti15,boolean acti16,
+							 boolean acti14,boolean acti15,boolean acti16,boolean acti17,boolean acti18,boolean acti19,boolean acti20,
 							 double param1, double param2, double param3, double param4, double param5,
 							 double param6, double param7, double param8, double param9, double param10, double param11, double param12, double param13
-							, double param14, double param15, double param16)
+							, double param14, double param15, double param16, double param17, double param18, double param19, double param20)
 	{
 		ArrayList<Double> probaBehavior = new ArrayList<>();
 		ArrayList<Boolean> memeAtivation = new ArrayList<>();
-		memeAtivation.addAll(Arrays.asList(acti1,acti2,acti3,acti4,acti5, acti6, acti7, acti8, acti9, acti10, acti11, acti12, acti13, acti14, acti15, acti16));
-		probaBehavior.addAll(Arrays.asList(param1,param2,param3,param4,param5, param6, param7, param8, param9, param10, param11, param12, param13, param14, param15, param16));
+		memeAtivation.addAll(Arrays.asList(acti1,acti2,acti3,acti4,acti5, acti6, acti7, acti8, acti9, acti10, acti11, acti12, acti13, acti14, acti15, acti16, acti17, acti18, acti19, acti20));
+		probaBehavior.addAll(Arrays.asList(param1,param2,param3,param4,param5, param6, param7, param8, param9, param10, param11, param12, param13, param14, param15, param16, param17, param18, param19, param20));
 		String toto = "";
 		for (Double aDouble : probaBehavior) {
 			toto += aDouble;

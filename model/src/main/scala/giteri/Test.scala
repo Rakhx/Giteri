@@ -21,7 +21,7 @@ object Test {
     val trueReader = new WriteNRead
     val lineReader = new NetworkFileLoader(null, trueReader)
 
-    val reader = trueReader.readAndCreateNetwork("default.txt", lineReader," ","#")
+    val reader = trueReader.readAndCreateNetwork("network.txt", lineReader," ","#")
     reader.getNetworkProperties(false, true);
 
   }

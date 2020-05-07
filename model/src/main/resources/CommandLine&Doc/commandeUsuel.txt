@@ -1,26 +1,24 @@
+// ----- [Rep. openMole et model sbt] -----
 cd C:\Users\John\IdeaProjects\Giteri\model
 cd c:\soft\Openmole
 
-// A lancer depuis le folder model pour compiler
+// ----- [A lancer depuis le folder model pour compiler] -----
 sbt osgiBundle
 // => $ [info] Packaging C:\Users\John\IdeaProjects\Giteri\model\target\scala-2.12\giteri_2.12-1.0-SNAPSHOT.jar ...
 
-//exemple de param pour lancer les trucs
+// ----- [exemple de param pour lancer les trucs] -----
 ".\.\src\main\resources\default.txt" 1 1 1 1 1 1 1 1 1 .0 .1 .2 .3 .4 .5 .6 .7 .8
  java -cp giteri_2.12-1.0-SNAPSHOT.jar giteri.run.jarVersion.JarVersion ".\.\src\main\resources\default.txt" 1 1 1 1 1 1 1 1 1 .0 .1 .2 .3 .4 .5 .6 .7 .8
  java -cp giteri_2.12-1.0-SNAPSHOT.jar giteri.run.jarVersion.JarVersion "../../default.txt" 1 1 1 1 1 1 1 1 1 .0 .1 .2 .3 .4 .5 .6 .7 .8
  
-//Lancement d'open avec le jar en plugin
+// ----- [Lancement d'open avec le jar en plugin] -----
  openmole -p C:\Users\John\IdeaProjects\Giteri\model\target\scala-2.12\giteri_2.12-1.0-SNAPSHOT.jar
 
 
- 
- 
-// Clean du jar et des résultats écrits depuis le jar
+// ----- [Clean du jar et des résultats écrits depuis le jar] -----
 rm -rf C:\Users\John\IdeaProjects\Giteri\Stability C:\Users\John\IdeaProjects\Giteri\model\target
 
-// Quel complexe action // position dans la liste d'activation et proba de propagation
-
+// ----- [Quel complexe action // position dans la liste d'activation et proba de propagation] -----
 ;.Add+-0.0
 ;.Add--0.1
 ;.Add∞-0.2
@@ -36,30 +34,46 @@ rm -rf C:\Users\John\IdeaProjects\Giteri\Stability C:\Users\John\IdeaProjects\Gi
 ;.RmvChain-0.93
 
 
-.RmvØ:0.8 .Add+:0.0 .AddØ-Hop:0.4 .RmvChain:0.93 .Rmv+:0.9 .AddØ-3Hop:0.5 .Add-:0.1 .Add∞:0.2 .RmvØ-2hop:0.7 .AddEq:0.6 .RmvEq:0.92 .Rmv-:0.91 .AddØ:0.3 
+true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true
+0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16
+
+.Add°:0.01
+.Add+:0.02
+.Add-:0.03
+.Add∞:0.04
+.AddØ:0.05
+.AddØ-Hop:0.06 
+.AddØ-3Hop:0.07
+.AddEq:0.08 
+.RmvØ-2hop:0.09
+.RmvØ:0.1 
+.Rmv°:0.11 
+.Rmv+:0.12 
+.Rmv-:0.13  
+.Rmv∞:0.14 
+.RmvEq:0.15   
+.RmvChain:0.16  
 
 
 
-Example d'appel pour lanchement cmdline
+
+// ----- [Example d'appel pour lanchement cmdline] -----
 ".\default.txt" 0 0 0 1 1 1 0 0 0 0 1 0 0 .0 .1 .2 .15 1 1 .6 .7 .8 .9 .91 .92 .93
 
 "model/default.txt" 1 0 1 1 0 0 1 1 0 1 0 1 0 0.6243914647012152 0.43335913567288065 0.43133148963256873 0.28554328666680345 0.3684688043879141 0.2858391149048476 0.4017778864043732 1.0 0.6298269460366629 0.5670929715380624 0.23197565577258714 0.2963476445399518 0.17390335560570958
 
-
-0.6243914647012152,0.43335913567288065,0.43133148963256873,0.28554328666680345,0.3684688043879141,0.2858391149048476,0.4017778864043732,1.0,0.6298269460366629,0.5670929715380624,0.23197565577258714,0.2963476445399518,0.17390335560570958,,48.90416091433514
-
-true,false,true,true,false,false,true,true,false,true,false,true,false
-Example pour Scala
+// ----- [Example pour Scala] -----
 
 run-main giteri.Run default.txt .0 .1 .2 .15 1 1 .6 .7 .8 .9 .91 .92 .93 0 0 0 1 1 1 0 0 0 0 1 0 0
 ".\default.txt", 1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2, ,2000
+
+".\default.txt" 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.1 0.11 0.12 0.13 0.14 0.15 0.16 0.17 0.18 0.19 0.2 
+
 
 
 Il n'est pas obligatoire de spécifier la mémoire nécessaire par CPU dans le batch.
 Par défaut, chaque Job dispose automatiquement d'une allocation RAM qui est
 variable suivant la partition utilisée
-
-
 
 
 

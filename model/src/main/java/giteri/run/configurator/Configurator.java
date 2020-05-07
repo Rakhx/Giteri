@@ -11,9 +11,9 @@ public final class Configurator {
 
 	public static boolean prepareTheOpti = false;
 
-
 	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
-	public static boolean noOuputOpenMole = true; // Aucun affichage, aucun fichier output
+	public static boolean fullBullshi = false; // Aucun affichage, aucun fichier output
+
 	// TODO
 	public static boolean writInfo4OpnMol = true; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
 	public static String fittingTxtPath = "fittingInfo";
@@ -63,7 +63,8 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static int activationCodeForScore = //17; // Config "is max CC possible?"
 	// 153;// SCORE POUR SMALLWORLD DENSITY - DDARRAY - DDAVG - APL
-	 170+512; // 170+512 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
+
+	  170+512; // 170+512 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
 	// 16 + 512 Clust + third
 	// 170+512 = THIRD APL EDGES ARRAY DDAVG
 
@@ -115,7 +116,6 @@ public final class Configurator {
 	public static String fileNameMeme = "memeCSV";
 	public static String fileNameSerialisation = "serialization.se";
 	public static String fileNameSerialisationOpen = "../../../../../../../serialization.se";
-
 
 	public static boolean displayOnIHMDensitySD = true;
 	// endregion

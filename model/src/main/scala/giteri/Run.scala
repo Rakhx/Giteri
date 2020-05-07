@@ -66,16 +66,19 @@ object Run{
           sevn: Double, sevnActi: Integer, hei: Double, heiActi: Integer,
           nine: Double, nineActi: Integer, ten: Double, tenActi:Integer,
           eleven: Double, elevenActi: Integer, twelve: Double, twelveActi: Integer,
-          thirteen: Double, thirteenActi: Integer,
-          fourteen: Double, fourteenActi: Integer, fiveteen: Double, fiveteenActi: Integer,
-          sixteen: Double, sixteenActi: Integer,
+          thirteen: Double, thirteenActi: Integer, fourteen: Double, fourteenActi: Integer,
+          fiveteen: Double, fiveteenActi: Integer, sixteen: Double, sixteenActi: Integer,
+          seventeen: Double, seventeenActi: Integer,heighteen: Double, heighteenActi: Integer,
+          nineteen: Double, nineteenActi: Integer,twenty: Double, twentyActi: Integer,
           seed: Long):Double = { //region Param
     val rand = new java.util.Random(seed)
     JarVersion.run(network,
       oneActi.==(1),twoActi.==(1), threeActi.==(1), fourActi.==(1), fiveActi.==(1), sixActi.==(1), sevnActi.==(1),
       heiActi.==(1), nineActi.==(1),tenActi.==(1), elevenActi.==(1), twelveActi.==(1), thirteenActi.==(1),
-      fourteenActi.==(1), fiveteenActi.==(1), sixteenActi.==(1),
-      one, two, three, four, five, six, sevn, hei, nine, ten, eleven, twelve, thirteen, fourteen, fiveteen, sixteen)
+      fourteenActi.==(1), fiveteenActi.==(1), sixteenActi.==(1),seventeenActi.==(1),heighteenActi.==(1),
+      nineteenActi.==(1), twentyActi.==(1),
+      one, two, three, four, five, six, sevn, hei, nine, ten, eleven, twelve, thirteen,
+      fourteen, fiveteen, sixteen, seventeen, heighteen, nineteen, twenty)
   }
 
   def formula(one:Double, two:Double, three:Double) : Double = {

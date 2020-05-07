@@ -195,6 +195,7 @@ public class NetworkFileLoader implements IReadNetwork {
 		//	System.out.println(System.getProperty("user.dir"));
 			FileInputStream file;
 			if(Configurator.typeOfConfig == Configurator.EnumLauncher.jarOpenMole)
+			//	file = new FileInputStream(Configurator.fileNameSerialisation);
 				file  = new FileInputStream(Configurator.fileNameSerialisationOpen);
 			else
 				 file = new FileInputStream(Configurator.fileNameSerialisation);
