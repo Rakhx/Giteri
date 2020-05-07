@@ -11,8 +11,8 @@ public final class Configurator {
 
 	public static boolean prepareTheOpti = false;
 
-	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
-	public static boolean fullBullshi = true; // Aucun affichage, aucun fichier output
+	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
+	public static boolean fullBullshi = false; // Aucun affichage, aucun fichier output
 
 	// TODO
 	public static boolean writInfo4OpnMol = true; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
@@ -66,10 +66,8 @@ public final class Configurator {
 	 *
 	 */
 	@toOutput ( yes = true )
-	public static int activationCodeForScore =1023;
-		//
-
-
+	public static int activationCodeForScore = 446;
+		// 446= 2 DDAVG + 4 DDINTER + 8 DDArray + 16 avg clust + 32 nbedge + 128 APL + 256 third moment
 
 			//17; // Config "is max CC possible?"
 	// 153;// SCORE POUR SMALLWORLD DENSITY - DDARRAY - DDAVG - APL
