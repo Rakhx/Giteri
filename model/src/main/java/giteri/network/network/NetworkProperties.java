@@ -108,10 +108,7 @@ public class NetworkProperties implements Cloneable, Serializable {
 					toConcat = ";ddArray" ;
 					toConcat += ";ddArray" ;
 					break;
-				case nbEdgesOnNbNodes:
-					toConcat = ";" + (double)nbEdges / nbNodes;
-					toConcat += ";" + (double)sd.nbEdges / sd.nbNodes;
-					break;
+
 				default:
 					toConcat = ";" + this.getValue(attrib);
 					toConcat += ";" + sd.getValue(attrib);
@@ -151,8 +148,6 @@ public class NetworkProperties implements Cloneable, Serializable {
 				return nbNodes;
 			case APL:
 				return this.APL;
-			case nbEdgesOnNbNodes:
-				return (double)nbEdges / nbNodes;
 			case thirdMoment:
 				return thirdMoment;
 			default:

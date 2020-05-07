@@ -658,23 +658,23 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		double distance = 0;double valueOne;double valueTwo;
 		int one, two;
 		int[] ddOne, ddTwo;
-		ArrayList<Double> temps = new ArrayList();
+		//ArrayList<Double> temps = new ArrayList();
 
 		switch (type) {
 			case DENSITY:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, 1);
+				distance = squareDistance(valueOne, valueTwo, 1);
 				break;
 			case DDAVG:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, Configurator.getNbNode() - 1);
+				distance = squareDistance(valueOne, valueTwo, Configurator.getNbNode() - 1);
 				break;
 			case DDINTERQRT:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, Configurator.getNbNode() - 1);
+				distance = squareDistance(valueOne, valueTwo, Configurator.getNbNode() - 1);
 				break;
 			case DDARRAY:
 				one = ((int[]) valueFrom).length;
@@ -685,41 +685,38 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 				distance = 0;
 				for (int i = 0; i < ((int[]) valueFrom).length; i++) {
-					distance += distance(ddOne[i], ddTwo[i], Configurator.getNbNode() - 1 );
-					temps.add(distance(ddOne[i], ddTwo[i], Configurator.getNbNode() - 1 ));
+					//distance += linearDistance(ddOne[i], ddTwo[i], Configurator.getNbNode() - 1 );
+					distance += Math.abs(ddOne[i]-ddTwo[i]);
+					//temps.add(linearDistance(ddOne[i], ddTwo[i], Configurator.getNbNode() - 1 ));
 				}
 
-				distance /= Configurator.getNbNode();
+				distance /= one + two;
+				distance *= 100;
 				break;
 			case AVGCLUST:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, 1);
+				distance = linearDistance(valueOne, valueTwo, 1);
 				break;
 			case NBEDGES:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, (Configurator.getNbNode() - 1) * Configurator.getNbNode());
+				distance = squareDistance(valueOne, valueTwo, (Configurator.getNbNode() - 1) * Configurator.getNbNode());
 				break;
 			case NBNODES:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, Configurator.getNbNode()-1);
+				distance = squareDistance(valueOne, valueTwo, Configurator.getNbNode()-1);
 				break;
 			case APL:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, (double)(Configurator.getNbNode()+1)/3);
-				break;
-			case nbEdgesOnNbNodes:
-				valueOne = (double) valueFrom;
-				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, 1);
+				distance = squareDistance(valueOne, valueTwo, (double)(Configurator.getNbNode()+1)/3);
 				break;
 			case thirdMoment:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, 1);
+				distance = squareDistance(valueOne, valueTwo, 3);
 				break;
 
 			default:
@@ -741,10 +738,21 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 * @param max
 	 * @return
 	 */
-	private static double distance(double valueOne, double valueTwo, double max){
+	private static double linearDistance(double valueOne, double valueTwo, double max){
 		return (Math.abs(valueOne - valueTwo) * 100) / max;
 	}
 
+	/**
+	 * Donne la distance entre deux éléments ( en pourcentage ), relative au max des ces éléments
+	 * L'importance des premiers écarts sont plus important que les derniers
+	 * @param valueOne
+	 * @param valueTwo
+	 * @param max
+	 * @return
+	 */
+	private static double squareDistance(double valueOne, double valueTwo, double max){
+		return Math.sqrt(linearDistance(valueOne,valueTwo,max)) * Math.sqrt(100);
+	}
 	//endregion
 
 	//region Event et nb action

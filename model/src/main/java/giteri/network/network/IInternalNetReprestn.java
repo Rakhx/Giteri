@@ -142,7 +142,7 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 						else
 							sum=0;
 
-						sum /= Math.pow(nbNodes,3);
+						sum /= nbNodes;
 						thirdMoment = sum;
 						netPropResult.setValue(NetworkAttribType.thirdMoment, thirdMoment);
 					}

@@ -11,8 +11,8 @@ public final class Configurator {
 
 	public static boolean prepareTheOpti = false;
 
-	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
-	public static boolean fullBullshi = false; // Aucun affichage, aucun fichier output
+	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
+	public static boolean fullBullshi = true; // Aucun affichage, aucun fichier output
 
 	// TODO
 	public static boolean writInfo4OpnMol = true; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
@@ -60,18 +60,28 @@ public final class Configurator {
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 
 	// SCORE
+
+	/** 1:density - 2:ddavg - 4:ddInterQuart - 8:ddArray 16:avgClust
+	 * 32: nbEdges 64: nbNodes 128:APL 256:Edges/nodes 512:thirdMoment
+	 *
+	 */
 	@toOutput ( yes = true )
-	public static int activationCodeForScore = //17; // Config "is max CC possible?"
+	public static int activationCodeForScore =1023;
+		//
+
+
+
+			//17; // Config "is max CC possible?"
 	// 153;// SCORE POUR SMALLWORLD DENSITY - DDARRAY - DDAVG - APL
 
-	  170+512; // 170+512 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
+	 // 170+512; // 170+512 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
 	// 16 + 512 Clust + third
 	// 170+512 = THIRD APL EDGES ARRAY DDAVG
 
 	public static boolean considereNodeAlone = true;
 
 
-	public static int activationCodeAllAttrib = 255 + 512;
+	public static int activationCodeAllAttrib = 511;
 
 	public static int initialnetworkForBase = 0; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 3- SF 4-SW
 
@@ -235,8 +245,7 @@ public final class Configurator {
 		NBEDGES, // 32
 		NBNODES, // 64
 		APL, // 128
-		nbEdgesOnNbNodes, // 256
-		thirdMoment; // 512
+		thirdMoment; // 256
 	}
 
 
@@ -345,10 +354,8 @@ public final class Configurator {
 				return 7;
 			case APL:
 				return 8;
-			case nbEdgesOnNbNodes:
-				return 9;
 			case thirdMoment:
-				return 10;
+				return 9;
 			default:
 				return -1;
 		}
