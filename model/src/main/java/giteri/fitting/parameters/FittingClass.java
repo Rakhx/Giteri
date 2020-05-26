@@ -717,6 +717,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
 				distance = squareDistance(valueOne, valueTwo, 3);
+				if(distance>100) distance = 100;
 				break;
 
 			default:

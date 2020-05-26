@@ -102,3 +102,9 @@ Verification des classes disponibles a appeler
  show compile:discoveredMainClasses
 
 Repertoire pour le fichier de réseau d'openmole, a sérialiser avant pour couple version et 
+
+		// 446= 2 DDAVG + 4 DDINTER + 8 DDArray + 16 avg clust + 32 nbedge + 128 APL + 256 third moment
+
+
+
+

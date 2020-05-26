@@ -11,8 +11,8 @@ public final class Configurator {
 
 	public static boolean prepareTheOpti = false;
 
-	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
-	public static boolean fullBullshi = false; // Aucun affichage, aucun fichier output
+	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
+	public static boolean fullBullshi = true; // Aucun affichage, aucun fichier output
 
 	// TODO
 	public static boolean writInfo4OpnMol = true; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
@@ -77,10 +77,7 @@ public final class Configurator {
 	// 170+512 = THIRD APL EDGES ARRAY DDAVG
 
 	public static boolean considereNodeAlone = true;
-
-
-	public static int activationCodeAllAttrib = 511;
-
+	public static int activationCodeAllAttrib = 1023;
 	public static int initialnetworkForBase = 0; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 3- SF 4-SW
 
 	// endregion
@@ -151,7 +148,7 @@ public final class Configurator {
 	public static boolean debugEntite = false;
 	public static boolean debugEntiteHandler = false;
 
-	public static boolean overallDebug = !jarMode;
+	public static boolean debugIHM = false;
 	public static boolean debugHopAway = false;
 
 	public static boolean debugJarMode = false;

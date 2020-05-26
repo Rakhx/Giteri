@@ -1501,7 +1501,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 				}
 			}
 			catch(NullPointerException npe){
-				if(Configurator.overallDebug)
+				if(Configurator.debugIHM)
 					System.err.println("[IHM-updateInformationDisplay()]-" + npe.getMessage());
 			}
 			catch (Exception e){
