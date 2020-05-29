@@ -676,22 +676,26 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 				valueTwo = (double) valueTarget;
 				distance = squareDistance(valueOne, valueTwo, Configurator.getNbNode() - 1);
 				break;
+
 			case DDARRAY:
 				one = ((int[]) valueFrom).length;
 				two = ((int[]) valueTarget).length;
 				one = Integer.max(one,two);
 				ddOne = Arrays.copyOf((int[]) valueFrom,one);
 				ddTwo = Arrays.copyOf((int[]) valueTarget,one);
-
 				distance = 0;
+				int nbElem = 0 ;
+
 				for (int i = 0; i < ((int[]) valueFrom).length; i++) {
-					//distance += linearDistance(ddOne[i], ddTwo[i], Configurator.getNbNode() - 1 );
-					distance += Math.abs(ddOne[i]-ddTwo[i]);
-					//temps.add(linearDistance(ddOne[i], ddTwo[i], Configurator.getNbNode() - 1 ));
+					if(ddOne[i] != 0 || ddTwo[i] != 0) {
+						distance += Math.abs(ddOne[i]- ddTwo[i]);
+						nbElem++;
+					}
 				}
 
-				distance /= one + two;
+				distance /= 2*Configurator.getNbNode();
 				distance *= 100;
+
 				break;
 			case AVGCLUST:
 				valueOne = (double) valueFrom;

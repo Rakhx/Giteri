@@ -123,43 +123,37 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 					}
 
 					netPropResult.setDd(distrib);
-					// si moment d'ordre 3
-					if (Configurator.isAttribActived(activationCode, NetworkAttribType.thirdMoment)){
-						double sum = .0;
-						double[] ddNSd;
-						Map<Integer, Integer> ddMap  = new Hashtable<>(nbNodes);
 
+					// si moment d'ordre 3
+					if (Configurator.isAttribActived(activationCode, NetworkAttribType.thirdMoment))
+					{
+						double sum = .0; double[] ddNSd;
+						Map<Integer, Integer> ddMap  = new Hashtable<>(nbNodes);
 						for (int i = 0; i < distrib.length; i++) {
 							ddMap.put(i,distrib[i]);
 						}
-
 						ddNSd = Toolz.getAvgNsd(ddMap);
 						// on centre réduit et eleve au cube pour le moment d'ordre 3. ( une fois centré la moyenne = 0 )
 						if(ddNSd[1] != 0)
 							for (int i = 0; i < distrib.length; i++) {
-								sum += Math.pow((ddNSd[0] - distrib[i])/ddNSd[1], 3);
-							}
+								sum += Math.pow((ddNSd[0] - distrib[i])/ddNSd[1], 3); }
 						else
 							sum=0;
-
-						sum /= nbNodes;
-						thirdMoment = sum;
+						sum /= nbNodes; thirdMoment = sum;
 						netPropResult.setValue(NetworkAttribType.thirdMoment, thirdMoment);
 					}
 
 					// Si espace interquartile
-					if (Configurator.isAttribActived(activationCode, NetworkAttribType.DDINTERQRT)) {
+					if (Configurator.isAttribActived(activationCode, NetworkAttribType.DDINTERQRT))
+					{
 						// Ecart inter quartile
-						parcouru = 0;
-						index = -1;
+						parcouru = 0; index = -1;
 						double temp = nbNodes * .25f;
 						do {
 							index++;
 							parcouru += distrib[index];
 						} while (parcouru < temp);
-
 						firstQ = index;
-
 						// 3er quartile
 						parcouru = 0;
 						index = -1;
@@ -169,13 +163,13 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 							parcouru += distrib[index];
 						} while (parcouru < temp);
 
-						thirdQ = index;
-						ddInterQrt = thirdQ - firstQ;
+						thirdQ = index; ddInterQrt = thirdQ - firstQ;
 						netPropResult.setValue(NetworkAttribType.DDINTERQRT,ddInterQrt);
 					}
 
 					//si avgClustering
-					if (avgClust) {
+					if (avgClust)
+					{
 						for (Integer nodeCentral : nodesAndConnections.keySet()) {
 							nodeClustering = 0;
 							for (Integer neigthboor : nodesAndConnections.get(nodeCentral)) {
@@ -184,7 +178,6 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 										nodeClustering++;
 								}
 							}
-
 							nodeClustering /= nodesAndConnections.get(nodeCentral).size() * (nodesAndConnections.get(nodeCentral).size() - 1);
 							clustByNode.put(nodeCentral, nodeClustering);
 						}
@@ -193,7 +186,6 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 						for (Double clust : clustByNode.values())
 							if (!clust.isNaN())
 								networkClustering += clust;
-
 						networkClustering /= clustByNode.values().size();
 						netPropResult.setValue(NetworkAttribType.AVGCLUST, networkClustering);
 					}
