@@ -72,7 +72,7 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 		 */
 		@Override
 		public NetworkProperties getNetworkProperties(Optional<NetworkProperties> toModify, String networkName, int activationCode) {
-			int parcouru, index,firstQ, thirdQ;
+			int parcouru, index,firstQ=-1,secondQ=-1, thirdQ=-1;
 			double density = -1, avgDegre = -1 ;
 			double apl = -1;
 			int[] distrib = new int[0];
@@ -104,7 +104,7 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 			// degré moyen sur les nodes
 			if (Configurator.isAttribActived(activationCode, NetworkAttribType.DDAVG)){
 				avgDegre = (double)nbEdges / (nbNodes);
-				netPropResult.setValue(NetworkAttribType.DDAVG,avgDegre);
+				netPropResult.setValue(NetworkAttribType.DDAVG, avgDegre);
 			}
 			// region DD
 			if(	Configurator.isAttribActived(activationCode, NetworkAttribType.DDINTERQRT) ||
@@ -146,24 +146,28 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 					// Si espace interquartile
 					if (Configurator.isAttribActived(activationCode, NetworkAttribType.DDINTERQRT))
 					{
-						// Ecart inter quartile
+						double q1,q2,q3;
+						q1 =  nbNodes * .25f;
+						q2 =  nbNodes * .5f;
+						q3 =  nbNodes * .75f;
 						parcouru = 0; index = -1;
-						double temp = nbNodes * .25f;
-						do {
+						while (parcouru < Configurator.getNbNode()) {
 							index++;
 							parcouru += distrib[index];
-						} while (parcouru < temp);
-						firstQ = index;
-						// 3er quartile
-						parcouru = 0;
-						index = -1;
-						temp = nbNodes * .75f;
-						do {
-							index++;
-							parcouru += distrib[index];
-						} while (parcouru < temp);
 
-						thirdQ = index; ddInterQrt = thirdQ - firstQ;
+							if(firstQ == -1 && parcouru > q1){
+								firstQ = index;
+							}if(secondQ == -1 && parcouru > q2){
+								secondQ = index;
+							}if(thirdQ == -1 && parcouru > q3){
+								thirdQ = index;
+								break;
+							}
+						}
+
+						double yule = (double)(firstQ+thirdQ-2*secondQ) / (thirdQ-firstQ);
+
+						ddInterQrt = thirdQ - firstQ;
 						netPropResult.setValue(NetworkAttribType.DDINTERQRT,ddInterQrt);
 					}
 

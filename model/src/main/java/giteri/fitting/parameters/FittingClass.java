@@ -658,7 +658,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		double distance = 0;double valueOne;double valueTwo;
 		int one, two;
 		int[] ddOne, ddTwo;
-		//ArrayList<Double> temps = new ArrayList();
 
 		switch (type) {
 			case DENSITY:
@@ -678,23 +677,65 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 				break;
 
 			case DDARRAY:
-				one = ((int[]) valueFrom).length;
-				two = ((int[]) valueTarget).length;
-				one = Integer.max(one,two);
-				ddOne = Arrays.copyOf((int[]) valueFrom,one);
-				ddTwo = Arrays.copyOf((int[]) valueTarget,one);
-				distance = 0;
-				int nbElem = 0 ;
+				one = Integer.max(((int[]) valueFrom).length,((int[]) valueTarget).length);
+				// doubler pour la taille max d'offset que subira l'une des deux
+				ddOne = Arrays.copyOf((int[]) valueFrom,one*2);
+				ddTwo = Arrays.copyOf((int[]) valueTarget,one*2);
 
-				for (int i = 0; i < ((int[]) valueFrom).length; i++) {
-					if(ddOne[i] != 0 || ddTwo[i] != 0) {
-						distance += Math.abs(ddOne[i]- ddTwo[i]);
-						nbElem++;
-					}
+				// on recupere la moyenne des arrays
+				int somme1 = 0, deno1 = 0;
+				int somme2 = 0, deno2 = 0;
+				int offset1=0, offset2=0;
+				for (int i = 0; i < one; i++) {
+					somme1 += ddOne[i]*i;
+					somme2 += ddTwo[i]*i;
+					deno1 += ddOne[i];
+					deno2 += ddTwo[i];
+				}
+				somme1 /= deno1;
+				somme2 /= deno2;
+
+				// si 1>2, quand on lit 1[0] on se réfère a 2[0-offset]
+				if(somme1>somme2)
+					offset2 = somme1-somme2;
+				if(somme2>somme1)
+					offset1 = somme2-somme1;
+
+				// on compare deosrmais les dd avec la plus petite qui est decalé de la differente des moyennes vers
+				//la plus grandes
+
+				distance = 0;
+				int nbElem = 0;
+				int value1,value2;
+
+				for (int i = 0; i < one; i++) {
+					value1 = (i-offset1) >=0 ? ddOne[i-offset1]:0;
+					value2 = (i-offset2) >=0 ? ddTwo[i-offset2]:0;
+					// l'un des deux offwset est nul
+					distance += Math.abs(value1-value2);
+					nbElem++;
 				}
 
-				distance /= 2*Configurator.getNbNode();
+				// cas max: deux distirb avec aucun pt en commun
+				distance /= nbElem*2;
 				distance *= 100;
+
+//				one = ((int[]) valueFrom).length;
+//				two = ((int[]) valueTarget).length;
+//				one = Integer.max(one,two);
+//				ddOne = Arrays.copyOf((int[]) valueFrom,one);
+//				ddTwo = Arrays.copyOf((int[]) valueTarget,one);
+//				distance = 0;
+//				int nbElem = 0 ;
+//
+//				for (int i = 0; i < ((int[]) valueFrom).length; i++) {
+//					if(ddOne[i] != 0 || ddTwo[i] != 0) {
+//						distance += Math.abs(ddOne[i]- ddTwo[i]);
+//						nbElem++;
+//					}
+//				}
+//				distance /= 2*Configurator.getNbNode();
+//				distance *= 100;
 
 				break;
 			case AVGCLUST:
