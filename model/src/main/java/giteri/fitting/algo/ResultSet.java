@@ -58,6 +58,9 @@ public class ResultSet extends Hashtable<Integer, Result> {
 					resForOneRun *= (1+stdDevia);
 				nbRun++;
 				resOfSimu += resForOneRun;
+				if(!Configurator.fullSilent)
+				System.out.println("run:"+numeroRun +" stDev:" + stdDevia + " res for one run:"+resForOneRun +" res simu" + resOfSimu);
+
 			}
 
 			resOfSimu /= nbRun;

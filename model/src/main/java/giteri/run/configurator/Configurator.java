@@ -11,7 +11,7 @@ public final class Configurator {
 
 	public static boolean prepareTheOpti = false;
 
-	public static boolean fullSilent = true; // Aucun affichage, aucun fichier output
+	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
 	public static boolean fullBullshi = false; // Aucun affichage, aucun fichier output
 
 	// TODO
@@ -98,7 +98,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
 	@toOutput ( yes = true )
-	public static int multiplicatorNbAction  = 3000; //  Par combein on multiplie le nombdre de noeud sur la simulation
+	public static int multiplicatorNbAction  = 3000; //  Par combein on multiplie le nombdre de noeud sur la simulation de base 3000
 
 	// endregion
 
@@ -168,7 +168,7 @@ public final class Configurator {
 
 	public static boolean oneAddForOneRmv = false; // ONEforONE Joue tour a tour un ajout d'un retrait
 	public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-d_HH'h'mm'm'ss's'");
-	public static File defaultPathForReadingNetwork = new File("model"+File.separator+"default.txt");
+	public static File defaultPathForReadingNetwork = new File("model"+File.separator+"network.txt");
 	public static Integer baseSleepTimeMulti = 0;
 	private static Integer threadSleepMultiplicateur = baseSleepTimeMulti;
 

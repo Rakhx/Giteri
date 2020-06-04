@@ -181,13 +181,12 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		Configurator.typeOfConfig == Configurator.EnumLauncher.jarC)
 			targetNetProperties = networkFileLoader.getNetworkProperties(true,false);
 
-
 		// CHEAT CODE
 		else // Sinon, les lire depuis le fichier donné en paramètre dans l'interface
 			targetNetProperties = networkFileLoader.getNetworkProperties(true,false);
 
 		if(Configurator.writInfo4OpnMol){
-			// System.out.println("Propriété fichier source " + targetNetProperties.avgClust);
+			 System.out.println("Propriété fichier source " + targetNetProperties.avgClust);
 		}
 
 		if(Configurator.prepareTheOpti){
@@ -824,7 +823,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public void handlerNbNodeChanged(NbNodeChangedEvent e) {
 		// Changement des steps etc
 		nbActionByStep = e.nbNode * 10;
-		nbActionBeforeQuit = 20 * e.nbNode;
+		nbActionBeforeQuit = Configurator.multiplicatorNbAction * e.nbNode;
 		com.generateGraph(Configurator.initialNetworkForFitting);
 	}
 

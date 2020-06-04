@@ -95,7 +95,8 @@ nodes: Number of nodes requested,
 threads: the number of threads for concurrent execution of tasks on the worker node, for instance threads = 4,
 coresByNodes: An alternative to specifying the number of threads. coresByNodes takes the value of the threads: the number of threads for concurrent execution of tasks on the worker node, for instance threads = 4 when not specified, or 1 if none of them is specified.
 
-
+squeue -u $(whoami)
+scancel -u bouadjio
 
 SOUS SBT
 Verification des classes disponibles a appeler
