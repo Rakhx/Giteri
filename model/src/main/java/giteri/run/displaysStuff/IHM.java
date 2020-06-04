@@ -268,7 +268,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 			resetComponentLabelMemeInformation();
 	}
 
-
 	/**
 	 * Lorsqu'une entité fait une action, fonction appelée. Mise à jour des
 	 * indicateurs
@@ -782,7 +781,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		return paneFour;
 	}
 
-//	/**
+	//	/**
 //	 * Génération du selecteur de meme. Regarde les meme disponibles dans le
 //	 * code et les proposes pour l'initialisation dans la simulation.
 //	 *
@@ -807,7 +806,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 //
 //		return allMemeSelector;
 //	}
-
 	private void resetComponentLabelMemeInformation() {
 		memeInfoPanel.removeAll();
 		nodesHavingXoxoMemesLabel.clear();
@@ -840,7 +838,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		memeInfoPanel.add(lastActionRatioLabel);
 
 	}
-
 
 	/** génération du panneau contenant les informations sur les nodes.
 	 *
@@ -879,9 +876,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		memeInfoPanel = panel;
 		return panel;
 	}
-
-
-
 
 	/**
 	 * Génération d'un panneau contenant les informations sur le network.
