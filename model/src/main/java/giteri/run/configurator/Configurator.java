@@ -9,7 +9,12 @@ import java.util.ArrayList;
 
 public final class Configurator {
 
-	public static boolean prepareTheOpti = false;
+
+
+
+
+	public static boolean quickScore = true; // Aucun affichage, aucun fichier output
+
 
 	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
 	public static boolean fullBullshi = false; // Aucun affichage, aucun fichier output
@@ -66,7 +71,7 @@ public final class Configurator {
 	 *
 	 */
 	@toOutput ( yes = true )
-	public static int activationCodeForScore = 190;
+	public static int activationCodeForScore = 188;
 	//190= 2 DDAVG + 4 DDINTER + 8 DDArray + 16 avg clust + 32 nbedge + 128 APL 
 		// 446= 2 DDAVG + 4 DDINTER + 8 DDArray + 16 avg clust + 32 nbedge + 128 APL + 256 third moment
 
@@ -91,7 +96,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static int initialNetworkForFitting = 0; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
 	@toOutput ( yes = true )
-	public static int nbRepetitionbyRun = 1;
+	public static int nbRepetitionbyRun = 20;
 	@toOutput ( yes = true )
 	public static int nbRepetitionForJar = 2;
 
@@ -140,6 +145,7 @@ public final class Configurator {
 	public static boolean checkWhenFullPropagate = false; 	// All action spread? affiche en combien d'action
 	public static int checkFullProRefreshRate = 75; // every X step vérification du full propagate
 
+	public static boolean prepareTheOpti = false; // usage de stopwatch
 	//endregion
 
 	// region affichage de debug

@@ -21,6 +21,7 @@ import giteri.network.networkStuff.WorkerFactory;
 import giteri.tool.objects.ObjectRef;
 
 import giteri.tool.other.StopWatchFactory;
+import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import giteri.tool.other.WriteNRead;
@@ -278,6 +279,13 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		numeroRunAsString = "Run#" + numeroRun;
 		repertoires.add(numeroRunAsString);
 		resultNetwork.put(numeroRun, new Result(explorator.getModelParameterSet()));
+		com.view.resetPlotDensity();
+		// Creation du fichier qui detail les infos sur les memes
+//		if(Configurator.writeNetworkResultOnFitting){
+//			writeNRead.writeSmallFile(repOfTheSearch,Configurator.fileNameMeme,
+//					entiteHandler.memeProperties.getHeaderToWriteMemeDetails(
+//							entiteHandler.getKVMemeTranslate(), numeroRun, numeroRepetition, explorator));
+//		}
 	}
 
 	/**
@@ -290,6 +298,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		resetActionLocal();
 		numeroRepetitionAsString = "Repetition#" + ++numeroRepetition;
 		repertoires.add(numeroRepetitionAsString);
+
 		synchronized(workerFactory.waitingForReset)
 		{
 			com.resetStuff();
@@ -301,22 +310,23 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		com.generateGraph(Configurator.initialNetworkForFitting);
 		explorator.apply();
 
+		// Creation du fichier de detail de meme, HEADER. Avant l'ajout du repertoire de repetition
+		if(Configurator.writeMemeResultOnFitting && numeroRepetition == 1&& !Configurator.jarMode)
+			writeNRead.writeSmallFile(repOfTheSearch, Configurator.fileNameMeme,
+					entiteHandler.memeProperties.getHeaderToWriteMemeDetails( entiteHandler.getKVMemeTranslate(), numeroRun, numeroRepetition, explorator));
+
+		//repertoires.add(numeroRepetitionAsString);
+
 		// Mise à jour des indicateurs de l'interface ( meme disponible a afficher )
 		com.setViewMemeAvailable(memesAvailables);
-
 		entiteHandler.updateMemeAvailableForProperties();
 
 		// & (3) Application de ces paramètres
 		if(Configurator.displayFittingProviderApplied && numeroRepetition == 1 && !Configurator.jarMode) {
 			System.out.println(numeroRunAsString + " applications des parametres: ");
 			System.out.println(explorator.toString());
-
-			// Creation du fichier de detail de meme, HEADER
-			if(Configurator.writeMemeResultOnFitting)
-				writeNRead.writeSmallFile(writeNRead.createAndGetDirFromString(repertoires), Configurator.fileNameMeme,
-						Collections.singletonList(
-						entiteHandler.memeProperties.getStringHeaderMemeDetail(explorator.getModelParameterSet(), true)));
 		}
+
 		if(debug) System.out.println(numeroRunAsString + " at " + numeroRepetitionAsString);
 
 		entiteHandler.resetProba();
@@ -351,10 +361,14 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		networksSameTurn.add(currentNetProperties);
 
 		// TODO [WayPoint]- Score distance entre deux network
-		currentNetworkScore = getNetworksDistanceDumb(Configurator.activationCodeForScore, targetNetProperties, currentNetProperties);
+		currentNetworkScore = getNetworksDistanceDumb(resultNetwork, Configurator.activationCodeForScore, numeroRun,
+				numeroRepetition,targetNetProperties, currentNetProperties);
 
 		// LA FLEMME // TODO [WayPoint]- Prise en compte des noeuds seuls
 		currentNetworkScore += networkConstructor.getNbNodeAlone();
+
+		if(!Configurator.fullSilent)
+			System.out.println("current score this conf:" + currentNetworkScore);
 
 		// Ajout a la classe des resultSet un score et propriété d'un réseau
 		resultNetwork.addScore(numeroRun, currentNetworkScore, currentNetProperties);
@@ -369,11 +383,10 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			resultNetwork.writelastRepDetailCSV(repOfTheSearch,
 					numeroRun, currentNetProperties, explorator);
 
-		if(Configurator.writeMemeResultOnFitting)
+		if(Configurator.writeMemeResultOnFitting) {
 			writeNRead.writeSmallFile(repOfTheSearch, Configurator.fileNameMeme, Arrays.asList(
-			entiteHandler.memeProperties.getStringToWriteMemeDetails(
-				entiteHandler.getEntitesActive(), numeroRun, numeroRepetition, explorator)));
-
+					entiteHandler.memeProperties.getStringToWriteMemeDetails(entiteHandler.getKVMemeTranslate())));
+		}
 	}
 
 	/**
@@ -386,10 +399,17 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		if(Configurator.writeNetworkResultOnFitting)
 			resultNetwork.writeLastRunOnCSV(repOfTheSearch, numeroRun,
 					networksSameTurn, Configurator.activationCodeForScore);
+		if(Configurator.writeNetworkResultOnFitting){
+			writeNRead.writeSmallFile(repOfTheSearch,Configurator.fileNameMeme,
+					entiteHandler.memeProperties.getCloserToWriteMemeDetails(entiteHandler.getKVMemeTranslate()));
+
+		}
+
 
 		// ici, ecrire: La chart de density sur les 4 runs, le fichier de config des runs?
 //		explorator.rememberNetwork(currentNetworkId);
-		com.view.resetPlotDensity();
+
+		// com.view.resetPlotDensity();
 	}
 
 	/**
@@ -581,13 +601,60 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		kvLastActionDone.clear();
 	}
 
+	/** TODO reunir les deux? la flemme
+	 * Methode la plus simple pour calculer la distance entre deux réseaux.
+	 *
+	 * @param activationCode
+	 * @param targetNetworkProperty
+	 */
+	public static double getNetworksDistanceDumb(ResultSet result, int activationCode, int numeroRun, int numeroRepetition,
+												 NetworkProperties targetNetworkProperty,
+												 NetworkProperties currentNetworkProperty) {
+		// variation sur nombre le nombre de temps un lien dur, et sur le
+		// pourcentage d'evap necessité :augmenter le nombre de paramètre regardé.
+		double currentDistance = 0;
+		double totalDistance = 0;
+		double currentValue;
+		NetworkAttribType attribut;
+		int nbAttribActivated = 0;
+
+		// On regarde sur tout les attributs de réseau ceux qui ont été activé
+		// pour le calcul de distance entre deux réseaux
+		for (int i = 0; i < Configurator.NetworkAttribType.values().length; i++) {
+			attribut = NetworkAttribType.values()[i];
+			if(Configurator.isAttribActived(activationCode, attribut))
+			{
+				// Calcul de la distance entre deux network sur ce critère
+				Object attributValueForCurrentNetwork = currentNetworkProperty.getValue(attribut);
+				Object attributValueForTargetNetwork = targetNetworkProperty.getValue(attribut);
+				currentDistance = getAttributDistance(attribut,	attributValueForCurrentNetwork,	attributValueForTargetNetwork);
+				if(attributValueForCurrentNetwork instanceof Double)
+					currentValue = (Double)attributValueForCurrentNetwork;
+				else
+					currentValue= -1; // cas distrib degree
+				result.addDetail(numeroRun, numeroRepetition, attribut, currentValue,currentDistance);
+				if(Configurator.quickScore){
+					System.out.println(attribut + "-t:"+attributValueForTargetNetwork +"; c:"+attributValueForCurrentNetwork
+					+"; s:"+currentDistance);
+
+				}
+
+				totalDistance += currentDistance;
+				nbAttribActivated++;
+			}
+		}
+
+		// Normalise par rapport aux nombres d'éléments pris en compte pour renvoyer un pourcentage
+		return totalDistance / nbAttribActivated;
+	}
 	/**
 	 * Methode la plus simple pour calculer la distance entre deux réseaux.
 	 *
 	 * @param activationCode
 	 * @param targetNetworkProperty
 	 */
-	public static double getNetworksDistanceDumb(int activationCode, NetworkProperties targetNetworkProperty,
+	public static double getNetworksDistanceDumb(int activationCode,
+												 NetworkProperties targetNetworkProperty,
 												 NetworkProperties currentNetworkProperty) {
 		// variation sur nombre le nombre de temps un lien dur, et sur le
 		// pourcentage d'evap necessité :augmenter le nombre de paramètre regardé.
@@ -606,6 +673,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 				Object attributValueForCurrentNetwork = currentNetworkProperty.getValue(attribut);
 				Object attributValueForTargetNetwork = targetNetworkProperty.getValue(attribut);
 				currentDistance = getAttributDistance(attribut,	attributValueForCurrentNetwork,	attributValueForTargetNetwork);
+				//result.addDetail(numeroRun,attribut,currentDistance);
 				totalDistance += currentDistance;
 				nbAttribActivated++;
 			}

@@ -65,6 +65,11 @@ public class ConsoleView implements Interfaces.IView {
     }
 
     @Override
+    public void screenshotMemeUsed() {
+
+    }
+
+    @Override
     public JFreeChart getDDChart() {
         return null;
     }

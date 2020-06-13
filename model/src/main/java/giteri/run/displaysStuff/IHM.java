@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
@@ -167,7 +168,7 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 	// a voir avec les structures de données
 
-	// Correspondance entre un meme et les memes le possédant
+	// Correspondance entre un meme et les noeuds le possédant
 	private Hashtable<String, ArrayList<Integer>> nodesHavingXoxoMemes;
 	// Nombre de fois ou le meme a été appelé
 	private Map<String, Integer> nbActivationByMemes;
@@ -208,6 +209,8 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 
 	private static int rmv = 1;
 	private static int add = 1;
+
+	private File savMemeUsage;
 	//</editor-fold>
 
 	public IHM(ModelController modelParam,
@@ -329,6 +332,27 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 			jlWorkInProgress.setText(message);
 			jlWorkInProgress.setVisible(true);
 		}
+	}
+
+	/** les informations sur les réparittions de meme sont ici, donc on fait lze screen sd'cic
+	 * mais devrait etre fait depuis le moidele
+	 *
+	 */
+
+	public void screenshotMemeUsed() {
+		//poessession instantané de meme sur entité
+//		nodesHavingXoxoMemes
+
+		// appelle depuis le debut de la simulation
+		//nbActivationByMemes
+
+		// 100 dernieres actions réalisé
+//		lastHundredActionDone
+
+//meme info mais rangé par meme
+		// nbActivationByMemes
+
+		// writeNRead.writeSmallFile("", savMemeUsage, )
 	}
 
 	public JFreeChart getDDChart() {
@@ -1217,7 +1241,6 @@ public class IHM extends JFrame implements IActionApplyListener, IBehaviorTransm
 		});
 
 		btScreenshot.addActionListener(e -> modelController.takeScreenshot(Optional.ofNullable(null)));
-
 		btPause.addActionListener(new PauseAction());
 		btStep.addActionListener(new StepAction());
 		//btReset.addActionListener(e-> modelController.comparaisonScreenshot());

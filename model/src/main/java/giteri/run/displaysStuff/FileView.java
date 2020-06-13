@@ -127,6 +127,11 @@ public class FileView implements Interfaces.IView {
     }
 
     @Override
+    public void screenshotMemeUsed() {
+
+    }
+
+    @Override
     public JFreeChart getDDChart() {
         return null;
     }

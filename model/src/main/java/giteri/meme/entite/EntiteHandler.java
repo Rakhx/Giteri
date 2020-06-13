@@ -1091,7 +1091,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(0, notLinked);
 		agregators.put(1, mineSup);
 		agregators.put(2, random);
-		memeFactory.registerMemeAction("Add-",1, true,true, add, attributs,KVAttributAgregator, false);
+		memeFactory.registerMemeAction("Add-",1, false,true, add, attributs,KVAttributAgregator, false);
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, theMost);
@@ -1113,7 +1113,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, notLinked);
 		agregators.put(index++, theLeast);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("Add°!", 1, false, true, add, attributs, KVAttributAgregator,false);
+		memeFactory.registerMemeAction("Add°!", 1, true, true, add, attributs, KVAttributAgregator,false);
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, hopAWay);
@@ -1379,6 +1379,21 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 	public ArrayList<Entite> getEntitesActive() {
 		return entitesActive;
+	}
+
+	/** renvoi une map de k:meme v:nom lisible
+	 *
+	 * @return
+	 */
+	public Map<Meme, String> getKVMemeTranslate(){
+		Map<Meme,String> res = new HashMap<>();
+		synchronized (memeFittingApplied) {
+			for (Meme meme : memeFittingApplied) {
+				res.put(meme, this.translateMemeCombinaisonReadable(meme.toString()));
+			}
+		}
+
+		return res;
 	}
 
 	//endregion

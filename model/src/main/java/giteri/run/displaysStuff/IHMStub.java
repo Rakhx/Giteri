@@ -57,6 +57,11 @@ public class IHMStub implements IView {
 	}
 
 	@Override
+	public void screenshotMemeUsed() {
+
+	}
+
+	@Override
 	public JFreeChart getDDChart() {
 		return null;
 	}
