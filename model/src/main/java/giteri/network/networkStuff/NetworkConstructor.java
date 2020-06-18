@@ -158,7 +158,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		int pourcentageLow = 2;
 		int pourcentageMiddle = 30;
 		double firePropa = .2;
-		int m = 3; // Parametre du nombre de connection pour un scale free
+		int m = 1; // Parametre du nombre de connection pour un scale free
 		int nbEdgeToAddByNode = 0;
 		boolean makeMe = false;
 

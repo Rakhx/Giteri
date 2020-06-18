@@ -19,40 +19,7 @@ openmole -p C:\Users\John\IdeaProjects\Giteri\model\target\scala-2.12\giteri_2.1
 rm -rf C:\Users\John\IdeaProjects\Giteri\Stability C:\Users\John\IdeaProjects\Giteri\model\target
 
 // ----- [Quel complexe action // position dans la liste d'activation et proba de propagation] -----
-;.Add+-0.0
-;.Add--0.1
-;.Add∞-0.2
-;.AddØ-0.3
-;.AddØ-Hop-0.4
-;.AddØ-3Hop-0.5
-;.AddEq-0.6
-;.RmvØ-2hop-0.7
-;.RmvØ-0.8
-;.Rmv+-0.9
-;.Rmv--0.91
-;.RmvEq-0.92
-;.RmvChain-0.93
-
-
-true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true
-0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16
-
-.Add°:0.01
-.Add+:0.02
-.Add-:0.03
-.Add∞:0.04
-.AddØ:0.05
-.AddØ-Hop:0.06 
-.AddØ-3Hop:0.07
-.AddEq:0.08 
-.RmvØ-2hop:0.09
-.RmvØ:0.1 
-.Rmv°:0.11 
-.Rmv+:0.12 
-.Rmv-:0.13  
-.Rmv∞:0.14 
-.RmvEq:0.15   
-.RmvChain:0.16  
+  
 
 
 

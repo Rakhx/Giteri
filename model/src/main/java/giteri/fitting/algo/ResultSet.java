@@ -64,7 +64,6 @@ public class ResultSet extends Hashtable<Integer, Result> {
 				resOfSimu += resForOneRun;
 				if(!Configurator.fullSilent)
 					System.out.println("run:"+numeroRun +" stDev:" + stdDevia + " res for one run:"+resForOneRun +" res simu" + resOfSimu);
-				// detailz = get(numeroRun).getDetailledScore();
 			}
 			resOfSimu /= nbRun;
 			System.out.println(resOfSimu);
@@ -97,7 +96,6 @@ public class ResultSet extends Hashtable<Integer, Result> {
 
 						val.add(valuez.get(attrib));
 						score.add(scorez.get(attrib));
-
 					}
 				}
 
@@ -110,9 +108,10 @@ public class ResultSet extends Hashtable<Integer, Result> {
 
 					System.out.println(networkAttribType +" score "+ Toolz.getNumberCutToPrecision(meanAndSdScore[0],3)+"["+
 							Toolz.getNumberCutToPrecision(meanAndSdScore[1],3)+"] "+ " v " + meanAndSdScore[0] + " sd " + meanAndSdScore[1] );
-
-
 				}
+
+				Double[] meanAndSd = Toolz.getMeanAndSd(get(numeroRun).getScores());
+				System.out.println("Au final score: " + meanAndSd[0] + " [" +meanAndSd[1] +"]" );
 
 				System.out.println("_____________________________________");
 				System.out.println("Configuration " + get(numeroRun).getCurrentConfig());
@@ -131,7 +130,6 @@ public class ResultSet extends Hashtable<Integer, Result> {
 		Result result = get(numeroRun);
 		result.addScore(scoreNetwork);
 		result.addProperties(properties.toString());
-
 	}
 
 	/** Ajoute un score pour le Result correspondant au numero de run courant.

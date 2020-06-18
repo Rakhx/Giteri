@@ -186,10 +186,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		else // Sinon, les lire depuis le fichier donné en paramètre dans l'interface
 			targetNetProperties = networkFileLoader.getNetworkProperties(true,false);
 
-		if(Configurator.writInfo4OpnMol){
-			 System.out.println("Propriété fichier source " + targetNetProperties.avgClust);
-		}
-
 		if(Configurator.prepareTheOpti){
 			boolean dog = (Configurator.typeOfConfig == Configurator.EnumLauncher.jarOpenMole) || (Configurator.typeOfConfig == Configurator.EnumLauncher.jarC);
 			System.out.println("FittingClass.Init() - Fin de lecture du fichier cible " + (dog? "serialise" : "non sériealisé"));
@@ -730,17 +726,20 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			case DENSITY:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = squareDistance(valueOne, valueTwo, 1);
+				distance = Configurator.onlyLinear? linearDistance(valueOne, valueTwo, 1):
+						squareDistance(valueOne, valueTwo, 1);
 				break;
 			case DDAVG:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = squareDistance(valueOne, valueTwo, Configurator.getNbNode() - 1);
+				distance =  Configurator.onlyLinear? linearDistance(valueOne, valueTwo, Configurator.getNbNode() - 1):
+						squareDistance(valueOne, valueTwo, Configurator.getNbNode() - 1);
 				break;
 			case DDINTERQRT:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = squareDistance(valueOne, valueTwo, Configurator.getNbNode() - 1);
+				distance = Configurator.onlyLinear?linearDistance(valueOne, valueTwo, Configurator.getNbNode() - 1):
+						squareDistance(valueOne, valueTwo, Configurator.getNbNode() - 1);
 				break;
 
 			case DDARRAY:
@@ -787,43 +786,31 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 				distance /= nbElem*2;
 				distance *= 100;
 
-//				one = ((int[]) valueFrom).length;
-//				two = ((int[]) valueTarget).length;
-//				one = Integer.max(one,two);
-//				ddOne = Arrays.copyOf((int[]) valueFrom,one);
-//				ddTwo = Arrays.copyOf((int[]) valueTarget,one);
-//				distance = 0;
-//				int nbElem = 0 ;
-//
-//				for (int i = 0; i < ((int[]) valueFrom).length; i++) {
-//					if(ddOne[i] != 0 || ddTwo[i] != 0) {
-//						distance += Math.abs(ddOne[i]- ddTwo[i]);
-//						nbElem++;
-//					}
-//				}
-//				distance /= 2*Configurator.getNbNode();
-//				distance *= 100;
 
 				break;
 			case AVGCLUST:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = linearDistance(valueOne, valueTwo, 1);
+				distance = Configurator.onlyLinear?linearDistance(valueOne, valueTwo, 1):
+						squareDistance(valueOne, valueTwo, 1);
 				break;
 			case NBEDGES:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = squareDistance(valueOne, valueTwo, (Configurator.getNbNode() - 1) * Configurator.getNbNode());
+				distance = Configurator.onlyLinear? linearDistance(valueOne, valueTwo, (Configurator.getNbNode() - 1) * Configurator.getNbNode()):
+						squareDistance(valueOne, valueTwo, (Configurator.getNbNode() - 1) * Configurator.getNbNode());
 				break;
 			case NBNODES:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = squareDistance(valueOne, valueTwo, Configurator.getNbNode()-1);
+				distance =  Configurator.onlyLinear?linearDistance(valueOne, valueTwo, Configurator.getNbNode()-1):
+						squareDistance(valueOne, valueTwo, Configurator.getNbNode()-1);
 				break;
 			case APL:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = squareDistance(valueOne, valueTwo, (double)(Configurator.getNbNode()+1)/3);
+				distance =  Configurator.onlyLinear?linearDistance(valueOne, valueTwo, (double)(Configurator.getNbNode()+1)/3):
+						squareDistance(valueOne, valueTwo, (double)(Configurator.getNbNode()+1)/3);
 				break;
 			case thirdMoment:
 				valueOne = (double) valueFrom;

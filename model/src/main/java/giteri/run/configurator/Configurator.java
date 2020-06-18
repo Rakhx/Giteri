@@ -12,15 +12,16 @@ public final class Configurator {
 
 
 
+	// si true, openmole mode activé
+	private static boolean fastSwitchOpen = true;
 
-	public static boolean quickScore = true; // Aucun affichage, aucun fichier output
+	public static boolean quickScore = !fastSwitchOpen; // Aucun affichage, aucun fichier output
+	public static boolean fullSilent = fastSwitchOpen; // Aucun affichage, aucun fichier output
 
-
-	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
+	public static boolean onlyLinear = true;
+	// plus besoin, passe par fittingOnce TODO a nettoyer
 	public static boolean fullBullshi = false; // Aucun affichage, aucun fichier output
 
-	// TODO
-	public static boolean writInfo4OpnMol = true; // Ecriture dans un fichier d'informaiton pour l'utilisation openmole
 	public static String fittingTxtPath = "fittingInfo";
 
 	// region initializer stuff
@@ -71,7 +72,9 @@ public final class Configurator {
 	 *
 	 */
 	@toOutput ( yes = true )
-	public static int activationCodeForScore = 188;
+	public static int activationCodeForScore = 157;
+	//public static int activationCodeForScore = 17;
+	//157 = 1 density + 4 ddinter + 8 DDarray + 16 avg Clust + 128 APL
 	//190= 2 DDAVG + 4 DDINTER + 8 DDArray + 16 avg clust + 32 nbedge + 128 APL 
 		// 446= 2 DDAVG + 4 DDINTER + 8 DDArray + 16 avg clust + 32 nbedge + 128 APL + 256 third moment
 
@@ -96,7 +99,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static int initialNetworkForFitting = 0; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
 	@toOutput ( yes = true )
-	public static int nbRepetitionbyRun = 20;
+	public static int nbRepetitionbyRun = 10;
 	@toOutput ( yes = true )
 	public static int nbRepetitionForJar = 2;
 
@@ -166,7 +169,7 @@ public final class Configurator {
 	//region ancien boolean, osef, etc
 	// moyen osef
 	public static final boolean lotOfNodes = true;
-	private static int nbNode = lotOfNodes ? 300 : 40;
+	private static int nbNode = lotOfNodes ? 300 : 20;
 	public static int refreshInfoRate = 10;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
 	public static boolean memeCanBeReplaceByCategory = true;
