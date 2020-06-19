@@ -9,66 +9,104 @@ import java.util.ArrayList;
 
 public final class Configurator {
 
-	public static boolean coupleVersion = true;
-	public static boolean fullSilent = false; // Aucun affichage, aucun fichier output
+
+
+
+	// si true, openmole mode activé
+	private static boolean fastSwitchOpen = true;
+
+	public static boolean quickScore = !fastSwitchOpen; // Aucun affichage, aucun fichier output
+	public static boolean fullSilent = fastSwitchOpen; // Aucun affichage, aucun fichier output
+
+	public static boolean onlyLinear = true;
+	// plus besoin, passe par fittingOnce TODO a nettoyer
+	public static boolean fullBullshi = false; // Aucun affichage, aucun fichier output
+
+	public static String fittingTxtPath = "fittingInfo";
 
 	// region initializer stuff
-	// set dans l'initializer
+	// VALEURS DONNEES A TITRE INDICATIF, set définitif dans l'initializer
+	// La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
+	// depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent
+	// cette configuration initiale
 	public static boolean withGraphicalDisplay;// = true;
 	public static boolean jarMode; // = true; // Si vrai, affiche le score resultat de simu
 	public static boolean systemPaused;// = false;
-	public static boolean writeNetworkResultOnFitting; //= !fullSilent; // Screenshot, network.csv...
-	public static boolean writeMemeResultOnFitting; //= writeNetworkResultOnFitting; // NetworkDetails.csv
-	public static EnumLauncher typeOfConfig;
+	public static boolean writeNetworkResultOnFitting ; //= !fullSilent; // Screenshot, network.csv...
+	public static boolean writeMemeResultOnFitting ; //= writeNetworkResultOnFitting; // NetworkDetails.csv
+	public static EnumLauncher typeOfConfig ;
 
 	// endregion
 
 	// region Modèle
 
 	// FONCTIONNEMENT
+	public static boolean manuelNextStep = false; // NO-AUTOSKIP pas de passage au run suivant, il faut appuyer sur next
+	public static boolean autoPauseIfNexted = false; // AUTOPAUSE mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	@toOutput ( yes = true )
 	public static boolean initializeDefaultBehavior = true;	// ----FLUIDITE----
+	public static boolean initializeDefaultBehaviorToBreeder = false;	// ----FLUIDITE BREEDER----
 	@toOutput ( yes = true )
+	public static boolean rebranchementAction = false; // REWIRE Faire l'ajout et le retrait dans le meme temps
 	public static boolean limitlessAction;
-	public static int initialnetworkForBase = 0; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 3- SF 4-SW
 
 	// MEME
 	@toOutput ( yes = true )
 	public static boolean strictEqualityInComparaison = true; // FALSE : >= || TRUE : >
 
 	// PROPAGATION
-	public static boolean coupleSingleTransmission = true; // Transmet le couple à l'entité ayant recu l'action et pas plus
-
+	public static boolean usePropagation = true; // utilisation de la propagation
 	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
+	@toOutput ( yes = true )
+	public static boolean autoMemeForBreeder = false;	// Les breeder ont associé un meme complémement, rmd ajout ou retrait.
+	public static boolean onlyOneToPropagate = true; // Dans le cas ou une action s'applique sur plusieurs entités
+	public static boolean usePropagationSecondGeneration = false; // transmet un des memes du porteur, pas forcement celui applied
+
 	public static boolean useEntitySuccesProba = false; // Prend en compte la proba porté pour l'entité pour APPLY a meme. Actuellement l'index
+	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 
 	// SCORE
+
+	/** 1:density - 2:ddavg - 4:ddInterQuart - 8:ddArray 16:avgClust
+	 * 32: nbEdges 64: nbNodes 128:APL 256:Edges/nodes 512:thirdMoment
+	 *
+	 */
 	@toOutput ( yes = true )
-	public static int activationCodeForScore =
-			17; // Config "is max CC possible?"
+	public static int activationCodeForScore = 157;
+	//public static int activationCodeForScore = 17;
+	//157 = 1 density + 4 ddinter + 8 DDarray + 16 avg Clust + 128 APL
+	//190= 2 DDAVG + 4 DDINTER + 8 DDArray + 16 avg clust + 32 nbedge + 128 APL 
+		// 446= 2 DDAVG + 4 DDINTER + 8 DDArray + 16 avg clust + 32 nbedge + 128 APL + 256 third moment
+
+			//17; // Config "is max CC possible?"
 	// 153;// SCORE POUR SMALLWORLD DENSITY - DDARRAY - DDAVG - APL
-	// 170+512; // 170+512 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
+
+	 // 170+512; // 170+512 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
 	// 16 + 512 Clust + third
 	// 170+512 = THIRD APL EDGES ARRAY DDAVG
-	public static int activationCodeAllAttrib = 255 + 512;
+
+	public static boolean considereNodeAlone = true;
+	public static int activationCodeAllAttrib = 1023;
+	public static int initialnetworkForBase = 0; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 3- SF 4-SW
 
 	// endregion
 
 	// region Fitting
 
 	public static EnumExplorationMethod explorator = EnumExplorationMethod.exhaustive; // Type d'exploration de fitting
+	public static MemeList typeOfMemeUseForFitting = MemeList.FITTING; // Peut etre ONMAP, EXISTING, FITTING
 
 	@toOutput ( yes = true )
 	public static int initialNetworkForFitting = 0; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
 	@toOutput ( yes = true )
-	public static int nbRepetitionbyRun = 1;
+	public static int nbRepetitionbyRun = 10;
 	@toOutput ( yes = true )
 	public static int nbRepetitionForJar = 2;
 
 	@toOutput ( yes = true )
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
 	@toOutput ( yes = true )
-	public static int multiplicatorNbAction  = 500; //  Par combein on multiplie le nombdre de noeud sur la simulation
+	public static int multiplicatorNbAction  = 3000; //  Par combein on multiplie le nombdre de noeud sur la simulation de base 3000
 
 	// endregion
 
@@ -84,7 +122,6 @@ public final class Configurator {
 	public static boolean displayMemePosessionDuringSimulation = true && !fullSilent; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
 	public static boolean writeNbActionPerSec = false; // pas de fichier nbline
 	public static boolean writeFailDensityLink = false; // fichier d'info sur les Fails X density variation
-	public static boolean writeFailMemeApply = false; // fichier d'info sur les Fails X density variation
 
 	public static String repByDefault = "DefaultRep";
 	public static String repForFitting = "Stability";
@@ -92,13 +129,14 @@ public final class Configurator {
 	public static String fileNameCsvDetail = "NetworkDetailsCSV";
 	public static String fileNameMeme = "memeCSV";
 	public static String fileNameSerialisation = "serialization.se";
+	public static String fileNameSerialisationOpen = "../../../../../../../serialization.se";
 
 	public static boolean displayOnIHMDensitySD = true;
 	// endregion
 
 	// region Affichage log
 	public static boolean DisplayLogBehaviorColors = false; // correspondance meme <=> code couleur
-
+	public static boolean displayLogMemeApplication = false; // Chaque application de meme
 	public static boolean displayLogAvgDegreeByMeme = false; // combinaisons de meme et leur degré + derniere application + application from start
 	public static boolean displayLogMemeTransmission = false; // qui recoit quel meme
 
@@ -110,44 +148,46 @@ public final class Configurator {
 	public static boolean checkWhenFullPropagate = false; 	// All action spread? affiche en combien d'action
 	public static int checkFullProRefreshRate = 75; // every X step vérification du full propagate
 
+	public static boolean prepareTheOpti = false; // usage de stopwatch
 	//endregion
 
 	// region affichage de debug
-
-	public static boolean debugJarMode = true;
-
 	public static boolean debugStatAndPlot = false;
+	public static boolean debugFittingClassFast = false;
 	public static boolean debugFittingClass = false;
 	public static boolean debugEntite = false;
 	public static boolean debugEntiteHandler = false;
-	public static boolean debugParameterCouple = false;
 
-	public static boolean overallDebug = !jarMode;
+	public static boolean debugIHM = false;
 	public static boolean debugHopAway = false;
+
+	public static boolean debugJarMode = false;
 	public static boolean timeEfficiency = false;
 
 	// endregion
 
 	//region ancien boolean, osef, etc
 	// moyen osef
-	public static final boolean lotOfNodes = false;
-	private static int nbNode = lotOfNodes ? 500 : 200;
-	public static int refreshInfoRate = 100;
+	public static final boolean lotOfNodes = true;
+	private static int nbNode = lotOfNodes ? 300 : 20;
+	public static int refreshInfoRate = 10;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
+	public static boolean memeCanBeReplaceByCategory = true;
 	public final static int semiAutoWaitingTime = 3000;
 
+	public static boolean oneAddForOneRmv = false; // ONEforONE Joue tour a tour un ajout d'un retrait
 	public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-d_HH'h'mm'm'ss's'");
-	public static File defaultPathForReadingNetwork = new File("model"+File.separator+"default.txt");
+	public static File defaultPathForReadingNetwork = new File("model"+File.separator+"network.txt");
 	public static Integer baseSleepTimeMulti = 0;
 	private static Integer threadSleepMultiplicateur = baseSleepTimeMulti;
-
-	public static boolean manuelNextStep = false; // NO-AUTOSKIP pas de passage au run suivant, il faut appuyer sur next
-	public static boolean autoPauseIfNexted = false; // AUTOPAUSE mise en pause automatique avant un changement de run. Il faut appuyer sur next
 
 	public static int sizeOfCircularForLastActionDone = 100;
 
 	// Construction aléatoire du réseau ou non // systeme en pause au lancement
 	private static Object lockOnPause = new Object();
+
+	// Ancien mecanismes
+	public static boolean useEntitePropagationProba = false;
 
 	//endregion
 
@@ -210,8 +250,7 @@ public final class Configurator {
 		NBEDGES, // 32
 		NBNODES, // 64
 		APL, // 128
-		nbEdgesOnNbNodes, // 256
-		thirdMoment; // 512
+		thirdMoment; // 256
 	}
 
 
@@ -234,19 +273,19 @@ public final class Configurator {
 		THEIRSUP,
 		THEIRSUPSIX,
 		THEIREQUAL,
-		SELFSUP,
-		BLANK
+		SELFSUP
 	}
 
 	/** Ajout lien...
 	 *
 	 */
-	public enum TypeOfUOT {
-		AJOUTLIEN, // ajout d'un lien
-		RETRAITLIEN, // retrait d'un lien
-		BASIC, // ajout ou retrait
-		COUPLE, // couple d'action
-		ANYTHING; // tout confondu
+	public enum ActionType {
+		AJOUTLIEN,
+		RETRAITLIEN,
+		COPIERANDOMMEME,
+		EVAPORATION,
+		REFRESH,
+		ANYTHING;
 	}
 
 
@@ -287,6 +326,8 @@ public final class Configurator {
 	public static ArrayList<String> getConfig(){
 		ArrayList<String> elements = new ArrayList<String>();
 		elements.add("Nombre de noeuds: "+ nbNode);
+		elements.add("Méthode de propagation" + (usePropagationSecondGeneration ?
+				"Transmet l'un des meme portée":"Transmission direct du meme joué"));
 		return elements;
 	}
 
@@ -318,10 +359,8 @@ public final class Configurator {
 				return 7;
 			case APL:
 				return 8;
-			case nbEdgesOnNbNodes:
-				return 9;
 			case thirdMoment:
-				return 10;
+				return 9;
 			default:
 				return -1;
 		}
@@ -388,7 +427,5 @@ public final class Configurator {
 		boolean yes();
 	}
 
-	// Diviseur appliqué a la propagation d'un couple meme ( un couple meme peut se proposer a tout les cibles? )
-	public static double coupleDividerTransmission = nbNode; //
 }
 

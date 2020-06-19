@@ -1,5 +1,6 @@
 package giteri.tool.other;
 
+import giteri.run.configurator.Configurator;
 import giteri.run.interfaces.Interfaces.IReadNetwork;
 
 import java.io.BufferedWriter;
@@ -76,8 +77,9 @@ public class WriteNRead {
 	 */
 	public IReadNetwork readAndCreateNetwork(String aFileName, IReadNetwork networkLoader, String separator ,String comString) throws IOException{
 		Path path = Paths.get(aFileName);
-		//(((WindowsPath) path).getAbsolutePath())
+		if(!Configurator.fullSilent)
 		System.out.println(path.getFileName().toAbsolutePath());
+
 		return pReadAndCreateNetwork(path, networkLoader, separator, comString);
 	}
 

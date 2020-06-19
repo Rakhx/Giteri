@@ -49,6 +49,10 @@ public class ResultSet extends Hashtable<Integer, Result> {
 		double resOfSimu = 0;
 		double stdDevia = 0;
 		int nbRun = 0;
+		Map<Configurator.NetworkAttribType, Double> valuez;
+		Map<Configurator.NetworkAttribType, Double> scorez;
+		Map<Configurator.NetworkAttribType, List<Double>> valuezCalc;
+		Map<Configurator.NetworkAttribType, List<Double>> scorezCalc;
 
 		if (Configurator.jarMode) {
 			for (Integer numeroRun : keySet()) {
@@ -58,17 +62,62 @@ public class ResultSet extends Hashtable<Integer, Result> {
 					resForOneRun *= (1+stdDevia);
 				nbRun++;
 				resOfSimu += resForOneRun;
+				if(!Configurator.fullSilent)
+					System.out.println("run:"+numeroRun +" stDev:" + stdDevia + " res for one run:"+resForOneRun +" res simu" + resOfSimu);
 			}
-
 			resOfSimu /= nbRun;
 			System.out.println(resOfSimu);
-
 		} else {
 			for (Integer numeroRun : keySet()) {
+				Result res = get(numeroRun); //
+				valuezCalc = new HashMap<>();
+				scorezCalc = new HashMap<>();
+
+			// integer: numero repetition
+				for(Integer repetNumber : res.detailledProp.keySet()){
+					// map < attributType, value&score>
+					valuez = res.detailledProp.get(repetNumber);
+					scorez = res.detailledScore.get(repetNumber);
+					// valuezCalc.put(integer, new ArrayList<>());
+
+					for (NetworkAttribType attrib : valuez.keySet()) {
+						List<Double> val;
+						List<Double> score;
+
+						if(!valuezCalc.containsKey(attrib)){
+							val = new ArrayList<>();
+							valuezCalc.put(attrib,val);
+							score = new ArrayList<>();
+							scorezCalc.put(attrib,score);
+						}else{
+							val = valuezCalc.get(attrib);
+							score = scorezCalc.get(attrib);
+						}
+
+						val.add(valuez.get(attrib));
+						score.add(scorez.get(attrib));
+					}
+				}
+
+				// calcul des valeurs de moyenne
+				for (NetworkAttribType networkAttribType : valuezCalc.keySet()) {
+					Double[] meanAndSd = Toolz.getMeanAndSd(valuezCalc.get(networkAttribType));
+					Double[] meanAndSdScore = Toolz.getMeanAndSd(scorezCalc.get(networkAttribType));
+					System.out.println(networkAttribType +" value "+ Toolz.getNumberCutToPrecision(meanAndSd[0],3)+"["+
+							Toolz.getNumberCutToPrecision(meanAndSd[1],3)+"] "+ " v " + meanAndSd[0] + " sd " + meanAndSd[1] );
+
+					System.out.println(networkAttribType +" score "+ Toolz.getNumberCutToPrecision(meanAndSdScore[0],3)+"["+
+							Toolz.getNumberCutToPrecision(meanAndSdScore[1],3)+"] "+ " v " + meanAndSdScore[0] + " sd " + meanAndSdScore[1] );
+				}
+
+				Double[] meanAndSd = Toolz.getMeanAndSd(get(numeroRun).getScores());
+				System.out.println("Au final score: " + meanAndSd[0] + " [" +meanAndSd[1] +"]" );
+
 				System.out.println("_____________________________________");
 				System.out.println("Configuration " + get(numeroRun).getCurrentConfig());
 			}
 		}
+
 		return resOfSimu;
 	}
 
@@ -81,6 +130,16 @@ public class ResultSet extends Hashtable<Integer, Result> {
 		Result result = get(numeroRun);
 		result.addScore(scoreNetwork);
 		result.addProperties(properties.toString());
+	}
+
+	/** Ajoute un score pour le Result correspondant au numero de run courant.
+	 * @param numeroRun le numero de run courant du fitting
+	 * @param scoreNetwork Le score obtenu
+	 * @param properties Propriété du network courant. Densité etc etc
+	 */
+	public void addDetail(int numeroRun, int numeroRep,NetworkAttribType attrib ,double value,double scoreNetwork) {
+		Result result = get(numeroRun);
+		result.addScore(numeroRep,attrib, value ,scoreNetwork);
 	}
 
 	/**

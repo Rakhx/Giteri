@@ -72,7 +72,7 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 		 */
 		@Override
 		public NetworkProperties getNetworkProperties(Optional<NetworkProperties> toModify, String networkName, int activationCode) {
-			int parcouru, index,firstQ, thirdQ;
+			int parcouru, index,firstQ=-1,secondQ=-1, thirdQ=-1;
 			double density = -1, avgDegre = -1 ;
 			double apl = -1;
 			int[] distrib = new int[0];
@@ -104,7 +104,7 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 			// degré moyen sur les nodes
 			if (Configurator.isAttribActived(activationCode, NetworkAttribType.DDAVG)){
 				avgDegre = (double)nbEdges / (nbNodes);
-				netPropResult.setValue(NetworkAttribType.DDAVG,avgDegre);
+				netPropResult.setValue(NetworkAttribType.DDAVG, avgDegre);
 			}
 			// region DD
 			if(	Configurator.isAttribActived(activationCode, NetworkAttribType.DDINTERQRT) ||
@@ -123,59 +123,57 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 					}
 
 					netPropResult.setDd(distrib);
-					// si moment d'ordre 3
-					if (Configurator.isAttribActived(activationCode, NetworkAttribType.thirdMoment)){
-						double sum = .0;
-						double[] ddNSd;
-						Map<Integer, Integer> ddMap  = new Hashtable<>(nbNodes);
 
+					// si moment d'ordre 3
+					if (Configurator.isAttribActived(activationCode, NetworkAttribType.thirdMoment))
+					{
+						double sum = .0; double[] ddNSd;
+						Map<Integer, Integer> ddMap  = new Hashtable<>(nbNodes);
 						for (int i = 0; i < distrib.length; i++) {
 							ddMap.put(i,distrib[i]);
 						}
-
 						ddNSd = Toolz.getAvgNsd(ddMap);
 						// on centre réduit et eleve au cube pour le moment d'ordre 3. ( une fois centré la moyenne = 0 )
 						if(ddNSd[1] != 0)
 							for (int i = 0; i < distrib.length; i++) {
-								sum += Math.pow((ddNSd[0] - distrib[i])/ddNSd[1], 3);
-							}
+								sum += Math.pow((ddNSd[0] - distrib[i])/ddNSd[1], 3); }
 						else
 							sum=0;
-
-						sum /= Math.pow(nbNodes,3);
-						thirdMoment = sum;
+						sum /= nbNodes; thirdMoment = sum;
 						netPropResult.setValue(NetworkAttribType.thirdMoment, thirdMoment);
 					}
 
 					// Si espace interquartile
-					if (Configurator.isAttribActived(activationCode, NetworkAttribType.DDINTERQRT)) {
-						// Ecart inter quartile
-						parcouru = 0;
-						index = -1;
-						double temp = nbNodes * .25f;
-						do {
+					if (Configurator.isAttribActived(activationCode, NetworkAttribType.DDINTERQRT))
+					{
+						double q1,q2,q3;
+						q1 =  nbNodes * .25f;
+						q2 =  nbNodes * .5f;
+						q3 =  nbNodes * .75f;
+						parcouru = 0; index = -1;
+						while (parcouru < Configurator.getNbNode()) {
 							index++;
 							parcouru += distrib[index];
-						} while (parcouru < temp);
 
-						firstQ = index;
+							if(firstQ == -1 && parcouru > q1){
+								firstQ = index;
+							}if(secondQ == -1 && parcouru > q2){
+								secondQ = index;
+							}if(thirdQ == -1 && parcouru > q3){
+								thirdQ = index;
+								break;
+							}
+						}
 
-						// 3er quartile
-						parcouru = 0;
-						index = -1;
-						temp = nbNodes * .75f;
-						do {
-							index++;
-							parcouru += distrib[index];
-						} while (parcouru < temp);
+						double yule = (double)(firstQ+thirdQ-2*secondQ) / (thirdQ-firstQ);
 
-						thirdQ = index;
 						ddInterQrt = thirdQ - firstQ;
 						netPropResult.setValue(NetworkAttribType.DDINTERQRT,ddInterQrt);
 					}
 
 					//si avgClustering
-					if (avgClust) {
+					if (avgClust)
+					{
 						for (Integer nodeCentral : nodesAndConnections.keySet()) {
 							nodeClustering = 0;
 							for (Integer neigthboor : nodesAndConnections.get(nodeCentral)) {
@@ -184,7 +182,6 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 										nodeClustering++;
 								}
 							}
-
 							nodeClustering /= nodesAndConnections.get(nodeCentral).size() * (nodesAndConnections.get(nodeCentral).size() - 1);
 							clustByNode.put(nodeCentral, nodeClustering);
 						}
@@ -193,7 +190,6 @@ public interface IInternalNetReprestn extends INetworkRepresentation{
 						for (Double clust : clustByNode.values())
 							if (!clust.isNaN())
 								networkClustering += clust;
-
 						networkClustering /= clustByNode.values().size();
 						netPropResult.setValue(NetworkAttribType.AVGCLUST, networkClustering);
 					}

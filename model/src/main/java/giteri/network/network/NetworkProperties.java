@@ -108,10 +108,7 @@ public class NetworkProperties implements Cloneable, Serializable {
 					toConcat = ";ddArray" ;
 					toConcat += ";ddArray" ;
 					break;
-				case nbEdgesOnNbNodes:
-					toConcat = ";" + (double)nbEdges / nbNodes;
-					toConcat += ";" + (double)sd.nbEdges / sd.nbNodes;
-					break;
+
 				default:
 					toConcat = ";" + this.getValue(attrib);
 					toConcat += ";" + sd.getValue(attrib);
@@ -151,8 +148,6 @@ public class NetworkProperties implements Cloneable, Serializable {
 				return nbNodes;
 			case APL:
 				return this.APL;
-			case nbEdgesOnNbNodes:
-				return (double)nbEdges / nbNodes;
 			case thirdMoment:
 				return thirdMoment;
 			default:
@@ -189,8 +184,10 @@ public class NetworkProperties implements Cloneable, Serializable {
 				break;
 			case APL:
 				this.APL = (double) value;
+				break;
 			case thirdMoment:
 				this.thirdMoment = (double) value;
+				break;
 			default:
 				break;
 		}
@@ -281,28 +278,28 @@ public class NetworkProperties implements Cloneable, Serializable {
 
 	//region useless.
 
-	/**
-	 *
-	 * @param graph
-	 */
-	public void computeAPL(Graph graph){
-		APSP apsp = new APSP();
-		apsp.init(graph);
-		apsp.setDirected(false);
-		apsp.compute();
-		APSPInfo info = graph.getNode("10").getAttribute(APSPInfo.ATTRIBUTE_NAME);
-		double total = 0;
-		int nbValue = 0;
-		for (int i = 0; i < graph.getNodeCount(); i++) {
-			info =  graph.getNode(""+i).getAttribute(APSPInfo.ATTRIBUTE_NAME);
-			for (String string : info.targets.keySet()) {
-				total += info.targets.get(string).distance;
-				nbValue++;
-			}
-		}
-		this.APL = total / nbValue;
-		System.out.println("Average path: "+ APL);
-	}
+//	/**
+//	 *
+//	 * @param graph
+//	 */
+//	public void computeAPL(Graph graph){
+//		APSP apsp = new APSP();
+//		apsp.init(graph);
+//		apsp.setDirected(false);
+//		apsp.compute();
+//		APSPInfo info = graph.getNode("10").getAttribute(APSPInfo.ATTRIBUTE_NAME);
+//		double total = 0;
+//		int nbValue = 0;
+//		for (int i = 0; i < graph.getNodeCount(); i++) {
+//			info =  graph.getNode(""+i).getAttribute(APSPInfo.ATTRIBUTE_NAME);
+//			for (String string : info.targets.keySet()) {
+//				total += info.targets.get(string).distance;
+//				nbValue++;
+//			}
+//		}
+//		this.APL = total / nbValue;
+//		System.out.println("Average path: "+ APL);
+//	}
 
 	/** Clone.
 	 *
@@ -320,6 +317,7 @@ public class NetworkProperties implements Cloneable, Serializable {
 		result.activator = this.activator;
 		result.dd = new int[this.dd.length];
 		result.APL = this.APL;
+		result.thirdMoment = this.thirdMoment;
 		for (int i = 0; i < dd.length; i++) {
 			result.dd[i] = this.dd[i];
 			result.furDurchschnitt.put(i, (double)dd[i]);

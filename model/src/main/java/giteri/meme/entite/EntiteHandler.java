@@ -23,6 +23,7 @@ import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
 import giteri.tool.math.Toolz;
 import giteri.tool.objects.ObjectRef;
 import giteri.tool.other.StopWatchFactory;
+
 import java.util.*;
 import static giteri.run.configurator.Configurator.*;
 
@@ -85,6 +86,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 *
 	 */
 	public EntiteHandler(NetworkConstructor networkC, MemeFactory memeF, WorkerFactory workF) {
+
 		networkConstruct = networkC;
 		memeFactory = memeF;
 		workerFactory = workF;
@@ -225,7 +227,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 		if(Configurator.displayMemePossessionEvolution && cptModulo % (Configurator.refreshInfoRate * 200) == 0){
 			kvMemeCodeNbEntities.clear();
-			for (IUnitOfTransfer meme : memeProperties.countOfEntitiesHavingMeme.keySet()) {
+			for (Meme meme : memeProperties.countOfEntitiesHavingMeme.keySet()) {
 				kvMemeCodeNbEntities.put(meme, (double)memeProperties.countOfEntitiesHavingMeme.get(meme) / entites.size());
 			}
 
@@ -693,7 +695,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 					toDisplayForRatio.add(oneAction.getActionType().name());
 					toDisplayForRatio.add("AddTried/rmvTried;" + (double) cptActionAddTried / cptActionRmvTried);
 				}
-				//}
 			}
 
 			// Si on veut afficher les X dernieres actions entreprises & action depuis le début
@@ -716,7 +717,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 								networkConstruct.updatePreciseNetworkProperties
 										(Configurator.getIndicateur(NetworkAttribType.DENSITY)).getDensity(), sumFailAction));
 				}
-				//}
 			}
 
 			if(!fullSilent && writeFailMemeApply &&toDisplayForRatio.isEmpty())
@@ -1097,6 +1097,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		AgregatorType theirSupSix = AgregatorType.THEIRSUPSIX;
 		AgregatorType theirEqual = AgregatorType.THEIREQUAL;
 		AgregatorType theMost = AgregatorType.THEMOST;
+		AgregatorType theLeast = AgregatorType.THELEAST;
 		AgregatorType selfSup = AgregatorType.SELFSUP;
 
 		KVAttributAgregator.put(degree, agregators);
@@ -1150,6 +1151,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();index = 0;
 		agregators.put(index++, blank);
 		ajouts.add(memeFactory.registerMemeAction("AddVoid",1, true, true, add,  attributs, KVAttributAgregator, false));
+		agregators.put(0, notLinked);
+		agregators.put(1, theirEqual);
+		agregators.put(2, random);
+		memeFactory.registerMemeAction("AddEq",1, false, true, add,  attributs, KVAttributAgregator, false);
 
 		agregators.clear();index = 0;
 		agregators.put(0, linked);
@@ -1171,6 +1176,29 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		retraits.add(memeFactory.registerMemeAction("Rmv+", 1, false, true, remove, attributs, KVAttributAgregator ,false));
 
 		agregators.clear(); index = 0;
+		agregators.put(index++, theMost);
+		agregators.put(index++, random);
+		memeFactory.registerMemeAction("Rmv∞", 1, false, true, remove, attributs, KVAttributAgregator,false);
+
+		agregators.clear(); index = 0;
+		agregators.put(index++, linked);
+		agregators.put(index++, theMost);
+		agregators.put(index++, random);
+		memeFactory.registerMemeAction("Rmv∞!", 1, false, true, remove, attributs, KVAttributAgregator,false);
+
+		agregators.clear(); index = 0;
+		agregators.put(index++, theLeast);
+		agregators.put(index++, random);
+		memeFactory.registerMemeAction("Rmv°", 1, false, true, remove, attributs, KVAttributAgregator,false);
+
+		agregators.clear(); index = 0;
+		agregators.put(index++, linked);
+		agregators.put(index++, theLeast);
+		agregators.put(index++, random);
+		memeFactory.registerMemeAction("Rmv°!", 1, false, true, remove, attributs, KVAttributAgregator,false);
+
+
+		agregators.clear(); index = 0;
 		agregators.put(index++, linked);
 		agregators.put(index++, triangle);
 		agregators.put(index++, random);
@@ -1185,7 +1213,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, linked);
-		agregators.put(index++, mineEq);
+		agregators.put(index++, theirEqual);
 		agregators.put(index++, random);
 		retraits.add(memeFactory.registerMemeAction("RmvEq",1, true, true, remove,  attributs, KVAttributAgregator, false));
 
@@ -1215,8 +1243,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 //		Integer.toBinaryString()
 		// memeFactory.extractAndAddCoupleMeme(index++,"AddEq","RmvVoid",1);
 
-
-//
 	}
 
 	/**
@@ -1407,6 +1433,21 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		return entitesActive;
 	}
 
+	/** renvoi une map de k:meme v:nom lisible
+	 *
+	 * @return
+	 */
+	public Map<Meme, String> getKVMemeTranslate(){
+		Map<Meme,String> res = new HashMap<>();
+		synchronized (memeFittingApplied) {
+			for (Meme meme : memeFittingApplied) {
+				res.put(meme, this.translateMemeCombinaisonReadable(meme.toString()));
+			}
+		}
+
+		return res;
+	}
+
 	public IUnitOfTransfer<CoupleMeme> getDoubleRandom() {
 		return doubleRandom;
 	}
@@ -1460,6 +1501,23 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 
 		return memes;
+	}
+
+	/** Selection d'une action, en excluant la derniere choisi si il s'agit d'un
+	 * ajout ou d'un retrait, et mis a jour de la dernier action faite.
+	 *
+	 * @param movingOne
+	 * @return
+	 */
+	private Meme actionSelectionControlledVersion(Entite movingOne) {
+		Meme selected = null;
+		selected = movingOne.chooseActionExclusionVersion(lastAction);
+		if (selected != null)
+			if (selected.action.getActionType() == ActionType.RETRAITLIEN
+					|| selected.action.getActionType() == ActionType.AJOUTLIEN)
+				lastAction = selected.action.getActionType();
+
+		return selected;
 	}
 
 	//endregion

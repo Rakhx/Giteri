@@ -5,6 +5,7 @@ import giteri.network.networkStuff.NetworkFileLoader
 import giteri.run.jarVersion.JarVersion
 import giteri.tool.other.WriteNRead
 
+import scala.util.Random
 
 object Run{
 
@@ -36,28 +37,28 @@ object Run{
     val elevenA: Integer = args(24).toInt
     val twelveA: Integer = args(25).toInt
     val thirteenA: Integer = args(26).toInt
-    println( run(network, one, oneA, two, twoA,
-      three, threeA, four, fourA,
-      five, fiveA, six, sixA,
-      seven, sevenA, eight, eightA,
-      nine, nineA, ten, tenA,
-      eleven, elevenA, twelve, twelveA,
-      thirteen, thirteenA))
-  }
+    val seed: Long = Random.nextLong()
 
+//    println( run(network, one, oneA, two, twoA,
+//      three, threeA, four, fourA,
+//      five, fiveA, six, sixA,
+//      seven, sevenA, eight, eightA,
+//      nine, nineA, ten, tenA,
+//      eleven, elevenA, twelve, twelveA,
+//      thirteen, thirteenA,
+//      seed))
+  }
 
   /** Sérialize, après lecture, les propriétés d'un réseau, issu d'un fichier .txt sous forme
    * list des edges séparé par un espace (tabulation? )
-   * Si appeler depuis OpenMole, rep. courant: C:/soft/openMole
+   *
    */
   def serializNetworkTarget(): Unit = {
     val trueReader = new WriteNRead
     val lineReader = new NetworkFileLoader(null, trueReader)
-    print(System.getProperty("user.dir"))
     val reader = trueReader.readAndCreateNetwork("default.txt", lineReader," ","#")
     reader.getNetworkProperties(false, true);
   }
-
 
   def run(network: File, one: Double, oneActi: Integer, two: Double, twoActi: Integer,
           three: Double, threeActi: Integer, four: Double, fourActi: Integer,
@@ -65,13 +66,25 @@ object Run{
           sevn: Double, sevnActi: Integer, hei: Double, heiActi: Integer,
           nine: Double, nineActi: Integer, ten: Double, tenActi:Integer,
           eleven: Double, elevenActi: Integer, twelve: Double, twelveActi: Integer,
-          thirteen: Double, thirteenActi: Integer
-         /* ,seed: Long*/):Double = { //region Param
-
+          thirteen: Double, thirteenActi: Integer, fourteen: Double, fourteenActi: Integer,
+          fiveteen: Double, fiveteenActi: Integer, sixteen: Double, sixteenActi: Integer,
+          seventeen: Double, seventeenActi: Integer,heighteen: Double, heighteenActi: Integer,
+          nineteen: Double, nineteenActi: Integer,twenty: Double, twentyActi: Integer,
+          seed: Long):Double = { //region Param
+    val rand = new java.util.Random(seed)
     JarVersion.run(network,
       oneActi.==(1),twoActi.==(1), threeActi.==(1), fourActi.==(1), fiveActi.==(1), sixActi.==(1), sevnActi.==(1),
       heiActi.==(1), nineActi.==(1),tenActi.==(1), elevenActi.==(1), twelveActi.==(1), thirteenActi.==(1),
-      one, two, three, four, five, six, sevn, hei, nine, ten, eleven, twelve, thirteen)
+      fourteenActi.==(1), fiveteenActi.==(1), sixteenActi.==(1),seventeenActi.==(1),heighteenActi.==(1),
+      nineteenActi.==(1), twentyActi.==(1),
+      one, two, three, four, five, six, sevn, hei, nine, ten, eleven, twelve, thirteen,
+      fourteen, fiveteen, sixteen, seventeen, heighteen, nineteen, twenty)
+  }
 
+  def formula(one:Double, two:Double, three:Double) : Double = {
+//    print(System.getProperty("user.dir"))
+//    print(new java.io.File(".").getCanonicalPath)
+    val four = (one * two) / ( two + three )
+    four
   }
 }

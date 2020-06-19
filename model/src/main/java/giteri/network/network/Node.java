@@ -77,7 +77,10 @@ public class Node {
 	public void setDisplayInfo(String displayInfo) {
 		this.displayInfo = displayInfo;
 	}
-	
+
+	public int getDegree(){
+		return this.getConnectedNodes().size();
+	}
 	//endregion
 
 }	

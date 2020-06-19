@@ -23,6 +23,7 @@ import giteri.network.networkStuff.WorkerFactory;
 import giteri.tool.objects.ObjectRef;
 
 import giteri.tool.other.StopWatchFactory;
+import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import giteri.tool.other.WriteNRead;
@@ -182,13 +183,21 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		if(Configurator.typeOfConfig == Configurator.EnumLauncher.jarOpenMole ||
 		Configurator.typeOfConfig == Configurator.EnumLauncher.jarC)
 			targetNetProperties = networkFileLoader.getNetworkProperties(true,false);
+
 		// CHEAT CODE
 		else // Sinon, les lire depuis le fichier donné en paramètre dans l'interface
 			targetNetProperties = networkFileLoader.getNetworkProperties(true,false);
+
+		if(Configurator.prepareTheOpti){
+			boolean dog = (Configurator.typeOfConfig == Configurator.EnumLauncher.jarOpenMole) || (Configurator.typeOfConfig == Configurator.EnumLauncher.jarC);
+			System.out.println("FittingClass.Init() - Fin de lecture du fichier cible " + (dog? "serialise" : "non sériealisé"));
+			StopWatchFactory.getInstance().publishResult();
+		}
+
 		boolean doTheWrite = !Configurator.fullSilent;
 
 		// ECRITURE
-		repertoires = new ArrayList<>(Arrays.asList("Stability"));
+		repertoires = new ArrayList<>(Arrays.asList(Configurator.repForFitting));
 		DateFormat dateFormat = Configurator.getDateFormat();
 		repertoires.add(dateFormat.format(new Date()));
 		repOfTheSearch = null;
@@ -268,6 +277,13 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		numeroRunAsString = "Run#" + numeroRun;
 		repertoires.add(numeroRunAsString);
 		resultNetwork.put(numeroRun, new Result(explorator.getModelParameterSet()));
+		com.view.resetPlotDensity();
+		// Creation du fichier qui detail les infos sur les memes
+//		if(Configurator.writeNetworkResultOnFitting){
+//			writeNRead.writeSmallFile(repOfTheSearch,Configurator.fileNameMeme,
+//					entiteHandler.memeProperties.getHeaderToWriteMemeDetails(
+//							entiteHandler.getKVMemeTranslate(), numeroRun, numeroRepetition, explorator));
+//		}
 	}
 
 	/**
@@ -280,6 +296,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		resetActionLocal();
 		numeroRepetitionAsString = "Repetition#" + ++numeroRepetition;
 		repertoires.add(numeroRepetitionAsString);
+
 		synchronized(workerFactory.waitingForReset)
 		{
 			com.resetStuff();
@@ -289,25 +306,25 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		Toolz.setSeed(currentSeed);
 
 		com.generateGraph(Configurator.initialNetworkForFitting);
-
 		explorator.apply();
+
+		// Creation du fichier de detail de meme, HEADER. Avant l'ajout du repertoire de repetition
+		if(Configurator.writeMemeResultOnFitting && numeroRepetition == 1&& !Configurator.jarMode)
+			writeNRead.writeSmallFile(repOfTheSearch, Configurator.fileNameMeme,
+					entiteHandler.memeProperties.getHeaderToWriteMemeDetails( entiteHandler.getKVMemeTranslate(), numeroRun, numeroRepetition, explorator));
+
+		//repertoires.add(numeroRepetitionAsString);
 
 		// Mise à jour des indicateurs de l'interface ( meme disponible a afficher )
 		com.setViewMemeAvailable(memesAvailables);
-
 		entiteHandler.updateMemeAvailableForProperties();
 
 		// & (3) Application de ces paramètres
 		if(Configurator.displayFittingProviderApplied && numeroRepetition == 1 && !Configurator.jarMode) {
 			System.out.println(numeroRunAsString + " applications des parametres: ");
 			System.out.println(explorator.toString());
-
-			// Creation du fichier de detail de meme, HEADER
-			if(Configurator.writeMemeResultOnFitting)
-				writeNRead.writeSmallFile(writeNRead.createAndGetDirFromString(repertoires), Configurator.fileNameMeme,
-						Collections.singletonList(
-						entiteHandler.memeProperties.getStringHeaderMemeDetail(explorator.getModelParameterSet(), true)));
 		}
+
 		if(debug) System.out.println(numeroRunAsString + " at " + numeroRepetitionAsString);
 
 		entiteHandler.resetProba();
@@ -342,7 +359,14 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		networksSameTurn.add(currentNetProperties);
 
 		// TODO [WayPoint]- Score distance entre deux network
-		currentNetworkScore = getNetworksDistanceDumb(Configurator.activationCodeForScore, targetNetProperties, currentNetProperties);
+		currentNetworkScore = getNetworksDistanceDumb(resultNetwork, Configurator.activationCodeForScore, numeroRun,
+				numeroRepetition,targetNetProperties, currentNetProperties);
+
+		// LA FLEMME // TODO [WayPoint]- Prise en compte des noeuds seuls
+		currentNetworkScore += networkConstructor.getNbNodeAlone();
+
+		if(!Configurator.fullSilent)
+			System.out.println("current score this conf:" + currentNetworkScore);
 
 		// Ajout a la classe des resultSet un score et propriété d'un réseau
 		resultNetwork.addScore(numeroRun, currentNetworkScore, currentNetProperties);
@@ -357,11 +381,10 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			resultNetwork.writelastRepDetailCSV(repOfTheSearch,
 					numeroRun, currentNetProperties, explorator);
 
-		if(Configurator.writeMemeResultOnFitting)
+		if(Configurator.writeMemeResultOnFitting) {
 			writeNRead.writeSmallFile(repOfTheSearch, Configurator.fileNameMeme, Arrays.asList(
-			entiteHandler.memeProperties.getStringToWriteMemeDetails(
-				entiteHandler.getEntitesActive(), numeroRun, numeroRepetition, explorator)));
-
+					entiteHandler.memeProperties.getStringToWriteMemeDetails(entiteHandler.getKVMemeTranslate())));
+		}
 	}
 
 	/**
@@ -374,10 +397,17 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		if(Configurator.writeNetworkResultOnFitting)
 			resultNetwork.writeLastRunOnCSV(repOfTheSearch, numeroRun,
 					networksSameTurn, Configurator.activationCodeForScore);
+		if(Configurator.writeNetworkResultOnFitting){
+			writeNRead.writeSmallFile(repOfTheSearch,Configurator.fileNameMeme,
+					entiteHandler.memeProperties.getCloserToWriteMemeDetails(entiteHandler.getKVMemeTranslate()));
+
+		}
+
 
 		// ici, ecrire: La chart de density sur les 4 runs, le fichier de config des runs?
 //		explorator.rememberNetwork(currentNetworkId);
-		com.view.resetPlotDensity();
+
+		// com.view.resetPlotDensity();
 	}
 
 	/**
@@ -544,13 +574,60 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		kvLastActionDone.clear();
 	}
 
+	/** TODO reunir les deux? la flemme
+	 * Methode la plus simple pour calculer la distance entre deux réseaux.
+	 *
+	 * @param activationCode
+	 * @param targetNetworkProperty
+	 */
+	public static double getNetworksDistanceDumb(ResultSet result, int activationCode, int numeroRun, int numeroRepetition,
+												 NetworkProperties targetNetworkProperty,
+												 NetworkProperties currentNetworkProperty) {
+		// variation sur nombre le nombre de temps un lien dur, et sur le
+		// pourcentage d'evap necessité :augmenter le nombre de paramètre regardé.
+		double currentDistance = 0;
+		double totalDistance = 0;
+		double currentValue;
+		NetworkAttribType attribut;
+		int nbAttribActivated = 0;
+
+		// On regarde sur tout les attributs de réseau ceux qui ont été activé
+		// pour le calcul de distance entre deux réseaux
+		for (int i = 0; i < Configurator.NetworkAttribType.values().length; i++) {
+			attribut = NetworkAttribType.values()[i];
+			if(Configurator.isAttribActived(activationCode, attribut))
+			{
+				// Calcul de la distance entre deux network sur ce critère
+				Object attributValueForCurrentNetwork = currentNetworkProperty.getValue(attribut);
+				Object attributValueForTargetNetwork = targetNetworkProperty.getValue(attribut);
+				currentDistance = getAttributDistance(attribut,	attributValueForCurrentNetwork,	attributValueForTargetNetwork);
+				if(attributValueForCurrentNetwork instanceof Double)
+					currentValue = (Double)attributValueForCurrentNetwork;
+				else
+					currentValue= -1; // cas distrib degree
+				result.addDetail(numeroRun, numeroRepetition, attribut, currentValue,currentDistance);
+				if(Configurator.quickScore){
+					System.out.println(attribut + "-t:"+attributValueForTargetNetwork +"; c:"+attributValueForCurrentNetwork
+					+"; s:"+currentDistance);
+
+				}
+
+				totalDistance += currentDistance;
+				nbAttribActivated++;
+			}
+		}
+
+		// Normalise par rapport aux nombres d'éléments pris en compte pour renvoyer un pourcentage
+		return totalDistance / nbAttribActivated;
+	}
 	/**
 	 * Methode la plus simple pour calculer la distance entre deux réseaux.
 	 *
 	 * @param activationCode
 	 * @param targetNetworkProperty
 	 */
-	public static double getNetworksDistanceDumb(int activationCode, NetworkProperties targetNetworkProperty,
+	public static double getNetworksDistanceDumb(int activationCode,
+												 NetworkProperties targetNetworkProperty,
 												 NetworkProperties currentNetworkProperty) {
 		// variation sur nombre le nombre de temps un lien dur, et sur le
 		// pourcentage d'evap necessité :augmenter le nombre de paramètre regardé.
@@ -569,6 +646,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 				Object attributValueForCurrentNetwork = currentNetworkProperty.getValue(attribut);
 				Object attributValueForTargetNetwork = targetNetworkProperty.getValue(attribut);
 				currentDistance = getAttributDistance(attribut,	attributValueForCurrentNetwork,	attributValueForTargetNetwork);
+				//result.addDetail(numeroRun,attribut,currentDistance);
 				totalDistance += currentDistance;
 				nbAttribActivated++;
 			}
@@ -610,6 +688,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 	/** retourne une distance entre deux attributs
 	 * Comprise entre 0 et 100
+	 * TODO [CheckPoint] calcul du score propriété par propriété
 	 * @param type
 	 * @param valueFrom
 	 * @param valueTarget
@@ -619,68 +698,102 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		double distance = 0;double valueOne;double valueTwo;
 		int one, two;
 		int[] ddOne, ddTwo;
-		ArrayList<Double> temps = new ArrayList();
 
 		switch (type) {
 			case DENSITY:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, 1);
+				distance = Configurator.onlyLinear? linearDistance(valueOne, valueTwo, 1):
+						squareDistance(valueOne, valueTwo, 1);
 				break;
 			case DDAVG:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, Configurator.getNbNode() - 1);
+				distance =  Configurator.onlyLinear? linearDistance(valueOne, valueTwo, Configurator.getNbNode() - 1):
+						squareDistance(valueOne, valueTwo, Configurator.getNbNode() - 1);
 				break;
 			case DDINTERQRT:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, Configurator.getNbNode() - 1);
+				distance = Configurator.onlyLinear?linearDistance(valueOne, valueTwo, Configurator.getNbNode() - 1):
+						squareDistance(valueOne, valueTwo, Configurator.getNbNode() - 1);
 				break;
+
 			case DDARRAY:
-				one = ((int[]) valueFrom).length;
-				two = ((int[]) valueTarget).length;
-				one = Integer.max(one,two);
-				ddOne = Arrays.copyOf((int[]) valueFrom,one);
-				ddTwo = Arrays.copyOf((int[]) valueTarget,one);
+				one = Integer.max(((int[]) valueFrom).length,((int[]) valueTarget).length);
+				// doubler pour la taille max d'offset que subira l'une des deux
+				ddOne = Arrays.copyOf((int[]) valueFrom,one*2);
+				ddTwo = Arrays.copyOf((int[]) valueTarget,one*2);
+
+				// on recupere la moyenne des arrays
+				int somme1 = 0, deno1 = 0;
+				int somme2 = 0, deno2 = 0;
+				int offset1=0, offset2=0;
+				for (int i = 0; i < one; i++) {
+					somme1 += ddOne[i]*i;
+					somme2 += ddTwo[i]*i;
+					deno1 += ddOne[i];
+					deno2 += ddTwo[i];
+				}
+				somme1 /= deno1;
+				somme2 /= deno2;
+
+				// si 1>2, quand on lit 1[0] on se réfère a 2[0-offset]
+				if(somme1>somme2)
+					offset2 = somme1-somme2;
+				if(somme2>somme1)
+					offset1 = somme2-somme1;
+
+				// on compare deosrmais les dd avec la plus petite qui est decalé de la differente des moyennes vers
+				//la plus grandes
 
 				distance = 0;
-				for (int i = 0; i < ((int[]) valueFrom).length; i++) {
-					distance += distance(ddOne[i], ddTwo[i], Configurator.getNbNode() - 1 );
-					temps.add(distance(ddOne[i], ddTwo[i], Configurator.getNbNode() - 1 ));
+				int nbElem = 0;
+				int value1,value2;
+
+				for (int i = 0; i < one; i++) {
+					value1 = (i-offset1) >=0 ? ddOne[i-offset1]:0;
+					value2 = (i-offset2) >=0 ? ddTwo[i-offset2]:0;
+					// l'un des deux offwset est nul
+					distance += Math.abs(value1-value2);
+					nbElem++;
 				}
 
-				distance /= Configurator.getNbNode();
+				// cas max: deux distirb avec aucun pt en commun
+				distance /= nbElem*2;
+				distance *= 100;
+
+
 				break;
 			case AVGCLUST:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, 1);
+				distance = Configurator.onlyLinear?linearDistance(valueOne, valueTwo, 1):
+						squareDistance(valueOne, valueTwo, 1);
 				break;
 			case NBEDGES:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, (Configurator.getNbNode() - 1) * Configurator.getNbNode());
+				distance = Configurator.onlyLinear? linearDistance(valueOne, valueTwo, (Configurator.getNbNode() - 1) * Configurator.getNbNode()):
+						squareDistance(valueOne, valueTwo, (Configurator.getNbNode() - 1) * Configurator.getNbNode());
 				break;
 			case NBNODES:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, Configurator.getNbNode()-1);
+				distance =  Configurator.onlyLinear?linearDistance(valueOne, valueTwo, Configurator.getNbNode()-1):
+						squareDistance(valueOne, valueTwo, Configurator.getNbNode()-1);
 				break;
 			case APL:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, (double)(Configurator.getNbNode()+1)/3);
-				break;
-			case nbEdgesOnNbNodes:
-				valueOne = (double) valueFrom;
-				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, 1);
+				distance =  Configurator.onlyLinear?linearDistance(valueOne, valueTwo, (double)(Configurator.getNbNode()+1)/3):
+						squareDistance(valueOne, valueTwo, (double)(Configurator.getNbNode()+1)/3);
 				break;
 			case thirdMoment:
 				valueOne = (double) valueFrom;
 				valueTwo = (double) valueTarget;
-				distance = distance(valueOne, valueTwo, 1);
+				distance = squareDistance(valueOne, valueTwo, 3);
+				if(distance>100) distance = 100;
 				break;
 
 			default:
@@ -702,10 +815,21 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	 * @param max
 	 * @return
 	 */
-	private static double distance(double valueOne, double valueTwo, double max){
+	private static double linearDistance(double valueOne, double valueTwo, double max){
 		return (Math.abs(valueOne - valueTwo) * 100) / max;
 	}
 
+	/**
+	 * Donne la distance entre deux éléments ( en pourcentage ), relative au max des ces éléments
+	 * L'importance des premiers écarts sont plus important que les derniers
+	 * @param valueOne
+	 * @param valueTwo
+	 * @param max
+	 * @return
+	 */
+	private static double squareDistance(double valueOne, double valueTwo, double max){
+		return Math.sqrt(linearDistance(valueOne,valueTwo,max)) * Math.sqrt(100);
+	}
 	//endregion
 
 	//region Event et nb action
@@ -731,7 +855,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	public void handlerNbNodeChanged(NbNodeChangedEvent e) {
 		// Changement des steps etc
 		nbActionByStep = e.nbNode * 10;
-		nbActionBeforeQuit = 20 * e.nbNode;
+		nbActionBeforeQuit = Configurator.multiplicatorNbAction * e.nbNode;
 		com.generateGraph(Configurator.initialNetworkForFitting);
 	}
 

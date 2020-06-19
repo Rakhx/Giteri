@@ -202,60 +202,96 @@ public class MemeProperties {
         return header;
     }
 
-    public String getStringToWriteMemeDetails(List<Entite> entitesActive, int numeroRun, int numeroRep, IExplorationMethod explorator){
+
+    /** création du header pour le fichier de detail concernant les memes sur l
+     * la simulation.
+     *  Ligne 1: meme
+     *  ligne 2: possession;nbActi;last nbActi
+     *
+     * @param translation
+     * @param numeroRun
+     * @param numeroRep
+     * @param explorator
+     * @return
+     */
+    public List<String> getHeaderToWriteMemeDetails(Map<Meme, String> translation , int numeroRun, int numeroRep, IExplorationMethod explorator){
+        List<String> lines = new ArrayList<>();
         String toWrite ="";
-        toWrite += numeroRun + "-" + numeroRep;
+        String line2= "";
+        // toWrite += numeroRun + "-" + numeroRep;
+        String memeLisible;
 
         // Config du fitting
-        for (IModelParameter<?> model : explorator.getModelParameterSet())
-            toWrite += ";" + model.valueString();
-
-        // detail sur les memes
-        List<IUnitOfTransfer> combinaisonLookedAt;
-        int nbEntitesOwning;
-        for (Integer i: memeCombinaisonFittingAvailable.keySet()){
-            nbEntitesOwning = 0;
-            combinaisonLookedAt = memeCombinaisonFittingAvailable.get(i);
-            for (Entite entite: entitesActive) {
-                if(entite.getMyUnitOfT().containsAll(combinaisonLookedAt)){
-                    nbEntitesOwning++;
-                }
-            }
-
-            toWrite += ";Meme[";
-            for (IUnitOfTransfer meme:memeCombinaisonFittingAvailable.get(i)) {
-                toWrite += meme.toFourCharString() +":";
-            }
-
-            toWrite += "]-" + nbEntitesOwning;
+//        for (IModelParameter<?> model : explorator.getModelParameterSet())
+//            toWrite += ";" + model.valueString();
+        lines.add(toWrite);
+        toWrite = "";
+        for (Meme meme : translation.keySet()) {
+            toWrite += translation.get(meme);
+            line2 += "#possession;";
+            toWrite += ";";
+            line2 += "nbAppliFromStart;";
+            toWrite += ";";
+            line2 += "nbAppliLast100;";
+            toWrite += ";";
         }
+
+        lines.add(toWrite);
+        lines.add(line2);
+
+        return lines;
+    }
+
+    public String getStringToWriteMemeDetails(Map<Meme, String> translation){
+        String toWrite ="";
+        for (Meme meme : translation.keySet()) {
+            toWrite += countOfEntitiesHavingMeme.get(meme) + ";";
+            toWrite += nbActivationByMemes.get(meme) + ";";
+            toWrite += countOfLastMemeActivation.get(meme) + ";";
+        }
+
+        toWrite = String.valueOf(toWrite.subSequence(0, toWrite.length()-1));
 
         return toWrite;
     }
 
 
-    public void updateDegree(Map<IUnitOfTransfer, Integer> degreeRounded){
+    public List<String> getCloserToWriteMemeDetails(Map<Meme, String> translation){//} , int numeroRun, int numeroRep, IExplorationMethod explorator){
 
+        List<String> retur= new ArrayList<>();
+        String toWrite ="";
+        String line2 ="";
 
+        char a = 'a';
+        String base = "";
+        String colonne;
+        for (Meme meme : translation.keySet()) {
+            for (int i = 0; i < 3; i++) {
+                colonne = base + a;
+                a++;
+                if(a == 'z'){
+                    a = 'a';
+                    base ="a";
+                }
+
+                toWrite += "=AVERAGE("+colonne+"4:INDIRECT(\""+colonne+"\"&(ROW()-1)));";
+                line2 += "=STDEV("+colonne+"4:INDIRECT(\""+colonne+"\"&(ROW()-2)));";
+            }
+
+        }
+
+        toWrite = String.valueOf(toWrite.subSequence(0, toWrite.length()-1));
+        line2 = String.valueOf(line2.subSequence(0, line2.length()-1));
+
+        retur.add(toWrite);
+        retur.add(line2);
+        return retur;
     }
-
-
-    public Map<IUnitOfTransfer, Integer> getMeanDegreeByUOT(){
-        Map<IUnitOfTransfer, Integer> couille = new HashMap<>();
-
-
-        return couille;
-    }
-
 
     // endregion
 
     Map<IUnitOfTransfer, Integer> getNbActivationByMemes() {
         return nbActivationByMemes;
     }
-
-
-
-
 
 }

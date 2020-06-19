@@ -432,14 +432,14 @@ public class Toolz {
 		double avg = 0, sd = 0, sum = 0, nbElement = 0;
 		T test;
 		for (Map.Entry<T, Integer> entry: input.entrySet()){
-			sum = Double.parseDouble(""+entry.getKey()) * entry.getValue();
+			sum += Double.parseDouble(""+entry.getKey()) * entry.getValue();
 			nbElement += entry.getValue();
 		}
 
 		avg = sum / nbElement;
 		sum = 0;
 		for (Map.Entry<T, Integer> entry: input.entrySet()){
-			sum = Math.pow(Double.parseDouble(""+entry.getKey())- avg, 2) * entry.getValue();
+			sum += Math.pow(Double.parseDouble(""+entry.getKey())- avg, 2) * entry.getValue();
 		}
 
 		sd = Math.sqrt(sum);

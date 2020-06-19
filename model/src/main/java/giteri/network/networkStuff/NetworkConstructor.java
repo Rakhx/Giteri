@@ -158,7 +158,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		int pourcentageLow = 2;
 		int pourcentageMiddle = 30;
 		double firePropa = .2;
-		int m = 2; // Parametre du nombre de connection pour un scale free
+		int m = 1; // Parametre du nombre de connection pour un scale free
 		int nbEdgeToAddByNode = 0;
 		boolean makeMe = false;
 
@@ -198,7 +198,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 			}
 		}
 		else if(activator == 4){ // SMALL WORLD
-			double probaRelink = .01;//.1;
+			double probaRelink = .001;//.1;
 			int newTarget;
 			int nbNodeLattice = 7;
 
@@ -437,6 +437,11 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 	 */
 	public NetworkProperties getNetworkProperties(){
 		return this.networkInstanceProperties;
+	}
+
+	// La flemme
+	public int getNbNodeAlone(){
+		return (int)this.networkInstance.getNodes().stream().filter(e -> e.getDegree() == 0).count();
 	}
 
 	/**

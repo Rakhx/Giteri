@@ -1,6 +1,5 @@
 package giteri.run.jarVersion;
 
-import giteri.run.configurator.ClassicOpenMoleParameter;
 import giteri.run.configurator.Initializer;
 import giteri.run.configurator.Configurator;
 
@@ -76,19 +75,8 @@ public class JarVersion {
 		return Initializer.initialize(launcher, comp);
 	}
 
-	/** depuis le main@JarVersion. ( main au dessus )
-	 *
-	 * @param fileInput
-	 * @param activation
-	 * @param proba
-	 * @return
-	 */
 	public static Double run(File fileInput, List<Boolean> activation, List<Double> proba){
-		ClassicOpenMoleParameter comp = new ClassicOpenMoleParameter();
-		comp.memeActication = activation;
-		comp.memeProba = proba;
-		return Initializer.initialize(launcher, comp);
+		return Initializer.initialize(launcher, fileInput, activation , proba);
 	}
-
 
 }

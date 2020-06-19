@@ -1,0 +1,78 @@
+// ----- [Rep. openMole et model sbt] -----
+cd C:\Users\John\IdeaProjects\Giteri\model
+cd c:\soft\Openmole
+
+// ----- [A lancer depuis le folder model pour compiler] -----
+sbt osgiBundle
+// => $ [info] Packaging C:\Users\John\IdeaProjects\Giteri\model\target\scala-2.12\giteri_2.12-1.0-SNAPSHOT.jar ...
+
+// ----- [exemple de param pour lancer les trucs] -----
+".\.\src\main\resources\default.txt" 1 1 1 1 1 1 1 1 1 .0 .1 .2 .3 .4 .5 .6 .7 .8
+ java -cp giteri_2.12-1.0-SNAPSHOT.jar giteri.run.jarVersion.JarVersion ".\.\src\main\resources\default.txt" 1 1 1 1 1 1 1 1 1 .0 .1 .2 .3 .4 .5 .6 .7 .8
+ java -cp giteri_2.12-1.0-SNAPSHOT.jar giteri.run.jarVersion.JarVersion "../../default.txt" 1 1 1 1 1 1 1 1 1 .0 .1 .2 .3 .4 .5 .6 .7 .8
+ 
+// ----- [Lancement d'open avec le jar en plugin] -----
+openmole -p C:\Users\John\IdeaProjects\Giteri\model\target\scala-2.12\giteri_2.12-1.0-SNAPSHOT.jar
+
+
+// ----- [Clean du jar et des résultats écrits depuis le jar] -----
+rm -rf C:\Users\John\IdeaProjects\Giteri\Stability C:\Users\John\IdeaProjects\Giteri\model\target
+
+// ----- [Quel complexe action // position dans la liste d'activation et proba de propagation] -----
+  
+
+
+
+
+// ----- [Example d'appel pour lanchement cmdline] -----
+".\default.txt" 0 0 0 1 1 1 0 0 0 0 1 0 0 .0 .1 .2 .15 1 1 .6 .7 .8 .9 .91 .92 .93
+
+"model/default.txt" 1 0 1 1 0 0 1 1 0 1 0 1 0 0.6243914647012152 0.43335913567288065 0.43133148963256873 0.28554328666680345 0.3684688043879141 0.2858391149048476 0.4017778864043732 1.0 0.6298269460366629 0.5670929715380624 0.23197565577258714 0.2963476445399518 0.17390335560570958
+
+// ----- [Example pour Scala] -----
+
+run-main giteri.Run default.txt .0 .1 .2 .15 1 1 .6 .7 .8 .9 .91 .92 .93 0 0 0 1 1 1 0 0 0 0 1 0 0
+".\default.txt", 1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2,  1, 0.2, ,2000
+
+".\default.txt" 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.1 0.11 0.12 0.13 0.14 0.15 0.16 0.17 0.18 0.19 0.2 
+
+
+
+Il n'est pas obligatoire de spécifier la mémoire nécessaire par CPU dans le batch.
+Par défaut, chaque Job dispose automatiquement d'une allocation RAM qui est
+variable suivant la partition utilisée
+
+
+
+OSIRIM
+val envDistant =
+  SLURMEnvironment(
+    "bouadjio",
+    "osirim-slurm.irit.fr",
+    // optional parameters
+    workDirectory = "/users/smac/bouadjio",
+	threads = 4,
+	queue = "24CPUNodes"
+)
+
+
+queue: the name of the queue on which jobs will be submitted, for instance queue = "longjobs",
+memory: the memory for the job, for instance memory = 2 gigabytes,
+nodes: Number of nodes requested,
+threads: the number of threads for concurrent execution of tasks on the worker node, for instance threads = 4,
+coresByNodes: An alternative to specifying the number of threads. coresByNodes takes the value of the threads: the number of threads for concurrent execution of tasks on the worker node, for instance threads = 4 when not specified, or 1 if none of them is specified.
+
+squeue -u $(whoami)
+scancel -u bouadjio
+
+SOUS SBT
+Verification des classes disponibles a appeler
+ show compile:discoveredMainClasses
+
+Repertoire pour le fichier de réseau d'openmole, a sérialiser avant pour couple version et 
+
+		// 446= 2 DDAVG + 4 DDINTER + 8 DDArray + 16 avg clust + 32 nbedge + 128 APL + 256 third moment
+
+
+
+

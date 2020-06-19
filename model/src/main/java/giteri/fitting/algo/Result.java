@@ -1,8 +1,9 @@
 package giteri.fitting.algo;
 
 import giteri.fitting.parameters.IModelParameter;
+import giteri.run.configurator.Configurator;
 import giteri.tool.math.Toolz;
-
+import giteri.run.configurator.Configurator.NetworkAttribType;
 import java.util.*;
 
 /** Classe contenant les résultats d'une configuration particulière -
@@ -21,6 +22,10 @@ public class Result {
     // Liste de properties as string pour les config
     List<String> propertiesAsString;
 
+    // <k:repetition v:<k:attrib,v:value>>
+    Map<Integer, Map<Configurator.NetworkAttribType, Double>> detailledScore;
+    Map<Integer,Map<Configurator.NetworkAttribType, Double>> detailledProp;
+
     /** Constructeur sans paramètre.
      *
      */
@@ -28,6 +33,8 @@ public class Result {
         kvProviderValues = new Hashtable<>();
         score = new ArrayList<>();
         propertiesAsString = new ArrayList<>();
+        detailledScore = new HashMap<>();
+        detailledProp = new HashMap<>();
     }
 
     /** Constructeur qui prend en param les providers contenant la configuration courante
@@ -49,6 +56,25 @@ public class Result {
      */
     public void addScore(double score){
         this.score.add(score);
+    }
+
+    /** Ajout du score a la fin d'un run pour la config
+     *
+     * @param score double
+     */
+    public void addScore(int repetition, Configurator.NetworkAttribType attrib, double value, double score){
+        Map<NetworkAttribType, Double> kvValeurs;
+        Map<NetworkAttribType, Double> kvScores;
+        if(detailledScore.containsKey(repetition)){
+            kvValeurs = detailledProp.get(repetition);
+            kvScores = detailledScore.get(repetition);
+        }else {
+            kvValeurs = new HashMap<>();
+            kvScores = new HashMap<>();
+        }
+        detailledProp.put(repetition, kvValeurs);
+        detailledScore.put(repetition, kvScores);
+        kvScores.put(attrib,score);kvValeurs.put(attrib,value);
     }
 
     /** ajout du toString sur le networkProperties. Seul l'ordre d'ajout
