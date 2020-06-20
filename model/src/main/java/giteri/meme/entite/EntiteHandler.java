@@ -1061,6 +1061,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		AgregatorType notLinked = AgregatorType.NOTLINKED;
 		AgregatorType mineInf = AgregatorType.MINEINF;
 		AgregatorType mineSup = AgregatorType.MINESUP;
+		AgregatorType mineEq = AgregatorType.MINEEQUAL;
 		AgregatorType random = AgregatorType.RANDOM;
 		AgregatorType hopAWay = AgregatorType.HOPAWAY;
 		AgregatorType hopAWay3 = AgregatorType.HOPAWAY3;
@@ -1129,7 +1130,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		agregators.clear();index = 0;
 		agregators.put(0, notLinked);
-		agregators.put(1, theirEqual);
+		agregators.put(1, mineEq);
 		agregators.put(2, random);
 		memeFactory.registerMemeAction("AddEq",1, false, true, add,  attributs, KVAttributAgregator, false);
 
