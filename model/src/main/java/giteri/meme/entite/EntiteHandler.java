@@ -1109,7 +1109,18 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		// agregators.put(index++, notLinked);
 		agregators.put(index++, theMost);
 		agregators.put(index++, random);
-		ajouts.add(memeFactory.registerMemeAction("Add∞", 1, false, true, add, attributs, KVAttributAgregator,false));
+		ajouts.add(memeFactory.registerMemeAction("Add∞!", 1, false, true, add, attributs, KVAttributAgregator,false));
+
+		agregators.clear(); index = 0;
+		agregators.put(index++, theLeast);
+		agregators.put(index++, random);
+		ajouts.add(memeFactory.registerMemeAction("Add°", 1, false, true, add, attributs, KVAttributAgregator,false));
+
+		agregators.clear(); index = 0;
+		agregators.put(index++, notLinked);
+		agregators.put(index++, theLeast);
+		agregators.put(index++, random);
+		ajouts.add(memeFactory.registerMemeAction("Add°!", 1, true, true, add, attributs, KVAttributAgregator,false));
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, hopAWay);
@@ -1185,7 +1196,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, linked);
 		agregators.put(index++, theirSup);
 		agregators.put(index++, random);
-		retraits.add(memeFactory.registerMemeAction("Rmv2",1, false, false, remove,  attributs, KVAttributAgregator, false));
+		retraits.add(memeFactory.registerMemeAction("RmvChain",1, false, false, remove,  attributs, KVAttributAgregator, false));
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, linked);
@@ -1201,15 +1212,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		index = 0;
 
 		// Creation des couples d'actions
-
-		// Creation depuis les params qui ont été donné dans l'initializer
-
-			this.doubleRandom = memeFactory.extractAndDoNotRegister("AddØ", "RmvØ", 0);
-			memeFactory.extractAndAddCoupleMeme( "AddEq", "Rmv-", .4, false);
-			//memeFactory.extractAndAddCoupleMeme( "AddØ-Hop", "Rmv-", .8, false);
-			memeFactory.extractAndAddCoupleMeme( "Add∞", "RmvEq", 1., false);
-
-
+		this.doubleRandom = memeFactory.extractAndDoNotRegister("AddØ", "RmvØ", 0);
+		memeFactory.extractAndAddCoupleMeme( "AddEq", "Rmv-", .4, false);
+		//memeFactory.extractAndAddCoupleMeme( "AddØ-Hop", "Rmv-", .8, false);
+		memeFactory.extractAndAddCoupleMeme( "Add∞", "RmvEq", 1., false);
 	}
 
 	/**
