@@ -107,7 +107,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	public void initialisation(){
 		generateMemeAvailableForMap();
 		bindNodeWithEntite(networkConstruct.getNetwork());
-
 	}
 
 	/**
@@ -123,15 +122,12 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			Toolz.addElementInHashArray(iOTByCategory,meme.getActionType(),meme);
 
 		// Quand version classique, on crée les couples disponibles sur la map
-		if(!coupleVersion)
-			memeProperties.memeCombinaisonFittingAvailable =
-				this.getMemeAvailable(FittingBehavior.simpleAndComplex, Optional.of(iOTByCategory));
-		else{
+
 			memeProperties.memeCombinaisonFittingAvailable = new HashMap<>();
 			int i = 0;
 			for (IUnitOfTransfer iUnitOfTransfer : this.memeFittingApplied) {
 				memeProperties.memeCombinaisonFittingAvailable.put(i++, new ArrayList<IUnitOfTransfer>(Arrays.asList(iUnitOfTransfer)));
-			}
+
 		}
 
 	}
@@ -192,13 +188,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		// Indicateur meme repartition, etc.
 		if(Configurator.displayMemePosessionDuringSimulation && (cptModulo % (Configurator.refreshInfoRate * 25) == 0) ) {
 			// affichage sur l'IHM de la distribution des memes
-			if(!coupleVersion)
-			vueController.displayMemeUsage(cptModulo,
-					memeProperties.getNbActivationByMemes(),
-					memeProperties.countOfLastMemeActivation,
-					memeProperties.lastHundredActionDone);
-			// Cas ou on s'interesse au degrée moyen des possesseurs des couples
-			else {
+
 				Map<IUnitOfTransfer, Integer> means = memeProperties.degreeMeanOfIOT;
 				Map<IUnitOfTransfer, Integer> nbParti = new Hashtable<>();
 				means.clear();
@@ -223,11 +213,11 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 						memeProperties.getNbActivationByMemes(),
 						means,
 						memeProperties.lastHundredActionDone);
-			}
+
 		}
 		if(Configurator.displayMemePossessionEvolution && cptModulo % (Configurator.refreshInfoRate * 200) == 0){
 			kvMemeCodeNbEntities.clear();
-			for (Meme meme : memeProperties.countOfEntitiesHavingMeme.keySet()) {
+			for (IUnitOfTransfer meme : memeProperties.countOfEntitiesHavingMeme.keySet()) {
 				kvMemeCodeNbEntities.put(meme, (double)memeProperties.countOfEntitiesHavingMeme.get(meme) / entites.size());
 			}
 
@@ -790,17 +780,14 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 					// hum. TODO [CV] réfléchir ici
 
 					// Si on reste sur l'ancienne facon de faire par une unque transmission direct
-					if(coupleVersion && !coupleSingleTransmission){
+					if( !coupleSingleTransmission){
 						cibles = entites;
 					}
 
 					// TODO[CV] - ici a eu lieu un chg
 					// Si couple version, que l'action jouée soit un ajout ou un retrait, c'est tout le couple qui est transmis
-					if(coupleVersion)
 						propagation(cibles, movingOne, movingOne.getMyUnitOfT().get(0));
-					// Sinon c'est l'action en question
-					else
-						propagation(cibles, movingOne, memeAction);
+
 
 
 					// endregion
@@ -893,10 +880,9 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	private double probaPropaDegree(Entite acting, Entite cible, double proba){
 
-		if(coupleVersion) {
 
 			proba /=  (1 + Math.abs(acting.getDegree() - cible.getDegree()));
-		}
+
 
 		return proba;
 	}
@@ -965,12 +951,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	private void giveFluideMeme(ArrayList<Entite> entitesToBeApplied){
 		for (Entite entite : entitesToBeApplied) {
-		if(!coupleVersion) {
-			if (addRandom != null)
-				eventMemeChanged(entite, entite.addUOT(addRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
-			if (removeRandom != null)
-				eventMemeChanged(entite, entite.addUOT(removeRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
-		}else{
+
 			entite.addUOT(getDoubleRandom());
 			for (Meme meme : getDoubleRandom()) {
 				if(meme.getActionType() == TypeOfUOT.AJOUTLIEN)
@@ -981,7 +962,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			}
 
 
-			}
+
 		}
 	}
 
@@ -1119,9 +1100,9 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		ajouts.add(memeFactory.registerMemeAction("Add+", 1, true,true, add, attributs,KVAttributAgregator, false));
 
 		agregators.clear();index = 0;
-		agregators.put(0, notLinked);
-		agregators.put(1, mineSup);
-		agregators.put(2, random);
+		agregators.put(index++, notLinked);
+		agregators.put(index++, mineSup);
+		agregators.put(index++, random);
 		ajouts.add(memeFactory.registerMemeAction("Add-",1, true,true, add, attributs,KVAttributAgregator, false));
 
 		agregators.clear(); index = 0;
@@ -1151,52 +1132,47 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();index = 0;
 		agregators.put(index++, blank);
 		ajouts.add(memeFactory.registerMemeAction("AddVoid",1, true, true, add,  attributs, KVAttributAgregator, false));
-		agregators.put(0, notLinked);
-		agregators.put(1, theirEqual);
-		agregators.put(2, random);
-		memeFactory.registerMemeAction("AddEq",1, false, true, add,  attributs, KVAttributAgregator, false);
 
 		agregators.clear();index = 0;
-		agregators.put(0, linked);
-		agregators.put(1, random);
+		agregators.put(index++, linked);
+		agregators.put(index++, random);
 		retraits.add(memeFactory.registerMemeAction("RmvØ",.7, false, false, remove,  attributs, KVAttributAgregator, false));
-		agregators.put(2, random);
+		agregators.put(index++, random);
 		removeRandom = memeFactory.registerMemeAction("RmvØ-neutral",0, false, false, remove,  attributs, KVAttributAgregator, true);
 
 		agregators.clear();index = 0;
-		agregators.put(0, linked);
-		agregators.put(1, mineSup);
-		agregators.put(2, random);
+		agregators.put(index++, linked);
+		agregators.put(index++, mineSup);
+		agregators.put(index++, random);
 		retraits.add(memeFactory.registerMemeAction("Rmv-", 1, false, true, remove, attributs, KVAttributAgregator ,false));
 
 		agregators.clear();index = 0;
-		agregators.put(0, linked);
-		agregators.put(1, mineInf);
-		agregators.put(2, random);
+		agregators.put(index++, linked);
+		agregators.put(index++, mineInf);
+		agregators.put(index++, random);
 		retraits.add(memeFactory.registerMemeAction("Rmv+", 1, false, true, remove, attributs, KVAttributAgregator ,false));
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, theMost);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("Rmv∞", 1, false, true, remove, attributs, KVAttributAgregator,false);
+		retraits.add(memeFactory.registerMemeAction("Rmv∞", 1, false, true, remove, attributs, KVAttributAgregator,false));
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, linked);
 		agregators.put(index++, theMost);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("Rmv∞!", 1, false, true, remove, attributs, KVAttributAgregator,false);
+		retraits.add(memeFactory.registerMemeAction("Rmv∞!", 1, false, true, remove, attributs, KVAttributAgregator,false));
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, theLeast);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("Rmv°", 1, false, true, remove, attributs, KVAttributAgregator,false);
+		retraits.add(memeFactory.registerMemeAction("Rmv°", 1, false, true, remove, attributs, KVAttributAgregator,false));
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, linked);
 		agregators.put(index++, theLeast);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("Rmv°!", 1, false, true, remove, attributs, KVAttributAgregator,false);
-
+		retraits.add(memeFactory.registerMemeAction("Rmv°!", 1, false, true, remove, attributs, KVAttributAgregator,false));
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, linked);
@@ -1227,21 +1203,12 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		// Creation des couples d'actions
 
 		// Creation depuis les params qui ont été donné dans l'initializer
-		if(coupleVersion){
+
 			this.doubleRandom = memeFactory.extractAndDoNotRegister("AddØ", "RmvØ", 0);
 			memeFactory.extractAndAddCoupleMeme( "AddEq", "Rmv-", .4, false);
 			//memeFactory.extractAndAddCoupleMeme( "AddØ-Hop", "Rmv-", .8, false);
 			memeFactory.extractAndAddCoupleMeme( "Add∞", "RmvEq", 1., false);
-		}
-		else {
-			// Action fluidité.
-			this.doubleRandom = memeFactory.extractAndAddCoupleMeme( "AddØ", "RmvØ", 0, false);
-			memeFactory.extractAndAddCoupleMeme( "AddEq", "Rmv-", .1, false);
-			memeFactory.extractAndAddCoupleMeme( "AddØ-Hop", "Rmv-", .8, false);
-			memeFactory.extractAndAddCoupleMeme( "Add∞", "Rmv-", .3, false);
-		}
-//		Integer.toBinaryString()
-		// memeFactory.extractAndAddCoupleMeme(index++,"AddEq","RmvVoid",1);
+
 
 	}
 
@@ -1440,9 +1407,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	public Map<Meme, String> getKVMemeTranslate(){
 		Map<Meme,String> res = new HashMap<>();
 		synchronized (memeFittingApplied) {
-			for (Meme meme : memeFittingApplied) {
-				res.put(meme, this.translateMemeCombinaisonReadable(meme.toString()));
-			}
+			//TODO
+//			for (Meme meme : memeFittingApplied) {
+//				res.put(meme, this.translateMemeCombinaisonReadable(meme.toString()));
+//			}
 		}
 
 		return res;
@@ -1503,22 +1471,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		return memes;
 	}
 
-	/** Selection d'une action, en excluant la derniere choisi si il s'agit d'un
-	 * ajout ou d'un retrait, et mis a jour de la dernier action faite.
-	 *
-	 * @param movingOne
-	 * @return
-	 */
-	private Meme actionSelectionControlledVersion(Entite movingOne) {
-		Meme selected = null;
-		selected = movingOne.chooseActionExclusionVersion(lastAction);
-		if (selected != null)
-			if (selected.action.getActionType() == ActionType.RETRAITLIEN
-					|| selected.action.getActionType() == ActionType.AJOUTLIEN)
-				lastAction = selected.action.getActionType();
-
-		return selected;
-	}
 
 	//endregion
 }

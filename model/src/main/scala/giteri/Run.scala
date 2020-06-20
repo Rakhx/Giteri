@@ -72,13 +72,14 @@ object Run{
           nineteen: Double, nineteenActi: Integer,twenty: Double, twentyActi: Integer,
           seed: Long):Double = { //region Param
     val rand = new java.util.Random(seed)
-    JarVersion.run(network,
-      oneActi.==(1),twoActi.==(1), threeActi.==(1), fourActi.==(1), fiveActi.==(1), sixActi.==(1), sevnActi.==(1),
-      heiActi.==(1), nineActi.==(1),tenActi.==(1), elevenActi.==(1), twelveActi.==(1), thirteenActi.==(1),
-      fourteenActi.==(1), fiveteenActi.==(1), sixteenActi.==(1),seventeenActi.==(1),heighteenActi.==(1),
-      nineteenActi.==(1), twentyActi.==(1),
-      one, two, three, four, five, six, sevn, hei, nine, ten, eleven, twelve, thirteen,
-      fourteen, fiveteen, sixteen, seventeen, heighteen, nineteen, twenty)
+//    JarVersion.run(network,
+//      oneActi.==(1),twoActi.==(1), threeActi.==(1), fourActi.==(1), fiveActi.==(1), sixActi.==(1), sevnActi.==(1),
+//      heiActi.==(1), nineActi.==(1),tenActi.==(1), elevenActi.==(1), twelveActi.==(1), thirteenActi.==(1),
+//      fourteenActi.==(1), fiveteenActi.==(1), sixteenActi.==(1),seventeenActi.==(1),heighteenActi.==(1),
+//      nineteenActi.==(1), twentyActi.==(1),
+//      one, two, three, four, five, six, sevn, hei, nine, ten, eleven, twelve, thirteen,
+//      fourteen, fiveteen, sixteen, seventeen, heighteen, nineteen, twenty)
+    5.6
   }
 
   def formula(one:Double, two:Double, three:Double) : Double = {

@@ -144,14 +144,12 @@ public class Initializer {
             fenetre.setVisible(true);
             entiteHandler.setVueController(vControl);
 
-            entiteHandler.giveMemeToEntiteFitting(memeFactory.getMemeAvailable(Configurator.ActionType.ANYTHING,false, true));
-
-
+            entiteHandler.giveMemeToEntiteFitting(memeFactory.getMemeAvailable(Configurator.TypeOfUOT.ANYTHING,false));
 
             // fait le lien entre les entités d'action et de transmission de meme
             // avec l'IHM, pour permettre la mise a jour des affichages etc
-//            entiteHandler.addEntityListener(fenetre);
             entiteHandler.addMemeListener(fenetre);
+//            entiteHandler.addEntityListener(fenetre);
 
             // De meme, le dessinateur graphique s'abonne aux évènements de type transmission de meme
             // Dans le but de faire changer la couleur du noeud en fonction des memes possédés par ce dernier
@@ -170,9 +168,8 @@ public class Initializer {
                 entiteHandler.suspend();
             }
 
-            //huhum
-            if(Configurator.coupleVersion)
-                entiteHandler.giveMemeToEntiteFitting(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.COUPLE));
+
+            entiteHandler.giveMemeToEntiteFitting(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.COUPLE));
             return 0.;
         }
 
@@ -213,7 +210,6 @@ public class Initializer {
         return stat.fitNetwork(Configurator.EnumLauncher.jarC,
                 Configurator.EnumExplorationMethod.oneShot,
                 parameters);
-
     }
 
 

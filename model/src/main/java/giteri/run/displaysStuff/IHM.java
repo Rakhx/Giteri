@@ -65,8 +65,6 @@ import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.BehavTransmEvent;
 import giteri.meme.event.IBehaviorTransmissionListener;
 
-import static giteri.run.configurator.Configurator.coupleVersion;
-
 /**
  * JFrame qui gère l'affichage de l'application.
  *
@@ -253,10 +251,7 @@ public class IHM extends JFrame implements  IBehaviorTransmissionListener, IView
 		// densityValues = new ArrayList<>();
 		densityValuesLast = new CircularFifoQueue<>(sizeOfCircularQueue);
 		memesTitle = new Hashtable<String, IUnitOfTransfer>();
-		if(coupleVersion)
 			this.setMemeAvailable(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.COUPLE));
-		else
-			this.setMemeAvailable(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.ANYTHING));
 		densityMaxValue = 0.0;
 		otherSymbols = new DecimalFormatSymbols(Locale.US);
 		decimal = new DecimalFormat("",otherSymbols);
@@ -1432,9 +1427,7 @@ public class IHM extends JFrame implements  IBehaviorTransmissionListener, IView
 
 						// NOMBRE D'APPEL DES MEMES DEPUIS LE DEBUT DE LA SIMULATION
 						// Savoir combien de fois le meme a été appelé depuis le début de la simulation
-						if(!coupleVersion)
-							nbAppel = nbActivationByMemes.containsKey(memeString)? nbActivationByMemes.get(memeString) : 0;
-						else
+
 							nbAppel = countOfLastMemeActivation.containsKey(memeString)? countOfLastMemeActivation.get(memeString) : 0;
 						// LABEL générique
 						nbActivationByMemesLabel.get(memeString).setText(memeRef + ":" + nbAppel );
@@ -1453,16 +1446,7 @@ public class IHM extends JFrame implements  IBehaviorTransmissionListener, IView
 				}
 
 				String oldText;
-				if(!coupleVersion)
-				// On refait une passe pour mettre a jour les % de possession
-					for (IUnitOfTransfer meme : selectedMemeOnSimulation) {
-						memeString = meme.toString();
-						if(totalAppel != 0 && nbActivationByMemesLabel.containsKey(memeString)){
-							oldText = nbActivationByMemesLabel.get(memeString).getText();
-							nbActivationByMemesLabel.get(memeString).setText(oldText +
-									"(" + nbActivationByMemes.get(memeString) * 100 / totalAppel +"%)");
-						}
-					}
+
 
 				//region DENSITY
 				densityValue = netProp.getDensity();
@@ -1487,7 +1471,7 @@ public class IHM extends JFrame implements  IBehaviorTransmissionListener, IView
 			}
 			//endregion
 			catch(NullPointerException npe){
-				if(Configurator.overallDebug)
+				if(!Configurator.fullSilent)
 					System.err.println("[IHM-updateInformationDisplay()]-" + npe.getMessage());
 			}
 			catch (Exception e){

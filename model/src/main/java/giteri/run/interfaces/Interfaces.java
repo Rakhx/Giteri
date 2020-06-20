@@ -174,9 +174,9 @@ public class Interfaces {
 	 * Peut etre un meme ou un couple de meme.
 	 * Extends comparable pour les sort, Iterable pour pouvoir appliquer les memes fonctions
 	 * aux couples<Meme> ou aux Meme simple.
-	 * @param <T>
+	 * @param <T> Pour le moment inutile qu'il soit typé
 	 */
-	public interface IUnitOfTransfer <T extends IUnitOfTransfer> extends Comparable<T>, Iterable<Meme> {
+	public interface IUnitOfTransfer <T extends IUnitOfTransfer<T>> extends Comparable<T>, Iterable<Meme> {
 		void setProbaPropagation(double p);
 		double getProbaPropagation();
 		Configurator.TypeOfUOT getActionType();

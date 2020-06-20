@@ -80,49 +80,15 @@ public class Entite implements Comparable<Entite>{
 	public IUnitOfTransfer takeMyMeme(IUnitOfTransfer toReceive){
 		boolean ok = false;
 
-		if(
-				!getMyUnitOfT().contains(toReceive) &&
-				(	breederOn == null ||
-						breederOn.getActionType() != toReceive.getActionType())
-		)
+		if(!getMyUnitOfT().contains(toReceive) &&
+		(breederOn == null || breederOn.getActionType() != toReceive.getActionType()))
 			ok = true;
 
-
-
-
-//		// S'il le possede déjà
-//		ok &= !getMyUnitOfT().contains(toReceive);
-//		// s'il est breeder sur l'action
-//		ok &= (breederOn != toReceive);
 		if(ok)
 			return addOrReplaceFast(toReceive);
 		return null;
 	}
 
-
-
-
-
-//	/** Apres application d'une action, l'entité apprend de cette action
-//	 * qu'il a vu.
-//	 *
-//	 * @Return Null si aucun ajout, l'ancien meme si remplacement, le nouveau meme si ajout sans remplacement
-//	 */
-//	public IUnitOfTransfer receiveMeme(IUnitOfTransfer subMeme){
-//
-//		// (!A || B) && (!A || C) <=> !A && !A || !A && C || !A && B || B && C
-//		boolean ok;
-//		ok = !getMyMemes().contains(subMeme);
-//		ok = ok && (!Configurator.useMemePropagationProba || Toolz.rollDice(subMeme.getProbaPropagation()));
-//		ok = ok && (!Configurator.useEntitePropagationProba || Toolz.rollDice(this.probaLearning));
-//
-//		if(ok) {
-//			return addOrReplaceFast(subMeme);
-//		}
-//
-//		// null si aucun ajout a l'entité
-//		return null;
-//	}
 
 	/** ajoute un meme ou remplace un meme déja existant,
 	 * avec une notion de slot pour meme d'ajout et meme de retrait.

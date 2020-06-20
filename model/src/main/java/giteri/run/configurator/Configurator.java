@@ -13,7 +13,7 @@ public final class Configurator {
 
 
 	// si true, openmole mode activé
-	private static boolean fastSwitchOpen = true;
+	private static boolean fastSwitchOpen = false;
 
 	public static boolean quickScore = !fastSwitchOpen; // Aucun affichage, aucun fichier output
 	public static boolean fullSilent = fastSwitchOpen; // Aucun affichage, aucun fichier output
@@ -55,7 +55,8 @@ public final class Configurator {
 	public static boolean strictEqualityInComparaison = true; // FALSE : >= || TRUE : >
 
 	// PROPAGATION
-	public static boolean usePropagation = true; // utilisation de la propagation
+	public static boolean coupleSingleTransmission = true; // Transmet le couple à l'entité ayant recu l'action et pas plus
+
 	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
 	@toOutput ( yes = true )
 	public static boolean autoMemeForBreeder = false;	// Les breeder ont associé un meme complémement, rmd ajout ou retrait.
@@ -122,6 +123,7 @@ public final class Configurator {
 	public static boolean displayMemePosessionDuringSimulation = true && !fullSilent; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
 	public static boolean writeNbActionPerSec = false; // pas de fichier nbline
 	public static boolean writeFailDensityLink = false; // fichier d'info sur les Fails X density variation
+	public static boolean writeFailMemeApply = false; // fichier d'info sur les Fails X density variation
 
 	public static String repByDefault = "DefaultRep";
 	public static String repForFitting = "Stability";
@@ -157,6 +159,7 @@ public final class Configurator {
 	public static boolean debugFittingClass = false;
 	public static boolean debugEntite = false;
 	public static boolean debugEntiteHandler = false;
+	public static boolean debugParameterCouple = false;
 
 	public static boolean debugIHM = false;
 	public static boolean debugHopAway = false;
@@ -250,7 +253,8 @@ public final class Configurator {
 		NBEDGES, // 32
 		NBNODES, // 64
 		APL, // 128
-		thirdMoment; // 256
+		nbEdgesOnNbNodes, // 256
+		thirdMoment; // 512
 	}
 
 
@@ -273,19 +277,19 @@ public final class Configurator {
 		THEIRSUP,
 		THEIRSUPSIX,
 		THEIREQUAL,
-		SELFSUP
+		SELFSUP,
+		BLANK
 	}
 
 	/** Ajout lien...
 	 *
 	 */
-	public enum ActionType {
-		AJOUTLIEN,
-		RETRAITLIEN,
-		COPIERANDOMMEME,
-		EVAPORATION,
-		REFRESH,
-		ANYTHING;
+	public enum TypeOfUOT {
+		AJOUTLIEN, // ajout d'un lien
+		RETRAITLIEN, // retrait d'un lien
+		BASIC, // ajout ou retrait
+		COUPLE, // couple d'action
+		ANYTHING; // tout confondu
 	}
 
 
@@ -359,8 +363,10 @@ public final class Configurator {
 				return 7;
 			case APL:
 				return 8;
-			case thirdMoment:
+			case nbEdgesOnNbNodes:
 				return 9;
+			case thirdMoment:
+				return 10;
 			default:
 				return -1;
 		}
@@ -427,5 +433,7 @@ public final class Configurator {
 		boolean yes();
 	}
 
+	// Diviseur appliqué a la propagation d'un couple meme ( un couple meme peut se proposer a tout les cibles? )
+	public static double coupleDividerTransmission = nbNode; //
 }
 
