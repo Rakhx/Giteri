@@ -309,7 +309,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		//repertoires.add(numeroRepetitionAsString);
 
 		// Mise à jour des indicateurs de l'interface ( meme disponible a afficher )
-		com.setViewMemeAvailable(memesAvailables);
+		// com.setViewMemeAvailable(memesAvailables);
+
 		entiteHandler.updateMemeAvailableForProperties();
 
 		// & (3) Application de ces paramètres
@@ -349,7 +350,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		// Sauvegarde des propriétés courantes du réseau
 		// TODO [refact2.0] quelque chose a voir par ici pour le score total
 		// idée: distance entre les score des différents run exponentiel
-		networksSameTurn.add(currentNetProperties);
+		networksSameTurn.add(currentNetProperties.Clone());
 
 		// TODO [WayPoint]- Score distance entre deux network
 		currentNetworkScore = getNetworksDistanceDumb(resultNetwork, Configurator.activationCodeForScore, numeroRun,
