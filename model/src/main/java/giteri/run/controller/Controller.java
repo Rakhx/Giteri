@@ -42,7 +42,6 @@ public class Controller {
 			vues.add(toAdd);
 		}
 
-
 		//region iview part
 		public void setMemeAvailable(List<Interfaces.IUnitOfTransfer> memes) {
 			for (Interfaces.IView vue : vues) {

@@ -3,6 +3,7 @@ package giteri.run.jarVersion;
 import giteri.run.configurator.CasteOpenMoleParameter;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Initializer;
+import scala.Array;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -45,12 +46,19 @@ public class JarVersionCast {
 
     }
 
+    public static Double gow(){
+        CasteOpenMoleParameter comp = new CasteOpenMoleParameter();
+        comp.getActionActivation2(250,4,120);
+        return 0.;
+    }
+
+
+
     /** Fonction appelée depuis openMole. Nombre de parametre en double étant addActi x rmvActi
      *
      */
     public static Double run(int addActi, int addNb, int addTotal, int rmvActi, int rmvNb, int rmvTotal,
                                Double... args){
-
         CasteOpenMoleParameter comp = new CasteOpenMoleParameter(addActi,addNb,addTotal,rmvActi,rmvNb,rmvTotal);
         comp.probaPropa = new ArrayList<>(Arrays.asList(args));
         assert(comp.probaPropa.size() == addNb * rmvNb);
@@ -60,9 +68,31 @@ public class JarVersionCast {
     }
 
 
+//    // Pour tester depuis openMole.
+//    public static int runlol(int... args){
+//        return args.length;
+//    }
 
     // Pour tester depuis openMole.
     public static int runlol(int... args){
         return args.length;
     }
+
+    // Pour tester depuis openMole.
+    public static int runDouble(scala.Double... args){
+        return args.length;
+    }
+    // Pour tester depuis openMole.
+    public static int runDouble1(scala.Double args){
+        return 1;
+    }
+
+    public static int runDouble2(scala.Array<scala.Double> args){  return 1;
+    }
+    public static int runDoubleThree(Array<Double> args){  return 1;
+    }
+    public static int runDoubleFour(Array<scala.Double> args){  return 1;
+    }
+
+
 }

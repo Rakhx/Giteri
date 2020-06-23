@@ -6,11 +6,21 @@ import giteri.tool.other.WriteNRead
 object Test {
   def main(args: Array[String]): Unit =
   {
-    testRandomFn(args(0).toInt,args(1).toInt,args(2).toInt)
+    giteri.run.jarVersion.JarVersionCast.gow()
   }
 
-  def testRandomFn( one: Int, two: Int, three: Int): Unit = {
-    print("One: " + one  + " Two: "+ two + " Three: " + three)
+  def testRandomFn( nbActivator: Int, selector: Double, probas:Array[Double]): Double = {
+
+    var resultat: Double = 1 ;
+    print("nbActi " + nbActivator  + " selector: "+ selector + " probas: " )
+    for (elem <- probas) {
+      println(elem)
+      if(resultat > elem)
+        resultat = elem
+    }
+
+
+    resultat
   }
 
   def compute(one:Int ) : Int = {
@@ -21,14 +31,35 @@ object Test {
     n*m
   }
 
+  /** calcul de factoriel
+   *
+   * @param n
+   * @return
+   */
   def factorial(n: Int): Int = {
     var f : Int = 1
     for(i <- 1 to n) {
       f = f * i
     }
+    f
+  }
+
+  /** semi factoriel, produit de min a max de 1 en 1
+   *
+   * @param max inclu dans les calculs
+   * @param min inclu dans les calculs
+   * @return
+   */
+  def semiFact(min:Int, max:Int) : Int = {
+    var f : Int = 1
+    for(i<- min to max){
+      f = f*i
+    }
 
     f
   }
+
+
 
   /** Renvoi une combinaison sans répétition de k éléments parmis n.
    *
@@ -40,6 +71,13 @@ object Test {
   {
     return factorial(parmiN) / (factorial(k)*factorial(parmiN - k))
   }
+
+  def combSansRepSimplified(k:Int, parmiN:Int) : Int =
+  {
+    return semiFact(parmiN-k+1,parmiN) / factorial(k);
+  }
+
+
 
 
   /** Sérialize, après lecture, les propriétés d'un réseau, issu d'un fichier .txt sous forme

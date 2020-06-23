@@ -15,6 +15,7 @@ public class CoupleMeme implements Iterable<Meme>, IUnitOfTransfer<CoupleMeme> {
     private Meme addAction,removeAction;
     private double probaPropagation;
     private int index;
+    private boolean isFluide = true;
 
     /** Constructeur
      *
@@ -27,7 +28,8 @@ public class CoupleMeme implements Iterable<Meme>, IUnitOfTransfer<CoupleMeme> {
         removeAction = rmv;
         this.index = index;
         this.setProbaPropagation(probaPropagation);
-
+        if(index != -1)
+            this.isFluide = false;
     }
 
     /**
@@ -170,7 +172,7 @@ public class CoupleMeme implements Iterable<Meme>, IUnitOfTransfer<CoupleMeme> {
         return TypeOfUOT.COUPLE;
     }
     public boolean isFluide(){
-        throw new NotImplementedException();
+       return isFluide;
     }
 
     //endregion

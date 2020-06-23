@@ -39,14 +39,6 @@ object Run{
     val thirteenA: Integer = args(26).toInt
     val seed: Long = Random.nextLong()
 
-//    println( run(network, one, oneA, two, twoA,
-//      three, threeA, four, fourA,
-//      five, fiveA, six, sixA,
-//      seven, sevenA, eight, eightA,
-//      nine, nineA, ten, tenA,
-//      eleven, elevenA, twelve, twelveA,
-//      thirteen, thirteenA,
-//      seed))
   }
 
   /** Sérialize, après lecture, les propriétés d'un réseau, issu d'un fichier .txt sous forme
@@ -59,6 +51,8 @@ object Run{
     val reader = trueReader.readAndCreateNetwork("default.txt", lineReader," ","#")
     reader.getNetworkProperties(false, true);
   }
+
+
 
   def run(network: File, one: Double, oneActi: Integer, two: Double, twoActi: Integer,
           three: Double, threeActi: Integer, four: Double, fourActi: Integer,
@@ -87,5 +81,9 @@ object Run{
 //    print(new java.io.File(".").getCanonicalPath)
     val four = (one * two) / ( two + three )
     four
+  }
+
+  def takingArray(one:Array[Double]) : Unit = {
+    printf(""+one.size)
   }
 }

@@ -19,6 +19,10 @@ public class CasteOpenMoleParameter implements IOpenMoleParameter {
     public boolean[] rmvActivation;
     public List<Double> probaPropa;
 
+    public CasteOpenMoleParameter(){
+
+    }
+
     /**
      * Si lancé depuis l'IHM, nécessite des valeurs pars défault
      *
@@ -36,14 +40,9 @@ public class CasteOpenMoleParameter implements IOpenMoleParameter {
         probaPropa = new ArrayList<>();
 
         // Dans le cas d'un appelle par Jar, probaProba est réécrit apres le constructeur
-
         for (int i = 0; i < addNb * rmvNb; i++) {
             probaPropa.add(1.);
         }
-
-      //  probaPropa.clear();
-      //  probaPropa.addAll(Arrays.asList(.1,.2,.3,.4));
-
 
         init();
     }
@@ -52,8 +51,6 @@ public class CasteOpenMoleParameter implements IOpenMoleParameter {
      * Transcription des 6 parametres en deux tableaux a deux dimensions de boolean
      */
     public void init() {
-
-        // addActivation = getActionActivation(addActi,addNb, addTotal);
         addActivation = getActionActivation2(addActi, addNb, addTotal);
         rmvActivation = getActionActivation2(rmvActi, rmvNb, rmvTotal);
     }
@@ -139,8 +136,8 @@ public class CasteOpenMoleParameter implements IOpenMoleParameter {
        if(debug) System.out.println("CALL: " + activator);
         boolean[] resultat = new boolean[maxactivator];
         boolean again = true;
-        int nbCombinaison = Toolz.getLittleFactorial(maxactivator) / (Toolz.getLittleFactorial(maxactivator - nbActivator)
-                * Toolz.getLittleFactorial(nbActivator));
+//        int nbCombinaison = Toolz.getLittleFactorial(maxactivator) / (Toolz.getLittleFactorial(maxactivator - nbActivator)
+//                * Toolz.getLittleFactorial(nbActivator));
 
         boolean ok = true;
         boolean hadMoved = false;
@@ -201,7 +198,7 @@ public class CasteOpenMoleParameter implements IOpenMoleParameter {
         } while (--activator > 0);
 
 
-      if(debug)  System.out.println("ijk- " + kvIndexerIndex.get(0) + kvIndexerIndex.get(1) + kvIndexerIndex.get(2));
+      if(debug)  System.out.println("ijk- " + kvIndexerIndex.get(0) +":"+ kvIndexerIndex.get(1) +";"+ kvIndexerIndex.get(2)+";"+ kvIndexerIndex.get(3));
 
         for (int i = 0; i < resultat.length; i++) {
             resultat[i] = false;

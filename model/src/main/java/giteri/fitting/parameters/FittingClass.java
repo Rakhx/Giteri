@@ -466,27 +466,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 	//region Fitting hardstuff
 
 	/**
-	 * Si la densité du network est quasiment au max avec peu de variation.
-	 *
-	 * @return
-	 */
-	private boolean heuristNetFull(){
-		boolean isFull = false;
-
-		return isFull;
-	}
-
-	/**
-	 *
-	 * @return
-	 */
-	private boolean heuristNetEmpty(){
-		boolean isEmpty = false;
-
-		return isEmpty;
-	}
-
-	/**
 	 * utilisation de la variation des coefficients directeurs sur des plages de données
 	 *
 	 * @param densities

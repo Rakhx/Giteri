@@ -181,7 +181,7 @@ public class IHM extends JFrame implements  IBehaviorTransmissionListener, IView
 
 	// a voir avec les structures de données
 
-	// Correspondance entre un meme et les memes le possédant
+	// Correspondance entre un meme et les entites le possédant
 	private Hashtable<String, ArrayList<Integer>> nodesHavingXoxoMemes;
 
 	// Nombre de fois ou le meme a été appelé
@@ -1344,11 +1344,10 @@ public class IHM extends JFrame implements  IBehaviorTransmissionListener, IView
 
 		// Pour chaque série qu'on veut ajouter
 		for (IUnitOfTransfer meme : memes) {
+			if(meme.isFluide())
+				continue;
 
-			// TODO [CV] - Ancienne méthode avec les translates, on va tenter en passant par le toNameString
-			//labelSerie = memeFactory.translateMemeCombinaisonReadable(meme.toFourCharString());
 			labelSerie = meme.toNameString();
-
 			// on crée les série dans l'ordre a partir de 0 et regarde le meme associé a cet index dans MemeFactory
 			XYSeries aSerie = new XYSeries(labelSerie);
 			serieIndex = memeFactory.getIndexFromMeme(meme);

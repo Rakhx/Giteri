@@ -10,8 +10,9 @@ import scala.util.Random
 
 object Test {
   def main(args: Array[String]): Unit = {
-    serializNetworkTarget()
+    giteri.run.jarVersion.JarVersionCast.gow()
   }
+
   /** Sérialize, après lecture, les propriétés d'un réseau, issu d'un fichier .txt sous forme
    * list des edges séparé par un espace (tabulation? )
    *
@@ -23,7 +24,6 @@ object Test {
 
     val reader = trueReader.readAndCreateNetwork("network.txt", lineReader," ","#")
     reader.getNetworkProperties(false, true);
-
   }
 }
 

@@ -18,7 +18,6 @@ public class Entite implements Comparable<Entite>{
 	int index;
 	Node associatedNode;
 	double probaLearning;
-	double probaAppliying;
 
 	// Liste de memes - should be a set
 	private List<IUnitOfTransfer> myMemes;
@@ -41,7 +40,6 @@ public class Entite implements Comparable<Entite>{
 		myMemes = new ArrayList<IUnitOfTransfer>();
 		intervalOfSelection = new Hashtable<>();
 		connectedNodes = new HashSet<>();
-		probaAppliying = 1;
 		isBreeder = false;
 	}
 
@@ -64,8 +62,8 @@ public class Entite implements Comparable<Entite>{
 		}
 
 		// En gros tjrs divisé par 2
+		roll = 1.0 / memes.size();
 		for (Meme meme : memes) {
-			roll = 1.0 / memes.size();
 			intervalOfSelection.put(meme, roll);
 		}
 
@@ -80,8 +78,8 @@ public class Entite implements Comparable<Entite>{
 	public IUnitOfTransfer takeMyMeme(IUnitOfTransfer toReceive){
 		boolean ok = false;
 
-		if(!getMyUnitOfT().contains(toReceive) &&
-		(breederOn == null || breederOn.getActionType() != toReceive.getActionType()))
+		// si on l'a pas deja et qu'on est pas breeder
+		if(!getMyUnitOfT().contains(toReceive) && breederOn == null)
 			ok = true;
 
 		if(ok)
@@ -106,12 +104,12 @@ public class Entite implements Comparable<Entite>{
 		for (IUnitOfTransfer possededMeme : getMyUnitOfT())
 			if(memeToAdd.getActionType() == possededMeme.getActionType())
 			{
-				// n'est pas censé arriver
-				if(memeToAdd.compareTo(possededMeme) == 0) {
-					okToBeAdded = false;
-					System.err.println("[entite.addOrReplaceFast] - Le meme est déjà possede. la verification aurait du avoir deja exclu ce cas");
-					throw new NotImplementedException();
-				}
+//				// n'est pas censé arriver
+//				if(memeToAdd.compareTo(possededMeme) == 0) {
+//					okToBeAdded = false;
+//					System.err.println("[entite.addOrReplaceFast] - Le meme est déjà possede. la verification aurait du avoir deja exclu ce cas");
+//					throw new NotImplementedException();
+//				}
 				// si oui, il faudra que la configuration l'autorise pour remplacer l'ancien meme.
 				memeReplaced = possededMeme;
 				needToBeReplaced = true;
@@ -323,16 +321,10 @@ public class Entite implements Comparable<Entite>{
 	public void setNode(Node myPlaceee){
 		associatedNode = myPlaceee;
 		index = myPlaceee.getIndex();
-		if(Configurator.useEntitySuccesProba)
-			probaAppliying = (index + 1.) / Configurator.getNbNode();
 	}
 
 	public ArrayList<Integer> getConnectedNodesIndex(){
 		return associatedNode.getConnectedNodes();
-	}
-
-	public double getProbaAppliying() {
-		return probaAppliying;
 	}
 
 	/** Obtient la liste des entités connectés depuis la hash de

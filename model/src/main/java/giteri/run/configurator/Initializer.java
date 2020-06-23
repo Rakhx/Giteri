@@ -144,7 +144,7 @@ public class Initializer {
             fenetre.setVisible(true);
             entiteHandler.setVueController(vControl);
 
-            entiteHandler.giveMemeToEntiteFitting(memeFactory.getMemeAvailable(Configurator.TypeOfUOT.ANYTHING,false));
+          //  entiteHandler.giveMemeToEntiteFitting(memeFactory.getMemeAvailable(Configurator.TypeOfUOT.ANYTHING,false));
 
             // fait le lien entre les entités d'action et de transmission de meme
             // avec l'IHM, pour permettre la mise a jour des affichages etc

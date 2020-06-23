@@ -9,20 +9,10 @@ import java.util.ArrayList;
 
 public final class Configurator {
 
-
-
-
 	// si true, openmole mode activé
 	private static boolean fastSwitchOpen = false;
-
 	public static boolean quickScore = !fastSwitchOpen; // Aucun affichage, aucun fichier output
 	public static boolean fullSilent = fastSwitchOpen; // Aucun affichage, aucun fichier output
-
-	public static boolean onlyLinear = true;
-	// plus besoin, passe par fittingOnce TODO a nettoyer
-	public static boolean fullBullshi = false; // Aucun affichage, aucun fichier output
-
-	public static String fittingTxtPath = "fittingInfo";
 
 	// region initializer stuff
 	// VALEURS DONNEES A TITRE INDICATIF, set définitif dans l'initializer
@@ -40,6 +30,11 @@ public final class Configurator {
 
 	// region Modèle
 
+	// MODELE II param
+	public static boolean coupleSingleTransmission = true; // Transmet le couple à l'entité ayant recu l'action et pas plus
+	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
+	// TODO apply whole couple or only one adction?
+
 	// FONCTIONNEMENT
 	public static boolean manuelNextStep = false; // NO-AUTOSKIP pas de passage au run suivant, il faut appuyer sur next
 	public static boolean autoPauseIfNexted = false; // AUTOPAUSE mise en pause automatique avant un changement de run. Il faut appuyer sur next
@@ -55,16 +50,13 @@ public final class Configurator {
 	public static boolean strictEqualityInComparaison = true; // FALSE : >= || TRUE : >
 
 	// PROPAGATION
-	public static boolean coupleSingleTransmission = true; // Transmet le couple à l'entité ayant recu l'action et pas plus
 
 	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
 	@toOutput ( yes = true )
 	public static boolean autoMemeForBreeder = false;	// Les breeder ont associé un meme complémement, rmd ajout ou retrait.
 	public static boolean onlyOneToPropagate = true; // Dans le cas ou une action s'applique sur plusieurs entités
-	public static boolean usePropagationSecondGeneration = false; // transmet un des memes du porteur, pas forcement celui applied
 
-	public static boolean useEntitySuccesProba = false; // Prend en compte la proba porté pour l'entité pour APPLY a meme. Actuellement l'index
-	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
+
 
 	// SCORE
 
@@ -86,6 +78,9 @@ public final class Configurator {
 	// 16 + 512 Clust + third
 	// 170+512 = THIRD APL EDGES ARRAY DDAVG
 
+	// distance linéaire ou carré (augmente l'importance des 1er point perdu )
+	public static boolean onlyLinear = true;
+	// decote de score par rapport au noeud non connecté'
 	public static boolean considereNodeAlone = true;
 	public static int activationCodeAllAttrib = 1023;
 	public static int initialnetworkForBase = 0; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 3- SF 4-SW
@@ -117,6 +112,7 @@ public final class Configurator {
 	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
 	public static int activationCodeForView = fullSilent? 0 : 5;
+//	public static int activationCodeForView = fullSilent? 0 : 7;
 
 	public static boolean displayMemePossessionEvolution = true && !fullSilent; // Affiche dans l'IHM la possession des meme au fur et a mesure
 	public static boolean displayPlotWhileSimulation = true && !fullSilent; // Affichage des DD et densité
@@ -137,9 +133,10 @@ public final class Configurator {
 	// endregion
 
 	// region Affichage log
+	public static boolean displayLogAvgDegreeByMeme = false; // combinaisons de meme et leur degré + derniere application + application from start
+
 	public static boolean DisplayLogBehaviorColors = false; // correspondance meme <=> code couleur
 	public static boolean displayLogMemeApplication = false; // Chaque application de meme
-	public static boolean displayLogAvgDegreeByMeme = false; // combinaisons de meme et leur degré + derniere application + application from start
 	public static boolean displayLogMemeTransmission = false; // qui recoit quel meme
 
 	private static boolean faster = false; // les rations d'echecs sur echec, echec sur réussite...
@@ -159,7 +156,7 @@ public final class Configurator {
 	public static boolean debugFittingClass = false;
 	public static boolean debugEntite = false;
 	public static boolean debugEntiteHandler = false;
-	public static boolean debugParameterCouple = false;
+	public static boolean debugParameterCouple = true;
 
 	public static boolean debugIHM = false;
 	public static boolean debugHopAway = false;
@@ -172,7 +169,7 @@ public final class Configurator {
 	//region ancien boolean, osef, etc
 	// moyen osef
 	public static final boolean lotOfNodes = true;
-	private static int nbNode = lotOfNodes ? 300 : 20;
+	private static int nbNode = lotOfNodes ? 300 : 40;
 	public static int refreshInfoRate = 10;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
 	public static boolean memeCanBeReplaceByCategory = true;
@@ -330,8 +327,6 @@ public final class Configurator {
 	public static ArrayList<String> getConfig(){
 		ArrayList<String> elements = new ArrayList<String>();
 		elements.add("Nombre de noeuds: "+ nbNode);
-		elements.add("Méthode de propagation" + (usePropagationSecondGeneration ?
-				"Transmet l'un des meme portée":"Transmission direct du meme joué"));
 		return elements;
 	}
 

@@ -123,13 +123,12 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		// Quand version classique, on crée les couples disponibles sur la map
 
-			memeProperties.memeCombinaisonFittingAvailable = new HashMap<>();
-			int i = 0;
-			for (IUnitOfTransfer iUnitOfTransfer : this.memeFittingApplied) {
-				memeProperties.memeCombinaisonFittingAvailable.put(i++, new ArrayList<IUnitOfTransfer>(Arrays.asList(iUnitOfTransfer)));
+		memeProperties.memeCombinaisonFittingAvailable = new HashMap<>();
+		int i = 0;
+		for (IUnitOfTransfer iUnitOfTransfer : this.memeFittingApplied) {
+			memeProperties.memeCombinaisonFittingAvailable.put(i++, new ArrayList<IUnitOfTransfer>(Arrays.asList(iUnitOfTransfer)));
 
 		}
-
 	}
 
 	//endregion
@@ -185,8 +184,9 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			StopWatchFactory.getInstance().publishResult();
 		}
 
+		int multiRefresher = 200;
 		// Indicateur meme repartition, etc.
-		if(Configurator.displayMemePosessionDuringSimulation && (cptModulo % (Configurator.refreshInfoRate * 25) == 0) ) {
+		if(Configurator.displayMemePosessionDuringSimulation && (cptModulo % (Configurator.refreshInfoRate * multiRefresher) == 0) ) {
 			// affichage sur l'IHM de la distribution des memes
 
 				Map<IUnitOfTransfer, Integer> means = memeProperties.degreeMeanOfIOT;
@@ -206,16 +206,13 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 						means.put(iUnitOfTransfer, 0);
 				}
 
-
-
-
 				vueController.displayMemeUsage(cptModulo,
 						memeProperties.getNbActivationByMemes(),
 						means,
 						memeProperties.lastHundredActionDone);
-
 		}
-		if(Configurator.displayMemePossessionEvolution && cptModulo % (Configurator.refreshInfoRate * 200) == 0){
+
+		if(Configurator.displayMemePossessionEvolution && cptModulo % (Configurator.refreshInfoRate * multiRefresher) == 0){
 			kvMemeCodeNbEntities.clear();
 			for (IUnitOfTransfer meme : memeProperties.countOfEntitiesHavingMeme.keySet()) {
 				kvMemeCodeNbEntities.put(meme, (double)memeProperties.countOfEntitiesHavingMeme.get(meme) / entites.size());
@@ -223,7 +220,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 			vueController.addValueToApplianceSerie(++cptMemePossession, kvMemeCodeNbEntities);
 		}
-		if (Configurator.displayLogAvgDegreeByMeme)
+		if (Configurator.displayLogAvgDegreeByMeme && cptModulo % (Configurator.refreshInfoRate*100)==0)
 			vueController.displayInfo(ViewMessageType.AVGDGRBYMEME, Arrays.asList(checkPropertiesByMemePossession()));
 
 		// Verification de la propagation totale des memes initiaux
@@ -576,9 +573,15 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		HashSet<Entite> toExamine = new HashSet<>(entites);
 		ArrayList<Integer> SelfDegrees = new ArrayList<>();
 		ArrayList<Integer> othersDegrees = new ArrayList<>();
+		// compte des memes possédés par les entités connecté a la courante
+		Map<String,Integer> othersMemes = new HashMap<>();
+		// liste des indexs par meme
+		ArrayList<String> entityByMeme = new ArrayList<>();
 		String memes = "";
 		Entite nodeConnected;
 		String resultat = "";
+		String part1, part2, part3;
+
 		try {
 			// On classe les entités par combinaison de memes qu'elles possedent
 			for (Entite entite : toExamine) {
@@ -594,35 +597,62 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			System.err.println(e.getStackTrace());
 		}
 
-		resultat += "-----------------------------------------------------\n";
-
+		int nbLien;
+		resultat += "-----------------------------------------------------";
 		for (String memeCombinaison : entiteByMemePossession.keySet()) {
+			nbLien = 0;
 			SelfDegrees.clear();
 			othersDegrees.clear();
+			entityByMeme.clear();
+			othersMemes.clear();
 
+			part1 = "";part2 = ""; part3 = "";
+			// pour chaque entité possédant la combinaison
 			for (Entite entite : entiteByMemePossession.get(memeCombinaison)) {
-
+				entityByMeme.add(""+entite.getIndex());
 				SelfDegrees.add(entite.getDegree());
+
+				// pour chaque entité connecté a l'entité courante
 				for (Integer nodeIndex : networkConstruct.getConnectedNodes(entite.getIndex())) {
+					nbLien++;
 					nodeConnected = this.getEntityCorresponding(nodeIndex);
-					if (nodeConnected != null)
+					if (nodeConnected != null) {
 						othersDegrees.add(nodeConnected.getDegree());
+						part3 = nodeConnected.getMyUnitOfT()!=null? nodeConnected.getMyUnitOfT().get(0).toNameString():"vide";
+						Toolz.addCountToElementInHashArray(othersMemes,part3, 1);
+					}
 					else
 						System.err.println("Ne DEVRAIT PAS ETRE POSSIBLE EH CHECKPROPERTIESBY...");
 				}
 			}
 
-			resultat += "("
+			// liste des memes possédés par les entités liées a l'entité courante
+			for (String s : othersMemes.keySet()) {
+				part2 +=  s + ":" + othersMemes.get(s) + "-" + Toolz.getNumberCutToPrecision(othersMemes.get(s)*100./nbLien,2) +"%" +" && ";
+			}
+
+			// Index des entités courantes
+			entityByMeme.sort(null);
+			part1 = "[";
+			// index des entites avec le meme courant
+			for (String s : entityByMeme) {
+				part1 += s+":";
+			}
+			part1 += "] \n";
+
+			resultat += "\n("
 					+ entiteByMemePossession.get(memeCombinaison).size()
 					+ ") - "
-					+ "Degree for nodes1@"
+					+ "Degree "
 					+ (memeCombinaison)
 					+ ": "
-					+ Toolz.getAvg(SelfDegrees)
-					+ " Degree for nodes connected to nodes1 : "
+					+ Toolz.getNumberCutToPrecision(Toolz.getAvg(SelfDegrees),2)
+					+ " Degree nodes connected to : "
 					+ Toolz.getNumberCutToPrecision(
 					Toolz.getAvg(othersDegrees), 2);
 			resultat += "\n";
+			resultat += part1;
+			resultat += part2;
 		}
 
 		return resultat;
@@ -779,17 +809,14 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 					// hum. TODO [CV] réfléchir ici
 
-					// Si on reste sur l'ancienne facon de faire par une unque transmission direct
+					// Si on reste sur l'ancienne facon de faire par une unique transmission direct
 					if( !coupleSingleTransmission){
 						cibles = entites;
 					}
 
 					// TODO[CV] - ici a eu lieu un chg
 					// Si couple version, que l'action jouée soit un ajout ou un retrait, c'est tout le couple qui est transmis
-						propagation(cibles, movingOne, movingOne.getMyUnitOfT().get(0));
-
-
-
+					propagation(cibles, movingOne, movingOne.getMyUnitOfT().get(0));
 					// endregion
 
 					// evenement d'application d'une action
@@ -837,13 +864,12 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @param memeAction L'action appliquée
 	 * @param proba la proba est prise ici car la proba d'un couple est portée par la classe CoupleMeme
 	 */
-	private void propagation(Set<Entite> cibles, Entite movingOne, IUnitOfTransfer memeAction ){
+	private void propagation(Set<Entite> cibles, Entite movingOne, IUnitOfTransfer memeAction){
 
 		IUnitOfTransfer removedAction;
 		double probaAction = 0 ;
 
 		for (Entite entite : cibles) {
-
 			probaAction = memeAction.getProbaPropagation();
 			probaAction = probaPropaDegree(movingOne, entite, probaAction);
 
@@ -879,11 +905,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @return
 	 */
 	private double probaPropaDegree(Entite acting, Entite cible, double proba){
-
-
-			proba /=  (1 + Math.abs(acting.getDegree() - cible.getDegree()));
-
-
+		if(Configurator.useMemePropagationProba)
+			proba /=  Math.sqrt(1 + Math.abs(acting.getDegree() - cible.getDegree()));
+		else
+			proba =	 Math.sqrt(1 + Math.abs(acting.getDegree() - cible.getDegree()));
 		return proba;
 	}
 
@@ -951,18 +976,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	private void giveFluideMeme(ArrayList<Entite> entitesToBeApplied){
 		for (Entite entite : entitesToBeApplied) {
-
 			entite.addUOT(getDoubleRandom());
-			for (Meme meme : getDoubleRandom()) {
-				if(meme.getActionType() == TypeOfUOT.AJOUTLIEN)
-					eventMemeChanged(entite, meme, MemeActivityPossibility.AjoutMeme.toString());
-				else
-					eventMemeChanged(entite, meme, MemeActivityPossibility.RetraitMeme.toString());
-
-			}
-
-
-
+			eventMemeChanged(entite, getDoubleRandom(), MemeActivityPossibility.AjoutMeme.toString());
 		}
 	}
 
@@ -1109,6 +1124,12 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		// agregators.put(index++, notLinked);
 		agregators.put(index++, theMost);
 		agregators.put(index++, random);
+		ajouts.add(memeFactory.registerMemeAction("Add∞", 1, false, true, add, attributs, KVAttributAgregator,false));
+
+		agregators.clear(); index = 0;
+		agregators.put(index++, notLinked);
+		agregators.put(index++, theMost);
+		agregators.put(index++, random);
 		ajouts.add(memeFactory.registerMemeAction("Add∞!", 1, false, true, add, attributs, KVAttributAgregator,false));
 
 		agregators.clear(); index = 0;
@@ -1213,9 +1234,9 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		// Creation des couples d'actions
 		this.doubleRandom = memeFactory.extractAndDoNotRegister("AddØ", "RmvØ", 0);
-		memeFactory.extractAndAddCoupleMeme( "AddEq", "Rmv-", .4, false);
-		//memeFactory.extractAndAddCoupleMeme( "AddØ-Hop", "Rmv-", .8, false);
+		memeFactory.extractAndAddCoupleMeme( "AddEq", "Rmv-", .1, false);
 		memeFactory.extractAndAddCoupleMeme( "Add∞", "RmvEq", 1., false);
+		memeFactory.extractAndAddCoupleMeme( "Add°!", "RmvChain", .2, false);
 	}
 
 	/**
