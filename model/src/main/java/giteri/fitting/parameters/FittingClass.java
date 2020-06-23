@@ -354,7 +354,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		// Sauvegarde des propriétés courantes du réseau
 		// TODO [refact2.0] quelque chose a voir par ici pour le score total
 		// idée: distance entre les score des différents run exponentiel
-		networksSameTurn.add(currentNetProperties);
+		networksSameTurn.add(currentNetProperties.Clone());
 
 		// TODO [WayPoint]- Score distance entre deux network
 		currentNetworkScore = getNetworksDistanceDumb(resultNetwork, Configurator.activationCodeForScore, numeroRun,
