@@ -48,8 +48,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		INbNodeChangedListener, IMemeAvailableListener {
 
 	//region Variables diverses
-
-	private boolean debug = Configurator.debugFittingClass;
 	private EntiteHandler entiteHandler;
 	private MemeFactory memeFactory;
 	private NetworkFileLoader networkFileLoader;
@@ -191,7 +189,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		if(Configurator.prepareTheOpti){
 			boolean dog = (Configurator.typeOfConfig == Configurator.EnumLauncher.jarOpenMole) || (Configurator.typeOfConfig == Configurator.EnumLauncher.jarC);
 			System.out.println("FittingClass.Init() - Fin de lecture du fichier cible " + (dog? "serialise" : "non sériealisé"));
-			StopWatchFactory.getInstance().publishResult();
 		}
 
 		boolean doTheWrite = !Configurator.fullSilent;
@@ -278,12 +275,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		repertoires.add(numeroRunAsString);
 		resultNetwork.put(numeroRun, new Result(explorator.getModelParameterSet()));
 		com.view.resetPlotDensity();
-		// Creation du fichier qui detail les infos sur les memes
-//		if(Configurator.writeNetworkResultOnFitting){
-//			writeNRead.writeSmallFile(repOfTheSearch,Configurator.fileNameMeme,
-//					entiteHandler.memeProperties.getHeaderToWriteMemeDetails(
-//							entiteHandler.getKVMemeTranslate(), numeroRun, numeroRepetition, explorator));
-//		}
+
 	}
 
 	/**
@@ -311,7 +303,8 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		// Creation du fichier de detail de meme, HEADER. Avant l'ajout du repertoire de repetition
 		if(Configurator.writeMemeResultOnFitting && numeroRepetition == 1&& !Configurator.jarMode)
 			writeNRead.writeSmallFile(repOfTheSearch, Configurator.fileNameMeme,
-					entiteHandler.memeProperties.getHeaderToWriteMemeDetails( entiteHandler.getKVMemeTranslate(), numeroRun, numeroRepetition, explorator));
+					entiteHandler.memeProperties.getHeaderToWriteMemeDetails(
+							entiteHandler.getKVMemeTranslate(), numeroRun, numeroRepetition, explorator));
 
 		//repertoires.add(numeroRepetitionAsString);
 
@@ -325,7 +318,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			System.out.println(explorator.toString());
 		}
 
-		if(debug) System.out.println(numeroRunAsString + " at " + numeroRepetitionAsString);
+		if(Configurator.debugFittingClass) System.out.println(numeroRunAsString + " at " + numeroRepetitionAsString);
 
 		entiteHandler.resetProba();
 		// STEP: Concernant la continuité du fitting sur meme config.
@@ -383,7 +376,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 
 		if(Configurator.writeMemeResultOnFitting) {
 			writeNRead.writeSmallFile(repOfTheSearch, Configurator.fileNameMeme, Arrays.asList(
-					entiteHandler.memeProperties.getStringToWriteMemeDetails(entiteHandler.getKVMemeTranslate())));
+					entiteHandler.memeProperties.getStringToWriteMemeDetails(entiteHandler.getKVUOTTranslate())));
 		}
 	}
 

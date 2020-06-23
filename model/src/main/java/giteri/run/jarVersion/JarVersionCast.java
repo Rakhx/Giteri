@@ -18,60 +18,40 @@ public class JarVersionCast {
     public static Configurator.EnumLauncher launcher;
 
     /** appelle depuis les lignes de commande java, non openmole
-     * Paramètres: filePath, Code d'activation ajout, nb meme Ajout, total Ajout, retrait, nb meme retrait, total retrait,
-     * memeAjout x memeRetrait proba
+     * transforme les données des lignes de commande pour appeler fonction run(), fonction appelée par
+     * openmole directement.
+     *
      *
      * @param args
      */
     public static void main(String[] args) {
-        boolean debug = false;
-
-        String filePath;
-        File inputFile;
         launcher = Configurator.EnumLauncher.jarC;
+        // entre 1 et 8
+        int nbMeme = 4;
+        // selection quel position
+        int selector = 458;
+        // total des memes dispo
+        int maxMemes = 100;
 
-        filePath = args[0];
-        inputFile = new File(filePath);
-        if(debug)System.out.print("Fichier d'input: " + (inputFile.exists()? "exist" : "does not exist"));
-        int decalage = 7;
-
-        Double[] proba = new Double[args.length -decalage];
-        for (int i = decalage; i < args.length; i++) {
-            proba[i-decalage] = Double.parseDouble(args[i]);
-        }
-
-
-        run(Integer.parseInt(args[1]),Integer.parseInt(args[2]),Integer.parseInt(args[3]),
-                Integer.parseInt(args[4]),Integer.parseInt(args[5]),Integer.parseInt(args[6]) , proba);
-
+        // proba de propa
+        List<Double> proba = new ArrayList<>(Arrays.asList(.1,.2,.3,.4,.5,.6,.7,.8));
+        run(selector,nbMeme,maxMemes,proba);
     }
 
-    public static Double gow(){
-        CasteOpenMoleParameter comp = new CasteOpenMoleParameter();
-        comp.getActionActivation2(250,4,120);
-        return 0.;
-    }
-
-
-
-    /** Fonction appelée depuis openMole. Nombre de parametre en double étant addActi x rmvActi
+    /** fonction appelée depuis openmole ou depuis le main de jarversioncast
      *
+     *
+     * @param activationCode
+     * @param nbMeme
+     * @param maxCombinaison
+     * @param proba
+     * @return
      */
-    public static Double run(int addActi, int addNb, int addTotal, int rmvActi, int rmvNb, int rmvTotal,
-                               Double... args){
-        CasteOpenMoleParameter comp = new CasteOpenMoleParameter(addActi,addNb,addTotal,rmvActi,rmvNb,rmvTotal);
-        comp.probaPropa = new ArrayList<>(Arrays.asList(args));
-        assert(comp.probaPropa.size() == addNb * rmvNb);
-
+    public static Double run(int activationCode, int nbMeme, int maxCombinaison, List<Double> proba){
+        CasteOpenMoleParameter comp = new CasteOpenMoleParameter(activationCode,nbMeme,maxCombinaison,proba);
         Initializer.initialize(launcher, comp);
         return 0.;
     }
-
-
-//    // Pour tester depuis openMole.
-//    public static int runlol(int... args){
-//        return args.length;
-//    }
 
     // Pour tester depuis openMole.
     public static int runlol(int... args){

@@ -315,10 +315,9 @@ public class MemeFactory {
 	/** Génère une liste de coupleMeme depuis les deux tableaux d'activation d'add et rmv. Produit carthésien
 	 *
 	 * @param addActi
-	 * @param rmvActi
 	 * @return
 	 */
-	public List<IUnitOfTransfer<CoupleMeme>> generateCoupleFromActivation(boolean[] addActi, boolean[] rmvActi){
+	public List<IUnitOfTransfer<CoupleMeme>> generateCoupleFromActivation(boolean[] activator){
 		// int i = 0, j = 0;
 		List<IUnitOfTransfer<CoupleMeme>> selected = new ArrayList<>();
 		List<Meme> addz, rmvz;
@@ -329,20 +328,70 @@ public class MemeFactory {
 		if(!Configurator.jarMode)
 			clearExistingCouple();
 
+//		addz = getMemes(MemeList.FITTING, TypeOfUOT.AJOUTLIEN).stream().map(e -> (Meme)e).collect(Collectors.toList());
+//		rmvz = getMemes(MemeList.FITTING, TypeOfUOT.RETRAITLIEN).stream().map(e -> (Meme)e).collect(Collectors.toList());;
+//		for (int i = 0; i < addActi.length; i++) {
+//			if(addActi[i]) {
+//				add = addz.get(i);
+//				for (int j = 0; j < rmvActi.length; j++) {
+//					// A new combinaison is born
+//					if(rmvActi[j]){
+//						rmv = rmvz.get(j);
+//						cree = extractAndAddCoupleMeme(add.getName(), rmv.getName(), .1, true);
+//						selected.add(cree);
+//					}
+//				}
+//			}
+//		}
+
+		return selected;
+	}
+
+	/** Génère une liste de coupleMeme depuis les deux tableaux d'activation d'add et rmv. Produit carthésien
+	 *
+	 * example de transcription d'un int en deux éléments. Si 3 est le max du 1er element, 13 est composé de
+	 * 13%3=1 -> 1er dimension
+	 * 13/3=4 -> 2er dimension
+	 * la 2eme correspond au nombre de fois ou on a eu 3 dans le chiffre 13
+	 * @param addActi
+	 * @return
+	 */
+	public List<IUnitOfTransfer<CoupleMeme>> generateCoupleFromMapIndex(Map<Integer, Integer> indexActivator,
+																		List<Double> probas){
+		List<IUnitOfTransfer<CoupleMeme>> selected = new ArrayList<>();
+		int addIndex = 0, rmvIndex = 0;
+		int nbAdd;
+		int nbRmv;
+
+		List<Meme> addz, rmvz;
+		Meme add, rmv;
+		IUnitOfTransfer<CoupleMeme> cree;
+
+		if(!Configurator.jarMode)
+			clearExistingCouple();
+
 		addz = getMemes(MemeList.FITTING, TypeOfUOT.AJOUTLIEN).stream().map(e -> (Meme)e).collect(Collectors.toList());
 		rmvz = getMemes(MemeList.FITTING, TypeOfUOT.RETRAITLIEN).stream().map(e -> (Meme)e).collect(Collectors.toList());;
-		for (int i = 0; i < addActi.length; i++) {
-			if(addActi[i]) {
-				add = addz.get(i);
-				for (int j = 0; j < rmvActi.length; j++) {
-					// A new combinaison is born
-					if(rmvActi[j]){
-						rmv = rmvz.get(j);
-						cree = extractAndAddCoupleMeme(add.getName(), rmv.getName(), .1, true);
-						selected.add(cree);
-					}
-				}
+		nbAdd = addz.size();
+		nbRmv = rmvz.size();
+
+		// pour chaque entrée de la map, donc pour chaque couple
+		for (Integer index : indexActivator.keySet()) {
+			addIndex = indexActivator.get(index) % nbAdd;
+			rmvIndex = indexActivator.get(index) / nbAdd; // vérifier que tjrs arrondi inférieur
+			add= addz.get(addIndex);
+			rmv = rmvz.get(rmvIndex);
+			cree =  extractAndAddCoupleMeme(add.getName(), rmv.getName(), probas.get(index), true);
+			selected.add(cree);
+		}
+
+		if(Configurator.debugCouple){
+			String debug = "[MemeFactory.generateCouple] "+nbAdd+":"+nbRmv;
+			for (IUnitOfTransfer<CoupleMeme> memes : selected) {
+				debug += "\n"+memes.toNameString() + " ("+memes.getProbaPropagation() + ")";
 			}
+
+			System.out.println(debug);
 		}
 
 		return selected;

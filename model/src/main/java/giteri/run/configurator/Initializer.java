@@ -38,11 +38,7 @@ import static giteri.run.configurator.Configurator.withGraphicalDisplay;
 public class Initializer {
     public static Double initialize(Configurator.EnumLauncher launcher, Interfaces.IOpenMoleParameter parameters) {
 
-        if(Configurator.timeEfficiency) {
-            StopWatchFactory.getInstance().addWatch("", "perf");
-            StopWatchFactory.getInstance().startWatch("perf");
-        }
-
+        //region init osef
         Configurator.typeOfConfig = launcher;
         boolean ihmLauncher = (launcher == Configurator.EnumLauncher.ihm) ;
 
@@ -109,6 +105,8 @@ public class Initializer {
         Controller.VueController vControl = c.new VueController();
         Controller.ModelController mControl = c.new ModelController(vControl, communicationModel);
 
+        //endregion
+
         if (ihmLauncher) {
             entiteHandler.initialisation();
             IHM fenetre;
@@ -144,19 +142,15 @@ public class Initializer {
             fenetre.setVisible(true);
             entiteHandler.setVueController(vControl);
 
-          //  entiteHandler.giveMemeToEntiteFitting(memeFactory.getMemeAvailable(Configurator.TypeOfUOT.ANYTHING,false));
-
             // fait le lien entre les entités d'action et de transmission de meme
             // avec l'IHM, pour permettre la mise a jour des affichages etc
-            entiteHandler.addMemeListener(fenetre);
-//            entiteHandler.addEntityListener(fenetre);
+            entiteHandler.addMemeListener(fenetre); // entiteHandler.addEntityListener(fenetre);
 
             // De meme, le dessinateur graphique s'abonne aux évènements de type transmission de meme
             // Dans le but de faire changer la couleur du noeud en fonction des memes possédés par ce dernier
             entiteHandler.addMemeListener(workerFactory.getDrawer());
-           // entiteHandler.addEntityListener(workerFactory.getCalculator());
 
-           // networkConstructor.start();
+            // entiteHandler.addEntityListener(workerFactory.getCalculator());  networkConstructor.start();
 
             if (!Configurator.isSystemPaused()) {
                 networkConstructor.start();
@@ -167,7 +161,6 @@ public class Initializer {
                 entiteHandler.start();
                 entiteHandler.suspend();
             }
-
 
             entiteHandler.giveMemeToEntiteFitting(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.COUPLE));
             return 0.;
@@ -181,14 +174,10 @@ public class Initializer {
                 vControl.addView(new ConsoleView());
             entiteHandler.setVueController(vControl);
             entiteHandler.initialisation();
-            entiteHandler.addMemeListener(workerFactory.getDrawer());
-          //  entiteHandler.addEntityListener(workerFactory.getCalculator());
+            entiteHandler.addMemeListener(workerFactory.getDrawer()); //  entiteHandler.addEntityListener(workerFactory.getCalculator());
 
             Interfaces.IReadNetwork nl = mControl.getReader();
-
-            entiteHandler.suspend();
-           // networkConstructor.suspend();
-          //  networkConstructor.start();
+            entiteHandler.suspend(); // networkConstructor.suspend();//  networkConstructor.start();
             entiteHandler.start();
 
             Double score = launchForClassic(stat, parameters);
@@ -196,7 +185,6 @@ public class Initializer {
             entiteHandler.stop();
             entiteHandler.resume();
             return score;
-
        }
     }
 

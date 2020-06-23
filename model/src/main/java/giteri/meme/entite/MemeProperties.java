@@ -242,12 +242,12 @@ public class MemeProperties {
         return lines;
     }
 
-    public String getStringToWriteMemeDetails(Map<Meme, String> translation){
+    public String getStringToWriteMemeDetails(Map<IUnitOfTransfer, String> translation){
         String toWrite ="";
-        for (Meme meme : translation.keySet()) {
-            toWrite += countOfEntitiesHavingMeme.get(meme) + ";";
-            toWrite += nbActivationByMemes.get(meme) + ";";
-            toWrite += countOfLastMemeActivation.get(meme) + ";";
+        for (IUnitOfTransfer<CoupleMeme> cMeme : translation.keySet()) {
+            toWrite += countOfEntitiesHavingMeme.get(cMeme) + ";";
+            toWrite += nbActivationByMemes.get(cMeme) + ";";
+            toWrite += countOfLastMemeActivation.get(cMeme) + ";";
         }
 
         toWrite = String.valueOf(toWrite.subSequence(0, toWrite.length()-1));

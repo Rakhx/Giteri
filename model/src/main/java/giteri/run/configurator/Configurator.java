@@ -102,7 +102,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
 	@toOutput ( yes = true )
-	public static int multiplicatorNbAction  = 3000; //  Par combein on multiplie le nombdre de noeud sur la simulation de base 3000
+	public static int multiplicatorNbAction  = 30; //  Par combein on multiplie le nombdre de noeud sur la simulation de base 3000
 
 	// endregion
 
@@ -151,19 +151,19 @@ public final class Configurator {
 	//endregion
 
 	// region affichage de debug
+
+
+	public static boolean debugCouple = true;
+
 	public static boolean debugStatAndPlot = false;
-	public static boolean debugFittingClassFast = false;
 	public static boolean debugFittingClass = false;
 	public static boolean debugEntite = false;
 	public static boolean debugEntiteHandler = false;
-	public static boolean debugParameterCouple = true;
 
 	public static boolean debugIHM = false;
 	public static boolean debugHopAway = false;
 
 	public static boolean debugJarMode = false;
-	public static boolean timeEfficiency = false;
-
 	// endregion
 
 	//region ancien boolean, osef, etc

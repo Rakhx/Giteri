@@ -58,8 +58,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	public boolean goNextStepInManuelMode = !Configurator.manuelNextStep;
 
 	boolean continuFitting = true;
-	boolean debug = Configurator.debugStatAndPlot;
-
 	//region structure de données
 
 	private int nbEltCirDensity = 100;
@@ -101,27 +99,24 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 							 Configurator.EnumExplorationMethod typeOfExplo,
 							 IOpenMoleParameter param) {
 
-		// appelé quand on lance en jar.
+		// appelé quand on lance en jar ou depuis jarmode simuli commande
 		// La version jar fourni tjrs des parametres en ligne de commande
 		if ((typeOfLaunch == Configurator.EnumLauncher.jarC || typeOfLaunch == Configurator.EnumLauncher.jarOpenMole))
 		{
-				memeFactory.generateCoupleFromActivation(((CasteOpenMoleParameter) param).addActivation,
-						((CasteOpenMoleParameter) param).rmvActivation);
-				memeFactory.associateProbaWithCouple(((CasteOpenMoleParameter) param).probaPropa);
-
-
+			CasteOpenMoleParameter paramter = ((CasteOpenMoleParameter) param);
+			memeFactory.generateCoupleFromMapIndex(
+					paramter.getActionActivation(paramter.activation,paramter.nbMemes,paramter.maxMeme)
+					,paramter.probaPropa);
 			return fittingLauncher(typeOfLaunch, typeOfExplo, param);
 		}
 		// appelé depuis IHM
 		else {
-			final IOpenMoleParameter proxyParam;
+			final CasteOpenMoleParameter proxyParam;
 			// ICI Faire des proxy des param. optional etc car lancée depuis L'IHM sans paramètre
 			// TODO [CV] Proxy COUPLE
-				proxyParam = new CasteOpenMoleParameter(9,2,10,10, 2, 10);
-				memeFactory.generateCoupleFromActivation(((CasteOpenMoleParameter)proxyParam).addActivation,
-						((CasteOpenMoleParameter)proxyParam).rmvActivation);
-				memeFactory.associateProbaWithCouple(((CasteOpenMoleParameter) proxyParam).probaPropa);
-
+			proxyParam = new CasteOpenMoleParameter(20, 4,120,Arrays.asList(.10,.11,.12,.13,.14,.15,.16,.17));
+			memeFactory.generateCoupleFromMapIndex(proxyParam.getActionActivation(proxyParam.activation,proxyParam.nbMemes,proxyParam.maxMeme)
+					,proxyParam.probaPropa);
 
 			(new Thread() {
 				public void run() {
@@ -232,7 +227,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 //			}
 //		}
 
-		unitToRun =memeFactory.getMemes(MemeList.FITTING, Configurator.TypeOfUOT.COUPLE);
+		unitToRun = memeFactory.getMemes(MemeList.FITTING, Configurator.TypeOfUOT.COUPLE);
 
 		unitToRun.sort(null);
 
@@ -242,10 +237,13 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		// Associer une proba de propagation
 		int compte = 0;
 		for (IUnitOfTransfer iUnitOfTransfer : unitToRun) {
-			unitAndProba.put(iUnitOfTransfer, new GenericDoubleParameter(proba.get(compte++)));
-			if (debugJarMode)
-				memesSelectionnes.add(";" + iUnitOfTransfer.toNameString() + "-" + proba.get(compte - 1));
 
+//			unitAndProba.put(iUnitOfTransfer, new GenericDoubleParameter(proba.get(compte++)));
+			// normalement proba deja mise en place lors de la creation des couples
+			unitAndProba.put(iUnitOfTransfer, new GenericDoubleParameter(iUnitOfTransfer.getProbaPropagation()));
+
+			if (debugJarMode)
+				memesSelectionnes.add(";" + iUnitOfTransfer.toNameString() + "-" + iUnitOfTransfer.getProbaPropagation());
 		}
 
 		// Ecriture dans un fichier rapide des meme acitvés et leurp roba de promagation
@@ -280,31 +278,21 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 								  IOpenMoleParameter parameter) {
 
 		double resultat;
-		List<Boolean> memeActivation;
-		List<Double> memeProba;
-		List<Double> probaPropa;
 
 		// Qui définira pour la classe de fitting l'espace de recherche
 		IExplorationMethod explorator = null;
 		FittingClass fittingConfig = new FittingClass();
 
-			probaPropa = ((CasteOpenMoleParameter)parameter).probaPropa;
-
-
-
-		// ICI génération des proxyparameter avant l'appel du fitting si en mode IHM
-		// Pour les cas OneShot from IHM;JAR
-//		if(typeOfExplo == EnumExplorationMethod.oneShot && !memeActivationOpt.isPresent())
-//			generateProxyParam(memeActivation,memeProba);
-
 		// Si on veut plus d'une itération, besoin d'utiliser un explorator plus complet.
 		// NON MIS A JOUR POUR COUPLE VERSION
 		if(typeOfExplo != EnumExplorationMethod.oneShot) {
-
 			// Si appelle oneShot, depuis IHM ou depuis JAR, explorator oneShot
 		}else {
 			explorator = callFromJar(fittingConfig, parameter);
 		}
+
+		if(Configurator.debugCouple)
+			System.out.println(explorator.toString());
 
 		// Classe de configuration qui contient tout ce qu'il faut pour faire une simu
 		fittingConfig.KindaConstructor(writeNRead, communicationModel,
@@ -318,6 +306,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		// retrait de la fitting classe des listener
 		entiteHandler.removeEntityListener(fittingConfig);
+
 		return resultat;
 	}
 
@@ -360,7 +349,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 					continuFitting = Configurator.limitlessAction || fittingConfig.continuFitting(cfqDensityOnFitting);
 					if(!continuFitting){
-						if(debug) System.out.println("Voudrait passer au step suivant");
+						if(Configurator.debugStatAndPlot) System.out.println("Voudrait passer au step suivant");
 					}
 
 					// Si la condition d'arret est ok et si on a pas activé le mode manual skip

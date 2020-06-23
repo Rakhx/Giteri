@@ -42,24 +42,27 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 	// les entités du réseau
 	protected Set<Entite> entites;
-
 	// Entite possedant des actions
 	private ArrayList<Entite> entitesActive;
+
 	private List<IUnitOfTransfer> memeFittingApplied;
+	private IUnitOfTransfer<CoupleMeme> doubleRandom = null;
+	private Map<IUnitOfTransfer, Double> kvMemeCodeNbEntities;
+
+	public MemeProperties memeProperties;
 
 	private boolean allTransmitted = false;
 	private boolean allAddTransmitted = false;
 	private boolean allrmvTransmitted = false;
-
-	public MemeProperties memeProperties;
 
 	// Listener pour les évènements issu de l'obtention de meme ou application
 	// de ce dernier.
 	private ArrayList<IActionApplyListener> entityListeners;
 	private ArrayList<IBehaviorTransmissionListener> memeListeners;
 
-	private Meme addRandom = null, removeRandom = null;
-	private IUnitOfTransfer<CoupleMeme> doubleRandom = null;
+
+
+
 
 	// Variable d'utilisation
 	private static int indexOfMemesCombinaisonRecursion;
@@ -73,7 +76,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private double lastDensity;
 	private int sumFailAction;
 	private ObjectRef<Integer> nbFail = new ObjectRef<>(0);
-	private Map<IUnitOfTransfer, Double> kvMemeCodeNbEntities;
 
 	// Variable utilisé dans la fonction doAction - fn appelée a chaque step
 	Set<Entite> cibles;
@@ -178,11 +180,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			checkAPM();
 		}
 		cptModulo++;
-
-		if(Configurator.timeEfficiency && cptModulo % 10000 == 0 ) {
-			System.out.println("nbAction: "+ cptModulo);
-			StopWatchFactory.getInstance().publishResult();
-		}
 
 		int multiRefresher = 200;
 		// Indicateur meme repartition, etc.
@@ -981,21 +978,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 	}
 
-	/** Donne au breeder la fluidité qu'ils leur manque
-	 *
-	 * @param breederToBeApplied
-	 */
-	private void giveFluideMemeBreeder(List<Entite> breederToBeApplied) {
-		for (Entite entite : breederToBeApplied) {
-			if (entite.getMyUnitOfT().stream().allMatch(e -> e.getActionType() == TypeOfUOT.AJOUTLIEN)) {
-				if (removeRandom != null)
-					eventMemeChanged(entite, entite.addUOT(removeRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
-			} else if (entite.getMyUnitOfT().stream().allMatch(e -> e.getActionType() == TypeOfUOT.RETRAITLIEN)) {
-				if (addRandom != null)
-					eventMemeChanged(entite, entite.addUOT(addRandom, false), Configurator.MemeActivityPossibility.AjoutMeme.toString());
-			}
-		}
-	}
 
 	/**
 	 * Fait le lien entre les agents et les noeuds du réseaux A appeler une fois
@@ -1102,11 +1084,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();index= 0;
 		agregators.put(index++, notLinked);
 		agregators.put(index++, random);
-		ajouts.add(
-		memeFactory.registerMemeAction("AddØ",0.15, false, false, add, attributs, KVAttributAgregator, false)
-		);
-		agregators.put(index++, random);
-		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, false, false, add, attributs, KVAttributAgregator, true);
+		ajouts.add(memeFactory.registerMemeAction("AddØ",0.15, false, false, add, attributs, KVAttributAgregator, false));
 
 		agregators.clear();index= 0;
 		agregators.put(index++, notLinked);
@@ -1169,8 +1147,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, linked);
 		agregators.put(index++, random);
 		retraits.add(memeFactory.registerMemeAction("RmvØ",.7, false, false, remove,  attributs, KVAttributAgregator, false));
-		agregators.put(index++, random);
-		removeRandom = memeFactory.registerMemeAction("RmvØ-neutral",0, false, false, remove,  attributs, KVAttributAgregator, true);
 
 		agregators.clear();index = 0;
 		agregators.put(index++, linked);
@@ -1431,13 +1407,30 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 *
 	 * @return
 	 */
-	public Map<Meme, String> getKVMemeTranslate(){
-		Map<Meme,String> res = new HashMap<>();
+	public Map<Meme, String> getKVMemeTranslate() {
+		Map<Meme, String> res = new HashMap<>();
 		synchronized (memeFittingApplied) {
 			//TODO
-//			for (Meme meme : memeFittingApplied) {
-//				res.put(meme, this.translateMemeCombinaisonReadable(meme.toString()));
-//			}
+			for (IUnitOfTransfer<CoupleMeme> uot : memeFittingApplied) {
+				for (Meme meme : uot) {
+					if(!res.containsKey(meme))
+						res.put(meme, meme.toString());
+				}
+			}
+		}
+
+		return res;
+	}
+		/** renvoi une map de k:meme v:nom lisible
+	 *
+	 * @return
+	 */
+	public Map<IUnitOfTransfer, String> getKVUOTTranslate(){
+		Map<IUnitOfTransfer,String> res = new HashMap<>();
+		synchronized (memeFittingApplied) {
+			for (IUnitOfTransfer uot : memeFittingApplied) {
+				res.put(uot, uot.toNameString());
+			}
 		}
 
 		return res;
