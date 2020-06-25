@@ -29,9 +29,9 @@ public class JarVersionCast {
         // entre 1 et 8
         int nbMeme = 4;
         // selection quel position
-        Double selector = 8066026.655799285;
+        Double selector =  8005408.0;
         // total des memes dispo
-        int maxMemes = 121;
+        int maxMemes =  121;
 
         // proba de propa
         List<Double> proba = new ArrayList<>(Arrays.asList(.1,.2,.3,.4,.5,.6,.7,.8));

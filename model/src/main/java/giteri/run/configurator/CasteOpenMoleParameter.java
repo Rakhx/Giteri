@@ -148,7 +148,7 @@ public class CasteOpenMoleParameter implements IOpenMoleParameter {
         boolean ok = true;
         boolean hadMoved = false;
 
-        int currentPlace, offset, lastStarter;
+        int currentPlace, place, lastStarter;
 
 
         // Key: les memes i,j,k d'enabler Value: Leur index dans le tableau de boolean
@@ -168,27 +168,36 @@ public class CasteOpenMoleParameter implements IOpenMoleParameter {
 
         do {
             hadMoved = true;
-            offset = -1;
+
             // (1) on commence a essayer d'augmenter i, puis
             // (2) on se retrouve ici si il n'a pas été possible d'augmenter facilement meme 0eme
             for (Integer index : kvIndexerIndex.keySet()) {
                 // (1) La place alloué au meme correspondant a l'index i si for imbriqué
                 currentPlace = kvIndexerIndex.get(index);
-                offset++;
                 // si le dudy s'est pas retiré du game
                 if (currentPlace != -1) {
                     // (1) Par exemple si 0eme meme, on essaye d'avance de 1 son slot
                     // (2) 1eme meme, on avance de 1 son slot
-                    if (currentPlace + 1 < maxactivator - offset) {
+                    if (currentPlace + 1 < maxactivator - index) {
                         kvIndexerIndex.put(index, ++currentPlace);
+//                        for(int i=index-1; i>= 0;i--){
+//                            kvIndexerIndex.put(i, ++currentPlace);
+//                            kvLastStarter.put(i, currentPlace);
+//                        }
                         break;
                     }
                     // si on peut pas avancer de 1 mais que le lastStarter + 1 est possible
                     // (1) Sinon il va falloir aussi incrementer les autres
                     // (2) s'il est a bout, rebelotte.
-                    else if (kvLastStarter.get(index) + 1 < maxactivator - offset) {
-                        kvIndexerIndex.put(index, kvLastStarter.get(index) + 1);
-                        kvLastStarter.put(index, kvLastStarter.get(index) + 1);
+                    else if (kvLastStarter.get(index) + 1 < maxactivator - index) {
+                        place = kvLastStarter.get(index) + 1;
+                        kvIndexerIndex.put(index, place);
+                        kvLastStarter.put(index, place);
+                        for(int i=index-1; i>= 0;i--){
+                            kvIndexerIndex.put(i, ++place);
+                            kvLastStarter.put(i, place);
+                        }
+
                         // (1) pas de break car le suivant va devoir augmenter son index aussi
                     }
                     // (1) Si aucun des deux, c'est qu'on est au bout du bout
