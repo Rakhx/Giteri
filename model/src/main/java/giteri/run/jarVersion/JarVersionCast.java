@@ -3,9 +3,7 @@ package giteri.run.jarVersion;
 import giteri.run.configurator.CasteOpenMoleParameter;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Initializer;
-import scala.Array;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

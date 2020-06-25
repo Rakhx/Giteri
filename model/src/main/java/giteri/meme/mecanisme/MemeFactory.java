@@ -12,7 +12,7 @@ import giteri.meme.entite.Meme;
 
 import giteri.run.configurator.Configurator.MemeList;
 import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
-import sun.nio.ch.IOUtil;
+
 
 /** Permet de gérer les meme du graph
  *
@@ -385,7 +385,7 @@ public class MemeFactory {
 			selected.add(cree);
 		}
 
-		if(Configurator.debugCouple){
+		if(Configurator.debugCouple && !Configurator.fullSilent){
 			String debug = "[MemeFactory.generateCouple] "+nbAdd+":"+nbRmv;
 			for (IUnitOfTransfer<CoupleMeme> memes : selected) {
 				debug += "\n"+memes.toNameString() + " ("+memes.getProbaPropagation() + ")";
@@ -463,19 +463,6 @@ public class MemeFactory {
 		}
 		return null;
 	}
-
-//	/**
-//	 *
-//	 * @param numero
-//	 * @return
-//	 */
-//	public Meme getMemeFromIndex(int numero){
-//		for (IUnitOfTransfer meme : kvMemeIndex.keySet()) {
-//			if(kvMemeIndex.get(meme) == numero)
-//				return meme;
-//		}
-//		return null;
-//	}
 
 	public IUnitOfTransfer getIemeMemeFromSpecList(MemeList list, int ieme){
 		if(!hasBeenSorted){

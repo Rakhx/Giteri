@@ -88,8 +88,6 @@ public class NetworkFileLoader implements IReadNetwork {
 
 		NetworkProperties netProp;
 		netProp = net.getNetworkProperties(Optional.empty(),"lu", Configurator.activationCodeAllAttrib);
-		// writeSerializePropertiesIntoFile(netProp);
-		// netProp = readSerializedPropertiesFromFile();
 
 		if(andWriteThem)
 			writeSerializePropertiesIntoFile(netProp);
@@ -188,7 +186,6 @@ public class NetworkFileLoader implements IReadNetwork {
 	 */
 	public NetworkProperties readSerializedPropertiesFromFile(){
 		NetworkProperties netProp = null;
-		// File repertoires = writeNRead.createAndGetDirFromString(new ArrayList<>(Arrays.asList(Configurator.fileNameSerialisation)));
 		try
 		{
 			// Reading the object from a file
@@ -196,7 +193,6 @@ public class NetworkFileLoader implements IReadNetwork {
 			System.out.println(System.getProperty("user.dir"));
 			FileInputStream file;
 			if(Configurator.typeOfConfig == Configurator.EnumLauncher.jarOpenMole)
-			//	file = new FileInputStream(Configurator.fileNameSerialisation);
 				file  = new FileInputStream(Configurator.fileNameSerialisationOpen);
 			else
 				 file = new FileInputStream(Configurator.fileNameSerialisation);
@@ -210,7 +206,7 @@ public class NetworkFileLoader implements IReadNetwork {
 		}
 		catch(IOException ex)
 		{
-			System.out.println("[networkFileLoader.read...]- IOException is caught");
+			System.out.println("[networkFileLoader.read...]- IOException is caught" + ex.getMessage());
 		}
 		catch(ClassNotFoundException ex)
 		{

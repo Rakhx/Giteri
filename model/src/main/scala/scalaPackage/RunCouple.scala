@@ -1,6 +1,5 @@
 package scalaPackage
-import scala.collection.JavaConverters._
-import giteri.run.jarVersion.JarVersion
+import giteri.run.configurator.Configurator
 
 object RunCouple {
   def main(args : Array[String]): Unit =
@@ -23,17 +22,18 @@ object RunCouple {
    * @return
    */
   def run(activationCode: Double, nbMeme: Int, maxCombinaison:Int,
-          proba1: Double,proba2: Double,proba3: Double, proba4: Double): Double = {
+          proba1: Double, proba2: Double,proba3: Double, proba4: Double): Double = {
     // Nombre total de combinaison d'activation de nbCouple parmi les totalDispo
     var nbPermutation : Int = combSansRepSimplified(nbMeme, maxCombinaison)
     var thoudans : Double = 10000;
     var tmp : Double = (activationCode * nbPermutation) / thoudans
     // conversion de selector double de openmole en int de selection plus tard en java
 
+    if(!Configurator.fullSilent)
     println("i'm call selector;conversion "+ activationCode+";"+tmp+" nbMeme:maxCombi "+nbMeme+":"+maxCombinaison
     +" pour "+ nbPermutation +" combinaisons")
 
-    giteri.run.jarVersion.JarVersionCast.run(tmp,nbMeme,nbPermutation, proba1,proba2,proba3, proba4)
+    giteri.run.jarVersion.JarVersionCast.run(tmp,nbMeme,maxCombinaison, proba1,proba2,proba3, proba4)
   }
 
   def combSansRepSimplified(k:Int, parmiN:Int) : Int =

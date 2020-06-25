@@ -10,7 +10,7 @@ import scala.util.Random
 
 object Test {
   def main(args: Array[String]): Unit = {
-
+    serializNetworkTarget()
   }
 
   /** Sérialize, après lecture, les propriétés d'un réseau, issu d'un fichier .txt sous forme

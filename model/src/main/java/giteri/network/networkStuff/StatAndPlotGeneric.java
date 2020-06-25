@@ -291,7 +291,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			explorator = callFromJar(fittingConfig, parameter);
 		}
 
-		if(Configurator.debugCouple)
+		if(Configurator.debugCouple&& !Configurator.fullSilent)
 			System.out.println(explorator.toString());
 
 		// Classe de configuration qui contient tout ce qu'il faut pour faire une simu

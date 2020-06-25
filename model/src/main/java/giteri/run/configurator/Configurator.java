@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public final class Configurator {
 
 	// si true, openmole mode activé
-	private static boolean fastSwitchOpen = false;
+	private static boolean fastSwitchOpen = true;
 	public static boolean quickScore = !fastSwitchOpen; // Aucun affichage, aucun fichier output
 	public static boolean fullSilent = fastSwitchOpen; // Aucun affichage, aucun fichier output
 
@@ -50,12 +50,10 @@ public final class Configurator {
 	public static boolean strictEqualityInComparaison = true; // FALSE : >= || TRUE : >
 
 	// PROPAGATION
-
 	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
 	@toOutput ( yes = true )
 	public static boolean autoMemeForBreeder = false;	// Les breeder ont associé un meme complémement, rmd ajout ou retrait.
 	public static boolean onlyOneToPropagate = true; // Dans le cas ou une action s'applique sur plusieurs entités
-
 
 
 	// SCORE
@@ -95,7 +93,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static int initialNetworkForFitting = 0; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
 	@toOutput ( yes = true )
-	public static int nbRepetitionbyRun = 10;
+	public static int nbRepetitionbyRun = 2;
 	@toOutput ( yes = true )
 	public static int nbRepetitionForJar = 2;
 

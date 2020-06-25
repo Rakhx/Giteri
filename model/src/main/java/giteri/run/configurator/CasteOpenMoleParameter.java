@@ -1,35 +1,22 @@
 package giteri.run.configurator;
 
-import giteri.run.interfaces.Interfaces;
 import giteri.run.interfaces.Interfaces.IOpenMoleParameter;
-import giteri.tool.math.Toolz;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Version couple meme // caste
  */
 public class CasteOpenMoleParameter implements IOpenMoleParameter {
 
-
     public int activation,nbMemes,maxMeme;
-    public boolean[] activated;
-
-    Map<Integer,Integer> indexActivator;
-
-    // Code d'activation, nombre de meme voulu activé, nombre de meme totaux
-    public int addActi, addNb, rmvActi, rmvNb;
-    // Obligation de passer par les setter afin de générer un tableau d'activation de la bonne taille
-    private int addTotal, rmvTotal;
-
-    public boolean[] addActivation;
-    public boolean[] rmvActivation;
     public List<Double> probaPropa;
 
     public CasteOpenMoleParameter(int activationCode, int nbMeme, int maxCombinaison, List<Double> probas){
         activation = activationCode; nbMemes = nbMeme; maxMeme = maxCombinaison; probaPropa = probas;
     }
-
 
     /**
      * Le numero d'activator. Le Max défini le nombre de combinaison max, et le Nb le nombre
@@ -42,7 +29,7 @@ public class CasteOpenMoleParameter implements IOpenMoleParameter {
      * @return un tableau de boolean a true pour les slots activé.
      */
     public boolean[] getActionActivation2(int activator, int nbActivator, int maxactivator) {
-        boolean debug = Configurator.debugCouple;
+        boolean debug = Configurator.debugCouple && !Configurator.fullSilent;
 
        if(debug) System.out.println("CALL: " + activator);
         boolean[] resultat = new boolean[maxactivator];
@@ -140,21 +127,18 @@ public class CasteOpenMoleParameter implements IOpenMoleParameter {
      * @return un tableau de boolean a true pour les slots activé.
      */
     public Map<Integer, Integer> getActionActivation(int activator, int nbActivator, int maxactivator) {
-        boolean debug = Configurator.debugCouple;
+        boolean debug = Configurator.debugCouple && !Configurator.fullSilent;
 
        if(debug) System.out.println("[ParamOpen.getActionActi()] activ " + activator+ " nbActi "+nbActivator + " maxActi " + maxactivator);
         boolean[] resultat = new boolean[maxactivator];
         boolean again = true;
         boolean ok = true;
         boolean hadMoved = false;
-
         int currentPlace, place, lastStarter;
-
 
         // Key: les memes i,j,k d'enabler Value: Leur index dans le tableau de boolean
         Map<Integer, Integer> kvIndexerIndex = new HashMap<>(nbActivator);
         Map<Integer, Integer> kvLastStarter = new HashMap<>(nbActivator);
-
 
         // startpoint [true, true, true, false, false false false ... ]
         for (int i = 0; i < nbActivator; i++) {
@@ -228,24 +212,5 @@ public class CasteOpenMoleParameter implements IOpenMoleParameter {
 
        return kvIndexerIndex;
     }
-
-    public int getAddTotal() {
-        return addTotal;
-    }
-
-    public void setAddTotal(int addTotal) {
-        this.addTotal = addTotal;
-        addActivation = new boolean[addTotal];
-    }
-
-    public int getRmvTotal() {
-        return rmvTotal;
-    }
-
-    public void setRmvTotal(int rmvTotal) {
-        this.rmvTotal = rmvTotal;
-        rmvActivation = new boolean[rmvTotal];
-    }
-
 
 }

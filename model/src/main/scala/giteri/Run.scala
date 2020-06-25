@@ -50,9 +50,7 @@ object Run{
     reader.getNetworkProperties(false, true);
   }
 
-
-
-  def run(network: File, one: Double, oneActi: Integer, two: Double, twoActi: Integer,
+ def run(network: File, one: Double, oneActi: Integer, two: Double, twoActi: Integer,
           three: Double, threeActi: Integer, four: Double, fourActi: Integer,
           five : Double, fiveActi: Integer, six: Double, sixActi:Integer,
           sevn: Double, sevnActi: Integer, hei: Double, heiActi: Integer,
