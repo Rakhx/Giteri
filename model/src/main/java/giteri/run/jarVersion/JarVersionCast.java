@@ -29,50 +29,54 @@ public class JarVersionCast {
         // entre 1 et 8
         int nbMeme = 4;
         // selection quel position
-        int selector = 458;
+        Double selector = 8066026.655799285;
         // total des memes dispo
-        int maxMemes = 100;
+        int maxMemes = 121;
 
         // proba de propa
         List<Double> proba = new ArrayList<>(Arrays.asList(.1,.2,.3,.4,.5,.6,.7,.8));
-        run(selector,nbMeme,maxMemes,proba);
+        run(selector,nbMeme,maxMemes,proba.get(0), proba.get(1), proba.get(2), proba.get(3));
     }
 
     /** fonction appelée depuis openmole ou depuis le main de jarversioncast
      *
      *
-     * @param activationCode
-     * @param nbMeme
-     * @param maxCombinaison
+     * @param activationCode entre 0 et 10000
+     * @param nbMeme entre 1 et 4
+     * @param maxCombinaison 11*11
      * @param proba
      * @return
      */
-    public static Double run(int activationCode, int nbMeme, int maxCombinaison, List<Double> proba){
-        CasteOpenMoleParameter comp = new CasteOpenMoleParameter(activationCode,nbMeme,maxCombinaison,proba);
-        Initializer.initialize(launcher, comp);
-        return 0.;
+    public static Double run(Double activationCode, int nbMeme, int maxCombinaison, Double... proba){
+
+        List<Double> probas = new ArrayList<>();
+        // Concernant
+        for (int i = 0; i < proba.length; i++) {
+            probas.add(proba[i]);
+        }
+
+
+        int activatio = (int)Math.floor(activationCode);
+        CasteOpenMoleParameter comp = new CasteOpenMoleParameter(activatio,nbMeme,maxCombinaison,probas);
+        return Initializer.initialize(launcher, comp);
     }
 
-    // Pour tester depuis openMole.
-    public static int runlol(int... args){
-        return args.length;
+
+    /**
+     *
+     * @param jpp
+     * @return
+     */
+    public static List<Double> convert(List<scala.Double> jpp){
+        List<Double> res = new ArrayList<>();
+        for (scala.Double aDouble : jpp) {
+            res.add(scala.Predef.double2Double(aDouble.toDouble()));
+        }
+
+        return res;
     }
 
-    // Pour tester depuis openMole.
-    public static int runDouble(scala.Double... args){
-        return args.length;
-    }
-    // Pour tester depuis openMole.
-    public static int runDouble1(scala.Double args){
-        return 1;
-    }
 
-    public static int runDouble2(scala.Array<scala.Double> args){  return 1;
-    }
-    public static int runDoubleThree(Array<Double> args){  return 1;
-    }
-    public static int runDoubleFour(Array<scala.Double> args){  return 1;
-    }
 
 
 }

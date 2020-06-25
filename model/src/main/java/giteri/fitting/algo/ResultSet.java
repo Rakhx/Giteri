@@ -194,7 +194,7 @@ public class ResultSet extends Hashtable<Integer, Result> {
 		List<String> parameter = result.getCurrentConfig();
 
 		// Mise à jour des valeurs de moyenne et d'écart type pour les réseaux
-		updateMeanAndSD(ListOfproperties, Configurator.activationCodeAllAttrib, netMean, netSD);
+		updateMeanAndSD(ListOfproperties, Configurator.activationCodeForScore, netMean, netSD);
 		toWriteSimple += numeroRun;
 		toWriteDetailled += numeroRun;
 

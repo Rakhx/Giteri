@@ -142,12 +142,9 @@ public class CasteOpenMoleParameter implements IOpenMoleParameter {
     public Map<Integer, Integer> getActionActivation(int activator, int nbActivator, int maxactivator) {
         boolean debug = Configurator.debugCouple;
 
-       if(debug) System.out.println("[ParamOpen.getActionActi()] activ" + activator+ " nbActi "+nbActivator + " maxActi" + maxactivator);
+       if(debug) System.out.println("[ParamOpen.getActionActi()] activ " + activator+ " nbActi "+nbActivator + " maxActi " + maxactivator);
         boolean[] resultat = new boolean[maxactivator];
         boolean again = true;
-//        int nbCombinaison = Toolz.getLittleFactorial(maxactivator) / (Toolz.getLittleFactorial(maxactivator - nbActivator)
-//                * Toolz.getLittleFactorial(nbActivator));
-
         boolean ok = true;
         boolean hadMoved = false;
 
@@ -155,8 +152,8 @@ public class CasteOpenMoleParameter implements IOpenMoleParameter {
 
 
         // Key: les memes i,j,k d'enabler Value: Leur index dans le tableau de boolean
-        Map<Integer, Integer> kvIndexerIndex = new HashMap<Integer, Integer>(nbActivator);
-        Map<Integer, Integer> kvLastStarter = new HashMap<Integer, Integer>(nbActivator);
+        Map<Integer, Integer> kvIndexerIndex = new HashMap<>(nbActivator);
+        Map<Integer, Integer> kvLastStarter = new HashMap<>(nbActivator);
 
 
         // startpoint [true, true, true, false, false false false ... ]
@@ -199,13 +196,9 @@ public class CasteOpenMoleParameter implements IOpenMoleParameter {
                         // se retire du game
                         kvIndexerIndex.put(index, -1);
                     }
-
                 }
             }
-
-
         } while (--activator > 0);
-
 
         String rez = "elements: ";
       if(debug) {
@@ -223,14 +216,6 @@ public class CasteOpenMoleParameter implements IOpenMoleParameter {
             resultat[integer] = true;
         }
 
-//        String res = "[";
-//        for (int i = 0; i < resultat.length; i++) {
-//            res += ";";
-//            res += resultat[i] ? "1" : "0";
-//        }
-//        res += "]";
-//
-//       if(debug) System.out.println(res);
 
        return kvIndexerIndex;
     }

@@ -1,10 +1,8 @@
 package giteri
+
 import java.io.File
-
 import giteri.network.networkStuff.NetworkFileLoader
-import giteri.run.jarVersion.JarVersion
 import giteri.tool.other.WriteNRead
-
 import scala.util.Random
 
 object Run{

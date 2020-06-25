@@ -6,7 +6,6 @@ import giteri.tool.other.WriteNRead
 object Test {
   def main(args: Array[String]): Unit =
   {
-    giteri.run.jarVersion.JarVersionCast.gow()
   }
 
   def testRandomFn( nbActivator: Int, selector: Double, probas:Array[Double]): Double = {

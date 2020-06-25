@@ -114,7 +114,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			final CasteOpenMoleParameter proxyParam;
 			// ICI Faire des proxy des param. optional etc car lancée depuis L'IHM sans paramètre
 			// TODO [CV] Proxy COUPLE
-			proxyParam = new CasteOpenMoleParameter(20, 4,120,Arrays.asList(.10,.11,.12,.13,.14,.15,.16,.17));
+			proxyParam = new CasteOpenMoleParameter(20, 4,121,Arrays.asList(.10,.11,.12,.13,.14,.15,.16,.17));
 			memeFactory.generateCoupleFromMapIndex(proxyParam.getActionActivation(proxyParam.activation,proxyParam.nbMemes,proxyParam.maxMeme)
 					,proxyParam.probaPropa);
 
