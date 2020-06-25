@@ -314,41 +314,6 @@ public class MemeFactory {
 
 	/** Génère une liste de coupleMeme depuis les deux tableaux d'activation d'add et rmv. Produit carthésien
 	 *
-	 * @param addActi
-	 * @return
-	 */
-	public List<IUnitOfTransfer<CoupleMeme>> generateCoupleFromActivation(boolean[] activator){
-		// int i = 0, j = 0;
-		List<IUnitOfTransfer<CoupleMeme>> selected = new ArrayList<>();
-		List<Meme> addz, rmvz;
-		Meme add, rmv;
-		IUnitOfTransfer<CoupleMeme> cree;
-		int index = -1;
-
-		if(!Configurator.jarMode)
-			clearExistingCouple();
-
-//		addz = getMemes(MemeList.FITTING, TypeOfUOT.AJOUTLIEN).stream().map(e -> (Meme)e).collect(Collectors.toList());
-//		rmvz = getMemes(MemeList.FITTING, TypeOfUOT.RETRAITLIEN).stream().map(e -> (Meme)e).collect(Collectors.toList());;
-//		for (int i = 0; i < addActi.length; i++) {
-//			if(addActi[i]) {
-//				add = addz.get(i);
-//				for (int j = 0; j < rmvActi.length; j++) {
-//					// A new combinaison is born
-//					if(rmvActi[j]){
-//						rmv = rmvz.get(j);
-//						cree = extractAndAddCoupleMeme(add.getName(), rmv.getName(), .1, true);
-//						selected.add(cree);
-//					}
-//				}
-//			}
-//		}
-
-		return selected;
-	}
-
-	/** Génère une liste de coupleMeme depuis les deux tableaux d'activation d'add et rmv. Produit carthésien
-	 *
 	 * example de transcription d'un int en deux éléments. Si 3 est le max du 1er element, 13 est composé de
 	 * 13%3=1 -> 1er dimension
 	 * 13/3=4 -> 2er dimension

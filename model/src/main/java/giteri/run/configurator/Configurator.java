@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public final class Configurator {
 
 	// si true, openmole mode activé
-	private static boolean fastSwitchOpen = true;
+	private static boolean fastSwitchOpen = false;
 	public static boolean quickScore = !fastSwitchOpen; // Aucun affichage, aucun fichier output
 	public static boolean fullSilent = fastSwitchOpen; // Aucun affichage, aucun fichier output
 
@@ -100,7 +100,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static boolean fixedNbAction  = false; //  ne pas augmenter le nombre d'action max en fonction du nombre de noeud
 	@toOutput ( yes = true )
-	public static int multiplicatorNbAction  = 30; //  Par combein on multiplie le nombdre de noeud sur la simulation de base 3000
+	public static int multiplicatorNbAction  = 3000; //  Par combein on multiplie le nombdre de noeud sur la simulation de base 3000
 
 	// endregion
 

@@ -95,7 +95,6 @@ public class CommunicationModel implements IModel {
 	 */
 	public void fittingSpecificConfig() {
 		System.out.println("Pouet");
-//		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.specific, Optional.empty(), Optional.empty());
 	}
 
 	/** Plus de fonctionnalité
@@ -103,6 +102,7 @@ public class CommunicationModel implements IModel {
 	 */
 	public void fittingOnce(){
 		Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
+
 		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.oneShot,null);
 	}
 
@@ -111,6 +111,7 @@ public class CommunicationModel implements IModel {
 	 *
 	 */
 	public void fittingNetworks(){
+
 		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.exhaustive, null);
 	}
 
@@ -129,8 +130,6 @@ public class CommunicationModel implements IModel {
 	 *
 	 */
 	public void displayInput(){
-
-
 		WriteNRead wr = new WriteNRead();
 		try {
 			wr.readAndCreateNetwork(Configurator.defaultPathForReadingNetwork,nl," ","#");
@@ -138,14 +137,6 @@ public class CommunicationModel implements IModel {
 			e.printStackTrace();
 		}
 		nl.getGraphFromDataRead();
-	}
-
-	/** Indique aux vues les memes disponibles sur la map.
-	 *
-	 * @param memes
-	 */
-	public void setViewMemeAvailable(List<Interfaces.IUnitOfTransfer> memes){
-		view.setMemeAvailable(memes);
 	}
 
 	public void rdmConfig(){

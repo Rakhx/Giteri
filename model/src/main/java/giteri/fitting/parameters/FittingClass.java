@@ -571,7 +571,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 			if(Configurator.isAttribActived(activationCode, attribut))
 			{
 				// Calcul de la distance entre deux network sur ce critère
-				System.out.println(attribut);
 				Object attributValueForCurrentNetwork = currentNetworkProperty.getValue(attribut);
 				Object attributValueForTargetNetwork = targetNetworkProperty.getValue(attribut);
 				currentDistance = getAttributDistance(attribut,	attributValueForCurrentNetwork,	attributValueForTargetNetwork);

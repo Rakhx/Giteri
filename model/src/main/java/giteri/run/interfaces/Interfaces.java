@@ -106,7 +106,6 @@ public class Interfaces {
 		void fittingOnce();
 		void exploFitting();
 		void rdmConfig();
-		void setViewMemeAvailable(List<IUnitOfTransfer> memes);
 		void takeSnapshot(long seed, Optional<ArrayList<String>> simulationPath);
 
 		void suspend();

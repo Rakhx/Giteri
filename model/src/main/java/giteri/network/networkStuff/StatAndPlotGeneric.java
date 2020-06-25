@@ -220,12 +220,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		if(debugJarMode) {
 			memesSelectionnes = new ArrayList<>();
 		}
-//			if(!coupleVersion)
-//				writeNRead.writeSmallFile(toWrite, "ActivatedMeme", ((ClassicOpenMoleParameter)parameter).memeActication.stream().map(e -> e.toString()).collect(Collectors.toList()));
-//			else{
-//				writeNRead.writeSmallFile(toWrite, "ActivatedMeme", (memeFactory.getMemes(MemeList.FITTING, Configurator.TypeOfUOT.COUPLE).stream().map(e -> e.toString()).collect(Collectors.toList())));
-//			}
-//		}
 
 		unitToRun = memeFactory.getMemes(MemeList.FITTING, Configurator.TypeOfUOT.COUPLE);
 
@@ -236,9 +230,8 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		// Associer une proba de propagation
 		int compte = 0;
-		for (IUnitOfTransfer iUnitOfTransfer : unitToRun) {
 
-//			unitAndProba.put(iUnitOfTransfer, new GenericDoubleParameter(proba.get(compte++)));
+		for (IUnitOfTransfer iUnitOfTransfer : unitToRun) {
 			// normalement proba deja mise en place lors de la creation des couples
 			unitAndProba.put(iUnitOfTransfer, new GenericDoubleParameter(iUnitOfTransfer.getProbaPropagation()));
 
@@ -291,7 +284,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			explorator = callFromJar(fittingConfig, parameter);
 		}
 
-		if(Configurator.debugCouple&& !Configurator.fullSilent)
+		if(Configurator.debugCouple && !Configurator.fullSilent)
 			System.out.println(explorator.toString());
 
 		// Classe de configuration qui contient tout ce qu'il faut pour faire une simu

@@ -175,7 +175,6 @@ public class Initializer {
             entiteHandler.setVueController(vControl);
             entiteHandler.initialisation();
             entiteHandler.addMemeListener(workerFactory.getDrawer()); //  entiteHandler.addEntityListener(workerFactory.getCalculator());
-
             Interfaces.IReadNetwork nl = mControl.getReader();
             entiteHandler.suspend(); // networkConstructor.suspend();//  networkConstructor.start();
             entiteHandler.start();
@@ -199,6 +198,5 @@ public class Initializer {
                 Configurator.EnumExplorationMethod.oneShot,
                 parameters);
     }
-
 
 }
