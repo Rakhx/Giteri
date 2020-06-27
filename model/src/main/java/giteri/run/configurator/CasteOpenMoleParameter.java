@@ -20,8 +20,6 @@ public class CasteOpenMoleParameter implements IOpenMoleParameter {
 
    // public CasteOpenMoleParameter()
 
-
-
     /**
      * Le numero d'activator. Le Max défini le nombre de combinaison max, et le Nb le nombre
      * d'élément qui constitue la combinaison considérée.

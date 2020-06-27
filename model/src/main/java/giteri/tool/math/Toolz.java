@@ -733,5 +733,18 @@ public class Toolz {
     	return resultat;
 	}
 
+	public static int semiFact(int min, int max){
+		int resul = 1;
+		for (int i = min; i <= max ; i++) {
+			resul *= i;
+		}
+
+		return resul;
+	}
+
+	public static int combinatoire(int k, int parmiN){
+		return semiFact(parmiN-k+1, parmiN)/ getLittleFactorial(k);
+	}
+
 
 }

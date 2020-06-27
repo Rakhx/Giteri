@@ -1,0 +1,106 @@
+// Define the variables that are transmitted between the tasks
+val one = Val[Double]
+val oneA = Val[Int]
+val two = Val[Double]
+val twoA = Val[Int]
+val three = Val[Double]
+val threeA = Val[Int]
+val four = Val[Double]
+val fourA = Val[Int]
+val five = Val[Double]
+val fiveA = Val[Int]
+val six = Val[Double]
+val sixA = Val[Int]
+val seven = Val[Double]
+val sevenA = Val[Int]
+val height = Val[Double]
+val heightA = Val[Int]
+val nine = Val[Double]
+val nineA = Val[Int]
+val ten = Val[Double]
+val tenA = Val[Int]
+val eleven = Val[Double]
+val elevenA = Val[Int]
+val twelve = Val[Double]
+val twelveA = Val[Int]
+val thirteen = Val[Double]
+val thirteenA = Val[Int]
+val fourteen = Val[Double]
+val fourteenA = Val[Int]
+val fiveteen = Val[Double]
+val fiveteenA = Val[Int]
+val sixteen = Val[Double]
+val sixteenA = Val[Int]
+val seventeen = Val[Double]
+val seventeenA = Val[Int]
+val heighteen = Val[Double]
+val heighteenA = Val[Int]
+val nineteen = Val[Double]
+val nineteenA = Val[Int]
+val twenty = Val[Double]
+val twentyA = Val[Int]
+
+val network = Val[File]
+val seed = Val[Long]
+// Score d'output du réseau obtenu par rapport au cible
+val o1 = Val[Double]
+
+// Output
+val display = ToStringHook()
+
+val model =
+  ScalaTask("""
+   |val (o1) = giteri.Run.run(network,one,oneA,two,twoA,three,threeA,four,fourA,five,fiveA,six,sixA,seven,sevenA,height,heightA, nine,nineA,ten ,tenA ,eleven ,elevenA ,twelve,twelveA ,thirteen ,thirteenA,fourteen, fourteenA, fiveteen,fiveteenA, sixteen, sixteenA,
+   seventeen,seventeenA ,heighteen, heighteenA,nineteen,nineteenA ,twenty, twentyA, seed)
+   |""".stripMargin) set (
+      inputs += (one,oneA,two,twoA,three,threeA,four,fourA,five,fiveA,six,sixA,seven,sevenA,height,heightA, nine,nineA, ten ,tenA ,eleven ,elevenA ,twelve,twelveA ,thirteen ,thirteenA, fourteen, fourteenA, fiveteen, fiveteenA, sixteen, sixteenA, 
+	  seventeen, seventeenA, heighteen, heighteenA,nineteen, nineteenA, twenty, twentyA,network, seed),
+      outputs += (o1),
+      network := workDirectory / "default.txt",
+      plugins += pluginsOf(giteri.Run)
+    )
+
+val evolution =
+  SteadyStateEvolution(
+    algorithm =  
+      NSGA2(
+        mu = 200,
+        genome = Seq(one in (0.0, 1.0),two in (0.0,1.0),three in (0.0,1.0),four in (0.0,1.0),five in (0.0,1.0),six in (0.0,1.0),seven in (0.0,1.0),height in (0.0,1.0),nine in (0.0,1.0),ten in (0.0,1.0),eleven in (0.0,1.0),twelve in (0.0,1.0),thirteen in (0.0,1.0), fourteen in (0.0,1.0),fiveteen in (0.0,1.0),sixteen in (0.0,1.0),seventeen in (0.0,1.0),heighteen in (0.0,1.0),
+		nineteen in (0.0,1.0),twenty in (0.0,1.0),
+		oneA in (0 to 1 by 1),twoA in (0 to 1 by 1),threeA in (0 to 1 by 1),fourA in (0 to 1 by 1),fiveA in (0 to 1 by 1),sixA in (0 to 1 by 1),sevenA in (0 to 1 by 1),heightA in (0 to 1 by 1),nineA in (0 to 1 by 1),tenA in (0 to 1 by 1),elevenA in (0 to 1 by 1),twelveA in (0 to 1 by 1),thirteenA in (0 to 1 by 1),fourteenA in (0 to 1 by 1),fiveteenA in (0 to 1 by 1),sixteenA in (0 to 1 by 1),seventeenA in (0 to 1 by 1),heighteenA in (0 to 1 by 1),nineteenA in (0 to 1 by 1),twentyA in (0 to 1 by 1),
+        ),
+        objectives = Seq(o1),
+        stochastic = Stochastic(seed = seed)
+      ),
+    evaluation = model,
+    parallelism = 1,//8, //12
+    termination = 150
+)
+
+val save = SavePopulationHook(evolution, workDirectory / "calibration")
+val env = LocalEnvironment(8)
+
+val envDistant =
+  SLURMEnvironment(
+    "bouadjio",
+    "osirim-slurm.irit.fr",
+    // optional parameters
+    workDirectory = "/users/smac/bouadjio",
+	threads = 8, //8,//12
+	queue = "48CPUNodes"
+)
+//48CPUNodes   64CPUNodes   GPUNodes 
+(evolution hook save on env)
+
+
+ 
+// Define the island model with 2,000 concurrent islands.
+// The algorithm stops after 200,000 islands evaluations.
+//val island = IslandEvolution(evolution, parallelism = 1000, termination = 100000)
+ 
+// Define a hook to save the Pareto frontier
+
+//val save = SavePopulationHook(island, workDirectory / "calibration")
+//val env = EGIEnvironment("vo.complex-systems.eu")
+
+//(island hook save on env)

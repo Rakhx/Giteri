@@ -595,7 +595,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 
 		int nbLien;
-		resultat += "-----------------------------------------------------";
+		resultat += "---------------------------------------------------------------";
 		for (String memeCombinaison : entiteByMemePossession.keySet()) {
 			nbLien = 0;
 			SelfDegrees.clear();
@@ -603,7 +603,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			entityByMeme.clear();
 			othersMemes.clear();
 
-			part1 = "";part2 = ""; part3 = "";
+			part1 = "";part2 = "Connection "; part3 = "";
 			// pour chaque entité possédant la combinaison
 			for (Entite entite : entiteByMemePossession.get(memeCombinaison)) {
 				entityByMeme.add(""+entite.getIndex());
@@ -625,7 +625,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 			// liste des memes possédés par les entités liées a l'entité courante
 			for (String s : othersMemes.keySet()) {
-				part2 +=  s + ":" + othersMemes.get(s) + "-" + Toolz.getNumberCutToPrecision(othersMemes.get(s)*100./nbLien,2) +"%" +" && ";
+				part2 += "["+ s + "]: " + othersMemes.get(s) + " (" + Toolz.getNumberCutToPrecision(othersMemes.get(s)*100./nbLien,2) +"%)" +" && ";
 			}
 
 			// Index des entités courantes
@@ -635,21 +635,23 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			for (String s : entityByMeme) {
 				part1 += s+":";
 			}
-			part1 += "] \n";
+			part1 += "]";
 
 			resultat += "\n("
 					+ entiteByMemePossession.get(memeCombinaison).size()
-					+ ") - "
-					+ "Degree "
+					+ ")-["
 					+ (memeCombinaison)
-					+ ": "
+					+ "] degree: "
 					+ Toolz.getNumberCutToPrecision(Toolz.getAvg(SelfDegrees),2)
-					+ " Degree nodes connected to : "
+					+ " degree nodes connected to : "
 					+ Toolz.getNumberCutToPrecision(
 					Toolz.getAvg(othersDegrees), 2);
+
+			resultat += "\n";
+			resultat += part2;
 			resultat += "\n";
 			resultat += part1;
-			resultat += part2;
+
 		}
 
 		return resultat;
@@ -905,7 +907,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		if(Configurator.useMemePropagationProba)
 			proba /=  Math.sqrt(1 + Math.abs(acting.getDegree() - cible.getDegree()));
 		else
-			proba =	 Math.sqrt(1 + Math.abs(acting.getDegree() - cible.getDegree()));
+			proba =	 1./Math.sqrt(1 + Math.abs(acting.getDegree() - cible.getDegree()));
 		return proba;
 	}
 

@@ -1459,14 +1459,13 @@ public class IHM extends JFrame implements  IBehaviorTransmissionListener, IView
 				seriesDensity.add(compteurSerieDensity++, netProp.getDensity());
 				if (refreshDDArray)
 					displayDDChart(netProp.getDd());
-				if(Configurator.displayOnIHMDensitySD)
-				{
-					densityValuesLast.add(netProp.getDensity());
-					try {
-						temp = Toolz.getNumberCutToPrecision(Toolz.getDeviation(densityValuesLast), 4);
-					}catch (Exception e){}
-					jlDensitySD.setText("SD density: " + temp);
-				}
+
+				densityValuesLast.add(netProp.getDensity());
+				try {
+					temp = Toolz.getNumberCutToPrecision(Toolz.getDeviation(densityValuesLast), 4);
+				}catch (Exception e){}
+				jlDensitySD.setText("SD density: " + temp);
+
 			}
 			//endregion
 			catch(NullPointerException npe){

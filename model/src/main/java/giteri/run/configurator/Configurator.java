@@ -10,29 +10,18 @@ import java.util.ArrayList;
 public final class Configurator {
 
 	// si true, openmole mode activé
-	private static boolean fastSwitchOpen = false;
+	private static boolean fastSwitchOpen = true;
 	public static boolean quickScore = !fastSwitchOpen; // Aucun affichage, aucun fichier output
 	public static boolean fullSilent = fastSwitchOpen; // Aucun affichage, aucun fichier output
 
-	// region initializer stuff
-	// VALEURS DONNEES A TITRE INDICATIF, set définitif dans l'initializer
-	// La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
-	// depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent
-	// cette configuration initiale
-	public static boolean withGraphicalDisplay;// = true;
-	public static boolean jarMode; // = true; // Si vrai, affiche le score resultat de simu
-	public static boolean systemPaused;// = false;
-	public static boolean writeNetworkResultOnFitting ; //= !fullSilent; // Screenshot, network.csv...
-	public static boolean writeMemeResultOnFitting ; //= writeNetworkResultOnFitting; // NetworkDetails.csv
-	public static EnumLauncher typeOfConfig ;
-
-	// endregion
+	// Fast debuguer & I/O
+	public static boolean displayLogAvgDegreeByMeme = false; // combinaisons de meme et leur degré + derniere application + application from start
 
 	// region Modèle
 
 	// MODELE II param
 	public static boolean coupleSingleTransmission = true; // Transmet le couple à l'entité ayant recu l'action et pas plus
-	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
+	public static boolean useMemePropagationProba = false; // utilise la proba de propagation portée par le meme
 	// TODO apply whole couple or only one adction?
 
 	// FONCTIONNEMENT
@@ -63,8 +52,8 @@ public final class Configurator {
 	 *
 	 */
 	@toOutput ( yes = true )
-	public static int activationCodeForScore = 157;
-	//public static int activationCodeForScore = 17;
+	//public static int activationCodeForScore = 157;
+	public static int activationCodeForScore = 17;
 	//157 = 1 density + 4 ddinter + 8 DDarray + 16 avg Clust + 128 APL
 	//190= 2 DDAVG + 4 DDINTER + 8 DDArray + 16 avg clust + 32 nbedge + 128 APL 
 		// 446= 2 DDAVG + 4 DDINTER + 8 DDArray + 16 avg clust + 32 nbedge + 128 APL + 256 third moment
@@ -109,8 +98,8 @@ public final class Configurator {
 	public static boolean displayFittingProviderApplied = fullSilent ? false : true;	// affiche dans la console apprlications des params:
 	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
-	public static int activationCodeForView = fullSilent? 0 : 5;
-//	public static int activationCodeForView = fullSilent? 0 : 7;
+	//public static int activationCodeForView = fullSilent? 0 : 5;
+	public static int activationCodeForView = fullSilent? 0 : 7;
 
 	public static boolean displayMemePossessionEvolution = true && !fullSilent; // Affiche dans l'IHM la possession des meme au fur et a mesure
 	public static boolean displayPlotWhileSimulation = true && !fullSilent; // Affichage des DD et densité
@@ -127,11 +116,9 @@ public final class Configurator {
 	public static String fileNameSerialisation = "serialization.se";
 	public static String fileNameSerialisationOpen = "../../../../../../../serialization.se";
 
-	public static boolean displayOnIHMDensitySD = true;
 	// endregion
 
 	// region Affichage log
-	public static boolean displayLogAvgDegreeByMeme = false; // combinaisons de meme et leur degré + derniere application + application from start
 
 	public static boolean DisplayLogBehaviorColors = false; // correspondance meme <=> code couleur
 	public static boolean displayLogMemeApplication = false; // Chaque application de meme
@@ -164,6 +151,18 @@ public final class Configurator {
 	public static boolean debugJarMode = false;
 	// endregion
 
+	// region initializer stuff
+	// VALEURS DONNEES A TITRE INDICATIF, set définitif dans l'initializer
+	// La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
+	// depuis la meme JVM donc ne pas modifier du static. Les launchers pour autres usages changent
+	// cette configuration initiale
+	public static boolean withGraphicalDisplay;// = true;
+	public static boolean jarMode; // = true; // Si vrai, affiche le score resultat de simu
+	public static boolean systemPaused;// = false;
+	public static boolean writeNetworkResultOnFitting ; //= !fullSilent; // Screenshot, network.csv...
+	public static boolean writeMemeResultOnFitting ; //= writeNetworkResultOnFitting; // NetworkDetails.csv
+	public static EnumLauncher typeOfConfig ;
+	// endregion
 	//region ancien boolean, osef, etc
 	// moyen osef
 	public static final boolean lotOfNodes = true;

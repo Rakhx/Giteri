@@ -1,0 +1,53 @@
+// activator de selection de CA a reprojeter dans espace
+val activator = Val[Double]
+// nombre de CA activés. random entre ? -> 8
+val nbActive = Val[Int]
+// PROBA
+val probaOne = Val[Double]
+val probaTwo = Val[Double]
+val probaThree = Val[Double]
+val probaFour = Val[Double]
+val seed = Val[Long]
+// SCORE RESEAU
+val sortie = Val[Double]
+
+val myModel = ScalaTask("val sortie = scalaPackage.RunCouple.run(activator,nbActive,121,probaOne, probaTwo,probaThree, probaFour )") set (
+    inputs += (activator, nbActive, probaOne, probaTwo, probaThree, probaFour),
+    outputs += (sortie),
+    plugins += (pluginsOf(giteri.Run),pluginsOf(scalaPackage.RunCouple))
+)
+
+val evolution =
+  SteadyStateEvolution(
+    algorithm =  
+      NSGA2
+      (
+        mu = 200,
+        genome = Seq(nbActive in (1 to 4 by 1),activator in (0.0,10000.0),
+		probaOne in (0.0 to 1.0 by 0.1),probaTwo in (0.0 to 1.0 by 0.1),probaThree in (0.0 to 1.0 by 0.1),
+        probaFour in (0.0 to 1.0 by 0.1)
+      ),
+        objectives = Seq(sortie),
+        stochastic = Stochastic(seed = seed)
+  ),
+    evaluation = myModel,
+    parallelism = 8,
+    termination = 150
+)
+
+val save = SavePopulationHook(evolution, workDirectory / "calibration")
+val env = LocalEnvironment(8)
+val envDistant =
+  SLURMEnvironment(
+    "bouadjio",
+    "osirim-slurm.irit.fr",
+    // optional parameters
+    workDirectory = "/users/smac/bouadjio",
+	threads = 8,//12
+	queue = "48CPUNodes"
+)
+
+(evolution hook save on envDistant)
+
+
+

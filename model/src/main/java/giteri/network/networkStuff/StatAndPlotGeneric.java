@@ -107,20 +107,20 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 			memeFactory.generateCoupleFromMapIndex(
 					paramter.getActionActivation(paramter.activation,paramter.nbMemes,paramter.maxMeme)
 					,paramter.probaPropa);
-			return fittingLauncher(typeOfLaunch, typeOfExplo, param);
+			return fittingLauncher(typeOfLaunch, typeOfExplo);
 		}
 		// appelé depuis IHM
 		else {
-			final CasteOpenMoleParameter proxyParam;
 			// ICI Faire des proxy des param. optional etc car lancée depuis L'IHM sans paramètre
-			// TODO [CV] Proxy COUPLE
-			proxyParam = new CasteOpenMoleParameter(20, 4,121,Arrays.asList(.10,.11,.12,.13,.14,.15,.16,.17));
+
+			final CasteOpenMoleParameter proxyParam = param == null?
+			new CasteOpenMoleParameter(20, 4,121,Arrays.asList(.10,.11,.12,.13,.14,.15,.16,.17)): (CasteOpenMoleParameter)param;
 			memeFactory.generateCoupleFromMapIndex(proxyParam.getActionActivation(proxyParam.activation,proxyParam.nbMemes,proxyParam.maxMeme)
 					,proxyParam.probaPropa);
 
 			(new Thread() {
 				public void run() {
-					fittingLauncher(typeOfLaunch, typeOfExplo, proxyParam);
+					fittingLauncher(typeOfLaunch, typeOfExplo);
 				}
 			}).start();
 			return 0.;
@@ -206,7 +206,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 *
 	 * @return
 	 */
-	private IExplorationMethod callFromJar(FittingClass fitter, IOpenMoleParameter parameter){
+	private IExplorationMethod callFromJar(FittingClass fitter){
 
 		// appelle sec avec un seul jeu de parametre, aux probas fixées
 		Hashtable<IUnitOfTransfer, GenericDoubleParameter> unitAndProba = new Hashtable<>();
@@ -225,8 +225,6 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 		unitToRun.sort(null);
 
-		List<Double> proba;
-			proba = ((CasteOpenMoleParameter)parameter).probaPropa;
 
 		// Associer une proba de propagation
 		int compte = 0;
@@ -267,8 +265,8 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 *
 	 */
 	// ICI Prend un IOpenMoleConfigurator à la place des memeActivations
-	public double fittingLauncher(Configurator.EnumLauncher typeOfLaunch, EnumExplorationMethod typeOfExplo,
-								  IOpenMoleParameter parameter) {
+	public double fittingLauncher(Configurator.EnumLauncher typeOfLaunch, EnumExplorationMethod typeOfExplo
+								  ) {
 
 		double resultat;
 
@@ -281,7 +279,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		if(typeOfExplo != EnumExplorationMethod.oneShot) {
 			// Si appelle oneShot, depuis IHM ou depuis JAR, explorator oneShot
 		}else {
-			explorator = callFromJar(fittingConfig, parameter);
+			explorator = callFromJar(fittingConfig);
 		}
 
 		if(Configurator.debugCouple && !Configurator.fullSilent)

@@ -3,6 +3,7 @@ package giteri.network.networkStuff;
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.entite.Meme;
 import giteri.network.network.NetworkProperties;
+import giteri.run.configurator.CasteOpenMoleParameter;
 import giteri.run.configurator.Configurator;
 import giteri.run.configurator.Configurator.FittingBehavior;
 import giteri.run.configurator.Configurator.NetworkAttribType;
@@ -11,6 +12,7 @@ import giteri.run.interfaces.Interfaces;
 import giteri.run.interfaces.Interfaces.IModel;
 import giteri.run.interfaces.Interfaces.IReadNetwork;
 import giteri.run.interfaces.Interfaces.StatAndPlotInterface;
+import giteri.tool.math.Toolz;
 import giteri.tool.other.WriteNRead;
 
 import java.io.IOException;
@@ -102,8 +104,23 @@ public class CommunicationModel implements IModel {
 	 */
 	public void fittingOnce(){
 		Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
+		List<Double> param = new ArrayList<Double>(Arrays.asList(
 
-		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.oneShot,null);
+				2.,7653.448252258795,0.30000000000000004,0.7999999999999999,0.9999999999999999,0.7999999999999999
+
+
+
+
+		));
+
+
+		int combinaison = Toolz.combinatoire((int)Math.floor(param.get(0)), 121 );
+		double activation = param.get(1) * combinaison / 10000;
+
+
+		CasteOpenMoleParameter comp = new CasteOpenMoleParameter(((int)Math.floor(activation)),(int)Math.floor(param.get(0)), 121,
+				param.subList(2,6));
+		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.oneShot,comp);
 	}
 
 	/** Lancement du processus de fittage du réseau courant à celui
