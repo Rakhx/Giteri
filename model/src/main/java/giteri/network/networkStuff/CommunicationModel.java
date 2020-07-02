@@ -104,11 +104,9 @@ public class CommunicationModel implements IModel {
 	 */
 	public void fittingOnce(){
 		Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
-		List<Double> param = new ArrayList<Double>(Arrays.asList(
+		List<Double> param = new ArrayList<>(Arrays.asList(
 
-				2.,7653.448252258795,0.30000000000000004,0.7999999999999999,0.9999999999999999,0.7999999999999999
-
-
+				3.,1460.5557916412642,0.5999999999999999,1.,0.,0.9999999999999999
 
 
 		));

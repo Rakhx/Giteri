@@ -22,19 +22,37 @@ object RunCouple {
    * @return
    */
   def run(activationCode: Double, nbMeme: Int, maxCombinaison:Int,
-          proba1: Double, proba2: Double,proba3: Double, proba4: Double): Double = {
+          proba1: Double, proba2: Double,proba3: Double, proba4: Double,
+          proba5: Double, proba6: Double,proba7: Double, proba8: Double,
+         ): Double = {
+    // Nombre total de combinaison d'activation de nbCouple parmi les totalDispo
+   // var nbPermutation : Int = combSansRepSimplified(nbMeme, maxCombinaison)
+    var thoudans : Double = 10000;
+   // var tmp : Double = (activationCode * nbPermutation) / thoudans
+    // conversion de selector double de openmole en int de selection plus tard en java
+
+  //  if(!Configurator.fullSilent)
+   // println("i'm call selector;conversion "+ activationCode+";"+tmp+" nbMeme:maxCombi "+nbMeme+":"+maxCombinaison
+   // +" pour xoxo combinaisons")
+
+    var tmp : Double = 4.0;
+    giteri.run.jarVersion.JarVersionCast.run(tmp,nbMeme,maxCombinaison, proba1,proba2,proba3, proba4,proba5, proba6, proba7, proba8)
+  }
+
+  def run(activationCode: Double, nbMeme: Int, maxCombinaison:Int,
+          proba1: Double,proba2: Double,proba3: Double, proba4: Double): Double = {
     // Nombre total de combinaison d'activation de nbCouple parmi les totalDispo
     var nbPermutation : Int = combSansRepSimplified(nbMeme, maxCombinaison)
     var thoudans : Double = 10000;
     var tmp : Double = (activationCode * nbPermutation) / thoudans
     // conversion de selector double de openmole en int de selection plus tard en java
 
-    if(!Configurator.fullSilent)
-    println("i'm call selector;conversion "+ activationCode+";"+tmp+" nbMeme:maxCombi "+nbMeme+":"+maxCombinaison
-    +" pour "+ nbPermutation +" combinaisons")
-
     giteri.run.jarVersion.JarVersionCast.run(tmp,nbMeme,maxCombinaison, proba1,proba2,proba3, proba4)
   }
+
+
+
+
 
   def combSansRepSimplified(k:Int, parmiN:Int) : Int =
   {

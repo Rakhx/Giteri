@@ -30,53 +30,6 @@ object Test {
     n*m
   }
 
-  /** calcul de factoriel
-   *
-   * @param n
-   * @return
-   */
-  def factorial(n: Int): Int = {
-    var f : Int = 1
-    for(i <- 1 to n) {
-      f = f * i
-    }
-    f
-  }
-
-  /** semi factoriel, produit de min a max de 1 en 1
-   *
-   * @param max inclu dans les calculs
-   * @param min inclu dans les calculs
-   * @return
-   */
-  def semiFact(min:Int, max:Int) : Int = {
-    var f : Int = 1
-    for(i<- min to max){
-      f = f*i
-    }
-
-    f
-  }
-
-
-
-  /** Renvoi une combinaison sans répétition de k éléments parmis n.
-   *
-   * @param k
-   * @param parmiN
-   * @return
-   */
-  def combinaisonSansRep(k:Int, parmiN:Int) : Int =
-  {
-    return factorial(parmiN) / (factorial(k)*factorial(parmiN - k))
-  }
-
-  def combSansRepSimplified(k:Int, parmiN:Int) : Int =
-  {
-    return semiFact(parmiN-k+1,parmiN) / factorial(k);
-  }
-
-
 
 
   /** Sérialize, après lecture, les propriétés d'un réseau, issu d'un fichier .txt sous forme

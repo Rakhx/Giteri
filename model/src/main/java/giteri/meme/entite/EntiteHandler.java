@@ -904,10 +904,36 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @return
 	 */
 	private double probaPropaDegree(Entite acting, Entite cible, double proba){
+		if(proba == 0)
+			return 0;
+		double multiplicateur = 0;
+		int diffDeg =  Math.abs(acting.getDegree() - cible.getDegree());
+		if(diffDeg == 0)
+			multiplicateur = 1;
+		else if(diffDeg == 1){
+			multiplicateur = 0.75;
+		}
+
+		/*
+		else if(diffDeg == 1){
+			multiplicateur = 0.5;
+		}
+		else if(diffDeg == 1){
+			multiplicateur = 0.5;
+		}
+		else if(diffDeg == 1){
+			multiplicateur = 0.25;
+		}
+		else {
+			multiplicateur = 0.01;
+		}*/
+
 		if(Configurator.useMemePropagationProba)
-			proba /=  Math.sqrt(1 + Math.abs(acting.getDegree() - cible.getDegree()));
-		else
-			proba =	 1./Math.sqrt(1 + Math.abs(acting.getDegree() - cible.getDegree()));
+			proba *= multiplicateur ; // Math.sqrt(1 + Math.abs(acting.getDegree() - cible.getDegree()));
+		else {
+			proba = multiplicateur; // 1. / Math.sqrt(1 + Math.abs(acting.getDegree() - cible.getDegree()));
+}
+
 		return proba;
 	}
 
