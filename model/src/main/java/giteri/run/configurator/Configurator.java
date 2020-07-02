@@ -39,6 +39,7 @@ public final class Configurator {
 	public static boolean strictEqualityInComparaison = true; // FALSE : >= || TRUE : >
 
 	// PROPAGATION
+	public static boolean usePropagation = true;	// Pour tester sans propagation
 	public static boolean fixedSlotForBreeder = true;	// les possesseurs initiaux des memes ne peuvent pas les perdre
 	@toOutput ( yes = true )
 	public static boolean autoMemeForBreeder = false;	// Les breeder ont associé un meme complémement, rmd ajout ou retrait.

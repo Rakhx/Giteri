@@ -509,6 +509,39 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 	}
 
+	/** Donne pour l'ensemble des noeuds des entités en fonction d'une réparition prennant les proba comme base.
+	 *
+	 * @param UOT
+	 */
+	public void giveMemeToEntiteFullNetwork(List<IUnitOfTransfer> UOT) {
+		double totalProba = 0;
+		Map<IUnitOfTransfer, Double> map = new HashMap<>();
+		List<Entite> entiteWithoutCouple = new ArrayList<>(entites);
+		List<Entite> entitePourvu = new ArrayList<>();
+
+		for (IUnitOfTransfer couple : UOT) {
+			totalProba += couple.getProbaPropagation();
+			map.put(couple, couple.getProbaPropagation());
+		}
+
+		double nbEntiteToGive;
+
+		for (IUnitOfTransfer iUnitOfTransfer : map.keySet()) {
+			entitePourvu.clear();
+			nbEntiteToGive = (map.get(iUnitOfTransfer) /totalProba) * entites.size();
+			map.put(iUnitOfTransfer, nbEntiteToGive);
+			for (Entite entite : entiteWithoutCouple) {
+				if(nbEntiteToGive < 1)
+					break;
+				eventMemeChanged(entite, entite.addUOT(iUnitOfTransfer, true), Configurator.MemeActivityPossibility.AjoutMeme.toString());
+				entitePourvu.add(entite);
+				nbEntiteToGive--;
+			}
+
+			entiteWithoutCouple.removeAll(entitePourvu);
+		}
+	}
+
 	/** Obtention de la liste des memes disponibles sur la map, soit les simples,
 	 * soit les combinaisons de deux memes existantes, en fonction du param de configuration.
 	 * @param setAsked
@@ -596,64 +629,69 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 		int nbLien;
 		resultat += "---------------------------------------------------------------";
-		for (String memeCombinaison : entiteByMemePossession.keySet()) {
-			nbLien = 0;
-			SelfDegrees.clear();
-			othersDegrees.clear();
-			entityByMeme.clear();
-			othersMemes.clear();
 
-			part1 = "";part2 = "Connection "; part3 = "";
-			// pour chaque entité possédant la combinaison
-			for (Entite entite : entiteByMemePossession.get(memeCombinaison)) {
-				entityByMeme.add(""+entite.getIndex());
-				SelfDegrees.add(entite.getDegree());
+		try {
+			for (String memeCombinaison : entiteByMemePossession.keySet()) {
+				nbLien = 0;
+				SelfDegrees.clear();
+				othersDegrees.clear();
+				entityByMeme.clear();
+				othersMemes.clear();
 
-				// pour chaque entité connecté a l'entité courante
-				for (Integer nodeIndex : networkConstruct.getConnectedNodes(entite.getIndex())) {
-					nbLien++;
-					nodeConnected = this.getEntityCorresponding(nodeIndex);
-					if (nodeConnected != null) {
-						othersDegrees.add(nodeConnected.getDegree());
-						part3 = nodeConnected.getMyUnitOfT()!=null? nodeConnected.getMyUnitOfT().get(0).toNameString():"vide";
-						Toolz.addCountToElementInHashArray(othersMemes,part3, 1);
+				part1 = "";
+				part2 = "Connection ";
+				part3 = "";
+				// pour chaque entité possédant la combinaison
+				for (Entite entite : entiteByMemePossession.get(memeCombinaison)) {
+					entityByMeme.add("" + entite.getIndex());
+					SelfDegrees.add(entite.getDegree());
+
+					// pour chaque entité connecté a l'entité courante
+					for (Integer nodeIndex : networkConstruct.getConnectedNodes(entite.getIndex())) {
+						nbLien++;
+						nodeConnected = this.getEntityCorresponding(nodeIndex);
+						if (nodeConnected != null) {
+							othersDegrees.add(nodeConnected.getDegree());
+							part3 = nodeConnected.getMyUnitOfT() != null ? nodeConnected.getMyUnitOfT().get(0).toNameString() : "vide";
+							Toolz.addCountToElementInHashArray(othersMemes, part3, 1);
+						} else
+							System.err.println("Ne DEVRAIT PAS ETRE POSSIBLE EH CHECKPROPERTIESBY...");
 					}
-					else
-						System.err.println("Ne DEVRAIT PAS ETRE POSSIBLE EH CHECKPROPERTIESBY...");
 				}
+
+				// liste des memes possédés par les entités liées a l'entité courante
+				for (String s : othersMemes.keySet()) {
+					part2 += "[" + s + "]: " + othersMemes.get(s) + " (" + Toolz.getNumberCutToPrecision(othersMemes.get(s) * 100. / nbLien, 2) + "%)" + " && ";
+				}
+
+				// Index des entités courantes
+				entityByMeme.sort(null);
+				part1 = "[";
+				// index des entites avec le meme courant
+				for (String s : entityByMeme) {
+					part1 += s + ":";
+				}
+				part1 += "]";
+
+				resultat += "\n("
+						+ entiteByMemePossession.get(memeCombinaison).size()
+						+ ")-["
+						+ (memeCombinaison)
+						+ "] degree: "
+						+ Toolz.getNumberCutToPrecision(Toolz.getAvg(SelfDegrees), 2)
+						+ " degree nodes connected to : "
+						+ Toolz.getNumberCutToPrecision(
+						Toolz.getAvg(othersDegrees), 2);
+
+				resultat += "\n";
+				resultat += part2;
+				resultat += "\n";
+				resultat += part1;
+
 			}
-
-			// liste des memes possédés par les entités liées a l'entité courante
-			for (String s : othersMemes.keySet()) {
-				part2 += "["+ s + "]: " + othersMemes.get(s) + " (" + Toolz.getNumberCutToPrecision(othersMemes.get(s)*100./nbLien,2) +"%)" +" && ";
-			}
-
-			// Index des entités courantes
-			entityByMeme.sort(null);
-			part1 = "[";
-			// index des entites avec le meme courant
-			for (String s : entityByMeme) {
-				part1 += s+":";
-			}
-			part1 += "]";
-
-			resultat += "\n("
-					+ entiteByMemePossession.get(memeCombinaison).size()
-					+ ")-["
-					+ (memeCombinaison)
-					+ "] degree: "
-					+ Toolz.getNumberCutToPrecision(Toolz.getAvg(SelfDegrees),2)
-					+ " degree nodes connected to : "
-					+ Toolz.getNumberCutToPrecision(
-					Toolz.getAvg(othersDegrees), 2);
-
-			resultat += "\n";
-			resultat += part2;
-			resultat += "\n";
-			resultat += part1;
-
+		}catch (Exception e){
+			System.out.println("[EH.checkPropByMemePoss]: "+e.getMessage());
 		}
-
 		return resultat;
 	}
 
@@ -809,14 +847,14 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 					// hum. TODO [CV] réfléchir ici
 
 					// Si on reste sur l'ancienne facon de faire par une unique transmission direct
-					if( !coupleSingleTransmission){
+					if(!coupleSingleTransmission){
 						cibles = entites;
 					}
 
 					// TODO[CV] - ici a eu lieu un chg
 					// Si couple version, que l'action jouée soit un ajout ou un retrait, c'est tout le couple qui est transmis
-					propagation(cibles, movingOne, movingOne.getMyUnitOfT().get(0));
-					// endregion
+					if(usePropagation)
+						propagation(cibles, movingOne, movingOne.getMyUnitOfT().get(0));
 
 					// evenement d'application d'une action
 					eventActionDone(movingOne, memeAction, actionDone);

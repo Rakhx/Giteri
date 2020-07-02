@@ -162,7 +162,8 @@ public class Initializer {
                 entiteHandler.suspend();
             }
 
-            entiteHandler.giveMemeToEntiteFitting(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.COUPLE));
+           // entiteHandler.giveMemeToEntiteFitting(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.COUPLE));
+            entiteHandler.giveMemeToEntiteFullNetwork(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.COUPLE));
             return 0.;
         }
 
