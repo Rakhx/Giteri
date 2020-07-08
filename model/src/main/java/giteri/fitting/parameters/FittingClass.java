@@ -304,7 +304,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		if(Configurator.writeMemeResultOnFitting && numeroRepetition == 1&& !Configurator.jarMode)
 			writeNRead.writeSmallFile(repOfTheSearch, Configurator.fileNameMeme,
 					entiteHandler.memeProperties.getHeaderToWriteMemeDetails(
-							entiteHandler.getKVMemeTranslate(), numeroRun, numeroRepetition, explorator));
+							entiteHandler.getKVUOTTranslate(), numeroRun, numeroRepetition, explorator));
 
 		//repertoires.add(numeroRepetitionAsString);
 
@@ -393,7 +393,7 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 					networksSameTurn, Configurator.activationCodeForScore);
 		if(Configurator.writeNetworkResultOnFitting){
 			writeNRead.writeSmallFile(repOfTheSearch,Configurator.fileNameMeme,
-					entiteHandler.memeProperties.getCloserToWriteMemeDetails(entiteHandler.getKVMemeTranslate()));
+					entiteHandler.memeProperties.getCloserToWriteMemeDetails(entiteHandler.getKVUOTTranslate()));
 
 		}
 

@@ -106,15 +106,20 @@ public class CommunicationModel implements IModel {
 		Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
 		List<Double> param = new ArrayList<>(Arrays.asList(
 
-				3.,1460.5557916412642,0.5999999999999999,1.,0.,0.9999999999999999
+				4.,9229.827415138872,0.5,0.4,0.7,0.1
+
+
+
+
+
+
+
 
 
 		));
 
-
 		int combinaison = Toolz.combinatoire((int)Math.floor(param.get(0)), 121 );
 		double activation = param.get(1) * combinaison / 10000;
-
 
 		CasteOpenMoleParameter comp = new CasteOpenMoleParameter(((int)Math.floor(activation)),(int)Math.floor(param.get(0)), 121,
 				param.subList(2,6));

@@ -14,15 +14,21 @@ public final class Configurator {
 	public static boolean quickScore = !fastSwitchOpen; // Aucun affichage, aucun fichier output
 	public static boolean fullSilent = fastSwitchOpen; // Aucun affichage, aucun fichier output
 
+	public static boolean furTesting = false; // pour les multi run @ same config pour txt result
+
 	// Fast debuguer & I/O
-	public static boolean displayLogAvgDegreeByMeme = true; // combinaisons de meme et leur degré + derniere application + application from start
+	public static boolean displayLogAvgDegreeByMeme = !furTesting; // combinaisons de meme et leur degré + derniere application + application from start
+	public static boolean displayMemePosessionDuringSimulation = true || !furTesting && !fullSilent; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
+
+
 
 	// region Modèle
 
 	// MODELE II param
 	public static boolean coupleSingleTransmission = true; // Transmet le couple à l'entité ayant recu l'action et pas plus
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
-	// TODO apply whole couple or only one adction?
+	public static boolean wholeEntityHavingCouple = false; // File des les débuts tt les couples sur tte les entités
+
 
 	// FONCTIONNEMENT
 	public static boolean manuelNextStep = false; // NO-AUTOSKIP pas de passage au run suivant, il faut appuyer sur next
@@ -32,7 +38,7 @@ public final class Configurator {
 	public static boolean initializeDefaultBehaviorToBreeder = false;	// ----FLUIDITE BREEDER----
 	@toOutput ( yes = true )
 	public static boolean rebranchementAction = false; // REWIRE Faire l'ajout et le retrait dans le meme temps
-	public static boolean limitlessAction;
+	public static boolean limitlessAction = !furTesting;
 
 	// MEME
 	@toOutput ( yes = true )
@@ -83,7 +89,7 @@ public final class Configurator {
 	@toOutput ( yes = true )
 	public static int initialNetworkForFitting = 0; // code pour le network en fitting. 0:empty 1:4% 2:50% 3:PA 4:SW
 	@toOutput ( yes = true )
-	public static int nbRepetitionbyRun = 2;
+	public static int nbRepetitionbyRun = 10;
 	@toOutput ( yes = true )
 	public static int nbRepetitionForJar = 2;
 
@@ -104,7 +110,6 @@ public final class Configurator {
 
 	public static boolean displayMemePossessionEvolution = true && !fullSilent; // Affiche dans l'IHM la possession des meme au fur et a mesure
 	public static boolean displayPlotWhileSimulation = true && !fullSilent; // Affichage des DD et densité
-	public static boolean displayMemePosessionDuringSimulation = true && !fullSilent; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
 	public static boolean writeNbActionPerSec = false; // pas de fichier nbline
 	public static boolean writeFailDensityLink = false; // fichier d'info sur les Fails X density variation
 	public static boolean writeFailMemeApply = false; // fichier d'info sur les Fails X density variation
@@ -139,7 +144,7 @@ public final class Configurator {
 	// region affichage de debug
 
 
-	public static boolean debugCouple = true;
+	public static boolean debugCouple = false;
 
 	public static boolean debugStatAndPlot = false;
 	public static boolean debugFittingClass = false;

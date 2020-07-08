@@ -76,6 +76,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private double lastDensity;
 	private int sumFailAction;
 	private ObjectRef<Integer> nbFail = new ObjectRef<>(0);
+	List<String> ratioSuccessEchec;
 
 	// Variable utilisé dans la fonction doAction - fn appelée a chaque step
 	Set<Entite> cibles;
@@ -741,8 +742,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 			// AFFICHAGE ET DEBUGGUAGE
 			if (Configurator.displayLogRatioTryAddOverTryRmv) {
-
-				//for (IUnitOfTransfer memeAction : memeActions) {
 				if (oneAction != null) {
 					if (oneAction.getActionType() == TypeOfUOT.AJOUTLIEN)
 						cptActionAddTried++;
@@ -760,12 +759,13 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				int i = -1;
 				//for (Meme memeAction : memeActions) {
 				i++;
+
+				ratioSuccessEchec = memeProperties.updateActionCount(oneAction, entiteActing.getMyUnitOfT().get(0), entiteActing.getIndex(), rez.get(i), cptModulo);
+
 				if (Configurator.displayLogRatioLogFailOverFail || Configurator.displayLogRatioLogFailOverSuccess) {
-					List<String> temp = memeProperties.updateActionCount(oneAction, entiteActing.getIndex(), rez.get(i), cptModulo);
-					if (temp != null)
-						toDisplayForRatio.addAll(temp);
-				} else
-					memeProperties.updateActionCount(oneAction, entiteActing.getIndex(), rez.get(i), cptModulo);
+					if (ratioSuccessEchec != null)
+						toDisplayForRatio.addAll(ratioSuccessEchec);
+				}
 
 				if (cptModulo % (Configurator.refreshInfoRate * 25) == 0) {
 					sumFailAction = memeProperties.lastFailAction(nbFail);
@@ -902,7 +902,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @param proba la proba est prise ici car la proba d'un couple est portée par la classe CoupleMeme
 	 */
 	private void propagation(Set<Entite> cibles, Entite movingOne, IUnitOfTransfer memeAction){
-
 		IUnitOfTransfer removedAction;
 		double probaAction = 0 ;
 
@@ -929,10 +928,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				}
 			}
 		}
-
-
 	}
-
 
 	/** Dans le cas de la version coule, prends en compte la distance de degrée pour
 	 * pondérer la propagation d'un meme.
@@ -944,33 +940,15 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private double probaPropaDegree(Entite acting, Entite cible, double proba){
 		if(proba == 0)
 			return 0;
-		double multiplicateur = 0;
+		double multiplicateur = 0.1;
 		int diffDeg =  Math.abs(acting.getDegree() - cible.getDegree());
-		if(diffDeg == 0)
-			multiplicateur = 1;
-		else if(diffDeg == 1){
-			multiplicateur = 0.75;
-		}
-
-		/*
-		else if(diffDeg == 1){
-			multiplicateur = 0.5;
-		}
-		else if(diffDeg == 1){
-			multiplicateur = 0.5;
-		}
-		else if(diffDeg == 1){
-			multiplicateur = 0.25;
-		}
-		else {
-			multiplicateur = 0.01;
-		}*/
+		multiplicateur /= Math.pow(1 + diffDeg, 2);
 
 		if(Configurator.useMemePropagationProba)
-			proba *= multiplicateur ; // Math.sqrt(1 + Math.abs(acting.getDegree() - cible.getDegree()));
+			proba *= multiplicateur ;
 		else {
-			proba = multiplicateur; // 1. / Math.sqrt(1 + Math.abs(acting.getDegree() - cible.getDegree()));
-}
+			proba = multiplicateur;
+		}
 
 		return proba;
 	}
@@ -1277,8 +1255,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		// Creation des couples d'actions
 		this.doubleRandom = memeFactory.extractAndDoNotRegister("AddØ", "RmvØ", 0);
 		memeFactory.extractAndAddCoupleMeme( "AddEq", "Rmv-", .1, false);
-		memeFactory.extractAndAddCoupleMeme( "Add∞", "RmvEq", 1., false);
-		memeFactory.extractAndAddCoupleMeme( "Add°!", "RmvChain", .2, false);
+		memeFactory.extractAndAddCoupleMeme( "Add∞", "RmvEq", 1, false);
+		memeFactory.extractAndAddCoupleMeme( "Add°!", "RmvChain", 1, false);
 	}
 
 	/**

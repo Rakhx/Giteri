@@ -23,9 +23,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import static giteri.run.configurator.Configurator.fullSilent;
-import static giteri.run.configurator.Configurator.withGraphicalDisplay;
-
+import static giteri.run.configurator.Configurator.*;
 
 
 /** Classe d'initialisation des objets nécessaires à l'utilisation du framework
@@ -44,13 +42,13 @@ public class Initializer {
 
         if(ihmLauncher){
             Configurator.displayPlotWhileSimulation = true;
-            Configurator.withGraphicalDisplay = true;
+            Configurator.withGraphicalDisplay = true && !furTesting;
             Configurator.jarMode = false;
             Configurator.systemPaused = true;
             Configurator.writeNetworkResultOnFitting = !fullSilent;
             Configurator.writeMemeResultOnFitting = !fullSilent;
             Configurator.explorator = Configurator.EnumExplorationMethod.exhaustive;
-            Configurator.limitlessAction = true;
+
         }
         else{
             // La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
@@ -162,8 +160,11 @@ public class Initializer {
                 entiteHandler.suspend();
             }
 
-           // entiteHandler.giveMemeToEntiteFitting(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.COUPLE));
-            entiteHandler.giveMemeToEntiteFullNetwork(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.COUPLE));
+            if(wholeEntityHavingCouple)
+                entiteHandler.giveMemeToEntiteFullNetwork(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.COUPLE));
+            else
+                entiteHandler.giveMemeToEntiteFitting(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.COUPLE));
+
             return 0.;
         }
 
