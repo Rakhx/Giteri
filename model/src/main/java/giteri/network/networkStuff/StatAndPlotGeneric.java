@@ -265,8 +265,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 	 *
 	 */
 	// ICI Prend un IOpenMoleConfigurator à la place des memeActivations
-	public double fittingLauncher(Configurator.EnumLauncher typeOfLaunch, EnumExplorationMethod typeOfExplo
-								  ) {
+	public double fittingLauncher(Configurator.EnumLauncher typeOfLaunch, EnumExplorationMethod typeOfExplo) {
 
 		double resultat;
 

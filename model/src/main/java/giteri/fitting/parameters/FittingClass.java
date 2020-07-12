@@ -275,7 +275,6 @@ public class FittingClass implements IBehaviorTransmissionListener, IActionApply
 		repertoires.add(numeroRunAsString);
 		resultNetwork.put(numeroRun, new Result(explorator.getModelParameterSet()));
 		com.view.resetPlotDensity();
-
 	}
 
 	/**

@@ -696,16 +696,11 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		return resultat;
 	}
 
-	public boolean memeAllTransmitted() {
-		return allTransmitted;
-	}
-
 	//endregion
 
 	//region PRIVATE
 
 	//region Action
-
 	/** va lancer l'action d'une entitée. Depend du boolean CoupleVersion.
 	 *
 	 */
@@ -898,33 +893,33 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 *
 	 * @param cibles les cibles qui ont subi l'action, souvent unitaire
 	 * @param movingOne L'entité agissante
-	 * @param memeAction L'action appliquée
+	 * @param coupleAction L'action appliquée
 	 * @param proba la proba est prise ici car la proba d'un couple est portée par la classe CoupleMeme
 	 */
-	private void propagation(Set<Entite> cibles, Entite movingOne, IUnitOfTransfer memeAction){
+	private void propagation(Set<Entite> cibles, Entite movingOne, IUnitOfTransfer coupleAction){
 		IUnitOfTransfer removedAction;
 		double probaAction = 0 ;
 
 		for (Entite entite : cibles) {
-			probaAction = memeAction.getProbaPropagation();
+			probaAction = coupleAction.getProbaPropagation();
 			probaAction = probaPropaDegree(movingOne, entite, probaAction);
 
 			// Proba de propagation - si on veut ajouter le meme
 			if(Toolz.rollDice(probaAction)) {
 
 				// Si le retour est nul c'est que l'entité a refuser le transfert
-				removedAction = entite.takeMyMeme(memeAction);
+				removedAction = entite.takeMyMeme(coupleAction);
 
 				// Si retour du meme a ajouter, il n'y a pas eu de remplacement
-				if(removedAction == memeAction)
-					eventMemeChanged(entite, memeAction, Configurator.MemeActivityPossibility.AjoutMeme.toString());
+				if(removedAction == coupleAction)
+					eventMemeChanged(entite, coupleAction, Configurator.MemeActivityPossibility.AjoutMeme.toString());
 
 				// Si un remplacement à eu lieu
-				if(removedAction != null && removedAction != memeAction) {
+				if(removedAction != null && removedAction != coupleAction) {
 					// un retrait
 					eventMemeChanged(entite, removedAction, Configurator.MemeActivityPossibility.RetraitMeme.toString());
 					// et un ajout
-					eventMemeChanged(entite, memeAction,Configurator.MemeActivityPossibility.AjoutMeme.toString());
+					eventMemeChanged(entite, coupleAction,Configurator.MemeActivityPossibility.AjoutMeme.toString());
 				}
 			}
 		}
@@ -956,7 +951,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	//endregion
 
 	//region Meme
-
 	/** Renvoi true si aucune des entités initiales ne possède un slot vide ou de fluidité.
 	 *
 	 * @return False si memes initiaux non intégralement transmis.
@@ -1021,7 +1015,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			eventMemeChanged(entite, getDoubleRandom(), MemeActivityPossibility.AjoutMeme.toString());
 		}
 	}
-
 
 	/**
 	 * Fait le lien entre les agents et les noeuds du réseaux A appeler une fois
@@ -1258,7 +1251,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		memeFactory.extractAndAddCoupleMeme( "Add∞", "RmvEq", 1, false);
 		memeFactory.extractAndAddCoupleMeme( "Add°!", "RmvChain", 1, false);
 	}
-
 	/**
 	 * Renvoi une hashtable contenant les combinaisons possibles de meme avec
 	 * les memes sur la map. Un meme du meme type par agent par combinaison.
@@ -1332,7 +1324,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	//endregion
 
 	//region divers
-
     /** indicateurs liant echec d'application de meme et variation de densité.
      *
      * @return
@@ -1423,10 +1414,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 	}
 
+
 	//endregion
 
 	//region getter//Setter
-
 	/**
 	 * Renvoi, pour affichage, en condensé index, obj et meme. ttes entités
 	 *
@@ -1441,6 +1432,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			}
 		}
 		return resultat;
+	}
+
+	public boolean memeAllTransmitted() {
+		return allTransmitted;
 	}
 
 	public ArrayList<Entite> getEntitesActive() {

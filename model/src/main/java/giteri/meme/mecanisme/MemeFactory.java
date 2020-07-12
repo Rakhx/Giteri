@@ -332,7 +332,7 @@ public class MemeFactory {
 		Meme add, rmv;
 		IUnitOfTransfer<CoupleMeme> cree;
 
-		if(!Configurator.jarMode)
+		if(!Configurator.jarMode) //humhum.?
 			clearExistingCouple();
 
 		addz = getMemes(MemeList.FITTING, TypeOfUOT.AJOUTLIEN).stream().map(e -> (Meme)e).collect(Collectors.toList());

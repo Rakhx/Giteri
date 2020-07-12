@@ -44,6 +44,12 @@ public class MemeProperties {
     // Combinaison de meme disponible
     Map<Integer, ArrayList<IUnitOfTransfer>> memeCombinaisonFittingAvailable;
 
+    //Structure pour information sur les flux d'entité entre les CA
+    // k:CoupleMeme+CoupleMeme v:Integer d'index
+    Map<String, Integer> kvCoupleTransitionIndex;
+    // Count du nombre de transition entre couple, indexer par rapport a kvCoupleTransitionIndex
+    Map<Integer, Integer> kvCoupleTransCount;
+
     int cptActionRmvFail = 0, cptActionAddFail = 0;
 
      MemeProperties(){
@@ -53,7 +59,9 @@ public class MemeProperties {
         countOfEntitiesHavingMeme = new Hashtable<>();
         lastHundredActionDone = new CircularFifoQueue<>(Configurator.sizeOfCircularForLastActionDone);
         lastFailActionTried = new ArrayList<>(); KVDegreeByIOT = new HashMap<>();
-         degreeMeanOfIOT = new Hashtable<>();
+        degreeMeanOfIOT = new Hashtable<>();
+        kvCoupleTransitionIndex = new Hashtable<>();
+        kvCoupleTransCount = new Hashtable<>();
     }
 
     public void clear(){
