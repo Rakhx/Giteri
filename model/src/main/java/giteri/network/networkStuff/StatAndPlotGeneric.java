@@ -288,6 +288,10 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 		fittingConfig.KindaConstructor(writeNRead, communicationModel,
 				memeFactory, networkFileLoader, workerFactory, entiteHandler, networkConstructor, explorator);
 
+		// Fourni indirectement au memeProperties les datastruc pour les flux entre CA
+		entiteHandler.generateDataStrucFlux(memeFactory.getMemes(Configurator.MemeList.FITTING, Configurator.TypeOfUOT.COUPLE));
+// A CHECKERRR TODO
+
 		// ajout de la fitting classe au listener
 		entiteHandler.addEntityListener(fittingConfig);
 

@@ -75,7 +75,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 	 *
 	 */
 	public void handlerBehavTransm(BehavTransmEvent e) {
-		if(Configurator.displayMemePosessionDuringSimulation)
+		if(Configurator.displayLogMemeTransmission)
 		// A priori inutile de parler du cas de remplacement car la classe de node écrase
 		// la précédente. A revoir si des memes peuvent etre spontanement perdu.
 		if(e.message == Configurator.MemeActivityPossibility.AjoutMeme.toString()){

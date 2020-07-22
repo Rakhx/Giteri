@@ -47,12 +47,13 @@ public class MemeProperties {
     //Structure pour information sur les flux d'entité entre les CA
     // k:CoupleMeme+CoupleMeme v:Integer d'index
     Map<String, Integer> kvCoupleTransitionIndex;
-    // Count du nombre de transition entre couple, indexer par rapport a kvCoupleTransitionIndex
+
+    // Count du nombre de transition entre couple, indexer par rapport a kvCoupleTransitionIndex. Remis a 0 en reset de map
     Map<Integer, Integer> kvCoupleTransCount;
 
     int cptActionRmvFail = 0, cptActionAddFail = 0;
 
-     MemeProperties(){
+    MemeProperties(){
         nbActivationByMemes = new Hashtable<>();
         nbActivationByCouple = new Hashtable<>();
         countOfLastMemeActivation = new Hashtable<>();
@@ -71,6 +72,9 @@ public class MemeProperties {
         lastHundredActionDone.clear();
         countOfEntitiesHavingMeme.clear();
         lastFailActionTried.clear();
+        for (Integer integer : kvCoupleTransCount.keySet()) {
+            kvCoupleTransCount.put(integer, 0);
+        }
     }
 
     //endregion
@@ -134,6 +138,30 @@ public class MemeProperties {
         return null;
     }
 
+    /** initialise les tableaux de flux entre CA.
+     * k: CoupleMeme.toString*CoupleMeme.toString; V:indexer
+     * k:indexer ; v:count
+     * @param availableCouple
+     */
+    void generateFluxDataStruct(List<IUnitOfTransfer> availableCouple){
+        List<String> edgeName = new ArrayList<>();
+        for (IUnitOfTransfer from : availableCouple) {
+            for (IUnitOfTransfer to : availableCouple) {
+                if(from != to ){
+                    edgeName.add(from.toNameString()+"*"+to.toNameString());
+                }
+            }
+        }
+
+        edgeName.sort(null);
+        int i = 0;
+        for (String s : edgeName) {
+            kvCoupleTransitionIndex.put(s,i);
+            kvCoupleTransCount.put(i,0);
+            i++;
+        }
+    }
+
     /** Check des derniers echecs sur une fenetre glissante;
      *
      * @return la somme des derniers fail, rmv étant -1, add +1
@@ -150,7 +178,7 @@ public class MemeProperties {
      * @param meme Le meme qui a recu ou perdu une entité associée
      * @param added Si true, une entité a recu le mail, sinon elle l'a perdu
      */
-    void updateMemePossession(IUnitOfTransfer meme, boolean added ){
+    void updateMemePossession(IUnitOfTransfer meme, boolean added){
         if(added)
             Toolz.addCountToElementInHashArray(countOfEntitiesHavingMeme,meme,1);
         else
@@ -200,7 +228,7 @@ public class MemeProperties {
             header += ";" + model.nameString();
 
         // combinaison de meme présent sur le run, classé par type d'action
-        Hashtable<Configurator.TypeOfUOT, ArrayList<IUnitOfTransfer>> memesByCategory = new Hashtable<>();
+        Hashtable<Configurator.TypeOfUOT, List<IUnitOfTransfer>> memesByCategory = new Hashtable<>();
         for (Interfaces.IUnitOfTransfer meme: iUnitOfTransfers)
             Toolz.addElementInHashArray(memesByCategory,meme.getActionType(),meme);
        // memeCombinaisonFittingAvailable = this.getMemeAvailable(Configurator.FittingBehavior.simpleAndComplex, Optional.of(memesByCategory));
@@ -318,6 +346,20 @@ public class MemeProperties {
 
     // endregion
 
+    // region getter // setter
+
+    /** Ajoute
+     *
+     * @param fluxName
+     */
+    void addCountToFlux(String fluxName){
+       if(kvCoupleTransitionIndex.containsKey(fluxName)) {
+           int index = kvCoupleTransitionIndex.get(fluxName);
+           Toolz.addCountToElementInHashArray(kvCoupleTransCount, index, 1);
+       }
+       // Si ce n'est pas le cas ca peut etre qu'on passe des fluidités a un vrai meme
+    }
+
     Map<IUnitOfTransfer, Integer> getNbActivationByMemes() {
         return nbActivationByMemes;
     }
@@ -326,4 +368,5 @@ public class MemeProperties {
         return nbActivationByCouple;
     }
 
+    // endregion
 }

@@ -182,7 +182,7 @@ public class IHM extends JFrame implements  IBehaviorTransmissionListener, IView
 	// a voir avec les structures de données
 
 	// Correspondance entre un meme et les entites le possédant
-	private Hashtable<String, ArrayList<Integer>> nodesHavingXoxoMemes;
+	private Hashtable<String, List<Integer>> nodesHavingXoxoMemes;
 
 	// Nombre de fois ou le meme a été appelé
 	private Map<String, Integer> nbActivationByMemes;
@@ -239,7 +239,7 @@ public class IHM extends JFrame implements  IBehaviorTransmissionListener, IView
 		lastHundredActionDone = new ArrayList<>(sizeOfCircularQueue);
 		nbActivationByMemes = new Hashtable<String, Integer>();
 		countOfLastMemeActivation = new Hashtable<String, Integer>();
-		nodesHavingXoxoMemes = new Hashtable<String, ArrayList<Integer>>();
+		nodesHavingXoxoMemes = new Hashtable<String,List<Integer>>();
 
 		nbLastActivationByMemesLabel = new Hashtable<String, JLabel>();
 		nbActivationByMemesLabel = new Hashtable<String, JLabel>();
@@ -1230,8 +1230,8 @@ public class IHM extends JFrame implements  IBehaviorTransmissionListener, IView
 		// TODO [Waypoint]- Appel des fonctions pour la comparaisons des networks
 		btAnalyze.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				IReadNetwork fileNetRdr = modelController.getReader();
 				NetworkProperties fileReadProperties;
+				IReadNetwork fileNetRdr = modelController.getReader();
 				NetworkProperties currentNetProperties;
 
 				try {

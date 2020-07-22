@@ -3,9 +3,7 @@ package giteri.test;
 import giteri.run.configurator.Initializer;
 import giteri.tool.math.Toolz;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class RandomTest {
     public static void main(String[] args)  {
@@ -14,6 +12,12 @@ public class RandomTest {
         int i = 0;
         changed(i);
         System.out.println(i);
+
+        Map<Integer, Double> maps = new HashMap<>();
+        Double one = 1.1, two = 2.2, three = 3.3;
+        Toolz.addNumberToElementInMap(maps, 1,one);
+        Toolz.addNumberToElementInMap(maps, 1,two);
+        Toolz.addNumberToElementInMap(maps, 2,three);
 
 
 

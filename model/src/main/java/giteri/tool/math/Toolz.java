@@ -268,7 +268,7 @@ public class Toolz {
 	 * @param value
 	 * @return true si la key existait déjé, false sinon.
 	 */
-	public static <T1 extends Object, T2 extends Object> boolean addElementInHashArray(Hashtable<T1,ArrayList<T2>> table,T1 key, T2 value){
+	public static <T1 extends Object, T2 extends Object> boolean addElementInHashArray(Map<T1,List<T2>> table,T1 key, T2 value){
 		if(table.containsKey(key)){
 			table.get(key).add(value);
 			return true;
@@ -318,7 +318,7 @@ public class Toolz {
 	 * @param value
 	 * @return true si la key existait déjé, false sinon.
 	 */
-	public static <T1 extends Object, T2 extends Object> boolean removeElementInHashArray(Hashtable<T1,ArrayList<T2>> table,T1 key, T2 value){
+	public static <T1 extends Object, T2 extends Object> boolean removeElementInHashArray(Hashtable<T1,List<T2>> table,T1 key, T2 value){
 		if(table.containsKey(key))
 			return table.get(key).remove(value);
 		else
@@ -364,6 +364,31 @@ public class Toolz {
 		}
 		else
 			return null;
+	}
+
+	public static <T1 extends Object, T2 extends Number> T2 addNumberToElementInMap(Map<T1,T2> table, T1 key, T2 value){
+		T2 actualValue = null;
+		if(table.containsKey(key))
+			actualValue = table.get(key);
+
+		switch (value.getClass().getName()){
+
+			case "java.lang.Double":
+				Double newValue = ((double)(actualValue != null? actualValue:0.) + (Double)value);
+				table.put(key, (T2)newValue);
+				break;
+			case "java.lang.Integer":
+				Integer newValue2 = ((Integer)(actualValue != null? actualValue:0) + (Integer)value);
+				table.put(key, (T2)newValue2);
+				break;
+			case "java.lang.Long":
+				Long newValue3 = ((Long)(actualValue != null? actualValue:0.) + (Long)value);
+				table.put(key, (T2)newValue3);
+				default:
+					return null;
+		}
+
+		return table.get(key);
 	}
 
 	//endregion

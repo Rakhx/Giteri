@@ -22,7 +22,8 @@ import giteri.run.interfaces.Interfaces;
 import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
 import giteri.tool.math.Toolz;
 import giteri.tool.objects.ObjectRef;
-import giteri.tool.other.StopWatchFactory;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
+
 
 import java.util.*;
 import static giteri.run.configurator.Configurator.*;
@@ -48,6 +49,25 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private List<IUnitOfTransfer> memeFittingApplied;
 	private IUnitOfTransfer<CoupleMeme> doubleRandom = null;
 	private Map<IUnitOfTransfer, Double> kvMemeCodeNbEntities;
+	// k: index entité ; v: queue de meme possédé
+	private Map<Integer, CircularFifoQueue<IUnitOfTransfer>> kvEntityCouple;
+	int nbelemEntityCouple = 200;
+	private Map<IUnitOfTransfer, Integer> kvNbCallByCouple;
+
+
+	// map circulaire appelée à chaque propagation, update si transfert de CA a eu lieu
+	private CircularFifoQueue<CoupleFlux> cfqLastKvFluxEntity;
+	int nbElemLastKvFluxEntity = 5000;
+	private boolean sthAddThisTurn = false;
+
+//	private Map<Integer, IUnitOfTransfer> couplePossessionAtTimeT;
+	/** map de Unit, et list des index qui les ont possédé. Mise a jour tout les 100 propagations
+	 *
+	 */
+	private Map<IUnitOfTransfer, List<Integer>> entityPossessionAtTimeT;
+	boolean firstTime = true;
+	int timestamPropa = 0;
+	int nbPropagation = 0;
 
 	public MemeProperties memeProperties;
 
@@ -59,10 +79,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	// de ce dernier.
 	private ArrayList<IActionApplyListener> entityListeners;
 	private ArrayList<IBehaviorTransmissionListener> memeListeners;
-
-
-
-
 
 	// Variable d'utilisation
 	private static int indexOfMemesCombinaisonRecursion;
@@ -101,6 +117,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		memeListeners = new ArrayList<>();
 		toDisplayForRatio = new ArrayList<>();
 		memeProperties = new MemeProperties();
+		kvEntityCouple = new Hashtable<>();
+		kvNbCallByCouple = new Hashtable<>();
 
 		if(Configurator.displayMemePossessionEvolution)
 			kvMemeCodeNbEntities = new HashMap<>();
@@ -110,6 +128,15 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	public void initialisation(){
 		generateMemeAvailableForMap();
 		bindNodeWithEntite(networkConstruct.getNetwork());
+		if(displayFluxOfCA){
+			//couplePossessionAtTimeT = new HashMap<>(entites.size());
+			entityPossessionAtTimeT = new HashMap<>();
+			cfqLastKvFluxEntity = new CircularFifoQueue<>(nbElemLastKvFluxEntity);
+			for (Entite entite : entites) {
+				kvEntityCouple.put(entite.index, new CircularFifoQueue<>(nbelemEntityCouple));
+			}
+		}
+
 	}
 
 	/**
@@ -120,7 +147,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		memeProperties.iUnitOfTransfers = this.memeFittingApplied;
 
 		//combinaison de meme présent sur le run, classé par type d'action
-		Hashtable<TypeOfUOT, ArrayList<Interfaces.IUnitOfTransfer>> iOTByCategory = new Hashtable<>();
+		Hashtable<TypeOfUOT, List<Interfaces.IUnitOfTransfer>> iOTByCategory = new Hashtable<>();
 		for (Interfaces.IUnitOfTransfer meme: this.memeFittingApplied)
 			Toolz.addElementInHashArray(iOTByCategory,meme.getActionType(),meme);
 
@@ -182,32 +209,51 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 		cptModulo++;
 
+		// Toutes les 100 propagations on check la circular queue pour les memes possessions
+		if(displayFluxOfCA && nbPropagation == 100){
+			nbPropagation = 0;
+			if(firstTime){
+				firstTime = false;
+			}else {
+				checkFluxWhereabout();
+			}
+
+			// dans tout les cas
+//			couplePossessionAtTimeT.clear();
+			entityPossessionAtTimeT.clear();
+			for (Entite entite : entitesActive) {
+				//
+				Toolz.addElementInHashArray(entityPossessionAtTimeT, entite.getMyUnitOfT().get(0), entite.getIndex());
+//				couplePossessionAtTimeT.put(entite.getIndex(), entite.getMyUnitOfT().get(0));
+			}
+		}
+
+
 		int multiRefresher = 200;
 		// Indicateur meme repartition, etc.
 		if(Configurator.displayMemePosessionDuringSimulation && (cptModulo % (Configurator.refreshInfoRate * multiRefresher) == 0) ) {
 			// affichage sur l'IHM de la distribution des memes
+			Map<IUnitOfTransfer, Integer> means = memeProperties.degreeMeanOfIOT;
+			Map<IUnitOfTransfer, Integer> nbParti = new Hashtable<>();
+			means.clear();
+			for (Entite entite : entitesActive) {
+				Toolz.addCountToElementInHashArray(means,entite.getMyUnitOfT().get(0),entite.getDegree() );
+				Toolz.addCountToElementInHashArray(nbParti,entite.getMyUnitOfT().get(0),1 );
+			}
 
-				Map<IUnitOfTransfer, Integer> means = memeProperties.degreeMeanOfIOT;
-				Map<IUnitOfTransfer, Integer> nbParti = new Hashtable<>();
-				means.clear();
-				for (Entite entite : entitesActive) {
-					Toolz.addCountToElementInHashArray(means,entite.getMyUnitOfT().get(0),entite.getDegree() );
-					Toolz.addCountToElementInHashArray(nbParti,entite.getMyUnitOfT().get(0),1 );
-				}
+			int nbDudy;
+			for (IUnitOfTransfer iUnitOfTransfer : means.keySet()) {
+				nbDudy = nbParti.get(iUnitOfTransfer);
+				if(nbDudy != 0)
+					means.put(iUnitOfTransfer, means.get(iUnitOfTransfer) / nbDudy);
+				else
+					means.put(iUnitOfTransfer, 0);
+			}
 
-				int nbDudy;
-				for (IUnitOfTransfer iUnitOfTransfer : means.keySet()) {
-					nbDudy = nbParti.get(iUnitOfTransfer);
-					if(nbDudy != 0)
-						means.put(iUnitOfTransfer, means.get(iUnitOfTransfer) / nbDudy);
-					else
-						means.put(iUnitOfTransfer, 0);
-				}
-
-				vueController.displayMemeUsage(cptModulo,
-						memeProperties.getNbActivationByMemes(),
-						means,
-						memeProperties.lastHundredActionDone);
+			vueController.displayMemeUsage(cptModulo,
+					memeProperties.getNbActivationByMemes(),
+					means,
+					memeProperties.lastHundredActionDone);
 		}
 
 		if(Configurator.displayMemePossessionEvolution && cptModulo % (Configurator.refreshInfoRate * multiRefresher) == 0){
@@ -218,6 +264,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 			vueController.addValueToApplianceSerie(++cptMemePossession, kvMemeCodeNbEntities);
 		}
+
 		if (Configurator.displayLogAvgDegreeByMeme && cptModulo % (Configurator.refreshInfoRate*100)==0)
 			vueController.displayInfo(ViewMessageType.AVGDGRBYMEME, Arrays.asList(checkPropertiesByMemePossession()));
 
@@ -543,6 +590,14 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 	}
 
+	/** fourni au memeProperties les meme dispos
+	 *
+	 * @param availableCouple
+	 */
+	public void generateDataStrucFlux(List<IUnitOfTransfer> availableCouple){
+		memeProperties.generateFluxDataStruct(availableCouple);
+	}
+
 	/** Obtention de la liste des memes disponibles sur la map, soit les simples,
 	 * soit les combinaisons de deux memes existantes, en fonction du param de configuration.
 	 * @param setAsked
@@ -550,10 +605,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 *            ou les deux.
 	 * @return
 	 */
-	public Hashtable<Integer, ArrayList<IUnitOfTransfer>>
+	public Hashtable<Integer, List<IUnitOfTransfer>>
 		getMemeAvailable(FittingBehavior setAsked, Optional<Hashtable<TypeOfUOT, ArrayList<IUnitOfTransfer>>> memeByC) {
 
-		Hashtable<Integer, ArrayList<IUnitOfTransfer>> memes = new Hashtable<>();
+		Hashtable<Integer, List<IUnitOfTransfer>> memes = new Hashtable<>();
 		if (setAsked == FittingBehavior.onlyComplex || setAsked == FittingBehavior.simpleAndComplex) {
 			memes = getMemeCombinaisonAvailable(memeByC);
 		}
@@ -574,11 +629,11 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	public ArrayList<String> getMemeAvailableAsString(FittingBehavior setAsked) {
 		ArrayList<String> memesAsString = new ArrayList<>();
-		Hashtable<Integer, ArrayList<IUnitOfTransfer>> memes = getMemeAvailable(setAsked, Optional.empty());
+		Hashtable<Integer, List<IUnitOfTransfer>> memes = getMemeAvailable(setAsked, Optional.empty());
 		ArrayList<String> classes = new ArrayList<String>();
 		String classe;
 
-		for (ArrayList<IUnitOfTransfer> combinaison : memes.values()) {
+		for (List<IUnitOfTransfer> combinaison : memes.values()) {
 			classes.clear();
 			for (IUnitOfTransfer meme : combinaison)
 				classes.add(meme.toFourCharString());
@@ -599,7 +654,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 *
 	 */
 	public String checkPropertiesByMemePossession() {
-		Hashtable<String, ArrayList<Entite>> entiteByMemePossession = new Hashtable<>();
+		Hashtable<String, List<Entite>> entiteByMemePossession = new Hashtable<>();
 		//@SuppressWarnings("unchecked")
 		HashSet<Entite> toExamine = new HashSet<>(entites);
 		ArrayList<Integer> SelfDegrees = new ArrayList<>();
@@ -696,6 +751,44 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		return resultat;
 	}
 
+	/** La map kvEntityCouple est, par index d'entité, une liste de X dernier couple recu.
+	 * On va en extraire un % de possession gardé par couple.
+	 * Si un meme n'apparait qu'une fois sur une entité il n'a pas bougé, donc 100% de stabilité
+	 *
+	 *
+	 */
+	public void checkEntityPossessionByCouple(){
+		// Map<IUnitOfTransfer,Integer> kvNbRetentionByCouple = new Hashtable<>();
+		Map<IUnitOfTransfer,Map<Integer, Double>> kvNbRetentionByCouple = new Hashtable<>();
+		// k:entity k:Couple v:nbGet
+		Map<Integer, Map<IUnitOfTransfer,Integer>> kvEntityKvMemeNbGet = new Hashtable<>();
+		Map<Integer, Map<IUnitOfTransfer,Double>> kvEntityKvMemePourcentGet = new Hashtable<>();
+		Map<IUnitOfTransfer, Map<Integer,Double>> kvMemeKvEntityPourcentGet = new Hashtable<>();
+
+		//region reduce circularQueue
+		// pour chaque entité
+		for (Integer index : kvEntityCouple.keySet()) {
+			// Somme des transferts par unit pour UNE entité
+			Map<IUnitOfTransfer, Integer> sumCalling = new HashMap<>();
+			// iterator sur la circular queue des couples qui sont passés sur l'entité
+			Iterator<IUnitOfTransfer> units = kvEntityCouple.get(index).iterator();
+			while(units.hasNext()){
+				// Tableau <Couple, NbArrivé> pour l'entité INDEX
+				Toolz.addCountToElementInHashArray(sumCalling, units.next(), 1 );
+			}
+
+			kvEntityKvMemeNbGet.put(index, sumCalling);
+		}
+
+		//endregion
+
+		//region get %
+
+		//endregion
+
+
+	}
+
 	//endregion
 
 	//region PRIVATE
@@ -709,12 +802,13 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		List<String> rez = new ArrayList<>();
 		Meme oneAction = null;
 		CoupleMeme coupleAction;
+		timestamPropa++;
 
 		synchronized (workerFactory.waitingForReset) {
 			workerFactory.getCalculator().incrementNbAction();
 			toDisplayForRatio.clear();
 
-			// CHOIX D'UNE ENTITÉE AU HASARD
+			// CHOIX D'UNE ENTITÉE ACTIVE AU HASARD
 			Entite entiteActing = selectActingEntiteV2();
 			if(Configurator.debugEntiteHandler)
 				System.out.println("[EH.runEntite]- entite choisie " + entiteActing.getIndex());
@@ -725,12 +819,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			}
 
 			// CHOIX DE L'ACTION POUR CETTE ENTITE
-
-			// Se démerder pour tjrs avoir un meme ici
-			oneAction = entiteActing.chooseAction();
+			oneAction = entiteActing.chooseAction(); // Se démerder pour tjrs avoir un meme ici
 			if (Configurator.debugEntiteHandler)
-				System.out.println("[EH.runEntite]- action choisie " + oneAction);
 				//System.out.println("[EH.runEntite]- action choisie " + memeActions.stream().map(e->e.toFourCharString()).reduce("",(added, e)-> added +" : "+e));
+				System.out.println("[EH.runEntite]- action choisie " + oneAction);
 
 			// APPLICATION ET PROPAGATION DE L'ACTION
 			rez.add(doAction(entiteActing, oneAction));
@@ -882,7 +974,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	/** Choix aléatoire d'une entité qui va faire une action.
 	 * Prise parmis la liste des entités possédant des actions.
 	 *
-	 * @return
+	 * @return une entité possédant au moins une action
 	 */
 	private Entite selectActingEntiteV2(){
 		return entitesActive.size() == 0? null :
@@ -911,15 +1003,27 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				removedAction = entite.takeMyMeme(coupleAction);
 
 				// Si retour du meme a ajouter, il n'y a pas eu de remplacement
-				if(removedAction == coupleAction)
+				if(removedAction == coupleAction) {
 					eventMemeChanged(entite, coupleAction, Configurator.MemeActivityPossibility.AjoutMeme.toString());
-
+				}
 				// Si un remplacement à eu lieu
 				if(removedAction != null && removedAction != coupleAction) {
 					// un retrait
 					eventMemeChanged(entite, removedAction, Configurator.MemeActivityPossibility.RetraitMeme.toString());
 					// et un ajout
-					eventMemeChanged(entite, coupleAction,Configurator.MemeActivityPossibility.AjoutMeme.toString());
+					eventMemeChanged(entite, coupleAction, Configurator.MemeActivityPossibility.AjoutMeme.toString());
+					// Mise a jour des comptes des flux de CA
+					CoupleFlux cf = new CoupleFlux(entite.getIndex(), removedAction, coupleAction, timestamPropa);
+					cfqLastKvFluxEntity.add(cf);
+					timestamPropa = 0;
+					nbPropagation++;
+
+					// Ajout d'un élément de flux d'une entité a l'autre format text remis a 0 en clear de map
+					memeProperties.addCountToFlux(removedAction.toNameString()+"*"+coupleAction.toNameString());
+
+					// Mise a jour de la map de possession de couple par entité
+					kvEntityCouple.get(entite.getIndex()).add(coupleAction);
+					Toolz.addCountToElementInHashArray(kvNbCallByCouple, coupleAction ,1);
 				}
 			}
 		}
@@ -951,6 +1055,102 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	//endregion
 
 	//region Meme
+
+	/** appelé apres X propagation
+	 *
+	 */
+	private void checkFluxWhereabout() {
+
+		// Map de <meme, <entite Index, Nombre de timestep de possession>>
+		Map<IUnitOfTransfer, Map<Integer, Integer>> kvUotKvEntityKept = new HashMap<>();
+		// Ensemble des UOT disponibles sur la map
+		Set<IUnitOfTransfer> couples = entityPossessionAtTimeT.keySet();
+		// Map contenant la liste des index par IOT, qui va évoluer avec les flux
+		Map<IUnitOfTransfer, List<Integer>> EntityPossessionEvolution = new HashMap<>(entityPossessionAtTimeT);
+
+		// pour la partie exploitation des données
+		int nbIot = couples.size();
+		// k:couple v:sum puis % de possession d'un CA par couple
+		Map<IUnitOfTransfer, Double> kvIOTMeanPossession = new HashMap<>(nbIot);
+		Map<IUnitOfTransfer, Map<Integer, Double>> kvIOTMeanPossessionByEntity = new HashMap<>(nbIot);
+
+		// k:couple <k:entite v:sum de
+		// Map<IUnitOfTransfer, Map<Integer, Double>> kvIOTEachPossession = new HashMap<>(nbIot);
+
+		// Transformation de la liste d'entité possédé par UOT en Map<Entite, 1> par UOT
+		for (IUnitOfTransfer iUnitOfTransfer : couples) {
+			Map<Integer, Integer> entityCount = new HashMap<>();
+			Map<Integer, Double> entitySumTimeStamp = new HashMap<>();
+			kvIOTMeanPossessionByEntity.put(iUnitOfTransfer, entitySumTimeStamp);
+			// k:index des entite ; v: 1
+			for (Integer integer : EntityPossessionEvolution.get(iUnitOfTransfer))
+				entityCount.put(integer, 1);
+
+			kvUotKvEntityKept.put(iUnitOfTransfer, entityCount);
+		}
+
+		// Incrementation des possessions
+		Iterator<CoupleFlux> fluxIter = cfqLastKvFluxEntity.iterator();
+		CoupleFlux now;
+		int countFlux = 0;
+		int timestamp;
+		int totalTimestamp = 0;
+		IUnitOfTransfer keyRemove;
+		IUnitOfTransfer keyAdd;
+		Integer entityConcerned;
+		List<Integer> indexes;
+
+		// pour chaque propagation
+		while (fluxIter.hasNext()) {
+			now = fluxIter.next();
+			timestamp = now.timestamp;
+			totalTimestamp += timestamp;
+			// incrementer la possession des CA pour chaque entité possédé au timestep
+			for (IUnitOfTransfer iUnitOfTransfer : couples) {
+				// Pendant le laps de temps timestamp qui sépare deux propagations, les entités ont gardé chaque CA
+				for (Integer integer : EntityPossessionEvolution.get(iUnitOfTransfer)) {
+					Toolz.addCountToElementInHashArray(kvUotKvEntityKept.get(iUnitOfTransfer), integer, timestamp);
+					Toolz.addNumberToElementInMap(kvIOTMeanPossession, iUnitOfTransfer, Double.parseDouble(""+timestamp));
+					Toolz.addNumberToElementInMap(kvIOTMeanPossessionByEntity.get(iUnitOfTransfer),integer, (double)timestamp);
+				}
+
+			}
+			// si ya eu une transition, mettre a jour le EntityPossessionEvolution
+			keyRemove = now.oldCouple;
+			keyAdd = now.newCouple;
+			entityConcerned = now.entity;
+			indexes = EntityPossessionEvolution.get(keyRemove);
+			indexes.remove(entityConcerned);
+			indexes = EntityPossessionEvolution.get(keyAdd);
+			indexes.add(entityConcerned);
+			countFlux++;
+		}
+
+		cfqLastKvFluxEntity.clear();
+
+		double valueSummed;
+		Map<Integer, Double> sumByEntity;
+		// Utilisation des données pour connaitre le pourcentage de possession
+		for (IUnitOfTransfer iUnitOfTransfer : couples) {
+			// Partie rétention général pour chaque couple action
+			valueSummed = kvIOTMeanPossession.get(iUnitOfTransfer);
+			valueSummed /= totalTimestamp;
+			valueSummed /= entites.size();
+			kvIOTMeanPossession.put(iUnitOfTransfer, valueSummed);
+
+			// partie rétention pour chaque entité
+			sumByEntity = kvIOTMeanPossessionByEntity.get(iUnitOfTransfer);
+			for (Integer integer : sumByEntity.keySet()) {
+				sumByEntity.put(integer, sumByEntity.get(integer)/totalTimestamp);
+			}
+
+		}
+
+		int lol = 2+1;
+
+	}
+
+
 	/** Renvoi true si aucune des entités initiales ne possède un slot vide ou de fluidité.
 	 *
 	 * @return False si memes initiaux non intégralement transmis.
@@ -1259,7 +1459,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @return une hash Int ( qui n'a pas de signification ), combinaison de
 	 *         meme.
 	 */
-	private Hashtable<Integer, ArrayList<IUnitOfTransfer>> getMemeCombinaisonAvailable
+	private Hashtable<Integer, List<IUnitOfTransfer>> getMemeCombinaisonAvailable
 				(Optional<Hashtable<TypeOfUOT, ArrayList<IUnitOfTransfer>>> memeByC) {
 
 		Hashtable<TypeOfUOT, ArrayList<IUnitOfTransfer>> memesByCategory = new Hashtable<>();
@@ -1288,7 +1488,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		for (int i = 0; i < key.size(); i++)
 			keyz[i] = key.get(i);
 
-		Hashtable<Integer, ArrayList<IUnitOfTransfer>> composition = new Hashtable<>();
+		Hashtable<Integer, List<IUnitOfTransfer>> composition = new Hashtable<>();
 		ArrayList<IUnitOfTransfer> memez = new ArrayList<>();
 		indexOfMemesCombinaisonRecursion = -1;
 		recursive(memesByCategory, memez, keyz, composition, -1);
@@ -1306,7 +1506,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	@SuppressWarnings("unchecked")
 	private void recursive(Hashtable<TypeOfUOT, ArrayList<IUnitOfTransfer>> memesByCategory,
 						   ArrayList<IUnitOfTransfer> memes, TypeOfUOT[] actions,
-						   Hashtable<Integer, ArrayList<IUnitOfTransfer>> selection, int indexAction) {
+						   Hashtable<Integer, List<IUnitOfTransfer>> selection, int indexAction) {
 
 		if ((++indexAction) < actions.length) {
 			for (IUnitOfTransfer meme : memesByCategory.get(actions[indexAction])) {

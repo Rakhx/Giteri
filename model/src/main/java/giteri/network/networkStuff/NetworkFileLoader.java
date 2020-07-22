@@ -26,7 +26,7 @@ public class NetworkFileLoader implements IReadNetwork {
 	private MemeFactory memeFactory;
 	private WriteNRead writeNRead;
 	// KV nodeIndex:<nodeIndex>
-	private Hashtable<Integer, ArrayList<Integer>> nodesAndLinks = new Hashtable<>();
+	private Hashtable<Integer,List<Integer>> nodesAndLinks = new Hashtable<>();
 	private boolean changed = true;
 	private TinyNetworks net;
 	private int nombreScreen = 0;

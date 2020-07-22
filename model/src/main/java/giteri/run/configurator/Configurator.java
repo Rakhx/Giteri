@@ -17,9 +17,9 @@ public final class Configurator {
 	public static boolean furTesting = false; // pour les multi run @ same config pour txt result
 
 	// Fast debuguer & I/O
-	public static boolean displayLogAvgDegreeByMeme = !furTesting; // combinaisons de meme et leur degré + derniere application + application from start
-	public static boolean displayMemePosessionDuringSimulation = true || !furTesting && !fullSilent; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
-
+	public static boolean displayFluxOfCA = true; // combinaisons de meme et leur degré + derniere application + application from start
+	public static boolean displayLogAvgDegreeByMeme = false ;//|| !furTesting; // combinaisons de meme et leur degré + derniere application + application from start
+	public static boolean displayMemePosessionDuringSimulation =  false; //!furTesting && !fullSilent; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
 
 
 	// region Modèle
@@ -128,7 +128,7 @@ public final class Configurator {
 
 	public static boolean DisplayLogBehaviorColors = false; // correspondance meme <=> code couleur
 	public static boolean displayLogMemeApplication = false; // Chaque application de meme
-	public static boolean displayLogMemeTransmission = false; // qui recoit quel meme
+	public static boolean displayLogMemeTransmission = true; // qui recoit quel meme
 
 	private static boolean faster = false; // les rations d'echecs sur echec, echec sur réussite...
 	public static boolean displayLogRatioLogFailOverFail = faster;
