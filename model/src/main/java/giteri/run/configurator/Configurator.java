@@ -128,7 +128,7 @@ public final class Configurator {
 
 	public static boolean DisplayLogBehaviorColors = false; // correspondance meme <=> code couleur
 	public static boolean displayLogMemeApplication = false; // Chaque application de meme
-	public static boolean displayLogMemeTransmission = true; // qui recoit quel meme
+	public static boolean displayLogMemeTransmission = false; // qui recoit quel meme
 
 	private static boolean faster = false; // les rations d'echecs sur echec, echec sur réussite...
 	public static boolean displayLogRatioLogFailOverFail = faster;

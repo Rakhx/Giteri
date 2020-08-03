@@ -9,6 +9,9 @@ public class RandomTest {
     public static void main(String[] args)  {
 
 
+        /*
+        // TEST AJOUT DE NUMBER DANS LISTE
+
         int i = 0;
         changed(i);
         System.out.println(i);
@@ -18,10 +21,7 @@ public class RandomTest {
         Toolz.addNumberToElementInMap(maps, 1,one);
         Toolz.addNumberToElementInMap(maps, 1,two);
         Toolz.addNumberToElementInMap(maps, 2,three);
-
-
-
-
+*/
 
 //        Initializer balbla = new Initializer();
 //        for (int i = 0; i < 120; i++) {

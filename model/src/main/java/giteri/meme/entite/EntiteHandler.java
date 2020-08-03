@@ -54,13 +54,14 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	int nbelemEntityCouple = 200;
 	private Map<IUnitOfTransfer, Integer> kvNbCallByCouple;
 
-
 	// map circulaire appelée à chaque propagation, update si transfert de CA a eu lieu
 	private CircularFifoQueue<CoupleFlux> cfqLastKvFluxEntity;
-	int nbElemLastKvFluxEntity = 5000;
-	private boolean sthAddThisTurn = false;
+	int nbPropagationBeforeCheck = 100;
 
-//	private Map<Integer, IUnitOfTransfer> couplePossessionAtTimeT;
+	// Pour les flux entre CA
+	private Map<IUnitOfTransfer, Integer> kvIotIndex ; // Correspondance iot et index
+	int[][] fluxInsideIot ; // MAtrice pour réseau dirigé de flux entre iot
+
 	/** map de Unit, et list des index qui les ont possédé. Mise a jour tout les 100 propagations
 	 *
 	 */
@@ -119,6 +120,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		memeProperties = new MemeProperties();
 		kvEntityCouple = new Hashtable<>();
 		kvNbCallByCouple = new Hashtable<>();
+		kvIotIndex = new HashMap<>();
 
 		if(Configurator.displayMemePossessionEvolution)
 			kvMemeCodeNbEntities = new HashMap<>();
@@ -129,14 +131,12 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		generateMemeAvailableForMap();
 		bindNodeWithEntite(networkConstruct.getNetwork());
 		if(displayFluxOfCA){
-			//couplePossessionAtTimeT = new HashMap<>(entites.size());
 			entityPossessionAtTimeT = new HashMap<>();
-			cfqLastKvFluxEntity = new CircularFifoQueue<>(nbElemLastKvFluxEntity);
+			cfqLastKvFluxEntity = new CircularFifoQueue<>(nbPropagationBeforeCheck);
 			for (Entite entite : entites) {
 				kvEntityCouple.put(entite.index, new CircularFifoQueue<>(nbelemEntityCouple));
 			}
 		}
-
 	}
 
 	/**
@@ -152,12 +152,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			Toolz.addElementInHashArray(iOTByCategory,meme.getActionType(),meme);
 
 		// Quand version classique, on crée les couples disponibles sur la map
-
 		memeProperties.memeCombinaisonFittingAvailable = new HashMap<>();
 		int i = 0;
 		for (IUnitOfTransfer iUnitOfTransfer : this.memeFittingApplied) {
 			memeProperties.memeCombinaisonFittingAvailable.put(i++, new ArrayList<IUnitOfTransfer>(Arrays.asList(iUnitOfTransfer)));
-
 		}
 	}
 
@@ -210,7 +208,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		cptModulo++;
 
 		// Toutes les 100 propagations on check la circular queue pour les memes possessions
-		if(displayFluxOfCA && nbPropagation == 100){
+		if(displayFluxOfCA && nbPropagation == nbPropagationBeforeCheck){
 			nbPropagation = 0;
 			if(firstTime){
 				firstTime = false;
@@ -219,12 +217,9 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			}
 
 			// dans tout les cas
-//			couplePossessionAtTimeT.clear();
 			entityPossessionAtTimeT.clear();
 			for (Entite entite : entitesActive) {
-				//
 				Toolz.addElementInHashArray(entityPossessionAtTimeT, entite.getMyUnitOfT().get(0), entite.getIndex());
-//				couplePossessionAtTimeT.put(entite.getIndex(), entite.getMyUnitOfT().get(0));
 			}
 		}
 
@@ -539,6 +534,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * @param UOT
 	 */
 	public void giveMemeToEntiteFitting(List<IUnitOfTransfer> UOT) {
+		UOT.sort(null);
 		ArrayList<Entite> entiteContente = new ArrayList<>();
 		Iterator<Entite> entitees = entites.iterator();
 		Entite actual;
@@ -596,6 +592,12 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	public void generateDataStrucFlux(List<IUnitOfTransfer> availableCouple){
 		memeProperties.generateFluxDataStruct(availableCouple);
+		int indexer = -1;
+		for (IUnitOfTransfer iUnitOfTransfer : availableCouple) {
+			kvIotIndex.put(iUnitOfTransfer, ++indexer);
+		}
+
+		fluxInsideIot = new int[availableCouple.size()][availableCouple.size()];
 	}
 
 	/** Obtention de la liste des memes disponibles sur la map, soit les simples,
@@ -1074,9 +1076,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		Map<IUnitOfTransfer, Double> kvIOTMeanPossession = new HashMap<>(nbIot);
 		Map<IUnitOfTransfer, Map<Integer, Double>> kvIOTMeanPossessionByEntity = new HashMap<>(nbIot);
 
-		// k:couple <k:entite v:sum de
-		// Map<IUnitOfTransfer, Map<Integer, Double>> kvIOTEachPossession = new HashMap<>(nbIot);
-
 		// Transformation de la liste d'entité possédé par UOT en Map<Entite, 1> par UOT
 		for (IUnitOfTransfer iUnitOfTransfer : couples) {
 			Map<Integer, Integer> entityCount = new HashMap<>();
@@ -1084,10 +1083,14 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			kvIOTMeanPossessionByEntity.put(iUnitOfTransfer, entitySumTimeStamp);
 			// k:index des entite ; v: 1
 			for (Integer integer : EntityPossessionEvolution.get(iUnitOfTransfer))
-				entityCount.put(integer, 1);
+				entityCount.put(integer, 0);
 
 			kvUotKvEntityKept.put(iUnitOfTransfer, entityCount);
 		}
+
+
+		// gathering d'info sur flux
+		fluxInsideIot = new int[nbIot][nbIot];
 
 		// Incrementation des possessions
 		Iterator<CoupleFlux> fluxIter = cfqLastKvFluxEntity.iterator();
@@ -1111,9 +1114,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				for (Integer integer : EntityPossessionEvolution.get(iUnitOfTransfer)) {
 					Toolz.addCountToElementInHashArray(kvUotKvEntityKept.get(iUnitOfTransfer), integer, timestamp);
 					Toolz.addNumberToElementInMap(kvIOTMeanPossession, iUnitOfTransfer, Double.parseDouble(""+timestamp));
-					Toolz.addNumberToElementInMap(kvIOTMeanPossessionByEntity.get(iUnitOfTransfer),integer, (double)timestamp);
 				}
-
 			}
 			// si ya eu une transition, mettre a jour le EntityPossessionEvolution
 			keyRemove = now.oldCouple;
@@ -1124,6 +1125,11 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			indexes = EntityPossessionEvolution.get(keyAdd);
 			indexes.add(entityConcerned);
 			countFlux++;
+
+			// gathering d'info
+			if(kvIotIndex.containsKey(keyRemove)){
+				fluxInsideIot[kvIotIndex.get(keyRemove)][kvIotIndex.get(keyAdd)]++;
+			}
 		}
 
 		cfqLastKvFluxEntity.clear();
@@ -1140,16 +1146,48 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 
 			// partie rétention pour chaque entité
 			sumByEntity = kvIOTMeanPossessionByEntity.get(iUnitOfTransfer);
-			for (Integer integer : sumByEntity.keySet()) {
-				sumByEntity.put(integer, sumByEntity.get(integer)/totalTimestamp);
+			for (Integer integer : kvUotKvEntityKept.get(iUnitOfTransfer).keySet()) {
+				sumByEntity.put(integer, (double)kvUotKvEntityKept.get(iUnitOfTransfer).get(integer)/totalTimestamp);
 			}
-
 		}
 
-		int lol = 2+1;
-
+		displayFluxIntraIot(fluxInsideIot, kvIotIndex);
+		displayIotRetention(kvIOTMeanPossessionByEntity,kvIOTMeanPossession);
 	}
 
+	/** affiche le nombre de flux d'entité entre iot
+	 *
+	 * @param datas
+	 */
+	private void displayFluxIntraIot(int[][] datas, Map<IUnitOfTransfer, Integer> iotIndexer) {
+		String res = "";
+		for (IUnitOfTransfer iot1 : iotIndexer.keySet()) {
+			res = iot1.toNameString() + ":";
+			for (IUnitOfTransfer iot2 : iotIndexer.keySet()) {
+				if(iot1 != iot2)
+					res += "\n |------ " + datas[iotIndexer.get(iot1)][iotIndexer.get(iot2)] + " ----> " + iot2.toNameString();
+			}
+
+			System.out.println(res);
+		}
+	}
+
+	/** affiche, par iot, la retention d'entité
+	 *
+	 */
+	/**
+	 *
+	 * @param detailled par iot et par entité, le pourcentage de retention sur les x derniers actions
+	 * @param average par iot, en moyenne, le pourcentage de retention sur tt les entités qui y sont passées
+	 */
+	private void displayIotRetention(Map<IUnitOfTransfer, Map<Integer, Double>> detailled, Map<IUnitOfTransfer, Double> average){
+		String res = "";
+		for (IUnitOfTransfer iot : average.keySet()) {
+			res += "\n "+iot.toNameString() +"("+ detailled.get(iot).keySet().size() + "):"
+					+ Toolz.getNumberCutToPrecision(average.get(iot), 2)+ "%";
+		}
+		System.out.println(res);
+	}
 
 	/** Renvoi true si aucune des entités initiales ne possède un slot vide ou de fluidité.
 	 *

@@ -17,10 +17,4 @@ public class CoupleFlux {
         newCouple = newOne;
         timestamp = time;
     }
-
-    // public static CoupleFlux getStub(){
-     //   return new CoupleFlux(-1, null, null);
-   // }
-
-
 }
