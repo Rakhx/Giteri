@@ -4,6 +4,7 @@ import giteri.meme.event.ActionApplyEvent;
 import giteri.meme.event.BehavTransmEvent;
 import giteri.meme.event.IActionApplyListener;
 import giteri.meme.event.IBehaviorTransmissionListener;
+import giteri.meme.mecanisme.ActionFactory;
 import giteri.meme.mecanisme.FilterFactory;
 import giteri.meme.mecanisme.FilterFactory.IFilter;
 import giteri.meme.mecanisme.AttributFactory.IAttribut;
@@ -23,6 +24,7 @@ import giteri.run.interfaces.Interfaces.IUnitOfTransfer;
 import giteri.tool.math.Toolz;
 import giteri.tool.objects.ObjectRef;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
 import java.util.*;
@@ -943,6 +945,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 					// TODO[CV] - ici a eu lieu un chg
 					// Si couple version, que l'action jouée soit un ajout ou un retrait, c'est tout le couple qui est transmis
 					if(usePropagation)
+						// a ce moment l'action a déja été appliquée
 						propagation(cibles, movingOne, movingOne.getMyUnitOfT().get(0));
 
 					// evenement d'application d'une action
@@ -992,7 +995,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 */
 	private void propagation(Set<Entite> cibles, Entite movingOne, IUnitOfTransfer coupleAction){
 		IUnitOfTransfer removedAction;
-		double probaAction = 0 ;
+		double probaAction = 0;
 
 		for (Entite entite : cibles) {
 			probaAction = coupleAction.getProbaPropagation();
@@ -1008,6 +1011,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				if(removedAction == coupleAction) {
 					eventMemeChanged(entite, coupleAction, Configurator.MemeActivityPossibility.AjoutMeme.toString());
 				}
+
 				// Si un remplacement à eu lieu
 				if(removedAction != null && removedAction != coupleAction) {
 					// un retrait
@@ -1031,7 +1035,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 	}
 
-	/** Dans le cas de la version coule, prends en compte la distance de degrée pour
+	/** Dans le cas de la version couple, prends en compte la distance de degrée pour
 	 * pondérer la propagation d'un meme.
 	 *
 	 * @param distance
@@ -1041,7 +1045,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private double probaPropaDegree(Entite acting, Entite cible, double proba){
 		if(proba == 0)
 			return 0;
-		double multiplicateur = 0.1;
+
+		double multiplicateur = 0.2;
 		int diffDeg =  Math.abs(acting.getDegree() - cible.getDegree());
 		multiplicateur /= Math.pow(1 + diffDeg, 2);
 
@@ -1184,7 +1189,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		String res = "";
 		for (IUnitOfTransfer iot : average.keySet()) {
 			res += "\n "+iot.toNameString() +"("+ detailled.get(iot).keySet().size() + "):"
-					+ Toolz.getNumberCutToPrecision(average.get(iot), 2)+ "%";
+					+ Toolz.getNumberCutToPrecision(average.get(iot)*100, 2)+ "%";
 		}
 		System.out.println(res);
 	}

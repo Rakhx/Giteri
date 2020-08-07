@@ -18,9 +18,9 @@ public final class Configurator {
 
 	// Fast debuguer & I/O
 	public static boolean displayFluxOfCA = true; // combinaisons de meme et leur degré + derniere application + application from start
-	public static boolean displayLogAvgDegreeByMeme = false ;//|| !furTesting; // combinaisons de meme et leur degré + derniere application + application from start
-	public static boolean displayMemePosessionDuringSimulation =  false; //!furTesting && !fullSilent; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
-
+	public static boolean displayColor = true; // combinaisons de meme et leur degré + derniere application + application from start
+	public static boolean displayLogAvgDegreeByMeme = true ;//|| !furTesting; // combinaisons de meme et leur degré + derniere application + application from start
+	public static boolean displayMemePosessionDuringSimulation = true; //!furTesting && !fullSilent; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
 
 	// region Modèle
 
@@ -28,7 +28,6 @@ public final class Configurator {
 	public static boolean coupleSingleTransmission = true; // Transmet le couple à l'entité ayant recu l'action et pas plus
 	public static boolean useMemePropagationProba = true; // utilise la proba de propagation portée par le meme
 	public static boolean wholeEntityHavingCouple = false; // File des les débuts tt les couples sur tte les entités
-
 
 	// FONCTIONNEMENT
 	public static boolean manuelNextStep = false; // NO-AUTOSKIP pas de passage au run suivant, il faut appuyer sur next
@@ -142,8 +141,6 @@ public final class Configurator {
 	//endregion
 
 	// region affichage de debug
-
-
 	public static boolean debugCouple = false;
 
 	public static boolean debugStatAndPlot = false;
