@@ -59,6 +59,7 @@ public class IHMStub implements IView {
 	}
 
 
+
 	@Override
 	public JFreeChart getDDChart() {
 		return null;

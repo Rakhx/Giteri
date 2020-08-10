@@ -20,14 +20,17 @@ public class ConsoleView implements Interfaces.IView {
     }
 
     public void displayXLastAction(int nbAction, Map<String, Integer> nbActivByMeme, Map<String,Integer> nbLastActivByMeme, List<String> lastXMemeApplied){
-        List<String> nbActiv = new ArrayList<>(Arrays.asList(""+nbAction));
-        nbActivByMeme.entrySet().stream().forEach(k -> nbActiv.add("meme "+k.getKey()+" - "+ k.getValue().toString()));
-        displayInfo(ViewMessageType.NBACTIVBYMEME, nbActiv);
+        if(!Configurator.displayMemePossessionOnlyIHM)
+        {
+            List<String> nbActiv = new ArrayList<>(Arrays.asList(""+nbAction));
+            nbActivByMeme.entrySet().stream().forEach(k -> nbActiv.add("meme "+k.getKey()+" - "+ k.getValue().toString()));
+            displayInfo(ViewMessageType.NBACTIVBYMEME, nbActiv);
 
-        nbActiv.clear();
-        nbActiv.add(""+nbAction);
-        nbLastActivByMeme.entrySet().stream().forEach(k -> nbActiv.add("meme "+k.getKey()+" - "+ k.getValue().toString()));
-        displayInfo(ViewMessageType.LASTMEMEACTIF, nbActiv);
+            nbActiv.clear();
+            nbActiv.add(""+nbAction);
+            nbLastActivByMeme.entrySet().stream().forEach(k -> nbActiv.add("meme "+k.getKey()+" - "+ k.getValue().toString()));
+            displayInfo(ViewMessageType.LASTMEMEACTIF, nbActiv);
+        }
     }
 
     @Override

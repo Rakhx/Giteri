@@ -48,7 +48,6 @@ public class Initializer {
             Configurator.writeNetworkResultOnFitting = !fullSilent;
             Configurator.writeMemeResultOnFitting = !fullSilent;
             Configurator.explorator = Configurator.EnumExplorationMethod.exhaustive;
-
         }
         else{
             // La configuration de base correspond a OpenMole, car histoire de multi acces a des variables
@@ -130,6 +129,7 @@ public class Initializer {
                 vControl.addView(new ConsoleView());
 
             // Le graph associé lors de l'affichage avec graphstream
+            // les couples de base onMap on déja été ajouté
             if (Configurator.withGraphicalDisplay) {
                 Graph graph = new SingleGraph("Embedded");
                 drawerGraphStream.setGraph(graph);
@@ -147,8 +147,6 @@ public class Initializer {
             // De meme, le dessinateur graphique s'abonne aux évènements de type transmission de meme
             // Dans le but de faire changer la couleur du noeud en fonction des memes possédés par ce dernier
             entiteHandler.addMemeListener(workerFactory.getDrawer());
-
-            // entiteHandler.addEntityListener(workerFactory.getCalculator());  networkConstructor.start();
 
             if (!Configurator.isSystemPaused()) {
                 networkConstructor.start();

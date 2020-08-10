@@ -20,7 +20,9 @@ public final class Configurator {
 	public static boolean displayFluxOfCA = true; // combinaisons de meme et leur degré + derniere application + application from start
 	public static boolean displayColor = true; // combinaisons de meme et leur degré + derniere application + application from start
 	public static boolean displayLogAvgDegreeByMeme = true ;//|| !furTesting; // combinaisons de meme et leur degré + derniere application + application from start
-	public static boolean displayMemePosessionDuringSimulation = true; //!furTesting && !fullSilent; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
+
+	public static boolean displayMemePosessionDuringSimulation = true && !fullSilent; //!furTesting && !fullSilent; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
+	public static boolean displayMemePossessionOnlyIHM = true; // combinaisons de meme et leur degré + derniere application + application from start
 
 	// region Modèle
 
@@ -127,7 +129,7 @@ public final class Configurator {
 
 	public static boolean DisplayLogBehaviorColors = false; // correspondance meme <=> code couleur
 	public static boolean displayLogMemeApplication = false; // Chaque application de meme
-	public static boolean displayLogMemeTransmission = false; // qui recoit quel meme
+	public static boolean displayLogMemeTransmission = false; // qui recoit quel meme - affiche les couleurs?
 
 	private static boolean faster = false; // les rations d'echecs sur echec, echec sur réussite...
 	public static boolean displayLogRatioLogFailOverFail = faster;
@@ -170,7 +172,7 @@ public final class Configurator {
 	// moyen osef
 	public static final boolean lotOfNodes = true;
 	private static int nbNode = lotOfNodes ? 300 : 40;
-	public static int refreshInfoRate = 10;
+	public static int refreshInfoRate = 1000;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
 	public static boolean memeCanBeReplaceByCategory = true;
 	public final static int semiAutoWaitingTime = 3000;

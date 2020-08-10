@@ -27,6 +27,7 @@ import giteri.meme.entite.Entite;
 import giteri.meme.entite.EntiteHandler;
 import giteri.meme.event.ActionApplyEvent;
 import giteri.meme.event.BehavTransmEvent;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /** Classe de dessin pour graphStream
  *
@@ -51,7 +52,7 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 	// Graphe associé
 	public Graph graph;
 	// x3
-	private int nbColorWanted = 3;
+	private int nbColorWanted = 4; //diviseur de250@rgb, donc (3+1)*4*4 combinaison,( - egalité)
 	private Hashtable<Integer, String> colorPieAsString;
 	private Hashtable<Integer, Color> colorPieAsColor;
 
@@ -75,15 +76,16 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 	 *
 	 */
 	public void handlerBehavTransm(BehavTransmEvent e) {
-		if(Configurator.displayLogMemeTransmission)
-		// A priori inutile de parler du cas de remplacement car la classe de node écrase
-		// la précédente. A revoir si des memes peuvent etre spontanement perdu.
-		if(e.message == Configurator.MemeActivityPossibility.AjoutMeme.toString()){
-			// On cherche le noeud concerné
-			Node noeud = graph.getNode(""+e.entite.getIndex());
-			setNodeClass(noeud, e.entite.getGraphStreamClass());
-			if(Configurator.displayLogMemeTransmission)
-				System.out.println(noeud+" "+e.meme.toNameString());
+		if(Configurator.displayColor) {
+			// A priori inutile de parler du cas de remplacement car la classe de node écrase
+			// la précédente. A revoir si des memes peuvent etre spontanement perdu.
+			if (e.message == Configurator.MemeActivityPossibility.AjoutMeme.toString()) {
+				// On cherche le noeud concerné
+				Node noeud = graph.getNode("" + e.entite.getIndex());
+				setNodeClass(noeud, e.entite.getGraphStreamClass());
+				if (Configurator.displayLogMemeTransmission)
+					System.out.println(noeud + " " + e.meme.toNameString());
+			}
 		}
 	}
 
@@ -258,19 +260,19 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 
 		String attribut = "";
 		Integer officialIndex;
-		int nbMemeSolo = memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.BASIC).size();
-		nbMemeSolo--;
 		int aAppliquer;
-		List<String> combinaisons =entiteHandler.getMemeAvailableAsString(Configurator.FittingBehavior.onlyComplex) ;
+		List<Interfaces.IUnitOfTransfer> couples = new ArrayList<>();
 
-
-		for (String combi : combinaisons) {
+		couples.addAll(memeFactory.getMemes(Configurator.MemeList.ONMAP, Configurator.TypeOfUOT.COUPLE));
+		couples.addAll(memeFactory.getMemes(Configurator.MemeList.FITTING, Configurator.TypeOfUOT.COUPLE));
+		String combi;
+		for (Interfaces.IUnitOfTransfer couple : couples) {
+			combi = couple.toFourCharString();
 			officialIndex = memeFactory.getIndexFromMemeFourChar(combi);
-
 			if (officialIndex != null)
 				aAppliquer = officialIndex;
 			else
-				aAppliquer = ++nbMemeSolo;
+				throw new NotImplementedException();
 
 			attribut += "node. " + combi + " {fill-color: " + colorPieAsString.get(aAppliquer) + ";}";
 			if (Configurator.DisplayLogBehaviorColors) {
@@ -279,8 +281,8 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 		}
 
 		// utilisé pour le step by step
-		attribut += "node.TARGET {fill-color: " + colorPieAsString.get(100) + ";}";
-		attribut += "node.NONTARGET {fill-color: " + colorPieAsString.get(101) + ";}";
+//		attribut += "node.TARGET {fill-color: " + colorPieAsString.get(100) + ";}";
+//		attribut += "node.NONTARGET {fill-color: " + colorPieAsString.get(101) + ";}";
 
 		graph.addAttribute("ui.stylesheet", attribut);
 	}

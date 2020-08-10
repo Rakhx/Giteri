@@ -42,7 +42,7 @@ public class MemeProperties {
     List<Integer> lastFailActionTried;
 
     // Combinaison de meme disponible
-    Map<Integer, ArrayList<IUnitOfTransfer>> memeCombinaisonFittingAvailable;
+   // Map<Integer, ArrayList<IUnitOfTransfer>> memeCombinaisonFittingAvailable;
 
     //Structure pour information sur les flux d'entité entre les CA
     // k:CoupleMeme+CoupleMeme v:Integer d'index

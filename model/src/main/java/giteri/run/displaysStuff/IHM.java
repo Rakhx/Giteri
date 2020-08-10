@@ -1341,19 +1341,22 @@ public class IHM extends JFrame implements  IBehaviorTransmissionListener, IView
 		String labelSerie;
 		Color serieColor;
 		int serieIndex;
+		int indexFrom=-1;
 
 		// Pour chaque série qu'on veut ajouter
-		for (IUnitOfTransfer meme : memes) {
-			if(meme.isFluide())
+		for (IUnitOfTransfer iUnitOfTransfer : memes) {
+			if(iUnitOfTransfer.isFluide())
 				continue;
 
-			labelSerie = meme.toNameString();
+			labelSerie = iUnitOfTransfer.toNameString();
 			// on crée les série dans l'ordre a partir de 0 et regarde le meme associé a cet index dans MemeFactory
 			XYSeries aSerie = new XYSeries(labelSerie);
-			serieIndex = memeFactory.getIndexFromMeme(meme);
+			serieIndex = memeFactory.getIndexFromMeme(iUnitOfTransfer);
+			indexFrom++; // les series sont ajoutées a compter de zero
 			// label son petit nom Couleur associé a cet index
 			serieColor = drawerGraphStream.getColorAsColor(serieIndex);
-			chartMemeAppliance.getXYPlot().getRenderer().setSeriesPaint(serieIndex, serieColor);
+			// on decale pour que le renderer associe la couleur de l'index 4en vrai a l'index 0 pour lui, puisque les series s'index de 0
+			chartMemeAppliance.getXYPlot().getRenderer().setSeriesPaint(indexFrom, serieColor);
 			datasetMemeAppliance.addSeries(aSerie);
 			ArraySeriesMemeAppliances.add(aSerie);
 		}
@@ -1395,10 +1398,10 @@ public class IHM extends JFrame implements  IBehaviorTransmissionListener, IView
 				netProp = modelController.getCurrentNetProperties(activator);
 
 				// Pour chaque Meme disponible sur la simulation
-				for (IUnitOfTransfer meme : selectedMemeOnSimulation) {
-					memeString = meme.toString();
-					memeFourChar = meme.toFourCharString();
-					associatedColor = drawerGraphStream.getColorAsColor(memeFactory.getIndexFromMemeFourChar(meme.toFourCharString()));
+				for (IUnitOfTransfer uot : selectedMemeOnSimulation) {
+					memeString = uot.toString();
+					memeFourChar = uot.toFourCharString();
+					associatedColor = drawerGraphStream.getColorAsColor(memeFactory.getIndexFromMemeFourChar(uot.toFourCharString()));
 
 					// NOMBRE DE POSSESSION DE MEME PAR LES ENTITES
 					// Trouver le label correspondant
@@ -1564,6 +1567,8 @@ public class IHM extends JFrame implements  IBehaviorTransmissionListener, IView
 
 		ArraySeriesMemeAppliances.clear();
 		datasetMemeAppliance.removeAllSeries();
+		// chartMemeAppliance.getXYPlot().getRenderer().
+
 	}
 
 	/** Reset la chart de densité over proba, utilisée pour

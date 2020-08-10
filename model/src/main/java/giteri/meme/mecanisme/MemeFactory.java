@@ -165,7 +165,6 @@ public class MemeFactory {
 		else {
 			ArrayList<IUnitOfTransfer> toReturn = new ArrayList<>();
 			if(typeAction == TypeOfUOT.ANYTHING) {
-
 				for (Meme meme : memeExisting) {
 					toReturn.add(meme);
 				}
@@ -397,7 +396,7 @@ public class MemeFactory {
 		indexOfIOT++;
 		IUnitOfTransfer<CoupleMeme> icm = new CoupleMeme(indexOfIOT, add, rmv, proba);
 		if(forFitting)
-		this.uOTFitting.add(icm);
+			this.uOTFitting.add(icm);
 		else
 			this.uOTOnMap.add(icm);
 		kvMemeIndex.put(icm, indexOfIOT);

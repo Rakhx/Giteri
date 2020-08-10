@@ -100,7 +100,7 @@ public class CommunicationModel implements IModel {
 	}
 
 	/** Plus de fonctionnalité
-	 *
+	 * TODO [WayPoint] Couple selection C/C fichier openMole
 	 */
 	public void fittingOnce(){
 		Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
