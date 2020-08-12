@@ -10,19 +10,19 @@ import java.util.ArrayList;
 public final class Configurator {
 
 	// si true, openmole mode activé
-	private static boolean fastSwitchOpen = false;
+	private static boolean fastSwitchOpen = true;
 	public static boolean quickScore = !fastSwitchOpen; // Aucun affichage, aucun fichier output
 	public static boolean fullSilent = fastSwitchOpen; // Aucun affichage, aucun fichier output
 
 	public static boolean furTesting = false; // pour les multi run @ same config pour txt result
 
 	// Fast debuguer & I/O
-	public static boolean displayFluxOfCA = true; // combinaisons de meme et leur degré + derniere application + application from start
-	public static boolean displayColor = true; // combinaisons de meme et leur degré + derniere application + application from start
-	public static boolean displayLogAvgDegreeByMeme = true ;//|| !furTesting; // combinaisons de meme et leur degré + derniere application + application from start
+	public static boolean displayFluxOfCA = true && !fullSilent; // combinaisons de meme et leur degré + derniere application + application from start
+	public static boolean displayColor = true && !fullSilent; // combinaisons de meme et leur degré + derniere application + application from start
+	public static boolean displayLogAvgDegreeByMeme = true && !fullSilent; // combinaisons de meme et leur degré + derniere application + application from start
 
 	public static boolean displayMemePosessionDuringSimulation = true && !fullSilent; //!furTesting && !fullSilent; // Affiche réparition des memes [NbActivByMeme] - [37500, meme ADLKDGRDMMNSPNTLK - 13528, meme RMLKDGRDMMNIFLK - 18132,
-	public static boolean displayMemePossessionOnlyIHM = true; // combinaisons de meme et leur degré + derniere application + application from start
+	public static boolean displayMemePossessionOnlyIHM = true && !fullSilent; // combinaisons de meme et leur degré + derniere application + application from start
 
 	// region Modèle
 
@@ -120,6 +120,7 @@ public final class Configurator {
 	public static String fileNameCsvSimple = "NetworkCSV";
 	public static String fileNameCsvDetail = "NetworkDetailsCSV";
 	public static String fileNameMeme = "memeCSV";
+	// Bon ca finira par etre encore une erreur
 	public static String fileNameSerialisation = "serialization.se";
 	public static String fileNameSerialisationOpen = "../../../../../../../serialization.se";
 
