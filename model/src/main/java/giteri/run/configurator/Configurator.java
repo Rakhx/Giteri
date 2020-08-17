@@ -169,6 +169,7 @@ public final class Configurator {
 	public static boolean writeMemeResultOnFitting ; //= writeNetworkResultOnFitting; // NetworkDetails.csv
 	public static EnumLauncher typeOfConfig ;
 	// endregion
+
 	//region ancien boolean, osef, etc
 	// moyen osef
 	public static final boolean lotOfNodes = true;

@@ -195,9 +195,9 @@ public class NetworkFileLoader implements IReadNetwork {
 		
 			FileInputStream file;
 			if(Configurator.typeOfConfig == Configurator.EnumLauncher.jarOpenMole) {
-				//file = new FileInputStream(Configurator.fileNameSerialisationOpen);
+				file = new FileInputStream(Configurator.fileNameSerialisationOpen);
 				// TODO [WayPoint] - passage sur openmole LA BAS
-				file = new FileInputStream(Configurator.fileNameSerialisation);
+			//	file = new FileInputStream(Configurator.fileNameSerialisation);
 			}
 			else {
 				file = new FileInputStream(Configurator.fileNameSerialisation);

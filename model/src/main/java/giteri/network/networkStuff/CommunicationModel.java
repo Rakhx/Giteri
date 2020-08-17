@@ -106,7 +106,7 @@ public class CommunicationModel implements IModel {
 		Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
 		List<Double> param = new ArrayList<>(Arrays.asList(
 
-				4.,9229.827415138872,0.5,0.4,0.7,0.1
+				2.,122.6301906301397,0.8999999999999999,0.30000000000000004,0.1,0.9999999999999999
 
 
 
