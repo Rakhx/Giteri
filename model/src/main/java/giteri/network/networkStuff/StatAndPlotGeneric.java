@@ -382,7 +382,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 
 
 	/** Va être appelé par le start classique et pour l'instant le oneshote aussi
-	 *
+	 * TODO [WayPoint]- C/C pour la config
 	 *
 	 * @param activator
 	 * @param proba
