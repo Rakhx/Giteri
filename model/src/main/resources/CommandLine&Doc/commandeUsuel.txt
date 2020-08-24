@@ -73,6 +73,9 @@ Repertoire pour le fichier de réseau d'openmole, a sérialiser avant pour coupl
 
 		// 446= 2 DDAVG + 4 DDINTER + 8 DDArray + 16 avg clust + 32 nbedge + 128 APL + 256 third moment
 
-
+MemeActivated:
+&.AddØ-Hop &.AddØ &.Add- &.Add∞ &.Rmv- &.RmvØ-2hop &.RmvØ &.Add∞! &.Rmv∞! &.Rmv°! &.Rmv+ &.RmvChain &.AddEq &.AddØ-3Hop &.Rmv∞ &.Rmv° &.Add+ &.RmvEq &.Add° &.Add°! 
+ProbaPropagation: 
+.AddØ-Hop:0.18 .AddØ:0.17 .Add-:0.14 .Add∞:0.15 .Rmv-:0.25 .RmvØ-2hop:0.2 .RmvØ:0.21 .Add∞!:0.16 .Rmv∞!:0.27 .Rmv°!:0.23 .Rmv+:0.24 .RmvChain:0.29 .AddEq:0.12 .AddØ-3Hop:0.19 .Rmv∞:0.26 .Rmv°:0.22 .Add+:0.13 .RmvEq:0.28 .Add°:0.1 .Add°!:0.11 
 
 
