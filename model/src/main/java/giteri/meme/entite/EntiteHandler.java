@@ -210,7 +210,9 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		cptModulo++;
 
 		// Toutes les 100 propagations on check la circular queue pour les memes possessions
-		if(displayFluxOfCA && nbPropagation == nbPropagationBeforeCheck){
+		if(displayFluxOfCA &&( (nbPropagation == nbPropagationBeforeCheck) || cptModulo % (Configurator.refreshInfoRate*100)== 0  )){
+			if(nbPropagation != nbPropagationBeforeCheck)
+				System.out.println("NBPROPAGATION :"+ nbPropagation);
 			nbPropagation = 0;
 			if(firstTime){
 				firstTime = false;
@@ -668,6 +670,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		Map<String,Integer> othersMemes = new HashMap<>();
 		// liste des indexs par meme
 		ArrayList<String> entityByMeme = new ArrayList<>();
+
 		String memes = "";
 		Entite nodeConnected;
 		String resultat = "";
@@ -702,20 +705,27 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				part1 = "";
 				part2 = "Connection ";
 				part3 = "";
+
+
 				// pour chaque entité possédant la combinaison
 				for (Entite entite : entiteByMemePossession.get(memeCombinaison)) {
 					entityByMeme.add("" + entite.getIndex());
 					SelfDegrees.add(entite.getDegree());
 
-					// pour chaque entité connecté a l'entité courante
+
+					// pour chaque entité connecté à l'entité courante
 					for (Integer nodeIndex : networkConstruct.getConnectedNodes(entite.getIndex())) {
-						nbLien++;
+
+						// Node correspondant
 						nodeConnected = this.getEntityCorresponding(nodeIndex);
-						if (nodeConnected != null) {
+
+						if (nodeConnected != null){
+							nbLien++;
 							othersDegrees.add(nodeConnected.getDegree());
 							part3 = nodeConnected.getMyUnitOfT() != null ? nodeConnected.getMyUnitOfT().get(0).toNameString() : "vide";
 							Toolz.addCountToElementInHashArray(othersMemes, part3, 1);
-						} else
+						}
+						else if(nodeConnected == null)
 							System.err.println("Ne DEVRAIT PAS ETRE POSSIBLE EH CHECKPROPERTIESBY...");
 					}
 				}
@@ -1050,7 +1060,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		if(proba == 0)
 			return 0;
 
-		double multiplicateur = 0.3;
+		double multiplicateur = .3;
 		int diffDeg =  Math.abs(acting.getDegree() - cible.getDegree());
 		multiplicateur /= Math.pow(1 + diffDeg, 2);
 

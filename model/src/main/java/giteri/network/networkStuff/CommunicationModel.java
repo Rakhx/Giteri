@@ -1,14 +1,11 @@
 package giteri.network.networkStuff;
 
 import giteri.meme.entite.EntiteHandler;
-import giteri.meme.entite.Meme;
 import giteri.network.network.NetworkProperties;
 import giteri.run.configurator.CasteOpenMoleParameter;
 import giteri.run.configurator.Configurator;
-import giteri.run.configurator.Configurator.FittingBehavior;
 import giteri.run.configurator.Configurator.NetworkAttribType;
 import giteri.run.controller.Controller.VueController;
-import giteri.run.interfaces.Interfaces;
 import giteri.run.interfaces.Interfaces.IModel;
 import giteri.run.interfaces.Interfaces.IReadNetwork;
 import giteri.run.interfaces.Interfaces.StatAndPlotInterface;
@@ -106,15 +103,42 @@ public class CommunicationModel implements IModel {
 		Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
 		List<Double> param = new ArrayList<>(Arrays.asList(
 
-				2.,122.6301906301397,0.8999999999999999,0.30000000000000004,0.1,0.9999999999999999
+
+
+				//RDM 2% not fixed
+				// 2.,8136.160881859491,0.4,0.1,0.30000000000000004,0.1
+				// 2.,8469.551490382237,0.7,0.0,0.1,0.5
+
+				// rdm 30% not fixed
+			// 	4.,8915.621431168347,0.5,0.5,0.5,0.5
+			//	1.,9018.693376428437,0.2,0.4,0.8999999999999999,0.7999999999999999
+				// 3.,7270.658561195815,0.2,0.9999999999999999,0.4,0.30000000000000004
+
+				// rdm 30% fixed // plateau sur le 30% puis monte
+				//4.,8736.998931322976,0.7,0.7999999999999999,0.8999999999999999,0.8999999999999999
+				// idem
+			//	4.,6660.851730329648,0.4,0.7,0.2,0.7
+				// bloqué a 10%
+			//	4.,7656.443397177638,0.5,0.0,0.5,0.6
+
+				// Scale free FIXED
+			//	4.,8036.785000400974,0.1,0.8999999999999999,0.7,0.9999999999999999
+			//	4.,3152.180327016305,0.4,0.8999999999999999,0.2,0.5
+			//	4.,8036.783877566521,0.0,0.8999999999999999,0.7,0.1
+
+
+				4.,4095.3653221997665,0.5,0.4,0.7,0.4
+			//	4.,6711.538455069639,0.4,0.30000000000000004,0.6,0.7
+				//4.,8143.162716253744,0.8999999999999999,0.6,0.2,0.0
+				//4.,8143.162716253744,0.2,0.1,0.2,0.0
 
 
 
-
-
-
-
-
+				// SW FIXED
+				//4.,1682.1578236601042,0.8999999999999999,0.30000000000000004,0.0,0.9999999999999999
+				//4.,244.402235453462,0.7,0.0,0.7,0.0
+				// zolie
+				//4.,8210.98736073283,0.2,0.6,0.5,0.5
 
 		));
 
