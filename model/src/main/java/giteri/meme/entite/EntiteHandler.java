@@ -209,8 +209,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		}
 		cptModulo++;
 
+
 		// Toutes les 100 propagations on check la circular queue pour les memes possessions
 		if(displayFluxOfCA &&( (nbPropagation == nbPropagationBeforeCheck) || cptModulo % (Configurator.refreshInfoRate*100)== 0  )){
+
 			if(nbPropagation != nbPropagationBeforeCheck)
 				System.out.println("NBPROPAGATION :"+ nbPropagation);
 			nbPropagation = 0;
@@ -695,6 +697,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		resultat += "---------------------------------------------------------------";
 
 		try {
+			// Pour un couple meme donné
 			for (String memeCombinaison : entiteByMemePossession.keySet()) {
 				nbLien = 0;
 				SelfDegrees.clear();
@@ -706,12 +709,10 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				part2 = "Connection ";
 				part3 = "";
 
-
 				// pour chaque entité possédant la combinaison
 				for (Entite entite : entiteByMemePossession.get(memeCombinaison)) {
 					entityByMeme.add("" + entite.getIndex());
 					SelfDegrees.add(entite.getDegree());
-
 
 					// pour chaque entité connecté à l'entité courante
 					for (Integer nodeIndex : networkConstruct.getConnectedNodes(entite.getIndex())) {
@@ -766,43 +767,6 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		return resultat;
 	}
 
-	/** La map kvEntityCouple est, par index d'entité, une liste de X dernier couple recu.
-	 * On va en extraire un % de possession gardé par couple.
-	 * Si un meme n'apparait qu'une fois sur une entité il n'a pas bougé, donc 100% de stabilité
-	 *
-	 *
-	 */
-	public void checkEntityPossessionByCouple(){
-		// Map<IUnitOfTransfer,Integer> kvNbRetentionByCouple = new Hashtable<>();
-		Map<IUnitOfTransfer,Map<Integer, Double>> kvNbRetentionByCouple = new Hashtable<>();
-		// k:entity k:Couple v:nbGet
-		Map<Integer, Map<IUnitOfTransfer,Integer>> kvEntityKvMemeNbGet = new Hashtable<>();
-		Map<Integer, Map<IUnitOfTransfer,Double>> kvEntityKvMemePourcentGet = new Hashtable<>();
-		Map<IUnitOfTransfer, Map<Integer,Double>> kvMemeKvEntityPourcentGet = new Hashtable<>();
-
-		//region reduce circularQueue
-		// pour chaque entité
-		for (Integer index : kvEntityCouple.keySet()) {
-			// Somme des transferts par unit pour UNE entité
-			Map<IUnitOfTransfer, Integer> sumCalling = new HashMap<>();
-			// iterator sur la circular queue des couples qui sont passés sur l'entité
-			Iterator<IUnitOfTransfer> units = kvEntityCouple.get(index).iterator();
-			while(units.hasNext()){
-				// Tableau <Couple, NbArrivé> pour l'entité INDEX
-				Toolz.addCountToElementInHashArray(sumCalling, units.next(), 1 );
-			}
-
-			kvEntityKvMemeNbGet.put(index, sumCalling);
-		}
-
-		//endregion
-
-		//region get %
-
-		//endregion
-
-
-	}
 
 	//endregion
 

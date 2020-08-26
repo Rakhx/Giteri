@@ -351,6 +351,7 @@ public abstract class StatAndPlotGeneric implements StatAndPlotInterface {
 					// Si la condition d'arret est ok et si on a pas activé le mode manual skip
 				} while( continuFitting || !goNextStepInManuelMode );
 
+
 				if(Configurator.manuelNextStep)
 					goNextStepInManuelMode = false;
 
