@@ -70,6 +70,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private int sumFailAction;
 	private ObjectRef<Integer> nbFail = new ObjectRef<>(0);
 	private Map<Meme, Double> kvMemeCodeNbEntities;
+	private int nbPropagation ;
 
 	// Variable utilisé dans la fonction doAction - fn appelée a chaque step
 	Set<Entite> cibles;
@@ -101,6 +102,8 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		// Variable pour la fonction doAction
 		cibles = new HashSet<>(Configurator.getNbNode());
 		ciblesIndex = new HashSet<>();
+
+		nbPropagation = 0;
 	}
 
 	public void initialisation(){
@@ -169,6 +172,11 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			checkAPM();
 		}
 		cptModulo++;
+
+		if(Configurator.getNbPropagation && cptModulo % 10000 == 0 ){
+			System.out.println(nbPropagation + " /10000");
+			nbPropagation = 0;
+		}
 
 		if(Configurator.timeEfficiency && cptModulo % 10000 == 0 ) {
 			System.out.println("nbAction: "+ cptModulo);
@@ -866,6 +874,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 					eventMemeChanged(entite, memeReturned, Configurator.MemeActivityPossibility.RetraitMeme.toString());
 					// et un ajout
 					eventMemeChanged(entite, selectedMeme,Configurator.MemeActivityPossibility.AjoutMeme.toString());
+					nbPropagation++;
 				}
 			}
 			// endregion
@@ -883,6 +892,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 					eventMemeChanged(entite, memeReturned, Configurator.MemeActivityPossibility.RetraitMeme.toString());
 					// et un ajout
 					eventMemeChanged(entite, memeAction,Configurator.MemeActivityPossibility.AjoutMeme.toString());
+					nbPropagation++;
 				}
 			}
 		}

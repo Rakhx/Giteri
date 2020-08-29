@@ -13,7 +13,9 @@ public final class Configurator {
 
 
 	// si true, openmole mode activé
-	private static boolean fastSwitchOpen = true;
+	private static boolean fastSwitchOpen = false;
+
+	public static boolean getNbPropagation = true;
 
 	public static boolean quickScore = !fastSwitchOpen; // Aucun affichage, aucun fichier output
 	public static boolean fullSilent = fastSwitchOpen; // Aucun affichage, aucun fichier output
