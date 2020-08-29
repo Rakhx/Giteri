@@ -15,6 +15,7 @@ public final class Configurator {
 	public static boolean fullSilent = fastSwitchOpen; // Aucun affichage, aucun fichier output
 
 	public static boolean furTesting = false; // pour les multi run @ same config pour txt result
+	public static boolean getNbPropagation = false; // Nombre de transmission tt les 10000 actions
 
 	// Fast debuguer & I/O
 	public static boolean displayFluxOfCA = true && !fullSilent && !furTesting; // combinaisons de meme et leur degré + derniere application + application from start

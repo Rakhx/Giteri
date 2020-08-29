@@ -210,11 +210,17 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		cptModulo++;
 
 
+		if(getNbPropagation &&(cptModulo % 100000 == 0) ){
+			System.out.println(nbPropagation +" /" +100000);
+			nbPropagation = 0;
+		}
+
 		// Toutes les 100 propagations on check la circular queue pour les memes possessions
 		if(displayFluxOfCA &&( (nbPropagation == nbPropagationBeforeCheck) || cptModulo % (Configurator.refreshInfoRate*100)== 0  )){
 
 			if(nbPropagation != nbPropagationBeforeCheck)
 				System.out.println("NBPROPAGATION :"+ nbPropagation);
+
 			nbPropagation = 0;
 			if(firstTime){
 				firstTime = false;
@@ -993,6 +999,9 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 					eventMemeChanged(entite, removedAction, Configurator.MemeActivityPossibility.RetraitMeme.toString());
 					// et un ajout
 					eventMemeChanged(entite, coupleAction, Configurator.MemeActivityPossibility.AjoutMeme.toString());
+
+					if(!displayFluxOfCA && getNbPropagation)
+						nbPropagation++;
 
 					// Mise a jour des comptes des flux de CA
 					if(displayFluxOfCA){
