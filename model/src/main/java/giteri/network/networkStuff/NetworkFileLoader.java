@@ -156,7 +156,11 @@ public class NetworkFileLoader implements IReadNetwork {
 		for (Integer i : nodesAndLinks.keySet()) {
 			for (Integer j : nodesAndLinks.get(i)) {
 				if(j > i)
-					graph.addEdge(""+i+""+j, ""+i, ""+j);
+					try {
+						graph.addEdge("" + i + "-" + j, "" + i, "" + j);
+					}catch (org.graphstream.graph.IdAlreadyInUseException e){
+						System.out.println(e.getMessage());
+					}
 			}
 		}
 
