@@ -143,8 +143,9 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 
 	/** Associe aux noeuds du réseau des classes qui permettront de changer leur couleurs d'affichage.
 	 * Prend un network et des noeuds sur lesquels il faut appliquer la couleur propore au target
-	 * Sur les autres noeuds, les passer en noirs. Le noeud qui fait l'action rester dans sa couleur
-	 * d'origine.
+	 * Sur les autres noeuds, inversion des couleurs de fond, noeud non concerné en blanc
+	 * noeud agissant en vert ( par soucis de commodité, mais pas le bon endroit pour le faire car appelé
+	 * a chaque filtre )
 	 *
 	 * @param net
 	 * @param nodeToDesignAsTarget
@@ -152,7 +153,13 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 	public void applyTargetColor(Network net, Integer actingEntite, Set<Integer> nodeToDesignAsTarget){
 
 		String attrib;
-		boolean found = false;
+		boolean isTarget = false;
+
+		// background color
+		graph.setAttribute("ui.stylesheet", "graph { fill-color: black; }");
+		graph.setAttribute("ui.stylesheet", "edge { fill-color: white; }");
+
+
 		// On regarde tous les nodes du réseau
 		for (giteri.network.network.Node node : net.getNodes()){
 			// on regarde dans la liste des entités de target
@@ -161,20 +168,28 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 				if(integer.intValue() == node.getIndex()){
 					Node noeud = graph.getNode("" + node.getIndex());
 					setNodeClass(noeud, "TARGET");
-					found = true;
+					isTarget = true;
+					
 					break;
 				}
 			}
 			// Dans le cas contraire; ca n'est pas une target
-			if(!found){
+			if(!isTarget){
 				// Et qu'il ne s'agit pas de l'entité agissant
 				if(node.getIndex() != actingEntite.intValue()){
 					Node noeud = graph.getNode("" + node.getIndex());
-					setNodeClass(noeud, "NOTTARGET");
+					setNodeClass(noeud, "NONTARGET");
+				}
+				// ca ne devrait pas se faire ici mais.
+				else {
+					Node noeud = graph.getNode("" + node.getIndex());
+					setNodeClass(noeud, "ACTING");
 				}
 			}
 
-			found = false;
+			isTarget = false;
+
+
 		}
 	}
 
@@ -184,6 +199,9 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 	 */
 	public void resetGoodColor(Network net){
 		String attrib;
+		graph.setAttribute("ui.stylesheet", "graph { fill-color: white; }");
+		graph.setAttribute("ui.stylesheet", "edge { fill-color: black; }");
+
 		for (giteri.network.network.Node node : net.getNodes())
 		{
 			// Etape pour connaitre les memes initiaux
@@ -294,7 +312,8 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 
 		// utilisé pour le step by step
 		attribut += "node.TARGET {fill-color: "+ colorPieAsString.get(100)+";}";
-		attribut += "node.NONTARGET {fill-color: "+ colorPieAsString.get(101)+";}";
+		attribut += "node.NONTARGET {fill-color: "+ colorPieAsString.get(102)+";}";
+		attribut += "node.ACTING {fill-color: "+ colorPieAsString.get(103)+";}";
 
 		graph.addAttribute("ui.stylesheet", attribut);
 
@@ -343,7 +362,6 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 					+ colorPieAsColor.get(index).getRed()+","
 					+ colorPieAsColor.get(index).getGreen()+","
 					+ colorPieAsColor.get(index).getBlue()+")");
-
 		}
 
 		if(Configurator.semiStepProgression){
@@ -351,7 +369,10 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 			colorPieAsColor. put(100, new Color(204,0,0));
 			colorPieAsString.put(101, "rgb(0,0,0)");
 			colorPieAsColor. put(101, new Color(0,0,0));
-			new Color(180,180,180);
+			colorPieAsString.put(102, "rgb(180,180,180)");
+			colorPieAsColor. put(102, new Color(180,180,180));
+			colorPieAsString.put(103, "rgb(60,180,60)");
+			colorPieAsColor. put(103, new Color(60,180,60));
 		}
 	}
 

@@ -665,7 +665,7 @@ public class Toolz {
     	return maxValue;
     }
     
-    /**
+    /** Pause dans le thread courant d'un temps spécifié en milliseconde.
      * 
      * @param milli
      */
@@ -673,8 +673,7 @@ public class Toolz {
     	try {				
 			Thread.sleep(milli);
 		} catch (InterruptedException e) {
-		
-			e.printStackTrace();
+    		e.printStackTrace();
 		}
     }
     

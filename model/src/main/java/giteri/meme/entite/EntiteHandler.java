@@ -22,6 +22,7 @@ import giteri.tool.objects.ObjectRef;
 import giteri.tool.other.StopWatchFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static giteri.run.configurator.Configurator.fullSilent;
 
@@ -71,6 +72,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	private ObjectRef<Integer> nbFail = new ObjectRef<>(0);
 	private Map<Meme, Double> kvMemeCodeNbEntities;
 	private int nbPropagation ;
+	private String filtreSorted;
 
 	// Variable utilisé dans la fonction doAction - fn appelée a chaque step
 	Set<Entite> cibles;
@@ -684,7 +686,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 				return ("Nope pas d'entite prete");
 			}
 
-			memeActions =(actionSelectionRulesVersion(entiteActing));
+			memeActions =actionSelectionRulesVersion(entiteActing);
 			if(Configurator.debugEntiteHandler)
 				System.out.println("[EH.runEntite]- action choisie " + memeActions.toFourCharString());
 
@@ -737,8 +739,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			if (Configurator.semiStepProgression)
 			{
 				giveEntiteBaseColor();
-				if (filterOnSemiAuto(null, null))
-					pauseStepInSemiAutoAction();
+				pauseStepInSemiAutoAction();
 			}
 		}
 
@@ -768,12 +769,15 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			for (IAttribut<Integer> attribut : memeAction.getAttributs()) {
 				attribString = attribut.toString();
 				// region semi auto
-				if (Configurator.semiStepProgression && filterOnSemiAuto(null, null)) {
+				if (Configurator.semiStepProgression) {
 					System.out.println("On va appliquer les filtres suivants pour l'action " + memeAction.name);
-					System.out.println(memeAction.getFilter(attribString).values());
+					System.out.println(
+					memeAction.getFilter(attribString).entrySet().stream().sorted((e1,e2)-> e1.getKey().compareTo(e2.getKey())).
+							collect(Collectors.toList()));
+
 				} //endregion
 
-				// Pour chaque filtre appliqué a un attribut
+				// Pour chaque filtre appliqué à un attribut
 				for (int order = 0; order < memeAction.getFilter(attribString).size(); order++) {
 					currentFilter = memeAction.getFilter(attribString).get(order);
 					currentFilter.applyFilter(movingOne, cibles, attribut);
@@ -1088,7 +1092,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();index= 0;
 		agregators.put(index++, notLinked);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("AddØ",0.15, false, true, add, attributs, KVAttributAgregator, false);
+		memeFactory.registerMemeAction("AddØ",0.5, true, true, add, attributs, KVAttributAgregator, false);
 		agregators.put(index++, random);
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, false, false, add, attributs, KVAttributAgregator, true);
 
@@ -1096,7 +1100,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, notLinked);
 		agregators.put(index++, mineInf);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("Add+", 1, false,true, add, attributs,KVAttributAgregator, false);
+		memeFactory.registerMemeAction("Add+", 1, true,true, add, attributs,KVAttributAgregator, false);
 
 		agregators.clear();index = 0;
 		agregators.put(0, notLinked);
@@ -1107,7 +1111,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear(); index = 0;
 		agregators.put(index++, theMost);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("Add∞", 1, false, true, add, attributs, KVAttributAgregator,false);
+		memeFactory.registerMemeAction("Add∞", 1, true, true, add, attributs, KVAttributAgregator,false);
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, notLinked);
@@ -1124,7 +1128,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, notLinked);
 		agregators.put(index++, theLeast);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("Add°!", 1, true, true, add, attributs, KVAttributAgregator,false);
+		memeFactory.registerMemeAction("Add°!", 1, false, true, add, attributs, KVAttributAgregator,false);
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, hopAWay);
@@ -1161,7 +1165,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, linked);
 		agregators.put(index++, mineInf);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("Rmv+", 1, true, true, remove, attributs, KVAttributAgregator ,false);
+		memeFactory.registerMemeAction("Rmv+", 1, false, true, remove, attributs, KVAttributAgregator ,false);
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, theMost);
@@ -1190,7 +1194,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, linked);
 		agregators.put(index++, triangle);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("RmvØ-2hop", .3, false, true, remove, attributs,KVAttributAgregator ,false);
+		memeFactory.registerMemeAction("RmvØ-2hop", .3, true, true, remove, attributs,KVAttributAgregator ,false);
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, selfSup);
@@ -1319,15 +1323,15 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		Toolz.waitInMillisd(Configurator.semiAutoWaitingTime);
 	}
 
-	/**
+	/** euh....?
 	 *
 	 * @param meme
 	 * @param actualFilter
 	 * @return
 	 */
 	private boolean filterOnSemiAuto(Meme meme, IFilter actualFilter) {
-		if (meme != null && actualFilter != null
-				&& actualFilter.getEnumType() == AgregatorType.HOPAWAY)
+		if (meme != null && actualFilter != null )
+			//	&& actualFilter.getEnumType() == AgregatorType.HOPAWAY) kesaco?
 			return true;
 		return false;
 	}

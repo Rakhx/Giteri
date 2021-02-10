@@ -9,12 +9,8 @@ import java.util.ArrayList;
 
 public final class Configurator {
 
-
-
-
 	// si true, openmole mode activé
 	private static boolean fastSwitchOpen = false;
-
 	public static boolean getNbPropagation = true;
 
 	public static boolean quickScore = !fastSwitchOpen; // Aucun affichage, aucun fichier output
@@ -46,7 +42,7 @@ public final class Configurator {
 	public static boolean manuelNextStep = false; // NO-AUTOSKIP pas de passage au run suivant, il faut appuyer sur next
 	public static boolean autoPauseIfNexted = false; // AUTOPAUSE mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	@toOutput ( yes = true )
-	public static boolean initializeDefaultBehavior = true;	// ----FLUIDITE----
+	public static boolean initializeDefaultBehavior = false;	// ----FLUIDITE----
 	public static boolean initializeDefaultBehaviorToBreeder = false;	// ----FLUIDITE BREEDER----
 	@toOutput ( yes = true )
 	public static boolean rebranchementAction = false; // REWIRE Faire l'ajout et le retrait dans le meme temps
@@ -117,7 +113,7 @@ public final class Configurator {
 	public static boolean displayFittingProviderApplied = fullSilent ? false : true;	// affiche dans la console apprlications des params:
 	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
-	public static int activationCodeForView = fullSilent? 0 : 5;
+	public static int activationCodeForView = fullSilent? 0 : 7;
 
 	public static boolean displayMemePossessionEvolution = true && !fullSilent; // Affiche dans l'IHM la possession des meme au fur et a mesure
 	public static boolean displayPlotWhileSimulation = true && !fullSilent; // Affichage des DD et densité
@@ -170,7 +166,7 @@ public final class Configurator {
 
 	//region ancien boolean, osef, etc
 	// moyen osef
-	public static final boolean lotOfNodes = true;
+	public static final boolean lotOfNodes = false;
 	private static int nbNode = lotOfNodes ? 300 : 20;
 	public static int refreshInfoRate = 10;
 	public static boolean semiStepProgression = false;	// applique les filtres tour a tour

@@ -155,7 +155,7 @@ public class NetworkConstructor extends ThreadHandler implements INbNodeChangedL
 		Hashtable<Integer,Double> KVNodeDegree = new Hashtable<>();
 		Integer target;
 		// 4% et 30% respectivement.
-		int pourcentageLow = 2;
+		int pourcentageLow = 10;
 		int pourcentageMiddle = 30;
 		double firePropa = .2;
 		int m = 1; // Parametre du nombre de connection pour un scale free
