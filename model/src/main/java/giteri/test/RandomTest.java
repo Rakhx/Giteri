@@ -10,6 +10,15 @@ public class RandomTest {
     public static void main(String[] args)  {
 
 
+        boolean[] donneur = new boolean[3];
+        donneur [2] = true;
+        boolean[] receveur = donneur.clone();
+        receveur[0] = true;
+        for (int i = 0; i < donneur.length; i++) {
+            System.out.println(donneur[i]);
+        }
+
+
 //        for (int i = 0; i < 100; i++) {
 //            System.out.println(VOILA(.5));
 //        }

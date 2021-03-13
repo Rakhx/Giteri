@@ -518,7 +518,7 @@ public class FilterFactory {
 			// plus de fonction recursive
 //				getNeightboor(entiteResult, entites, asker, reach);
 
-			entiteResult = zzz(asker.getIndex(), getNetwork(), beforeFil, reach);
+ 			entiteResult = zzz(asker.getIndex(), getNetwork(), beforeFil, reach);
 			if(Configurator.debugHopAway){
 				String result = "after Entites:";
 				String resultNoooo = "after Entites nope actionsljzmzljd:";
@@ -601,15 +601,17 @@ public class FilterFactory {
 			// On trouve les adjacents a l'asker; il s'agit du cercle de distance 1
 			boolean[] adja ;
 			int nbNode = Configurator.getNbNode();
-			boolean[] soFar  = network[asker]; // Liste des noeuds déjà visité, qu'on retirera de la liste à la fin
+			boolean[] soFar  = new boolean[nbNode];//network[asker].clone(); // Liste des noeuds déjà visité, qu'on retirera de la liste à la fin
 			soFar[asker] = true; // on y ajoute le noeud agissant
 			boolean[] resultat = new boolean[nbNode];
 
-			for (int profondeur = 1; profondeur < deep; profondeur++) {
+			// profondeur = 1 -> noeud adjacent
+			for (int profondeur = 1; profondeur <= deep  ; profondeur++) {
 				adja = new boolean[nbNode];
 				// On récupère tt les noeuds adjacents à ceux qu'on a soFar
+				// on parcourt tt les noeuds du réseau
 				for (int indexNode = 0; indexNode < nbNode; indexNode++) {
-					// Si on a un noeud a l'index
+					// Si on a un noeud a l'index déja parcouru
 					if(soFar[indexNode]) {
 						// On ajoute a Adja la liste des liens du noeud indexNode
 						for (int i = 0; i < nbNode; i++) {
@@ -619,7 +621,7 @@ public class FilterFactory {
 				}
 				// A la fin de la boucle for on se retrouve avec tous les noeuds adjacents a ceux de la liste soFar
 				// Si on est pas arrivé la fin de profondeur, on ajoute ces noeuds a la liste des soFar
-				if(profondeur != deep - 1 ){
+				if(profondeur != deep  ){
 					for (int i = 0; i < nbNode; i++) {
 						soFar[i] |= adja[i];
 					}
@@ -631,7 +633,7 @@ public class FilterFactory {
 
 					for (int i = 0; i < nbNode; i++) {
 						if(!soFar[i] && adja[i]) {
-							result.add(entites.get(i));
+							result.add(eh.getEntityCorresponding(i));
 						}
 					}
 				}
