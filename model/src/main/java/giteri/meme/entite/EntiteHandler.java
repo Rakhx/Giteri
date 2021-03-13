@@ -735,7 +735,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 			if(!fullSilent && toDisplayForRatio.isEmpty())
 				vueController.displayInfo(ViewMessageType.ECHECS, toDisplayForRatio);
 
-			// Dans le cas ou on veut les filtres en semi step, remis a zero des couleurs.
+			// Dans le cas ou on on a les filtres en semi step, remis a zero des couleurs.
 			if (Configurator.semiStepProgression)
 			{
 				giveEntiteBaseColor();
@@ -1092,7 +1092,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear();index= 0;
 		agregators.put(index++, notLinked);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("AddØ",0.5, true, true, add, attributs, KVAttributAgregator, false);
+		memeFactory.registerMemeAction("AddØ",0.5, false, true, add, attributs, KVAttributAgregator, false);
 		agregators.put(index++, random);
 		addRandom = memeFactory.registerMemeAction("AddØ-Neutral",0, false, false, add, attributs, KVAttributAgregator, true);
 
@@ -1100,7 +1100,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, notLinked);
 		agregators.put(index++, mineInf);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("Add+", 1, true,true, add, attributs,KVAttributAgregator, false);
+		memeFactory.registerMemeAction("Add+", 1, false,true, add, attributs,KVAttributAgregator, false);
 
 		agregators.clear();index = 0;
 		agregators.put(0, notLinked);
@@ -1111,7 +1111,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.clear(); index = 0;
 		agregators.put(index++, theMost);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("Add∞", 1, true, true, add, attributs, KVAttributAgregator,false);
+		memeFactory.registerMemeAction("Add∞", 1, false, true, add, attributs, KVAttributAgregator,false);
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, notLinked);
@@ -1134,7 +1134,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, hopAWay);
 		agregators.put(index++, notLinked);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("AddØ-Hop", .4, false, true, add,attributs, KVAttributAgregator ,false);
+		memeFactory.registerMemeAction("AddØ-Hop", .4, true, true, add,attributs, KVAttributAgregator ,false);
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, hopAWay3);
@@ -1194,7 +1194,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 		agregators.put(index++, linked);
 		agregators.put(index++, triangle);
 		agregators.put(index++, random);
-		memeFactory.registerMemeAction("RmvØ-2hop", .3, true, true, remove, attributs,KVAttributAgregator ,false);
+		memeFactory.registerMemeAction("RmvØ-2hop", .3, false, true, remove, attributs,KVAttributAgregator ,false);
 
 		agregators.clear(); index = 0;
 		agregators.put(index++, selfSup);

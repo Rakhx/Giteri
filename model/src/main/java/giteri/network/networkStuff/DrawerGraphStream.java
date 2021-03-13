@@ -155,10 +155,11 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 		String attrib;
 		boolean isTarget = false;
 
-		// background color
-		graph.setAttribute("ui.stylesheet", "graph { fill-color: black; }");
-		graph.setAttribute("ui.stylesheet", "edge { fill-color: white; }");
-
+		if(Configurator.invertedColor) {
+			// background color
+			graph.setAttribute("ui.stylesheet", "graph { fill-color: black; }");
+			graph.setAttribute("ui.stylesheet", "edge { fill-color: white; }");
+		}
 
 		// On regarde tous les nodes du réseau
 		for (giteri.network.network.Node node : net.getNodes()){
@@ -365,9 +366,9 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 		}
 
 		if(Configurator.semiStepProgression){
-			colorPieAsString.put(100, "rgb(204,0,0)");
+			colorPieAsString.put(100, "rgb(204,0,0)"); // acting
 			colorPieAsColor. put(100, new Color(204,0,0));
-			colorPieAsString.put(101, "rgb(0,0,0)");
+			colorPieAsString.put(101, "rgb(0,0,0)"); //
 			colorPieAsColor. put(101, new Color(0,0,0));
 			colorPieAsString.put(102, "rgb(180,180,180)");
 			colorPieAsColor. put(102, new Color(180,180,180));

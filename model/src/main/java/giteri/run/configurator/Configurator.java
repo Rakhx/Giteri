@@ -11,12 +11,14 @@ public final class Configurator {
 
 	// si true, openmole mode activé
 	private static boolean fastSwitchOpen = false;
-	public static boolean getNbPropagation = true;
+	public static boolean getNbPropagation = false;
+
+	public static boolean semiStepProgression = true;	// applique les filtres tour a tour
+	public static boolean invertedColor = false ; // inverse les couleurs pendant le step by step
 
 	public static boolean quickScore = !fastSwitchOpen; // Aucun affichage, aucun fichier output
 	public static boolean fullSilent = fastSwitchOpen; // Aucun affichage, aucun fichier output
 
-	public static boolean onlyLinear = true;
 	// plus besoin, passe par fittingOnce TODO a nettoyer
 	public static boolean fullBullshi = false; // Aucun affichage, aucun fichier output
 
@@ -73,19 +75,20 @@ public final class Configurator {
 	public static int activationCodeForScore = 157;
 	//public static int activationCodeForScore = 17;
 	//157 = 1 density + 4 ddinter + 8 DDarray + 16 avg Clust + 128 APL
-	//190= 2 DDAVG + 4 DDINTER + 8 DDArray + 16 avg clust + 32 nbedge + 128 APL 
-		// 446= 2 DDAVG + 4 DDINTER + 8 DDArray + 16 avg clust + 32 nbedge + 128 APL + 256 third moment
+	//190= 2 DDAVG + 4 DDINTER + 8 DDArray + 16 avg clust + 32 nbedge + 128 APL
+	// 446= 2 DDAVG + 4 DDINTER + 8 DDArray + 16 avg clust + 32 nbedge + 128 APL + 256 third moment
 
-			//17; // Config "is max CC possible?"
+	//17; // Config "is max CC possible?"
 	// 153;// SCORE POUR SMALLWORLD DENSITY - DDARRAY - DDAVG - APL
 
-	 // 170+512; // 170+512 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
+	// 170+512; // 170+512 153: APL(128)+avgClust(16)+DDArray(8)+Density(1)+ third(512)
 	// 16 + 512 Clust + third
 	// 170+512 = THIRD APL EDGES ARRAY DDAVG
 
 	public static boolean considereNodeAlone = true;
 	public static int activationCodeAllAttrib = 1023;
-	public static int initialnetworkForBase = 0; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 3- SF 4-SW
+	public static int initialnetworkForBase = 3; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 3- SF 4-SW
+	public static boolean onlyLinear = true; // calcul du score, distance lineaire ou autre
 
 	// endregion
 
@@ -113,7 +116,7 @@ public final class Configurator {
 	public static boolean displayFittingProviderApplied = fullSilent ? false : true;	// affiche dans la console apprlications des params:
 	// 1 = ihm, 2 = console, 4 = file; Et combinaison. 3 = ihm + console
 	// 5 = file + ihm, 6 = console + file, 7 tout le tralal.
-	public static int activationCodeForView = fullSilent? 0 : 7;
+	public static int activationCodeForView = fullSilent? 0 : 1;
 
 	public static boolean displayMemePossessionEvolution = true && !fullSilent; // Affiche dans l'IHM la possession des meme au fur et a mesure
 	public static boolean displayPlotWhileSimulation = true && !fullSilent; // Affichage des DD et densité
@@ -157,7 +160,7 @@ public final class Configurator {
 	public static boolean debugEntiteHandler = false;
 
 	public static boolean debugIHM = false;
-	public static boolean debugHopAway = false;
+	public static boolean debugHopAway = true;
 
 	public static boolean debugJarMode = false;
 	public static boolean timeEfficiency = false;
@@ -167,9 +170,8 @@ public final class Configurator {
 	//region ancien boolean, osef, etc
 	// moyen osef
 	public static final boolean lotOfNodes = false;
-	private static int nbNode = lotOfNodes ? 300 : 20;
+	private static int nbNode = lotOfNodes ? 1000 : 40;
 	public static int refreshInfoRate = 10;
-	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
 	public static boolean memeCanBeReplaceByCategory = true;
 	public final static int semiAutoWaitingTime = 3000;
 

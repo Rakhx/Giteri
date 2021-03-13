@@ -513,7 +513,7 @@ public class FilterFactory {
 			for (Entite entite : entites) {
 				beforeFil[entite.getIndex()] = true;
 			}
-			Set<Entite> entiteResult;  // = new HashSet<>();
+			Set<Entite> entiteResult;
 
 			// plus de fonction recursive
 //				getNeightboor(entiteResult, entites, asker, reach);
@@ -587,8 +587,16 @@ public class FilterFactory {
 			Set<Entite> entiteAccepted = new HashSet<>();
 		}
 
+		/**
+		 *
+		 * @param asker index de l'agissant
+		 * @param network réseau complet sous la forme boolean = true si connection
+		 * @param beforeFilter set d'entité en entrée
+		 * @param deep distance a laquelle on veut aller
+		 * @return
+		 */
 		private Set<Entite> zzz(int asker, boolean[][] network, boolean[] beforeFilter ,int deep){
-			Set<Entite> result= new HashSet<>();
+			Set<Entite> result = new HashSet<>();
 			List<Entite> entites = eh.getEntites() ;
 			// On trouve les adjacents a l'asker; il s'agit du cercle de distance 1
 			boolean[] adja ;
