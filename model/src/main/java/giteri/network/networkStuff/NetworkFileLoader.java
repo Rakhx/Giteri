@@ -154,7 +154,7 @@ public class NetworkFileLoader implements IReadNetwork {
 		for (Integer i : nodesAndLinks.keySet()) {
 			for (Integer j : nodesAndLinks.get(i)) {
 				if(j > i)
-					graph.addEdge(""+i+""+j, ""+i, ""+j);
+					graph.addEdge(""+i+"-"+""+j, ""+i, ""+j);
 			}
 		}
 

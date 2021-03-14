@@ -10,11 +10,11 @@ import java.util.ArrayList;
 public final class Configurator {
 
 	// si true, openmole mode activé
-	private static boolean fastSwitchOpen = true;
+	private static boolean fastSwitchOpen = false;
 	public static boolean quickScore = !fastSwitchOpen; // Aucun affichage, aucun fichier output
 	public static boolean fullSilent = fastSwitchOpen; // Aucun affichage, aucun fichier output
 
-	public static boolean furTesting = false; // pour les multi run @ same config pour txt result
+	public static boolean furTesting = true; // pour les multi run @ same config pour txt result
 	public static boolean getNbPropagation = false; // Nombre de transmission tt les 10000 actions
 
 	// Fast debuguer & I/O

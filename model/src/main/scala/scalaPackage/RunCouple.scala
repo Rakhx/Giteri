@@ -51,9 +51,6 @@ object RunCouple {
   }
 
 
-
-
-
   def combSansRepSimplified(k:Int, parmiN:Int) : Int =
   {
     return semiFact(parmiN-k+1,parmiN) / factorial(k);

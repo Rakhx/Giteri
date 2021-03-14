@@ -103,8 +103,6 @@ public class CommunicationModel implements IModel {
 		Configurator.explorator = Configurator.EnumExplorationMethod.oneShot;
 		List<Double> param = new ArrayList<>(Arrays.asList(
 
-
-
 				//RDM 2% not fixed
 				// 2.,8136.160881859491,0.4,0.1,0.30000000000000004,0.1
 				// 2.,8469.551490382237,0.7,0.0,0.1,0.5
@@ -128,7 +126,7 @@ public class CommunicationModel implements IModel {
 				//4.,6481.424041212047,0.7999999999999999,0.7,0.6,0.4
 				//4.,7324.707566654569,0.7999999999999999,0.6,0.0,0.7999999999999999
 				//4.,8122.869926717637,0.7,0.30000000000000004,0.7,0.1
-				4.,118.18516197954155,0.9999999999999999,0.7999999999999999,0.4,0.9999999999999999
+				//4.,118.18516197954155,0.9999999999999999,0.7999999999999999,0.4,0.9999999999999999
 
 
 
@@ -156,14 +154,11 @@ public class CommunicationModel implements IModel {
 				//4.,0.0,0.0,0.7999999999999999,0.6,0.9999999999999999
 				//4.,7996.092504983751,0.7,0.9999999999999999,0.9999999999999999,0.9999999999999999
 			//	4.,4495.600396080507,0.7999999999999999,0.9999999999999999,0.7,0.8999999999999999
-			//	4.,5297.973178956758,0.5,0.6,0.1,0.2
-
-
+				4.,5297.973178956758,0.5,0.6,0.1,0.2
 		));
 
 		int combinaison = Toolz.combinatoire((int)Math.floor(param.get(0)), 121 );
 		double activation = param.get(1) * combinaison / 10000;
-
 		CasteOpenMoleParameter comp = new CasteOpenMoleParameter(((int)Math.floor(activation)),(int)Math.floor(param.get(0)), 121,
 				param.subList(2,6));
 		this.calculator.fitNetwork(Configurator.EnumLauncher.ihm, Configurator.EnumExplorationMethod.oneShot,comp);
