@@ -13,7 +13,7 @@ public final class Configurator {
 	private static boolean fastSwitchOpen = false;
 	public static boolean getNbPropagation = false;
 
-	public static boolean semiStepProgression = true;	// applique les filtres tour a tour
+	public static boolean semiStepProgression = false;	// applique les filtres tour a tour
 	public static boolean invertedColor = false ; // inverse les couleurs pendant le step by step
 
 	public static boolean quickScore = !fastSwitchOpen; // Aucun affichage, aucun fichier output
@@ -44,7 +44,7 @@ public final class Configurator {
 	public static boolean manuelNextStep = false; // NO-AUTOSKIP pas de passage au run suivant, il faut appuyer sur next
 	public static boolean autoPauseIfNexted = false; // AUTOPAUSE mise en pause automatique avant un changement de run. Il faut appuyer sur next
 	@toOutput ( yes = true )
-	public static boolean initializeDefaultBehavior = false;	// ----FLUIDITE----
+	public static boolean initializeDefaultBehavior = true;	// ----FLUIDITE----
 	public static boolean initializeDefaultBehaviorToBreeder = false;	// ----FLUIDITE BREEDER----
 	@toOutput ( yes = true )
 	public static boolean rebranchementAction = false; // REWIRE Faire l'ajout et le retrait dans le meme temps
@@ -87,7 +87,7 @@ public final class Configurator {
 
 	public static boolean considereNodeAlone = true;
 	public static int activationCodeAllAttrib = 1023;
-	public static int initialnetworkForBase = 3; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 3- SF 4-SW
+	public static int initialnetworkForBase = 0; // Réseau tout initial tout au début 0-Vide 1-4% 2-30% 3- SF 4-SW
 	public static boolean onlyLinear = true; // calcul du score, distance lineaire ou autre
 
 	// endregion
@@ -160,7 +160,7 @@ public final class Configurator {
 	public static boolean debugEntiteHandler = false;
 
 	public static boolean debugIHM = false;
-	public static boolean debugHopAway = true;
+	public static boolean debugHopAway = false;
 
 	public static boolean debugJarMode = false;
 	public static boolean timeEfficiency = false;
@@ -169,8 +169,8 @@ public final class Configurator {
 
 	//region ancien boolean, osef, etc
 	// moyen osef
-	public static final boolean lotOfNodes = false;
-	private static int nbNode = lotOfNodes ? 1000 : 40;
+	public static final boolean lotOfNodes = true;
+	private static int nbNode = lotOfNodes ? 300 : 40;
 	public static int refreshInfoRate = 10;
 	public static boolean memeCanBeReplaceByCategory = true;
 	public final static int semiAutoWaitingTime = 3000;
