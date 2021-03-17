@@ -55,7 +55,6 @@ public class DrawerGraphStream extends StatAndPlotGeneric implements Interfaces.
 
 	FileSinkImages fs;
 
-
 	/** Permet de transmettre l'instance du graph.
 	 *
 	 * @param thisgraph

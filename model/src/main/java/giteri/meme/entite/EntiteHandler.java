@@ -1056,6 +1056,7 @@ public class EntiteHandler extends ThreadHandler implements INbNodeChangedListen
 	 * Génère les memes disponibles sur la map, qui seront associés ou non aux
 	 * entités. Ajouté directement dans la liste des memes dispos du memeHandler
 	 * TODO [WayPoint] - Génération des memes disponibles sur la map
+	 * TODO [Demo] - Génération des memes disponibles sur la map
 	 *
 	 */
 	@SuppressWarnings("UnusedAssignment")
